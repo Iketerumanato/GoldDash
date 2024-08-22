@@ -3,6 +3,9 @@ using Unity.VisualScripting;
 
 public class CameraControll : MonoBehaviour
 {
+    [Header("カメラ操作用のジョイスティック")]
+    [SerializeField] DynamicJoystick dynamicjoystick;
+
     [Header("プレイヤーのオブジェクト")]
     [SerializeField] GameObject playerBody;
 
