@@ -44,12 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50d9f1b68a0d38b46b95f118fd322501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  availabMagics:
-  - {fileID: 11400000, guid: 31f6aa7182e60f7498f39ca509bbfa03, type: 2}
-  - {fileID: 11400000, guid: ab4054b20d3308e459a06aa50c739576, type: 2}
-  - {fileID: 0}
+  availabMagics: []
   MagicButtons:
-  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
