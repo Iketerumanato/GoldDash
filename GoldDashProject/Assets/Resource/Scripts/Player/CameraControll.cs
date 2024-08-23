@@ -26,6 +26,17 @@ public class CameraControll : MonoBehaviour
     readonly float CamNeer = 0.1f;
     readonly float CamFar = 1000f;
 
+    public static CameraControll _cameracontrollIns { get; private set; }
+    private void Awake()
+    {
+        if (_cameracontrollIns != null && _cameracontrollIns != this) Destroy(gameObject);
+        else
+        {
+            _cameracontrollIns = this;
+            DontDestroyOnLoad(gameObject);
+        }
+    }
+
     #region ÉQÅ[ÉÄãNìÆéûïKÇ∏åƒÇŒÇÍÇÈ
     private void Start()
     {
@@ -68,4 +79,16 @@ public class CameraControll : MonoBehaviour
         playerBody.transform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
     }
     #endregion
+
+    public void OffCamera()
+    {
+        this.enabled = false;
+        cameramoveJoystick.enabled = false;
+    }
+
+    public void ActiveCamera()
+    {
+        this.enabled = true;
+        cameramoveJoystick.enabled = true;
+    }
 }

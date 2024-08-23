@@ -20,6 +20,7 @@ public class Player : MonoBehaviour
     //private float verticalInput;
 
     [SerializeField] DrawCircle drawCircle;
+    [SerializeField] CameraControll cameraControll;
 
     public VariableJoystick variableJoystick;
     private Vector3 inputVector;
