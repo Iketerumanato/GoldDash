@@ -34,26 +34,16 @@ public class Player : MonoBehaviour
     }
     #endregion
 
-    private void Update()
+    private void FixedUpdate()
     {
 
         //verticalInput = Input.GetAxis("Vertical"); // W/S または 上下矢印キー
 
-        // ローカルプレイヤーの場合のみジョイスティックの入力を取得
-        float horizontal = variableJoystick.Horizontal;
-        float vertical = variableJoystick.Vertical;
-        // 入力ベクトルを更新
-        inputVector = new Vector3(horizontal, 0, vertical);
+        // 移動
         MovePlayerJoystick(inputVector);
 
         // ジャンプ
         if (Input.GetKey(KeyCode.Space)) Jump();
-    }
-
-    private void FixedUpdate()
-    {
-        // プレイヤーを移動
-        //Move(verticalInput);
 
         // 落下時のリスポーン
         if (transform.position.y < fallThreshold) PlayerRespawn();
@@ -67,8 +57,9 @@ public class Player : MonoBehaviour
     #region プレイヤーの操作と落下
     private void MovePlayerJoystick(Vector3 input)
     {
-        Vector3 move = input * moveSpeed * Time.deltaTime;
-        transform.Translate(move, Space.World);
+        // 移動
+        input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
+        transform.position += moveSpeed * Time.deltaTime * input;
     }
 
     //void Move(float vertical)
