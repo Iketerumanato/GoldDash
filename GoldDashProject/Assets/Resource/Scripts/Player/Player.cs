@@ -17,12 +17,12 @@ public class Player : MonoBehaviour
 
     private Rigidbody rig;
 
-    private float verticalInput;
+    //private float verticalInput;
 
     [SerializeField] DrawCircle drawCircle;
 
-    //public VariableJoystick variableJoystick;
-    //private Vector3 inputVector;
+    public VariableJoystick variableJoystick;
+    private Vector3 inputVector;
 
     #region ゲーム起動時必ず呼ばれる
     void Start()
@@ -34,27 +34,16 @@ public class Player : MonoBehaviour
     }
     #endregion
 
-    private void Update()
+    private void FixedUpdate()
     {
 
-        verticalInput = Input.GetAxis("Vertical"); // W/S または 上下矢印キー
+        //verticalInput = Input.GetAxis("Vertical"); // W/S または 上下矢印キー
 
-        // ローカルプレイヤーの場合のみジョイスティックの入力を取得
-        //float horizontal = variableJoystick.Horizontal;
-        //float vertical = variableJoystick.Vertical;
-        //// 入力ベクトルを更新
-        //inputVector = new Vector3(horizontal, 0, vertical);
-        //// サーバーに入力値を送信
-        //CmdSendInput(inputVector);
+        // 移動
+        MovePlayerJoystick(inputVector);
 
         // ジャンプ
         if (Input.GetKey(KeyCode.Space)) Jump();
-    }
-
-    private void FixedUpdate()
-    {
-        // プレイヤーを移動
-        Move(verticalInput);
 
         // 落下時のリスポーン
         if (transform.position.y < fallThreshold) PlayerRespawn();
@@ -66,29 +55,22 @@ public class Player : MonoBehaviour
     }
 
     #region プレイヤーの操作と落下
-    //[Command]
-    //void CmdSendInput(Vector3 input)
-    //{
-    //    // サーバー側で入力ベクトルを更新
-    //    RPCMovePlayer(input);
-    //    Debug.Log("Player is Moving : " + input);
-    //}
-    //[ClientRpc]
-    //private void RPCMovePlayer(Vector3 input)
-    //{
-    //    Vector3 move = input * moveSpeed * Time.deltaTime;
-    //    transform.Translate(move, Space.World);
-    //}
-
-    void Move(float vertical)
+    private void MovePlayerJoystick(Vector3 input)
     {
-        // WASDキーの入力に基づく移動
-        Vector3 moveDirection = new Vector3(0, 0, vertical).normalized;
-        moveDirection = transform.TransformDirection(moveDirection);
-
-        // AddForce で移動
-        rig.AddForce(moveDirection * moveSpeed, ForceMode.VelocityChange);
+        // 移動
+        input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
+        transform.position += moveSpeed * Time.deltaTime * input;
     }
+
+    //void Move(float vertical)
+    //{
+    //    // WASDキーの入力に基づく移動
+    //    Vector3 moveDirection = new Vector3(0, 0, vertical).normalized;
+    //    moveDirection = transform.TransformDirection(moveDirection);
+
+    //    // AddForce で移動
+    //    rig.AddForce(moveDirection * moveSpeed, ForceMode.VelocityChange);
+    //}
 
     private void Jump()
     {

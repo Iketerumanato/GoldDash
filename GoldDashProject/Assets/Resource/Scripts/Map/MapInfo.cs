@@ -16,6 +16,7 @@ public class MapInfo : MonoBehaviour
     [SerializeField] GameObject doorObj;
     [SerializeField] GameObject chestObj;
     [SerializeField] GameObject respawnObj;
+    [SerializeField] GameObject Player;
 
     //組み合わせるマップパーツの数。4つ。
     const int NUM_OF_PARTS = 4;
@@ -41,6 +42,9 @@ public class MapInfo : MonoBehaviour
             Resources.Load("MapPart14") as TextAsset};
 
         map = MergeMap(textAsset_array);
+
+        // Playerが生成される位置を格納する変数
+        Vector3 playerSpawnPosition = Vector3.zero;
 
         //TODO
         //廊下を生成()
@@ -137,10 +141,18 @@ public class MapInfo : MonoBehaviour
                 {
                     GameObject respawn = Instantiate(respawnObj, new Vector3(i + 0.5f, 0.4f, j + 0.5f), Quaternion.identity);
                     respawn.transform.parent = stageParent;
+
+                    // Playerがスポーンする位置を保存
+                    playerSpawnPosition = respawn.transform.position;
                 }
             }
         }
-        
+
+        // Playerをスポーン位置に生成
+        if (playerSpawnPosition != Vector3.zero)
+        {
+            Instantiate(Player, playerSpawnPosition, Quaternion.identity);
+        }
     }
 
     //ランダム抽選用
@@ -160,12 +172,12 @@ public class MapInfo : MonoBehaviour
 
         //重複なしでTextAssetを4つ取り出して配列に格納する
         for (int i = 0; i < size; i++)
-        { 
+        {
             int index = UnityEngine.Random.Range(0, csvMap_List.Count);
             ret[i] = csvMap_List[index];
             csvMap_List.RemoveAt(index);
         }
-        
+
         //返却
         return ret;
     }
@@ -299,7 +311,7 @@ public class MapInfo : MonoBehaviour
 
                     //頭文字をスキップ
                     cellReader.Read();
-                    
+
                     //1文字目から順に読んで変数に代入
                     cellInfo.wallLeft = (CellInfo.WALL_TYPE)(ConvertASCIIToInt(cellReader.Read()));
                     cellInfo.wallRight = (CellInfo.WALL_TYPE)(ConvertASCIIToInt(cellReader.Read()));
@@ -312,7 +324,7 @@ public class MapInfo : MonoBehaviour
                     cellInfo.spawnPlayer = Convert.ToBoolean(ConvertASCIIToInt(cellReader.Read()));
 
                     //返却用配列に書き込む
-                    ret[i,j] = cellInfo;
+                    ret[i, j] = cellInfo;
 
                     //Debug.Log(i + "," + j);
                 }
@@ -366,7 +378,7 @@ public class MapInfo : MonoBehaviour
             //書き換えが終わったら返却する
             return ret;
         }
-        
+
         return ret;
     }
 

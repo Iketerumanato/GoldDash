@@ -34,8 +34,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -2.4998, y: 0.000061035}
+  m_SizeDelta: {x: -4.9998, y: 0.00012207}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3171934088663613618
 CanvasRenderer:
@@ -52,7 +52,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2284531435540352603}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -459,10 +459,10 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8912705162608257862}
   - {fileID: 6402744300203196290}
-  - {fileID: 4984135033699913627}
+  - {fileID: 8912705162608257862}
   - {fileID: 6606033135620032349}
+  - {fileID: 4984135033699913627}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -560,7 +560,7 @@ MonoBehaviour:
   canvasGroup: {fileID: 8267297367050192293}
   panelImage: {fileID: 9012927982130975408}
   fadeDuration: 1
-  Panel: {fileID: 2284531435540352603}
+  drawcircle: {fileID: 0}
 --- !u!114 &569184305296409015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -574,6 +574,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   drawPanel: {fileID: 6402744300203196290}
+  _magicmanagement: {fileID: 0}
 --- !u!1 &4014388806320427249
 GameObject:
   m_ObjectHideFlags: 0
@@ -1026,7 +1027,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -383, y: -354}
+  m_AnchoredPosition: {x: -412, y: -326}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &7197300901408540611
