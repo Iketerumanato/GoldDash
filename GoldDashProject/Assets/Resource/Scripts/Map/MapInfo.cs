@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class MapInfo : MonoBehaviour
 {
+    public bool IsNetwork = false;//true = Server/false = Client
+
     // 親オブジェクト
     [SerializeField] Transform stageParent;
 
@@ -149,7 +151,7 @@ public class MapInfo : MonoBehaviour
         }
 
         // Playerをスポーン位置に生成
-        if (playerSpawnPosition != Vector3.zero)
+        if (playerSpawnPosition != Vector3.zero && !IsNetwork)
         {
             Instantiate(Player, playerSpawnPosition, Quaternion.identity);
         }

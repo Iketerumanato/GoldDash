@@ -67,6 +67,7 @@ public class DrawCircle : MonoBehaviour
                     {
                         Debug.Log("ïÛî†ÉIÅ[ÉvÉì");
                         CanvasFade._canvusfadeIns.FadeOutImage();
+                        CameraControll._cameracontrollIns.ActiveCamera();
                         magicList.GrantRandomMagics(_magicmanagement);
                         circleCount = 0;
                     }
