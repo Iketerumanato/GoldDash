@@ -4,16 +4,33 @@ using UnityEngine;
 public class Fire : MagicInfo
 {
     [SerializeField] int AttackPoint;
-    public GameObject fireballPrefab; // íeÇÃPrefab
-    public float fireballSpeed = 10f; // íeÇÃë¨ìx
+    [SerializeField] GameObject fireballPrefab; // íeÇÃPrefab
+    [SerializeField] float fireballSpeed = 10f; // íeÇÃë¨ìx
+
+    [SerializeField] float DestroyTime = 1f;
 
     public override void CastMagic(Vector3 position, Quaternion rotation)
     {
         if (UsageCount >= 0) UsageCount--;
-        //Player.Instance.TakeDamage(AttackPoint);
+        //É_ÉÅÅ[ÉWèàóùÇÕÇ±Ç±
         GameObject fireball = Instantiate(fireballPrefab, position, rotation);
         Rigidbody rb = fireball.GetComponent<Rigidbody>();
         rb.velocity = rotation * Vector3.forward * fireballSpeed;
         Debug.Log("âäÇî≠éÀ");
+        DestroyObj(ref fireball, DestroyTime);
+    }
+
+    void DestroyObj<T>(ref T obj, float time = 0) where T : Object
+    {
+        if (obj != null)
+        {
+#if UNITY_EDITOR
+            if (Application.isPlaying) Object.Destroy(obj, time);
+            else Object.DestroyImmediate(obj);
+#else
+        Object.Destroy(obj, t);
+#endif
+            obj = null;
+        }
     }
 }
