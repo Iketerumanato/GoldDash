@@ -37,7 +37,6 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-
         //verticalInput = Input.GetAxis("Vertical"); // W/S または 上下矢印キー
 
         // 移動
@@ -100,18 +99,5 @@ public class Player : MonoBehaviour
         transform.position = initialSpawnPosition;
         Debug.Log("RpcRespawn called on client");
     }
-    #endregion
-
-    #region キャンバスの生成
-    //[Command]
-    //void CmdCanvasIns()
-    //{
-    //    RPCCanvusIns();
-    //}
-    //[ClientRpc]
-    //void RPCCanvusIns()
-    //{
-    //    Instantiate(PlayerCanvas);
-    //}
     #endregion
 }

@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: Magic_Thunder
   m_EditorClassIdentifier: 
   MagicName: "\u30B5\u30F3\u30C0\u30FC"
-  UsageCount: 3
+  UsageCount: 1
   AttackPoint: 0
   thunderPrehab: {fileID: 4934584247018614022, guid: 337e11b0c956de04aa458b14655b1450, type: 3}
-  fadeDuration: 2
-  fallPos: {x: 9.5, y: 1, z: 9.5}
-  DestroyTime: 1
+  fallPos: {x: 18.49963, y: 0.264, z: 17.50019}
+  DestroyTime: 3

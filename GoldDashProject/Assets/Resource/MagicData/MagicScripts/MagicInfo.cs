@@ -16,4 +16,18 @@ public class MagicInfo : ScriptableObject
     {
         return;
     }
+
+    public void DestroyObj<T>(ref T obj, float time = 0) where T : Object
+    {
+        if (obj != null)
+        {
+#if UNITY_EDITOR
+            if (Application.isPlaying) Object.Destroy(obj, time);
+            else Object.DestroyImmediate(obj);
+#else
+            Object.Destroy(obj, time);
+#endif
+            obj = null;
+        }
+    }
 }
