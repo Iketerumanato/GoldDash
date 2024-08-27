@@ -42,6 +42,7 @@ public class CameraControll : MonoBehaviour
     {
         cameramoveJoystick = FindObjectOfType<DynamicJoystick>();
         PlayerCamera = new GameObject("PlayerCamera").AddComponent<Camera>();
+        PlayerCamera.tag = "MainCamera";
         PlayerCamera.AddComponent<CamTest>();
         SetClippingPlanes(CamNeer, CamFar);
         PlayerCamera.transform.SetParent(transform);

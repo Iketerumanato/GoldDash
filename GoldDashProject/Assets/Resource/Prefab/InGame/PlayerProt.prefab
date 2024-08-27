@@ -271,6 +271,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4430109752086799490, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
   m_PrefabInstance: {fileID: 499522233538966327}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6451797705516629175 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6874686588614365056, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
+  m_PrefabInstance: {fileID: 499522233538966327}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba0d0e7a039f526499c356a3c5cd6d3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &6842585365485359769 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6348694426792321454, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
@@ -330,11 +341,11 @@ PrefabInstance:
     - target: {fileID: 3914094888245212085, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
       propertyPath: availabMagics.Array.data[1]
       value: 
-      objectReference: {fileID: 11400000, guid: 2edc7ec1fa3508c4c9ade2f7d14e6015, type: 2}
+      objectReference: {fileID: 11400000, guid: ab4054b20d3308e459a06aa50c739576, type: 2}
     - target: {fileID: 3914094888245212085, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
       propertyPath: availabMagics.Array.data[2]
       value: 
-      objectReference: {fileID: 11400000, guid: 65fa21c3f07e3414c8a92ffa578c90d5, type: 2}
+      objectReference: {fileID: 11400000, guid: ab4054b20d3308e459a06aa50c739576, type: 2}
     - target: {fileID: 3914094888245212085, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
       propertyPath: availabMagics.Array.data[3]
       value: 
@@ -645,7 +656,7 @@ MonoBehaviour:
   maxPlayerHP: 10
   fallThreshold: -10
   drawCircle: {fileID: 74466413822374528}
-  cameraControll: {fileID: 0}
+  cameraControll: {fileID: 5333032087004986904}
   variableJoystick: {fileID: 9154391625030011372}
 --- !u!114 &5333032087004986904
 MonoBehaviour:
@@ -660,7 +671,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerBody: {fileID: 5880924705522823218}
-  cameramoveJoystick: {fileID: 0}
+  cameramoveJoystick: {fileID: 6451797705516629175}
   joystickSensitivity: 100
   cameraOffset: {x: 0, y: 0.7, z: 0.4}
   CamXMaxClanpRot: 90
