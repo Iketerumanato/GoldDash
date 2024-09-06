@@ -17,6 +17,7 @@ public class MagicInfo : ScriptableObject
         return;
     }
 
+    //‰½‚©‚µ‚ç‚ğ¶¬‚µ‚½ê‡‚Í‚±‚¿‚ç‚Å”jŠü
     public void DestroyObj<T>(ref T obj, float time = 0) where T : Object
     {
         if (obj != null)

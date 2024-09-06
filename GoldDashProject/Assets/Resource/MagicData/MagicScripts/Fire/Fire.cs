@@ -15,7 +15,6 @@ public class Fire : MagicInfo
         GameObject fireball = Instantiate(fireballPrefab, position, rotation);
         Rigidbody rb = fireball.GetComponent<Rigidbody>();
         rb.velocity = rotation * Vector3.forward * fireballSpeed;
-        Debug.Log("‰Š‚ð”­ŽË");
         DestroyObj(ref fireball, DestroyTime);
     }
 }

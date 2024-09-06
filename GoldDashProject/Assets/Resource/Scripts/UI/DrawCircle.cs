@@ -3,6 +3,12 @@ using System.Collections.Generic;
 
 public class DrawCircle : MonoBehaviour
 {
+    [SerializeField] RectTransform drawPanel;
+    [SerializeField] MagicManagement _magicmanagement;
+    [SerializeField] CameraControll cameraControll;
+    UIFade uiFade;
+    MagicList magicList;
+
     readonly private List<Vector2> drawpoints = new();
     private Vector2 center = Vector2.zero;
     private float angleSum = 0;
@@ -11,15 +17,10 @@ public class DrawCircle : MonoBehaviour
     const int MaxDrawCount = 5;
     const int NoneNum = 0;
 
-    [SerializeField] RectTransform drawPanel;
-
-    MagicList magicList;
-
-    [SerializeField] MagicManagement _magicmanagement;
-
     private void Start()
     {
         magicList = FindObjectOfType<MagicList>();
+        uiFade = this.gameObject.GetComponent<UIFade>();
     }
 
     void Update()
@@ -68,8 +69,8 @@ public class DrawCircle : MonoBehaviour
                     if (circleCount == MaxDrawCount)
                     {
                         Debug.Log("ïÛî†ÉIÅ[ÉvÉì");
-                        CanvasFade._canvusfadeIns.FadeOutImage();
-                        CameraControll._cameracontrollIns.ActiveCamera();
+                        uiFade.FadeOutImage();
+                        cameraControll.ActiveCameraControll();
                         magicList.GrantRandomMagics(_magicmanagement);
                         circleCount = 0;
                     }

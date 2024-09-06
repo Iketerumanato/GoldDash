@@ -49,11 +49,6 @@ public class Player : MonoBehaviour
         if (transform.position.y < fallThreshold) PlayerRespawn();
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Tresure")) drawCircle.enabled = true;
-    }
-
     #region ƒvƒŒƒCƒ„[‚Ì‘€ì‚Æ—Ž‰º
     private void MovePlayerJoystick(Vector3 input)
     {
@@ -100,4 +95,9 @@ public class Player : MonoBehaviour
         Debug.Log("RpcRespawn called on client");
     }
     #endregion
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Tresure")) drawCircle.enabled = true;
+    }
 }

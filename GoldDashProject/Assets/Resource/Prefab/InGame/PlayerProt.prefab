@@ -13,6 +13,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 74466413822374528}
     - target: {fileID: 92082205371730832, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
+      propertyPath: drawCircle
+      value: 
+      objectReference: {fileID: 74466413822374528}
+    - target: {fileID: 92082205371730832, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
       propertyPath: drawcircle
       value: 
       objectReference: {fileID: 74466413822374528}
@@ -21,9 +25,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8192705780347656187}
     - target: {fileID: 569184305296409015, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
+      propertyPath: uiFade
+      value: 
+      objectReference: {fileID: 552126996649277607}
+    - target: {fileID: 569184305296409015, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 569184305296409015, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
+      propertyPath: cameraControll
+      value: 
+      objectReference: {fileID: 5333032087004986904}
     - target: {fileID: 569184305296409015, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
       propertyPath: _magicmanagement
       value: 
@@ -256,6 +268,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd8289a195b126e46ba4b7f1b83c426f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &552126996649277607 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 92082205371730832, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
+  m_PrefabInstance: {fileID: 499522233538966327}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4880b5e27dbd73c4b823595ed66d8877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2437338262640705032 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2827560105566096703, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
@@ -316,7 +339,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3914094888245212085, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
       propertyPath: availabMagics.Array.size
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3914094888245212085, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
       propertyPath: MagicButtons.Array.data[0]
@@ -341,7 +364,7 @@ PrefabInstance:
     - target: {fileID: 3914094888245212085, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
       propertyPath: availabMagics.Array.data[1]
       value: 
-      objectReference: {fileID: 11400000, guid: ab4054b20d3308e459a06aa50c739576, type: 2}
+      objectReference: {fileID: 11400000, guid: 31f6aa7182e60f7498f39ca509bbfa03, type: 2}
     - target: {fileID: 3914094888245212085, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
       propertyPath: availabMagics.Array.data[2]
       value: 
@@ -677,6 +700,7 @@ MonoBehaviour:
   CamXMaxClanpRot: 90
   CamXMinClanpRot: -90
   rotateSpeed: 100
+  ChecklightObj: {fileID: 5092620170585947546, guid: 337e11b0c956de04aa458b14655b1450, type: 3}
 --- !u!54 &6720886867277296009
 Rigidbody:
   m_ObjectHideFlags: 0

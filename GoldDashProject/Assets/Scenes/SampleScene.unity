@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsNetwork: 0
-  stageParent: {fileID: 438655900}
+  Parenttransform: {fileID: 438655900}
   floorObj: {fileID: 6506074169082892065, guid: 654ef1ba9ef1cc141b22e805380d48d9, type: 3}
   wallObj: {fileID: 3201486429960166728, guid: b794f629a45a4254b961bba1d1d9b8c5, type: 3}
   doorObj: {fileID: 6386287164377620441, guid: 52aff7cf64cbca04b8caaa2a5c88e2c0, type: 3}
@@ -188,7 +188,7 @@ GameObject:
   - component: {fileID: 447059881}
   m_Layer: 0
   m_Name: ServerCamera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -446,7 +446,7 @@ GameObject:
   - component: {fileID: 943504890}
   m_Layer: 0
   m_Name: MagicList
-  m_TagString: Untagged
+  m_TagString: MagicList
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
