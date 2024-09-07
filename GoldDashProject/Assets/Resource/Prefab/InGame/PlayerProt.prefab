@@ -339,7 +339,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3914094888245212085, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
       propertyPath: availabMagics.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3914094888245212085, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
       propertyPath: MagicButtons.Array.data[0]
@@ -700,7 +700,6 @@ MonoBehaviour:
   CamXMaxClanpRot: 90
   CamXMinClanpRot: -90
   rotateSpeed: 100
-  ChecklightObj: {fileID: 5092620170585947546, guid: 337e11b0c956de04aa458b14655b1450, type: 3}
 --- !u!54 &6720886867277296009
 Rigidbody:
   m_ObjectHideFlags: 0
