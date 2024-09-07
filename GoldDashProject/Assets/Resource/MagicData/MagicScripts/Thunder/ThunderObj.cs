@@ -1,31 +1,28 @@
-using System.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class ThunderObj : MonoBehaviour
 {
     [SerializeField] float fadeDuration = 2f; // フラッシュの減少時間
     [SerializeField] Light FlashLightPrefab;
     [SerializeField] GameObject FlashImagePrefab;
-    private Camera mainCamera;
+    Camera mainCamera;
+    CancellationTokenSource cancellationToken;
 
     private void Start()
     {
         // メインカメラの取得
         mainCamera = Camera.main;
+        cancellationToken = new CancellationTokenSource();
 
         // ライトがカメラの視界にあるかをチェック
-        if (IsInCameraView(transform.position, mainCamera) && mainCamera != null)
-        {
-            Debug.Log("ライトはカメラの視界にあります");
-            GameObject flashInstance = Instantiate(FlashImagePrefab);
-            flashInstance.transform.SetParent(this.transform, false);
-        }
-        else Debug.Log("ライトはカメラの視界にありません");
+        if (IsInCameraView(transform.position, mainCamera) && mainCamera != null) FlashImagePrefab.SetActive(true);
 
-        FadeOutLightAsync(FlashLightPrefab, fadeDuration);
+        FadeOutLightAsync(FlashLightPrefab, fadeDuration, cancellationToken.Token).Forget();
     }
 
-    public async void FadeOutLightAsync(Light light, float duration)
+    private async UniTask FadeOutLightAsync(Light light, float duration, CancellationToken token)
     {
         // フェードアウト処理
         float startIntensity = light.intensity;
@@ -35,7 +32,7 @@ public class ThunderObj : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             light.intensity = Mathf.Lerp(startIntensity, 0, elapsedTime / duration);
-            await Task.Yield();
+            await UniTask.Yield(token);
         }
     }
 
@@ -48,5 +45,11 @@ public class ThunderObj : MonoBehaviour
         return (screenPoint.x >= 0 && screenPoint.x <= 1 &&
                 screenPoint.y >= 0 && screenPoint.y <= 1 &&
                 screenPoint.z > 0); // z > 0 はカメラの前にあることを確認
+    }
+
+    //破壊時にUniTaskをキャンセル
+    private void OnDestroy()
+    {
+        cancellationToken.Cancel();
     }
 }
