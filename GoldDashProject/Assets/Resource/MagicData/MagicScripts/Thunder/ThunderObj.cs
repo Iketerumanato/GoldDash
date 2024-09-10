@@ -36,10 +36,10 @@ public class ThunderObj : MonoBehaviour
         }
     }
 
-    private bool IsInCameraView(Vector3 position, Camera camera)
+    private bool IsInCameraView(Vector3 targetposition, Camera playercamera)
     {
         // ワールド座標からスクリーン座標に変換
-        Vector3 screenPoint = camera.WorldToViewportPoint(position);
+        Vector3 screenPoint = playercamera.WorldToViewportPoint(targetposition);
 
         // スクリーン座標が0から1の範囲内にあるかをチェック
         return (screenPoint.x >= 0 && screenPoint.x <= 1 &&
