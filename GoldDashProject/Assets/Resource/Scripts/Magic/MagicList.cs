@@ -13,7 +13,7 @@ public class MagicList : MonoBehaviour
         List<MagicInfo> selectedMagics = new();
 
         // 一時リストを作成してランダムに魔法を選ぶ
-        List<MagicInfo> tempMagicList = new List<MagicInfo>(storedMagics);
+        List<MagicInfo> tempMagicList = new(storedMagics);
 
         for (int MagicCnt = 0; MagicCnt < magicSelectionCount && tempMagicList.Count > 0; MagicCnt++)
         {

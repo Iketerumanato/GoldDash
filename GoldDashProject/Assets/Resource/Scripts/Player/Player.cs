@@ -37,7 +37,6 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-
         //verticalInput = Input.GetAxis("Vertical"); // W/S または 上下矢印キー
 
         // 移動
@@ -48,11 +47,6 @@ public class Player : MonoBehaviour
 
         // 落下時のリスポーン
         if (transform.position.y < fallThreshold) PlayerRespawn();
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Tresure")) drawCircle.enabled = true;
     }
 
     #region プレイヤーの操作と落下
@@ -102,16 +96,8 @@ public class Player : MonoBehaviour
     }
     #endregion
 
-    #region キャンバスの生成
-    //[Command]
-    //void CmdCanvasIns()
-    //{
-    //    RPCCanvusIns();
-    //}
-    //[ClientRpc]
-    //void RPCCanvusIns()
-    //{
-    //    Instantiate(PlayerCanvas);
-    //}
-    #endregion
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Tresure")) drawCircle.enabled = true;
+    }
 }

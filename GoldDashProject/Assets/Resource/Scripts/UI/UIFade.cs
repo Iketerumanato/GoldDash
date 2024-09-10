@@ -1,34 +1,28 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
-public class CanvasFade : MonoBehaviour
+public class UIFade : MonoBehaviour
 {
     [SerializeField] CanvasGroup canvasGroup;
     [SerializeField] Image panelImage;
-    [SerializeField] float fadeDuration = 1.0f;//フェードする速さ
-    [SerializeField] DrawCircle drawcircle;
+    [SerializeField] float fadeDuration;
+    DrawCircle drawCircle;
 
-    public static CanvasFade _canvusfadeIns { get; private set; }
-    private void Awake()
+    private void Start()
     {
-        if (_canvusfadeIns != null && _canvusfadeIns != this) Destroy(gameObject);
-        else
-        {
-            _canvusfadeIns = this;
-            DontDestroyOnLoad(gameObject);
-        }
+        drawCircle = this.gameObject.GetComponent<DrawCircle>();
     }
 
     #region フェードインメソッド
     public void FadeInCanvasGroup()
     {
-        StartCoroutine(ActiveCanvus());
+        StartCoroutine(ActiveCanvas());
         StartCoroutine(FadeCanvasGroup(canvasGroup, canvasGroup.alpha, 1, fadeDuration));
     }
     public void FadeInImage()
     {
-        StartCoroutine(ActiveCanvus());
+        StartCoroutine(ActiveCanvas());
         StartCoroutine(FadeImage(panelImage, 0f, 0.5f, fadeDuration));
     }
     #endregion
@@ -37,16 +31,17 @@ public class CanvasFade : MonoBehaviour
     public void FadeOutCanvasGroup()
     {
         StartCoroutine(FadeCanvasGroup(canvasGroup, canvasGroup.alpha, 0, fadeDuration));
-        StartCoroutine(NotActiveCanvus());
+        StartCoroutine(NotActiveCanvas());
     }
     public void FadeOutImage()
     {
-        StartCoroutine(FadeImage(panelImage, 0.5f, 0f, fadeDuration));
-        StartCoroutine(NotActiveCanvus());
+        StartCoroutine(FadeImage(panelImage, panelImage.color.a, 0f, fadeDuration));
+        StartCoroutine(NotActiveCanvas());
     }
     #endregion
 
     #region フェードさせるコルーチン
+    //キャンバス
     private IEnumerator FadeCanvasGroup(CanvasGroup cg, float start, float end, float duration)
     {
         float elapsedTime = 0f;
@@ -58,7 +53,7 @@ public class CanvasFade : MonoBehaviour
         }
         cg.alpha = end;
     }
-
+    //画像
     private IEnumerator FadeImage(Image image, float startalpha, float endalpha, float duration)
     {
         Color color = image.color;
@@ -75,19 +70,19 @@ public class CanvasFade : MonoBehaviour
     }
     #endregion
 
-    #region Active true/false
-    IEnumerator ActiveCanvus()
+    #region CanvasActive true/false
+    IEnumerator ActiveCanvas()
     {
         panelImage.enabled = true;
-        drawcircle.enabled = true;
+        drawCircle.enabled = true;
         yield return new WaitForSeconds(fadeDuration);
     }
 
-    IEnumerator NotActiveCanvus()
+    IEnumerator NotActiveCanvas()
     {
         yield return new WaitForSeconds(fadeDuration);
         panelImage.enabled = false;
-        drawcircle.enabled = false;
+        drawCircle.enabled = false;
     }
     #endregion
 }

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3171934088663613618}
   - component: {fileID: 9012927982130975408}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: TresurePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -560,7 +560,6 @@ MonoBehaviour:
   canvasGroup: {fileID: 8267297367050192293}
   panelImage: {fileID: 9012927982130975408}
   fadeDuration: 1
-  drawcircle: {fileID: 0}
 --- !u!114 &569184305296409015
 MonoBehaviour:
   m_ObjectHideFlags: 0

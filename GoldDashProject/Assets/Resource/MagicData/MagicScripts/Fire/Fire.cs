@@ -4,16 +4,17 @@ using UnityEngine;
 public class Fire : MagicInfo
 {
     [SerializeField] int AttackPoint;
-    public GameObject fireballPrefab; // 弾のPrefab
-    public float fireballSpeed = 10f; // 弾の速度
+    [SerializeField] GameObject fireballPrefab; 
+    [SerializeField] float fireballSpeed = 10f;
+    [SerializeField] float DestroyTime = 1f;
 
     public override void CastMagic(Vector3 position, Quaternion rotation)
     {
         if (UsageCount >= 0) UsageCount--;
-        //Player.Instance.TakeDamage(AttackPoint);
+        //ダメージ処理はここ
         GameObject fireball = Instantiate(fireballPrefab, position, rotation);
         Rigidbody rb = fireball.GetComponent<Rigidbody>();
         rb.velocity = rotation * Vector3.forward * fireballSpeed;
-        Debug.Log("炎を発射");
+        DestroyObj(ref fireball, DestroyTime);
     }
 }

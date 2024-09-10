@@ -26,36 +26,9 @@ public class CameraControll : MonoBehaviour
     readonly float CamNeer = 0.1f;
     readonly float CamFar = 1000f;
 
-    public static CameraControll _cameracontrollIns { get; private set; }
-    private void Awake()
-    {
-        if (_cameracontrollIns != null && _cameracontrollIns != this) Destroy(gameObject);
-        else
-        {
-            _cameracontrollIns = this;
-            DontDestroyOnLoad(gameObject);
-        }
-    }
-
-    #region ゲーム起動時必ず呼ばれる
     private void Start()
     {
-        cameramoveJoystick = FindObjectOfType<DynamicJoystick>();
-        PlayerCamera = new GameObject("PlayerCamera").AddComponent<Camera>();
-        PlayerCamera.AddComponent<CamTest>();
-        SetClippingPlanes(CamNeer, CamFar);
-        PlayerCamera.transform.SetParent(transform);
-        PlayerCamera.transform.localPosition = cameraOffset;
-    }
-    #endregion
-
-    void SetClippingPlanes(float near, float far)
-    {
-        if (PlayerCamera != null)
-        {
-            PlayerCamera.nearClipPlane = near;
-            PlayerCamera.farClipPlane = far;
-        }
+        CreateCamera();
     }
 
     #region カメラの毎フレーム処理
@@ -80,15 +53,39 @@ public class CameraControll : MonoBehaviour
     }
     #endregion
 
-    public void OffCamera()
+    #region カメラの生成と設定
+    void CreateCamera()
     {
-        this.enabled = false;
-        cameramoveJoystick.enabled = false;
+        cameramoveJoystick = FindObjectOfType<DynamicJoystick>();
+        PlayerCamera = new GameObject("PlayerCamera").AddComponent<Camera>();
+        PlayerCamera.tag = "MainCamera";
+        PlayerCamera.AddComponent<CamTest>();
+        SetClippingPlanes(CamNeer, CamFar);
+        PlayerCamera.transform.SetParent(transform);
+        PlayerCamera.transform.localPosition = cameraOffset;
     }
 
-    public void ActiveCamera()
+    void SetClippingPlanes(float near, float far)
+    {
+        if (PlayerCamera != null)
+        {
+            PlayerCamera.nearClipPlane = near;
+            PlayerCamera.farClipPlane = far;
+        }
+    }
+    #endregion
+
+    #region CameraOn/Off
+    public void ActiveCameraControll()
     {
         this.enabled = true;
         cameramoveJoystick.enabled = true;
     }
+
+    public void OffCameraControll()
+    {
+        this.enabled = false;
+        cameramoveJoystick.enabled = false;
+    }
+    #endregion
 }

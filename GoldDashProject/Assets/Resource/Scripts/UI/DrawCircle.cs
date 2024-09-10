@@ -3,21 +3,24 @@ using System.Collections.Generic;
 
 public class DrawCircle : MonoBehaviour
 {
+    [SerializeField] RectTransform drawPanel;
+    [SerializeField] MagicManagement _magicmanagement;
+    [SerializeField] CameraControll cameraControll;
+    UIFade uiFade;
+    MagicList magicList;
+
     readonly private List<Vector2> drawpoints = new();
     private Vector2 center = Vector2.zero;
     private float angleSum = 0;
     private int circleCount = 0;
     private float previousSign = 0;
-
-    [SerializeField] RectTransform drawPanel;
-
-    MagicList magicList;
-
-    [SerializeField] MagicManagement _magicmanagement;
+    const int MaxDrawCount = 5;
+    const int NoneNum = 0;
 
     private void Start()
     {
         magicList = FindObjectOfType<MagicList>();
+        uiFade = this.gameObject.GetComponent<UIFade>();
     }
 
     void Update()
@@ -26,8 +29,8 @@ public class DrawCircle : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             drawpoints.Clear();
-            angleSum = 0;
-            previousSign = 0;
+            angleSum = NoneNum;
+            previousSign = NoneNum;
         }
 
         if (Input.GetMouseButton(0))
@@ -44,15 +47,15 @@ public class DrawCircle : MonoBehaviour
 
                 //中心点とクリックしたときの点とのなす角を求めて角度の変化方向をチェック
                 float sign = Mathf.Sign(Vector2.SignedAngle(drawpoints[drawpoints.Count - 2] - center, drawpoints[drawpoints.Count - 1] - center));
-                if (previousSign == 0)
+                if (previousSign == NoneNum)
                 {
                     previousSign = sign;
                 }
                 else if (sign != previousSign)
                 {
                     Debug.Log("角度の方向が逆転しました。カウントをリセットします");
-                    circleCount = 0;
-                    angleSum = 0;
+                    circleCount = NoneNum;
+                    angleSum = NoneNum;
                     previousSign = sign;
                 }
 
@@ -63,11 +66,11 @@ public class DrawCircle : MonoBehaviour
                     circleCount++;
                     angleSum -= 360f;
                     Debug.Log("円を一周しました！ 現在のカウント: " + circleCount);
-                    if (circleCount == 5)
+                    if (circleCount == MaxDrawCount)
                     {
                         Debug.Log("宝箱オープン");
-                        CanvasFade._canvusfadeIns.FadeOutImage();
-                        CameraControll._cameracontrollIns.ActiveCamera();
+                        uiFade.FadeOutImage();
+                        cameraControll.ActiveCameraControll();
                         magicList.GrantRandomMagics(_magicmanagement);
                         circleCount = 0;
                     }

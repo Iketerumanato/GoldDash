@@ -2,13 +2,21 @@ using UnityEngine;
 
 public class Tresure : MonoBehaviour
 {
+    private UIFade uiFade;
+    private CameraControll cameraControll;
+
+    private void Start()
+    {
+        uiFade = FindObjectOfType<UIFade>();
+        cameraControll = FindObjectOfType<CameraControll>();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
-        {           
-            CanvasFade._canvusfadeIns.FadeInImage();
-            CameraControll._cameracontrollIns.OffCamera();
-            //Debug.Log("Player‚ªÚG‚µ‚Ü‚µ‚½");
+        {
+            cameraControll.OffCameraControll();
+            uiFade.FadeInImage();
         }
     }
 
@@ -16,9 +24,8 @@ public class Tresure : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            CanvasFade._canvusfadeIns.FadeOutImage();
-            CameraControll._cameracontrollIns.ActiveCamera();
-            //Debug.Log("Player‚ª•ó” ‚Ì”ÍˆÍ‚ğo‚Ü‚µ‚½");
+            cameraControll.ActiveCameraControll();
+            uiFade.FadeOutImage();
         }
     }
 }
