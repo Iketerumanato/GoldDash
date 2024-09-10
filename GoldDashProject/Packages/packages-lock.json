@@ -7,6 +7,13 @@
       "dependencies": {},
       "hash": "9057452c86079e4265228480b1439442894d5078"
     },
+    "com.github-glitchenzo.nugetforunity": {
+      "version": "4.1.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
     "com.unity.ai.navigation": {
       "version": "1.1.5",
       "depth": 0,
