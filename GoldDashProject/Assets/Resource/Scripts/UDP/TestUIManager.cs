@@ -24,6 +24,6 @@ public class TestUIManager : MonoBehaviour
 
     private void Start()
     {
-        //buttonServerMode.OnClickAsObservable().Subscribe();
+        buttonServerMode.OnClickAsObservable().Subscribe();
     }
 }

@@ -1,0 +1,16 @@
+# 全ファイル共通設定
+[*]
+
+# 文字コード
+charset = utf-8
+# 改行コード
+end_of_line = crlf
+
+
+# C#ファイル用設定
+[*.cs]
+
+# インデント設定
+indent_size = 4
+indent_style = space
+tab_width = 4
