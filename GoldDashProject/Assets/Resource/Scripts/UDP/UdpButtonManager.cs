@@ -4,11 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using R3;
 
-public class UdpUIManager
-    : MonoBehaviour
+public class UdpButtonManager : MonoBehaviour
 {
     //subjectに乗せて通知を飛ばすためのenum
-    public enum UI_MANAGER_EVENT : byte
+    public enum UDP_BUTTON_EVENT : byte
     {
         BUTTON_START_SERVER_MODE,
         BUTTON_START_CLIENT_MODE,
@@ -38,19 +37,19 @@ public class UdpUIManager
     [SerializeField] private Button buttonQuitMode;
 
     //通知用subject
-    public Subject<UI_MANAGER_EVENT> udpUIManagerSubject;
+    public Subject<UDP_BUTTON_EVENT> udpUIManagerSubject;
 
     public void InitObservation()
     {
         //通知用にsubjectのインスタンス作成　外部から購読する
-        udpUIManagerSubject = new Subject<UI_MANAGER_EVENT>();
+        udpUIManagerSubject = new Subject<UDP_BUTTON_EVENT>();
 
         //ボタンクリック時にSubscribe(関数名)で指定された関数を実行できる
         //Subscribeの引数はラムダ式でよいのだが、()=>と書くとエラー。
         //Subscribeの引数にラムダ式を取ることは本来できないのだが、ObservableSubscribeExtensionsというドキュメントの中で
         //引数にAction型を取るオーバーロードが定義されている。ここで、()=>でなく_=>と書くことで引数が明示的にAction型になるので、オーバーロードが参照されるようになる。
-        buttonServerMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UI_MANAGER_EVENT.BUTTON_START_SERVER_MODE));
-        buttonClientMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UI_MANAGER_EVENT.BUTTON_START_CLIENT_MODE));
-        buttonQuitMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UI_MANAGER_EVENT.BUTTON_QUIT_MODE));
+        buttonServerMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE));
+        buttonClientMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE));
+        buttonQuitMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_QUIT_MODE));
     }
 }

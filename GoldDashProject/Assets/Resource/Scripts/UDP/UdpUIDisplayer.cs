@@ -27,16 +27,16 @@ public class UdpUIDisplayer : MonoBehaviour
     //装飾
     [SerializeField] private GameObject line;
 
-    public void InitObservation(UdpUIManager udpUIManager)
+    public void InitObservation(UdpButtonManager udpUIManager)
     {
         udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
     }
 
-    private void ProcessUdpManagerEvent(UdpUIManager.UI_MANAGER_EVENT e)
+    private void ProcessUdpManagerEvent(UdpButtonManager.UDP_BUTTON_EVENT e)
     {
         switch (e)
         { 
-            case UdpUIManager.UI_MANAGER_EVENT.BUTTON_START_SERVER_MODE:
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE:
                 //非表示
                 buttonServerMode.SetActive(false);
                 buttonClientMode.SetActive(false);
@@ -49,7 +49,7 @@ public class UdpUIDisplayer : MonoBehaviour
                 informations.SetActive(true);
                 break;
 
-            case UdpUIManager.UI_MANAGER_EVENT.BUTTON_START_CLIENT_MODE:
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
                 //非表示
                 buttonServerMode.gameObject.SetActive(false);
                 buttonClientMode.gameObject.SetActive(false);
@@ -62,7 +62,7 @@ public class UdpUIDisplayer : MonoBehaviour
                 informations.SetActive(true);
                 break;
 
-            case UdpUIManager.UI_MANAGER_EVENT.BUTTON_QUIT_MODE:
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_QUIT_MODE:
                 //非表示
                 buttonActivate.gameObject.SetActive(false);
                 buttonDeactivate.gameObject.SetActive(false);
