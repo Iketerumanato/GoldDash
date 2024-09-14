@@ -368,7 +368,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9619c48f74d749b46931220698d01117, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  udpUIManager: {fileID: 377543645}
+  udpButtonManager: {fileID: 377543645}
   udpUIDisplayer: {fileID: 377543646}
 --- !u!1 &377543643
 GameObject:
@@ -412,7 +412,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 377543643}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 815a359d23a21af4f94225bca9788baf, type: 3}
+  m_Script: {fileID: 11500000, guid: a8a800c7db787404bb03cc6a65831b15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonServerMode: {fileID: 1955288932}
