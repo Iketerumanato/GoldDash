@@ -324,6 +324,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &176831867
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 176831868}
+  - component: {fileID: 176831869}
+  m_Layer: 0
+  m_Name: SubscribeOrderManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &176831868
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 176831867}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 960, y: 540, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &176831869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 176831867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9619c48f74d749b46931220698d01117, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  udpUIManager: {fileID: 377543645}
+  udpUIDisplayer: {fileID: 377543646}
 --- !u!1 &377543643
 GameObject:
   m_ObjectHideFlags: 0
@@ -334,6 +380,7 @@ GameObject:
   m_Component:
   - component: {fileID: 377543644}
   - component: {fileID: 377543645}
+  - component: {fileID: 377543646}
   m_Layer: 0
   m_Name: UIManager
   m_TagString: Untagged
@@ -376,6 +423,31 @@ MonoBehaviour:
   buttonConnect: {fileID: 2099534997}
   buttonDisconnect: {fileID: 893209872}
   buttonQuitMode: {fileID: 1560170463}
+--- !u!114 &377543646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 377543643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a90a0f078edc93a49bdaaf796a9d8fc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonServerMode: {fileID: 1955288930}
+  buttonClientMode: {fileID: 1834305325}
+  buttonQuitApp: {fileID: 1321285962}
+  buttonActivate: {fileID: 1051842058}
+  buttonDeactivate: {fileID: 1469145183}
+  buttonConnect: {fileID: 2099534995}
+  buttonDisconnect: {fileID: 893209870}
+  buttonQuitMode: {fileID: 1560170461}
+  stateMessage: {fileID: 1829652680}
+  GeneralMessage: {fileID: 392011455}
+  ImportantMessage: {fileID: 545803845}
+  informations: {fileID: 1467684026}
+  line: {fileID: 1610966005}
 --- !u!1 &392011455
 GameObject:
   m_ObjectHideFlags: 0
@@ -1940,7 +2012,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1467684027
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2778,7 +2850,7 @@ GameObject:
   - component: {fileID: 1829652683}
   - component: {fileID: 1829652682}
   m_Layer: 5
-  m_Name: State
+  m_Name: StateMessage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3361,3 +3433,4 @@ SceneRoots:
   - {fileID: 377543644}
   - {fileID: 1250031076}
   - {fileID: 1956700146}
+  - {fileID: 176831868}
