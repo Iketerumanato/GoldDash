@@ -22,50 +22,50 @@ public class UdpTextWriter : MonoBehaviour
         switch (e)
         {
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE:
-                stateMessage.text = "SERVER MODE : IDLE";
-                GeneralMessage.text = "Server mode ready. Press the ACTIVATE button to activate the server.";
+                stateMessage.text = "SERVER MODE : IDLING";
+                GeneralMessage.text = "Server mode ready. To activate the server, press ACTIVATE button.";
                 ImportantMessage.text = "";
                 informations.text = "";
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
                 stateMessage.text = "SERVER MODE : RUNNING";
-                GeneralMessage.text = "Running in server mode. To start the stop process, press the DEACTIVATE button.";
+                GeneralMessage.text = "Running in Server mode. To start the stop process, press DEACTIVATE button.";
                 ImportantMessage.text = "";
                 informations.text = "";
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
-                stateMessage.text = "SERVER MODE : IDLE";
-                GeneralMessage.text = "Server mode ended and ready. Press the ACTIVATE button to activate the server.";
+                stateMessage.text = "SERVER MODE : IDLING";
+                GeneralMessage.text = "Server mode ended and ready. To activate the server, press ACTIVATE button.";
                 ImportantMessage.text = "";
                 informations.text = "";
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
-                stateMessage.text = "CLIENT MODE : IDLE";
-                GeneralMessage.text = "Client mode ready. Press the CONNECT button to try to connect to the server.";
+                stateMessage.text = "CLIENT MODE : IDLING";
+                GeneralMessage.text = "Client mode ready. To try connecting to the server, press CONNECT button.";
                 ImportantMessage.text = "";
                 informations.text = "";
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
                 stateMessage.text = "CLIENT MODE : RUNNING";
-                GeneralMessage.text = "Running in client mode. To start the stop process, press the DISCONNECT button.";
+                GeneralMessage.text = "Running in Client mode. To start the stop process, press DISCONNECT button.";
                 ImportantMessage.text = "";
                 informations.text = "";
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
-                stateMessage.text = "CLIENT MODE : IDLE";
-                GeneralMessage.text = "Client mode ended and ready. Press the CONNECT button to try to connect to the server.";
+                stateMessage.text = "CLIENT MODE : IDLING";
+                GeneralMessage.text = "Client mode ended and ready. To try connecting to the server, press CONNECT button.";
                 ImportantMessage.text = "";
                 informations.text = "";
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_QUIT_MODE:
                 stateMessage.text = "MODE SELECTION";
-                GeneralMessage.text = "Please select a mode. To quit application, press the QUIT button or knead a shrimp!";
+                GeneralMessage.text = "Please select a mode. To quit application, press QUIT button.";
                 ImportantMessage.text = "";
                 informations.text = "";
                 break;
