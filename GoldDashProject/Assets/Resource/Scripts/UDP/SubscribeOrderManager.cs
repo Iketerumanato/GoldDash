@@ -7,6 +7,9 @@ public class SubscribeOrderManager : MonoBehaviour
     [SerializeField] private UdpTextWriter udpTextWriter;
     [SerializeField] private UdpUIColorChanger udpUIColorChanger;
 
+    //仮のサウンドマネージャー
+    [SerializeField] private TmpSoundManager soundManager;
+
     //subjectの初期化および購読はNull参照頻発地点。ここにエントリーポイントを作って、そこで購買関係の構築順序を制御する
     private void Awake()
     {
@@ -17,5 +20,7 @@ public class SubscribeOrderManager : MonoBehaviour
         udpUIDisplayer.InitObservation(udpButtonManager);
         udpTextWriter.InitObservation(udpButtonManager);
         udpUIColorChanger.InitObservation(udpButtonManager);
+
+        soundManager.InitObservation(udpButtonManager);
     }
 }
