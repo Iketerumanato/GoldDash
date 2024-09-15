@@ -19,7 +19,7 @@ public class UdpButtonManager : MonoBehaviour
         BUTTON_CLIENT_CONNECT,
         BUTTON_CLIENT_DISCONNECT,
 
-        BUTTON_QUIT_APP,
+        //BUTTON_QUIT_APP,
     }
 
     //最初から表示されているボタン
@@ -49,7 +49,25 @@ public class UdpButtonManager : MonoBehaviour
         //Subscribeの引数にラムダ式を取ることは本来できないのだが、ObservableSubscribeExtensionsというドキュメントの中で
         //引数にAction型を取るオーバーロードが定義されている。ここで、()=>でなく_=>と書くことで引数が明示的にAction型になるので、オーバーロードが参照されるようになる。
         buttonServerMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE));
+        buttonActivate.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE));
+        buttonDeactivate.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE));
+
         buttonClientMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE));
+        buttonConnect.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT));
+        buttonDisconnect.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT));
+
         buttonQuitMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_QUIT_MODE));
+
+        //ここは通知を送るのではなくアプリ終了に
+        buttonQuitApp.OnClickAsObservable().Subscribe(_ => QuitApplication());
+    }
+
+    private void QuitApplication()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }
