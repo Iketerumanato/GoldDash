@@ -52,7 +52,7 @@ public class TmpSoundManager : MonoBehaviour
                 audioSource.PlayOneShot(seDeactive);
                 break;
 
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_QUIT_MODE:
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
                 audioSource.PlayOneShot(seNegative);
                 break;
 

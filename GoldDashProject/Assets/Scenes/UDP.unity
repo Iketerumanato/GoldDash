@@ -512,7 +512,7 @@ MonoBehaviour:
   buttonDeactivate: {fileID: 1469145185}
   buttonConnect: {fileID: 2099534997}
   buttonDisconnect: {fileID: 893209872}
-  buttonQuitMode: {fileID: 1560170463}
+  buttonBack: {fileID: 1560170463}
 --- !u!114 &377543646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -532,7 +532,7 @@ MonoBehaviour:
   buttonDeactivate: {fileID: 1469145183}
   buttonConnect: {fileID: 2099534995}
   buttonDisconnect: {fileID: 893209870}
-  buttonQuitMode: {fileID: 1560170461}
+  buttonBack: {fileID: 1560170461}
   stateMessage: {fileID: 1829652680}
   GeneralMessage: {fileID: 392011455}
   ImportantMessage: {fileID: 545803845}
@@ -2073,7 +2073,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: QUIT
+  m_text: BACK
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2789,7 +2789,7 @@ GameObject:
   - component: {fileID: 1560170464}
   - component: {fileID: 1560170463}
   m_Layer: 5
-  m_Name: BUTTON_QUIT
+  m_Name: BUTTON_BACK
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

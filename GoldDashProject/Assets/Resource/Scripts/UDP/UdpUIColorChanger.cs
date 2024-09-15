@@ -54,7 +54,7 @@ public class UdpUIColorChanger : MonoBehaviour
                 timeOffsetSize = 0.1f;
                 break;
 
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_QUIT_MODE:
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
                 currentGradiant = select;
                 timeOffsetSize = 0f;
                 break;

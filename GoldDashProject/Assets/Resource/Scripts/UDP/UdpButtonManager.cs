@@ -11,7 +11,7 @@ public class UdpButtonManager : MonoBehaviour
     {
         BUTTON_START_SERVER_MODE,
         BUTTON_START_CLIENT_MODE,
-        BUTTON_QUIT_MODE,
+        BUTTON_BACK_TO_SELECT,
 
         BUTTON_SERVER_ACTIVATE,
         BUTTON_SERVER_DEACTIVATE,
@@ -34,7 +34,7 @@ public class UdpButtonManager : MonoBehaviour
     [SerializeField] private Button buttonConnect;
     [SerializeField] private Button buttonDisconnect;
 
-    [SerializeField] private Button buttonQuitMode;
+    [SerializeField] private Button buttonBack;
 
     //通知用subject
     public Subject<UDP_BUTTON_EVENT> udpUIManagerSubject;
@@ -56,7 +56,7 @@ public class UdpButtonManager : MonoBehaviour
         buttonConnect.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT));
         buttonDisconnect.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT));
 
-        buttonQuitMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_QUIT_MODE));
+        buttonBack.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT));
 
         //ここは通知を送るのではなくアプリ終了に
         buttonQuitApp.OnClickAsObservable().Subscribe(_ => QuitApplication());

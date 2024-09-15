@@ -63,7 +63,7 @@ public class UdpTextWriter : MonoBehaviour
                 informations.text = "";
                 break;
 
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_QUIT_MODE:
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
                 stateMessage.text = "MODE SELECTION";
                 GeneralMessage.text = "Please select a mode. To quit application, press QUIT button.";
                 ImportantMessage.text = "";

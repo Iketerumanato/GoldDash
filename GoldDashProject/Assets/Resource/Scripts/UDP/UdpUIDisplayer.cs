@@ -16,7 +16,7 @@ public class UdpUIDisplayer : MonoBehaviour
     [SerializeField] private GameObject buttonConnect;
     [SerializeField] private GameObject buttonDisconnect;
 
-    [SerializeField] private GameObject buttonQuitMode;
+    [SerializeField] private GameObject buttonBack;
 
     //テキストオブジェクト
     [SerializeField] private GameObject stateMessage;
@@ -45,7 +45,7 @@ public class UdpUIDisplayer : MonoBehaviour
                 //表示
                 buttonActivate.SetActive(true);
                 buttonDeactivate.SetActive(true);
-                buttonQuitMode.SetActive(true);
+                buttonBack.SetActive(true);
                 informations.SetActive(true);
                 break;
 
@@ -58,17 +58,17 @@ public class UdpUIDisplayer : MonoBehaviour
                 //表示
                 buttonConnect.gameObject.SetActive(true);
                 buttonDisconnect.gameObject.SetActive(true);
-                buttonQuitMode.gameObject.SetActive(true);
+                buttonBack.gameObject.SetActive(true);
                 informations.SetActive(true);
                 break;
 
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_QUIT_MODE:
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
                 //非表示
                 buttonActivate.gameObject.SetActive(false);
                 buttonDeactivate.gameObject.SetActive(false);
                 buttonConnect.gameObject.SetActive(false);
                 buttonDisconnect.gameObject.SetActive(false);
-                buttonQuitMode.gameObject.SetActive(false);
+                buttonBack.gameObject.SetActive(false);
                 informations.SetActive(false);
 
                 //表示
