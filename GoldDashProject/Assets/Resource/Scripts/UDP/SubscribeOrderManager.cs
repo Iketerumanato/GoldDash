@@ -6,6 +6,7 @@ public class SubscribeOrderManager : MonoBehaviour
     [SerializeField] private UdpUIDisplayer udpUIDisplayer;
     [SerializeField] private UdpTextWriter udpTextWriter;
     [SerializeField] private UdpUIColorChanger udpUIColorChanger;
+    [SerializeField] private GameServerManager gameServerManager;
 
     //仮のサウンドマネージャー
     [SerializeField] private TmpSoundManager soundManager;
@@ -22,5 +23,7 @@ public class SubscribeOrderManager : MonoBehaviour
         udpUIColorChanger.InitObservation(udpButtonManager);
 
         soundManager.InitObservation(udpButtonManager);
+
+        gameServerManager.InitObservation(udpButtonManager);
     }
 }

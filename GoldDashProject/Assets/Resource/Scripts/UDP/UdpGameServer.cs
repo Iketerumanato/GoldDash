@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
 using System;
+using System.Threading.Tasks;
 
 public class UdpGameServer : UdpCommnicator
 {
@@ -35,6 +36,8 @@ public class UdpGameServer : UdpCommnicator
 
         //パケットを出力先（外部クラスの持つキューの参照）をセット
         this.output = output;
+
+        Task.Run(() => Receive());
     }
 
     public override void Send(byte[] sendData)
@@ -111,5 +114,10 @@ public class UdpGameServer : UdpCommnicator
 
             return false;
         }
+    }
+
+    public override void Dispose()
+    {
+        //Taskのキャンセル処理など
     }
 }

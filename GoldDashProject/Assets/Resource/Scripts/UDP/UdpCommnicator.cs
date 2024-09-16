@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-public abstract class UdpCommnicator
+public abstract class UdpCommnicator : IDisposable
 {
     protected const int START_PORT = 60000; //はじめに使用を試みるポート番号
 
@@ -75,4 +76,6 @@ public abstract class UdpCommnicator
         //見つからなかったら-1を返す
         return -1;
     }
+
+    public abstract void Dispose();
 }

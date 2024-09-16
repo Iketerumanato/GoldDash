@@ -372,6 +372,7 @@ MonoBehaviour:
   udpUIDisplayer: {fileID: 377543646}
   udpTextWriter: {fileID: 377543647}
   udpUIColorChanger: {fileID: 377543648}
+  gameServerManager: {fileID: 1385810818}
   soundManager: {fileID: 863796698}
 --- !u!1 &346718029
 GameObject:
@@ -2380,6 +2381,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1321285962}
   m_CullTransparentMesh: 1
+--- !u!1 &1385810817
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1385810819}
+  - component: {fileID: 1385810818}
+  m_Layer: 0
+  m_Name: GameServerManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1385810818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385810817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9764d9c4f7b14a4db9ecad60b8a819b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sessionPass: 9999
+--- !u!4 &1385810819
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385810817}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1467684026
 GameObject:
   m_ObjectHideFlags: 0
@@ -3819,3 +3865,4 @@ SceneRoots:
   - {fileID: 346718033}
   - {fileID: 176831868}
   - {fileID: 863796697}
+  - {fileID: 1385810819}
