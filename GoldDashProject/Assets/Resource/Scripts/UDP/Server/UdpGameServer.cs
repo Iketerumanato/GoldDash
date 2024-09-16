@@ -109,7 +109,7 @@ public class UdpGameServer : UdpCommnicator
             switch (receivedData[6]) //7バイト目にパケット種別が書かれているので
             {
                 case 0: //initパケットなら
-                    if (BitConverter.ToUInt16(receivedData, 0) == sessionPass) //パスワードが正しければ
+                    if (BitConverter.ToUInt16(receivedData, 13) == sessionPass) //パスワードが正しければ
                     {
                         //IDを決めてdictionaryに書き込む
                         clientDictionary.Add(giveID, new IPEndPoint(addr, BitConverter.ToUInt16(receivedData, 2)));
