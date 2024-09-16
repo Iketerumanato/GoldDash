@@ -12,6 +12,7 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private ushort sessionPass;
 
     [SerializeField] private ushort initSessionPass;
+
     public void InitObservation(UdpButtonManager udpUIManager)
     {
         udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
@@ -28,7 +29,7 @@ public class GameClientManager : MonoBehaviour
                 if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
 
                 //Initパケット送信
-                udpGameClient.Send(new Header(initSessionPass, 0, 0, 0, 0, new byte[0]).ToByte());
+                udpGameClient.Send(new Header(0, 0, 0, 0, 0, new InitPacketClient(sessionPass, udpGameClient.rcvPort, "").ToByte()).ToByte());
 
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:

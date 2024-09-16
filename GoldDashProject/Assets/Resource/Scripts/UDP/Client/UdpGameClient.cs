@@ -17,6 +17,8 @@ public class UdpGameClient : UdpCommnicator
 
     IPEndPoint serverEndpoint;
 
+    public ushort rcvPort;
+
     public UdpGameClient(ref Queue<byte[]> output, ushort initSessionPass)
     {
         serverEndpoint = null;
@@ -34,6 +36,7 @@ public class UdpGameClient : UdpCommnicator
         UnityEngine.Debug.Log($"受信用ローカルエンドポイントを生成。　IPアドレス：{localEndPointForReceive.Address}　ポート：{localEndPointForReceive.Port}");
         this.receiver = new UdpClient(localEndPointForReceive);
         UnityEngine.Debug.Log("受信用UDPクライアントを生成しました。");
+        this.rcvPort = (ushort)localEndPointForReceive.Port;
 
         //パケットを出力先（外部クラスの持つキューの参照）をセット
         this.output = output;

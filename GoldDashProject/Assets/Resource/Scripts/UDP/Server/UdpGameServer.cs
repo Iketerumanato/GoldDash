@@ -22,6 +22,8 @@ public class UdpGameServer : UdpCommnicator
         giveID = 0;
         //reuseID = new List<ushort>();
 
+        clientDictionary = new Dictionary<ushort, IPEndPoint>();
+
         //ローカルコンピュータのエンドポイント作成
         //ローカルのエンドポイントにバインドしたクライアント作成
         this.localEndPointForSend = new IPEndPoint(GetMyIPAddressIPv4(), GetAvailablePort(START_PORT));
