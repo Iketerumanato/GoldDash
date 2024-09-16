@@ -39,13 +39,10 @@ public class Player : MonoBehaviour
     {
         //verticalInput = Input.GetAxis("Vertical"); // W/S または 上下矢印キー
 
-        // 移動
         MovePlayerJoystick(inputVector);
 
-        // ジャンプ
         if (Input.GetKey(KeyCode.Space)) Jump();
 
-        // 落下時のリスポーン
         if (transform.position.y < fallThreshold) PlayerRespawn();
     }
 
