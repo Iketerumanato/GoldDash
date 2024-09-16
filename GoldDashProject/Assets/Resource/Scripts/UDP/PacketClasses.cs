@@ -43,7 +43,7 @@ public class Header : Packet
     private ushort indexDiff; //このパケット以降に続くパケット(RUDP用の古いパケット)の位置と、このパケットの先頭インデックスの差を示す
     private uint sendNum; //このパケットの送信番号
     private uint ackNum; //最後に相手から受け取ったパケットの送信番号
-    private ushort packetType; //このパケットのタイプ
+    private byte packetType; //このパケットのタイプ
     private byte[] data; //データ本体
 
     //コンストラクタ１　各変数の値を直接指定する
@@ -70,8 +70,8 @@ public class Header : Packet
         index += sizeof(uint);
         this.ackNum = BitConverter.ToUInt32(bytes, index);
         index += sizeof(uint);
-        this.sessionID = BitConverter.ToUInt16(bytes, index);
-        index += sizeof(ushort);
+        this.packetType = bytes[index];
+        index++;
         data = bytes.Skip(index).ToArray();
     }
 
@@ -84,7 +84,7 @@ public class Header : Packet
         ret = AddBytes(ret, BitConverter.GetBytes(indexDiff));
         ret = AddBytes(ret, BitConverter.GetBytes(sendNum));
         ret = AddBytes(ret, BitConverter.GetBytes(ackNum));
-        ret = AddBytes(ret, BitConverter.GetBytes(packetType));
+        ret = AddByte(ret, packetType);
         ret = AddBytes(ret, data);
 
         return ret;

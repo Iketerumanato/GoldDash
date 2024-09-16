@@ -8,22 +8,22 @@ using System.Net.Sockets;
 
 public abstract class UdpCommnicator
 {
-    private const int START_PORT = 60000; //はじめに使用を試みるポート番号
+    protected const int START_PORT = 60000; //はじめに使用を試みるポート番号
 
-    private IPEndPoint localEndPointForSend; //自分の送信用エンドポイント
-    private IPEndPoint localEndPointForReceive; //自分の受信用エンドポイント。別に送信用と分けなくてもいいんだけど分けるとポートの仕事量に余裕が生まれる
+    protected IPEndPoint localEndPointForSend; //自分の送信用エンドポイント
+    protected IPEndPoint localEndPointForReceive; //自分の受信用エンドポイント。別に送信用と分けなくてもいいんだけど分けるとポートの仕事量に余裕が生まれる
 
-    private UdpClient sender; //送信用クライアント
-    private UdpClient receiver; //受信用クライアント
+    protected UdpClient sender; //送信用クライアント
+    protected UdpClient receiver; //受信用クライアント
 
-    private Queue<byte[]> output; //パケットをバイト配列にしてこのキューに出力する
+    protected Queue<byte[]> output; //パケットをバイト配列にしてこのキューに出力する
 
-    protected abstract void Send(byte[] sendData);
+    public abstract void Send(byte[] sendData);
 
-    protected abstract void Receive();
+    public abstract void Receive();
 
     //ローカルのIPv4用IPアドレスを取得する。
-    private IPAddress GetMyIPAddressIPv4()
+    protected IPAddress GetMyIPAddressIPv4()
     {
         IPAddress ret = null;
 
@@ -44,7 +44,7 @@ public abstract class UdpCommnicator
     }
 
     //使用可能なポート番号を返す。参考：https://note.dokeep.jp/post/csharp-get-active-port/
-    private int GetAvailablePort(int startPort)
+    protected int GetAvailablePort(int startPort)
     {
         //ローカルのネットワーク接続情報を取得
         IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
