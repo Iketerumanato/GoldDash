@@ -87,7 +87,16 @@ public class UdpGameServer : UdpCommnicator
             else
             {
                 UnityEngine.Debug.Log("未知のリモートエンドポイントからのパケットです。パケットを精査します。");
-                if(RegisterClient(receivedData, remoteEndPoint.Address)) output.Enqueue(receivedData);
+
+                if (RegisterClient(receivedData, remoteEndPoint.Address))
+                {
+                    UnityEngine.Debug.Log("該当リモートコンピュータをクライアントと確認し、登録しました。エンキューします。");
+                    output.Enqueue(receivedData);
+                }
+                else
+                {
+                    UnityEngine.Debug.Log("該当リモートコンピュータをクライアントと確認できませんでした。パケットを破棄します。");
+                }
             }
         }
 

@@ -7,18 +7,21 @@ using System.Threading.Tasks;
 
 public class UdpGameClient : UdpCommnicator
 {
-    private const int BROADCAST_RANGE = 5; //ブロードキャスト送信時相手のポート番号がわからないのでSTART_PORT番～START_PORT + BROADCAST_RANGE番までのポートに一つずつ送って反応を伺う
+    private const int BROADCAST_RANGE = 4; //ブロードキャスト送信時相手のポート番号がわからないのでSTART_PORT番～START_PORT + BROADCAST_RANGE番までのポートに一つずつ送って反応を伺う
     private const int WAIT_RESPONSE_TIME = 100; //ブロードキャスト送信時、リモートコンピュータからのレスポンスをWAIT_RESPONSE_TIMEミリ秒待ち、レスポンスがなければ新たなポートにブロードキャスト送信をする
     private const int NUM_OF_RETRY_BROADCAST = 2; //ブロードキャスト送信時、リモートコンピュータからのレスポンスが確認できなかったときNUM_OF_RETRY_BROADCAST回再送する
+
+    protected ushort initSessionPass; //初回通信時にプレイヤー側から送るセッションパス。得られたレスポンスがサーバーからのものであると断定するときに使う。その後は使わない。
 
     private ushort mySessionID;
 
     IPEndPoint serverEndpoint;
 
-    public UdpGameClient(ref Queue<byte[]> output)
+    public UdpGameClient(ref Queue<byte[]> output, ushort initSessionPass)
     {
         serverEndpoint = null;
         this.output = output;
+        this.initSessionPass = initSessionPass;
 
         //ローカルコンピュータのエンドポイント作成
         //ローカルのエンドポイントにバインドしたクライアント作成
@@ -65,18 +68,19 @@ public class UdpGameClient : UdpCommnicator
 
                     if (serverEndpoint != null)
                     {
-                        UnityEngine.Debug.Log($"リモートエンドポイントの登録が確認されました。ブロードキャスト送信を終了します。");
+                        UnityEngine.Debug.Log($"サーバーの登録が確認されました。ブロードキャスト送信を終了します。");
                         remotePort = START_PORT + BROADCAST_RANGE;
                         break;
                     }
                     else
                     {
-                        UnityEngine.Debug.Log($"リモートエンドポイントの登録が確認できませんでした。あと{NUM_OF_RETRY_BROADCAST - retryCount}回再送します。");
+                        UnityEngine.Debug.Log($"サーバーの登録が確認できませんでした。あと{NUM_OF_RETRY_BROADCAST - retryCount}回再送します。");
                     }
                 }
                 //次のポート番号へ
                 remotePort++;
             }
+            UnityEngine.Debug.Log($"サーバーの登録が確認できませんでした。ブロードキャスト送信を終了します。");
         }
         //サーバーが登録されているならサーバーに送信する
         else
@@ -110,37 +114,36 @@ public class UdpGameClient : UdpCommnicator
             //サーバーのパケットならエンキューする、そうでないなら登録処理またはパケット破棄
             if (remoteEndPoint.Equals(serverEndpoint))
             {
-                UnityEngine.Debug.Log("登録済クライアントからのパケットです。エンキューします。");
+                UnityEngine.Debug.Log("サーバーからのパケットです。エンキューします。");
                 output.Enqueue(receivedData);
             }
             else
             {
-                UnityEngine.Debug.Log("未知のリモートエンドポイントからのパケットです。パケットを精査します。");
-                if (RegisterClient(receivedData, remoteEndPoint.Address)) output.Enqueue(receivedData);
+                UnityEngine.Debug.Log("未知のリモートコンピュータからのパケットです。パケットを精査します。");
+
+                if (RegisterServer(receivedData, remoteEndPoint.Address))
+                {
+                    UnityEngine.Debug.Log("該当リモートコンピュータをサーバーと確認し、登録しました。エンキューします。");
+                    output.Enqueue(receivedData);
+                }
+                else
+                {
+                    UnityEngine.Debug.Log("該当リモートコンピュータをサーバーと確認できませんでした。パケットを破棄します。");
+                }
             }
         }
 
         //リモートをハッシュリストに登録
-        bool RegisterClient(byte[] receivedData, IPAddress addr)
+        bool RegisterServer(byte[] receivedData, IPAddress addr)
         {
-            //未知のクライアントから送られてくるパケットの種類を調べる
-            switch (receivedData[6]) //7バイト目にパケット種別が書かれているので
+            //ここがこの通信の脆弱性。たまたま6000X番のポートに入ってきた無関係なパケットを1/65535の確率でサーバーと誤認する。
+            //initSessionPassをushortではなく64バイトの整数型などにすれば確実だろうが。。。
+            if (BitConverter.ToUInt16(receivedData, 0) == initSessionPass) //相手が自分の送信した初期化用セッションパスをそのまま返して来たら
             {
-                case 0: //initパケットなら
-                    if (BitConverter.ToUInt16(receivedData, 0) == sessionPass) //パスワードが正しければ
-                    {
-                        //IDを決めてdictionaryに書き込む
-                        clientDictionary.Add(giveID, new IPEndPoint(addr, BitConverter.ToUInt16(receivedData, 2)));
-                        giveID++;
-                        //IDのオーバーフローは今は対策しない
-                        return true;
-                    }
-                    break;
-
-                default: //そうでないならsessionIDからこのゲーム用のパケットなのか調べて、dictionaryを編集
-                    break;
+                //サーバーのエンドポイント情報を登録
+                serverEndpoint = new IPEndPoint(addr, BitConverter.ToUInt16(receivedData, 2));
+                return true;
             }
-
             return false;
         }
     }

@@ -373,6 +373,7 @@ MonoBehaviour:
   udpTextWriter: {fileID: 377543647}
   udpUIColorChanger: {fileID: 377543648}
   gameServerManager: {fileID: 1385810818}
+  gameClientManager: {fileID: 1385810820}
   soundManager: {fileID: 863796698}
 --- !u!1 &346718029
 GameObject:
@@ -2391,8 +2392,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1385810819}
   - component: {fileID: 1385810818}
+  - component: {fileID: 1385810820}
   m_Layer: 0
-  m_Name: GameServerManager
+  m_Name: GameSessionManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2426,6 +2428,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1385810820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385810817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f63d56cfaac9cb04b9d9182cbb0c8a65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sessionPass: 9999
+  initSessionPass: 1234
 --- !u!1 &1467684026
 GameObject:
   m_ObjectHideFlags: 0

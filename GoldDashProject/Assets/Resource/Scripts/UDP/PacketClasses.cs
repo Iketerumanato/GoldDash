@@ -135,13 +135,15 @@ public class InitPacketClient : Packet
 
 public class InitPacketServer : Packet
 {
+    private ushort pass; //マッチング用パスワード
     private ushort rcvPort; //サーバのポート番号
     private ushort sessionID; //サーバーから与えるID
     private byte state; //現在のサーバの状態を返すプレイヤー名の重複が起きたときなど
     private byte error; //エラーコード　現在のサーバの状態を返すプレイヤー名の重複が起きたときなど
 
-    public InitPacketServer(ushort rcvPort, ushort sessionID, byte state, byte error)
+    public InitPacketServer(ushort pass, ushort rcvPort, ushort sessionID, byte state, byte error)
     {
+        this.pass = pass;
         this.rcvPort = rcvPort;
         this.sessionID = sessionID;
         this.state = state;
@@ -152,6 +154,8 @@ public class InitPacketServer : Packet
     {
         int index = 0;
 
+        this.pass = BitConverter.ToUInt16(bytes, index);
+        index += sizeof(ushort);
         this.rcvPort = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
         this.sessionID = BitConverter.ToUInt16(bytes, index);
@@ -160,10 +164,12 @@ public class InitPacketServer : Packet
         index++;
         this.error = bytes[index];
     }
+
     public override byte[] ToByte()
     {
         byte[] ret = new byte[0];
 
+        ret = AddBytes(ret, BitConverter.GetBytes(pass));
         ret = AddBytes(ret, BitConverter.GetBytes(rcvPort));
         ret = AddBytes(ret, BitConverter.GetBytes(sessionID));
         ret = AddByte(ret, state);

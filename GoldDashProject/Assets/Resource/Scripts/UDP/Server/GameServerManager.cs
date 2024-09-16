@@ -22,15 +22,20 @@ public class GameServerManager : MonoBehaviour
     {
         switch (e)
         {
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE:
                 udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
                 break;
-
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
+                if (udpGameServer == null) udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
+                isRunning = true;
+                break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
                 udpGameServer.Dispose();
+                isRunning = false;
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
-                udpGameServer.Dispose();
+                if (udpGameServer != null) udpGameServer.Dispose();
+                isRunning = false;
                 break;
             default:
                 break;
