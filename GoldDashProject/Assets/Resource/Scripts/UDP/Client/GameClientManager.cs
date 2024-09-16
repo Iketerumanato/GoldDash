@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using R3;
+using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 
 public class GameClientManager : MonoBehaviour
 {
-    private bool inSession;
+    private bool isRunning;
 
     private UdpGameClient udpGameClient;
 
@@ -33,15 +35,40 @@ public class GameClientManager : MonoBehaviour
                 //Initパケット送信
                 udpGameClient.Send(new Header(0, 0, 0, 0, 0, new InitPacketClient(sessionPass, udpGameClient.rcvPort, "").ToByte()).ToByte());
 
+                isRunning = true;
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
                 udpGameClient.Dispose();
+                isRunning = false;
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
                 if (udpGameClient != null) udpGameClient.Dispose();
+                isRunning = false;
                 break;
             default:
                 break;
+        }
+    }
+
+    private void Start()
+    {
+        Task.Run(() => ProcessPacket());
+    }
+
+    private async void ProcessPacket()
+    {
+        while (true)
+        {
+            await UniTask.WaitUntil(() => isRunning);
+
+            while (isRunning)
+            {
+                //キューにパケットが入るのを待つ
+                await UniTask.WaitUntil(() => packetQueue.Count > 0);
+
+                packetQueue.Dequeue();
+                Debug.Log("処理ィ！削除ォ！");
+            }
         }
     }
 }
