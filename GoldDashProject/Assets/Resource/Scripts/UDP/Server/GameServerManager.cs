@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using R3;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 public class GameServerManager : MonoBehaviour
 {
@@ -15,6 +17,8 @@ public class GameServerManager : MonoBehaviour
 
     public void InitObservation(UdpButtonManager udpUIManager)
     {
+        packetQueue = new Queue<byte[]>();
+
         udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
     }
 
@@ -39,6 +43,28 @@ public class GameServerManager : MonoBehaviour
                 break;
             default:
                 break;
+        }
+    }
+
+    private void Start()
+    {
+        Task.Run(() => ProcessPacket());
+    }
+
+    private async void ProcessPacket()
+    {
+        while (true)
+        {
+            await UniTask.WaitUntil(() => isRunning);
+
+            while (isRunning)
+            {
+                //キューにパケットが入るのを待つ
+                await UniTask.WaitUntil(() => packetQueue.Count > 0);
+
+                packetQueue.Dequeue();
+                Debug.Log("処理ィ！削除ォ！");
+            }
         }
     }
 }
