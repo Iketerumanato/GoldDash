@@ -5,7 +5,9 @@ using R3;
 
 public class GameClientManager : MonoBehaviour
 {
-    UdpGameClient udpGameClient;
+    private bool inSession;
+
+    private UdpGameClient udpGameClient;
 
     private Queue<byte[]> packetQueue;
 

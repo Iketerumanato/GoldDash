@@ -5,9 +5,9 @@ using R3;
 
 public class GameServerManager : MonoBehaviour
 {
-    bool isRunning;
+    private bool isRunning;
 
-    UdpGameServer udpGameServer;
+    private UdpGameServer udpGameServer;
 
     private Queue<byte[]> packetQueue;
      
