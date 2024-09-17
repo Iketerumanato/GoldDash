@@ -62,8 +62,26 @@ public class GameServerManager : MonoBehaviour
                 //キューにパケットが入るのを待つ
                 await UniTask.WaitUntil(() => packetQueue.Count > 0);
 
-                packetQueue.Dequeue();
+                //パケットを取り出す
+                byte[] receivedBytes = packetQueue.Dequeue();
+
                 Debug.Log("処理ィ！削除ォ！");
+
+                //まずHeaderを取り出す
+                Header header = new Header(receivedBytes);
+
+                switch (header.packetType)
+                {
+                    case (byte)PacketBuilder.PACKET_TYPE.INIT_PACKET_CLIENT:
+                        //InitPacketを受け取ったときの処理
+                        break;
+                    case (byte)PacketBuilder.PACKET_TYPE.ACTION_PACKET:
+                        //ActionPacketを受け取ったときの処理
+                        break;
+                    default:
+                        Debug.Log($"{(PacketBuilder.PACKET_TYPE)header.packetType}はサーバーでは処理できません。処理を終了します。");
+                        break;
+                }
             }
         }
     }

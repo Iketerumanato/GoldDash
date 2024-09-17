@@ -39,12 +39,12 @@ public abstract class Packet
 //UDPClientから送信するパケットの先頭に付与するカスタムUDPヘッダ。送信番号を持たせて通信交換するとRUDPに進化。おめでとう！
 public class Header : Packet
 {
-    private ushort sessionID; //サーバーから与えるID。セキュリティが要るならハッシュを使うべきか。
-    private ushort indexDiff; //このパケット以降に続くパケット(RUDP用の古いパケット)の位置と、このパケットの先頭インデックスの差を示す
-    private uint sendNum; //このパケットの送信番号
-    private uint ackNum; //最後に相手から受け取ったパケットの送信番号
-    private byte packetType; //このパケットのタイプ
-    private byte[] data; //データ本体
+    public ushort sessionID; //サーバーから与えるID。セキュリティが要るならハッシュを使うべきか。
+    public ushort indexDiff; //このパケット以降に続くパケット(RUDP用の古いパケット)の位置と、このパケットの先頭インデックスの差を示す
+    public uint sendNum; //このパケットの送信番号
+    public uint ackNum; //最後に相手から受け取ったパケットの送信番号
+    public byte packetType; //このパケットのタイプ
+    public byte[] data; //データ本体
 
     //コンストラクタ１　各変数の値を直接指定する
     public Header(ushort sessionID, ushort indexDiff, uint sendNum, uint ackNum, byte packetType, byte[] data)
@@ -94,10 +94,10 @@ public class Header : Packet
 //初回通信用パケット
 public class InitPacketClient : Packet
 {
-    private ushort pass; //マッチング用パスワード
-    private ushort rcvPort; //クライアントが受信用に空けているポートの番号
-    private byte playerNameLength; //プレイヤー名のバイト数
-    private string playerName; //プレイヤー名
+    public ushort pass; //マッチング用パスワード
+    public ushort rcvPort; //クライアントが受信用に空けているポートの番号
+    public byte playerNameLength; //プレイヤー名のバイト数
+    public string playerName; //プレイヤー名
 
     public InitPacketClient(ushort pass, ushort rcvPort, string playerName)
     {
@@ -135,18 +135,16 @@ public class InitPacketClient : Packet
 
 public class InitPacketServer : Packet
 {
-    private ushort pass; //マッチング用パスワード
-    private ushort rcvPort; //サーバのポート番号
-    private ushort sessionID; //サーバーから与えるID
-    private byte state; //現在のサーバの状態を返すプレイヤー名の重複が起きたときなど
-    private byte error; //エラーコード　現在のサーバの状態を返すプレイヤー名の重複が起きたときなど
+    public ushort pass; //マッチング用パスワード
+    public ushort rcvPort; //サーバのポート番号
+    public ushort sessionID; //サーバーから与えるID
+    public byte error; //エラーコード　現在のサーバの状態を返すプレイヤー名の重複が起きたときなど
 
     public InitPacketServer(ushort pass, ushort rcvPort, ushort sessionID, byte state, byte error)
     {
         this.pass = pass;
         this.rcvPort = rcvPort;
         this.sessionID = sessionID;
-        this.state = state;
         this.error = error;
     }
 
@@ -160,8 +158,6 @@ public class InitPacketServer : Packet
         index += sizeof(ushort);
         this.sessionID = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
-        this.state = bytes[index];
-        index++;
         this.error = bytes[index];
     }
 
@@ -172,7 +168,6 @@ public class InitPacketServer : Packet
         ret = AddBytes(ret, BitConverter.GetBytes(pass));
         ret = AddBytes(ret, BitConverter.GetBytes(rcvPort));
         ret = AddBytes(ret, BitConverter.GetBytes(sessionID));
-        ret = AddByte(ret, state);
         ret = AddByte(ret, error);
 
         return ret;
@@ -181,12 +176,12 @@ public class InitPacketServer : Packet
 
 public class ActionPacket : Packet
 {
-    byte roughID; //アクションのカテゴリを示す
-    byte detailID; //アクションの詳細な種類を示す
-    byte targetID; //アクションの対象を示す
-    Vector3 pos; //座標データを持つアクションで参照する
+    public byte roughID; //アクションのカテゴリを示す
+    public byte detailID; //アクションの詳細な種類を示す
+    public ushort targetID; //アクションの対象を示す
+    public Vector3 pos; //座標データを持つアクションで参照する
 
-    public ActionPacket(byte roughID, byte detailID, byte targetID, UnityEngine.Vector3 pos)
+    public ActionPacket(byte roughID, byte detailID, ushort targetID, Vector3 pos)
     {
         this.roughID = roughID;
         this.detailID = detailID;
@@ -203,8 +198,8 @@ public class ActionPacket : Packet
         index++;
         this.detailID = bytes[index];
         index++;
-        this.targetID = bytes[index];
-        index++;
+        this.targetID = BitConverter.ToUInt16(bytes, index);
+        index += sizeof(ushort);
         x = BitConverter.ToSingle(bytes, index);
         index += sizeof(float);
         y = BitConverter.ToSingle(bytes, index);
@@ -219,7 +214,7 @@ public class ActionPacket : Packet
 
         ret = AddByte(ret, roughID);
         ret = AddByte(ret, detailID);
-        ret = AddByte(ret, targetID);
+        ret = AddBytes(ret, BitConverter.GetBytes(targetID));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.x));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.y));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.z));
@@ -230,14 +225,14 @@ public class ActionPacket : Packet
 
 public class PositionPacket : Packet
 {
-    byte id0;
-    Vector3 pos0;
-    byte id1;
-    Vector3 pos1;
-    byte id2;
-    Vector3 pos2;
-    byte id3;
-    Vector3 pos3;
+    public byte id0;
+    public Vector3 pos0;
+    public byte id1;
+    public Vector3 pos1;
+    public byte id2;
+    public Vector3 pos2;
+    public byte id3;
+    public Vector3 pos3;
 
     public PositionPacket(byte id0, Vector3 pos0, byte id1, Vector3 pos1, byte id2, Vector3 pos2, byte id3, Vector3 pos3)
     {
