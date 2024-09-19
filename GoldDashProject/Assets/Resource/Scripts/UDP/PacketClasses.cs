@@ -94,7 +94,7 @@ public class Header : Packet
 //初回通信用パケット
 public class InitPacketClient : Packet
 {
-    public ushort pass; //マッチング用パスワード
+    public ushort sessionPass; //マッチング用パスワード
     public ushort rcvPort; //クライアントが受信用に空けているポートの番号
     public ushort initSessionPass; ////初回通信時にプレイヤー側から送るセッションパス。得られたレスポンスがサーバーからのものであると断定するときに使う。
     public byte playerNameLength; //プレイヤー名のバイト数
@@ -102,7 +102,7 @@ public class InitPacketClient : Packet
 
     public InitPacketClient(ushort pass, ushort rcvPort, ushort initSessionPass, string playerName)
     {
-        this.pass = pass;
+        this.sessionPass = pass;
         this.rcvPort = rcvPort;
         this.initSessionPass = initSessionPass;
         this.playerName = playerName;
@@ -113,7 +113,7 @@ public class InitPacketClient : Packet
     {
         int index = 0;
 
-        this.pass = BitConverter.ToUInt16(bytes, index);
+        this.sessionPass = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
         this.rcvPort = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
@@ -128,7 +128,7 @@ public class InitPacketClient : Packet
     {
         byte[] ret = new byte[0];
 
-        ret = AddBytes(ret, BitConverter.GetBytes(pass));
+        ret = AddBytes(ret, BitConverter.GetBytes(sessionPass));
         ret = AddBytes(ret, BitConverter.GetBytes(rcvPort));
         ret = AddBytes(ret, BitConverter.GetBytes(initSessionPass));
         ret = AddByte(ret, playerNameLength);

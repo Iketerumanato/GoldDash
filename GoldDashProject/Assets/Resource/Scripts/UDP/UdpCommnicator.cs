@@ -17,7 +17,7 @@ public abstract class UdpCommnicator : IDisposable
     protected UdpClient sender; //送信用クライアント
     protected UdpClient receiver; //受信用クライアント
 
-    protected Queue<byte[]> output; //パケットをバイト配列にしてこのキューに出力する
+    protected Queue<Header> output; //パケットをHeaderクラスとして開封し整合性チェックをしてからこのキューに出力する
 
     public abstract void Send(byte[] sendData);
 

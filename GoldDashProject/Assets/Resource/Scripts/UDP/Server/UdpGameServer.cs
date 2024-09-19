@@ -7,21 +7,23 @@ using System.Threading.Tasks;
 
 public class UdpGameServer : UdpCommnicator
 {
-    private Dictionary<ushort, IPEndPoint> clientDictionary;
+    private ushort sessionPass; //このサーバーに接続するためのパスコード。コンストラクタから取得
 
-    private ushort sessionPass;
+    private Dictionary<ushort, IPEndPoint> clientDictionary; //ユーザーに割り当てた固有のIDを鍵とし、現在のIPアドレスを保存
+    //脆弱性：ユーザーIDが短すぎて偽装パケットの危険性あり。サーバー性能が貧弱なので我慢。
+    //同じsessionIDのパケットが違うIPアドレスから送られてきたら登録を上書きする
+    //また、クライアントIPアドレスが変わってしまうケースは考慮しない。卒展の環境なら問題ない。甘える。
 
-    private ushort giveID; //これはServerManagerのSessionIDとは違う。エンドポイントを識別し、パケットをキューに通してよいか判じるためのもの。
+    private HashSet<ushort> usedID; //sessionIDの重複防止に使う。使用済IDを記録して新規発行時にはcontainsで調べる
     //private List<ushort> reuseID; //IDのオーバーフロー対策
 
-    public ushort rcvPort;
+    public ushort rcvPort; //GameServerManagerから読み取るためpublic
 
-    public UdpGameServer(ref Queue<byte[]> output, ushort sessionPass)
+    public UdpGameServer(ref Queue<Header> output, ushort sessionPass)
     { 
-        this.output = output;
+        this.output = output; //パケット排出用キューをセット
         this.sessionPass = sessionPass;
 
-        giveID = 0;
         //reuseID = new List<ushort>();
 
         clientDictionary = new Dictionary<ushort, IPEndPoint>();
@@ -29,19 +31,17 @@ public class UdpGameServer : UdpCommnicator
         //ローカルコンピュータのエンドポイント作成
         //ローカルのエンドポイントにバインドしたクライアント作成
         this.localEndPointForSend = new IPEndPoint(GetMyIPAddressIPv4(), GetAvailablePort(START_PORT));
-        UnityEngine.Debug.Log($"送信用ローカルエンドポイントを生成しました。　IPアドレス：{localEndPointForSend.Address}　ポート：{localEndPointForSend.Port}");
+        UnityEngine.Debug.Log($"送信用ローカルエンドポイントを生成しました。 IPアドレス：{localEndPointForSend.Address} ポート：{localEndPointForSend.Port}");
         this.sender = new UdpClient(localEndPointForSend);
         UnityEngine.Debug.Log("送信用UDPクライアントを生成しました。");
 
         this.localEndPointForReceive = new IPEndPoint(GetMyIPAddressIPv4(), GetAvailablePort(START_PORT));
-        UnityEngine.Debug.Log($"受信用ローカルエンドポイントを生成。　IPアドレス：{localEndPointForReceive.Address}　ポート：{localEndPointForReceive.Port}");
+        UnityEngine.Debug.Log($"受信用ローカルエンドポイントを生成。 IPアドレス：{localEndPointForReceive.Address} ポート：{localEndPointForReceive.Port}");
         this.receiver = new UdpClient(localEndPointForReceive);
         UnityEngine.Debug.Log("受信用UDPクライアントを生成しました。");
         this.rcvPort = (ushort)localEndPointForReceive.Port;
 
-        //パケットを出力先（外部クラスの持つキューの参照）をセット
-        this.output = output;
-
+        //パケットの受信を非同期で行う
         Task.Run(() => Receive());
     }
 
@@ -62,7 +62,6 @@ public class UdpGameServer : UdpCommnicator
 
     public override void Receive()
     {
-
         //パケット送信者のIPEndPoint。あらゆるIPアドレス、あらゆるポートを認める
         IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
@@ -84,49 +83,68 @@ public class UdpGameServer : UdpCommnicator
             UnityEngine.Debug.Log("パケットを受信しました。処理します。");
 
             //通信相手一覧に登録された相手からのパケットならエンキューする、そうでないなら登録処理またはパケット破棄
-            if (clientDictionary.ContainsValue(remoteEndPoint))
+            //判別するためにHeaderを展開してsessionIDを調べる
+            Header receivedHeader = new Header(receivedData);
+
+            if (clientDictionary.ContainsKey(receivedHeader.sessionID)) //登録済なら
             {
                 UnityEngine.Debug.Log("登録済クライアントからのパケットです。エンキューします。");
-                output.Enqueue(receivedData);
+                output.Enqueue(receivedHeader); //せっかく展開したので、Headerの状態でエンキューする
             }
             else
             {
-                UnityEngine.Debug.Log("未知のリモートエンドポイントからのパケットです。パケットを精査します。");
+                UnityEngine.Debug.Log("未知のリモートコンピュータからのパケットです。パケットを精査します。");
 
-                if (RegisterClient(receivedData, remoteEndPoint.Address))
+                if (RegisterClient(receivedHeader, remoteEndPoint.Address))
                 {
-                    UnityEngine.Debug.Log("該当リモートコンピュータをクライアントと確認し、登録しました。エンキューします。");
-                    output.Enqueue(receivedData);
+                    UnityEngine.Debug.Log("当該リモートコンピュータをクライアントと確認し、登録しました。エンキューします。");
+                    output.Enqueue(receivedHeader);
                 }
                 else
                 {
-                    UnityEngine.Debug.Log("該当リモートコンピュータをクライアントと確認できませんでした。パケットを破棄します。");
+                    UnityEngine.Debug.Log("当該リモートコンピュータをクライアントと確認できませんでした。パケットを破棄します。");
                 }
             }
         }
 
         //リモートをハッシュリストに登録
-        bool RegisterClient(byte[] receivedData, IPAddress addr)
+        bool RegisterClient(Header receivedHeader, IPAddress addr)
         {
             //未知のクライアントから送られてくるパケットの種類を調べる
-            switch (receivedData[6]) //7バイト目にパケット種別が書かれているので
+            switch (receivedHeader.packetType)
             {
-                case 0: //initパケットなら
-                    if (BitConverter.ToUInt16(receivedData, 13) == sessionPass) //パスワードが正しければ
+                case (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT: //initパケットなら開封する
+                    //基本的にこのクラスでHeader.dataは参照しないのだが、InitパケットはsessionPassを見る必要がある
+                    InitPacketClient receivedData = new InitPacketClient(receivedHeader.data);
+
+                    if (receivedData.sessionPass == this.sessionPass) //パスワードが正しければ
                     {
+                        //重複しないsessionIDを作る
+                        ushort sessionID;
+                        do
+                        {
+                            Random random = new Random(); //UnityEngine.Randomはマルチスレッドで使用できないのでSystemを使う
+                            sessionID = (ushort)random.Next(0, 65535); //0から65535までの整数を生成して2バイトにキャスト
+                        }
+                        while (usedID.Contains(sessionID)); //使用済IDと同じ値を生成してしまったならやり直し
+                        //ここかなり粗製です。クライアントが65000人くらいになるとほぼ猿になる。4人プレイ用なのでこれで。
+                        //マジで数万人のクライアントを捌く場合は予め生成したIDを1個ずつ割り振っていくか、ハッシュ関数などを使うしかない。
+
                         //IDを決めてdictionaryに書き込む
-                        clientDictionary.Add(giveID, new IPEndPoint(addr, BitConverter.ToUInt16(receivedData, 2)));
-                        giveID++;
+                        clientDictionary.Add(sessionID, new IPEndPoint(addr, receivedData.rcvPort)); //受信用ポート番号でIPEndPointを登録
+                        usedID.Add(sessionID);
                         //IDのオーバーフローは今は対策しない
                         //というか、切断するたびにDictionaryがデカくなっていくので
                         //一定時間パケットを送ってきていないIPEndPointは登録を抹消したい。
+
+                        //最後に、作ってあげたsessionIDをHeaderに書き込んであげる
+                        receivedHeader.sessionID = sessionID;
                         return true;
                     }
                     break;
 
-                default: //そうでないならsessionIDからこのゲーム用のパケットなのか調べて、dictionaryに追加
-                    //正直言って、sessionIDは2バイトなのでこれだけで断定するのはセキュリティ上問題だと思う
-                    //DDoSとか受けたら秒でシステムが落とされる。DDoSしないでね。
+                default: //そうでないならsessionIDを知らないのにInitPacket以外を送ってきていることになるのでおかしい。
+                    //ここでエラーコードを返すことは、ハッカーにヒントを与えることになるらしい。のでなにもしない。
                     break;
             }
 
