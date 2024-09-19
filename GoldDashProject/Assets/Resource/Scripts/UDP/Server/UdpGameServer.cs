@@ -11,7 +11,7 @@ public class UdpGameServer : UdpCommnicator
 
     private ushort sessionPass;
 
-    private ushort giveID;
+    private ushort giveID; //これはServerManagerのSessionIDとは違う。エンドポイントを識別し、パケットをキューに通してよいか判じるためのもの。
     //private List<ushort> reuseID; //IDのオーバーフロー対策
 
     public ushort rcvPort;
@@ -118,11 +118,15 @@ public class UdpGameServer : UdpCommnicator
                         clientDictionary.Add(giveID, new IPEndPoint(addr, BitConverter.ToUInt16(receivedData, 2)));
                         giveID++;
                         //IDのオーバーフローは今は対策しない
+                        //というか、切断するたびにDictionaryがデカくなっていくので
+                        //一定時間パケットを送ってきていないIPEndPointは登録を抹消したい。
                         return true;
                     }
                     break;
 
-                default: //そうでないならsessionIDからこのゲーム用のパケットなのか調べて、dictionaryを編集
+                default: //そうでないならsessionIDからこのゲーム用のパケットなのか調べて、dictionaryに追加
+                    //正直言って、sessionIDは2バイトなのでこれだけで断定するのはセキュリティ上問題だと思う
+                    //DDoSとか受けたら秒でシステムが落とされる。DDoSしないでね。
                     break;
             }
 

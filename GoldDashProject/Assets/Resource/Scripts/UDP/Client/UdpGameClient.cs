@@ -120,6 +120,10 @@ public class UdpGameClient : UdpCommnicator
                 UnityEngine.Debug.Log("サーバーからのパケットです。エンキューします。");
                 output.Enqueue(receivedData);
             }
+            else if (serverEndpoint != null)
+            {
+                UnityEngine.Debug.Log("サーバーを既に登録既なので、パケットを破棄します。");
+            }
             else
             {
                 UnityEngine.Debug.Log("未知のリモートコンピュータからのパケットです。パケットを精査します。");

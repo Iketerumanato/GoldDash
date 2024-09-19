@@ -2,7 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public static class PacketBuilder
+public static class PacketDefiner
+
 {
     //パケットの種類
     public enum PACKET_TYPE : byte

@@ -7,14 +7,22 @@ using Cysharp.Threading.Tasks;
 
 public class GameServerManager : MonoBehaviour
 {
-    private bool isRunning;
+    private bool isRunning; //サーバーが稼働中か
 
-    private UdpGameServer udpGameServer;
+    //GameServer関連のインスタンスがDisposeメソッド以外で破棄されることは想定していない。そのときはおしまいだろう。
+    private UdpGameServer udpGameServer; //UdpCommunicatorを継承したUdpGameServerのインスタンス
 
-    private Queue<byte[]> packetQueue;
-     
-    [SerializeField] private ushort sessionPass;
+    private Queue<byte[]> packetQueue; //udpGameServerは”勝手に”このキューにパケットを入れてくれる。不正パケット処理なども済んだ状態で入る。
 
+    [SerializeField] private ushort sessionPass; //サーバーに入るためのパスワード。udpGameServerのコンストラクタに渡す。
+
+    private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを保管
+
+    private HashSet<ushort> usedID; //sessionIDの重複防止に使う。使用済IDを記録して新規発行時にはcontainsで調べる
+
+    private HashSet<string> usedName; //プレイヤーネームの重複防止に使う。
+
+    #region ボタンが押されたらサーバーを有効化したり無効化したり
     public void InitObservation(UdpButtonManager udpUIManager)
     {
         packetQueue = new Queue<byte[]>();
@@ -45,9 +53,17 @@ public class GameServerManager : MonoBehaviour
                 break;
         }
     }
+    #endregion
 
     private void Start()
     {
+        //sessionIDについて、0はsessionIDを持っていないクライアントを表すナンバーなので、予め使用済にしておく。
+        usedID.Add(0);
+        //同様に、1はサーバーを表すナンバーなので、予め使用済にしておく。
+        usedID.Add(0);
+
+        //パケットの処理をUpdateでやると1フレームの計算量が保障できなくなる（カクつきの原因になり得る）のでマルチスレッドで
+        //スレッドが何個いるのかは試してみないと分からない
         Task.Run(() => ProcessPacket());
     }
 
@@ -65,21 +81,59 @@ public class GameServerManager : MonoBehaviour
                 //パケットを取り出す
                 byte[] receivedBytes = packetQueue.Dequeue();
 
-                Debug.Log("処理ィ！削除ォ！");
+                Debug.Log("パケットを受け取ったぜ！開封するぜ！");
 
                 //まずHeaderを取り出す
-                Header header = new Header(receivedBytes);
+                Header rcvHeader = new Header(receivedBytes);
 
-                switch (header.packetType)
+                Debug.Log($"ヘッダーを確認するぜ！パケット種別は{rcvHeader.packetType}だぜ！");
+
+                switch (rcvHeader.packetType)
                 {
-                    case (byte)PacketBuilder.PACKET_TYPE.INIT_PACKET_CLIENT:
+                    case (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT:
+
                         //InitPacketを受け取ったときの処理
+                        Debug.Log($"Initパケットを処理するぜ！ActorDictionaryに追加するぜ！");
+
+                        //クラスに変換する
+                        InitPacketClient rcvPacket = new InitPacketClient(rcvHeader.data);
+
+                        //送られてきたプレイヤーネームが使用済ならエラーコード1番を返す。sessionIDは登録しない。
+                        if (usedName.Contains(rcvPacket.playerName))
+                        {
+                            InitPacketServer errorPacket = new InitPacketServer(rcvPacket.initSessionPass, udpGameServer.rcvPort, 0, 1);
+                            Header errorHeader = new Header(0, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_SERVER, errorPacket.ToByte());
+
+                            Debug.Log($"プレイヤーネーム:{rcvPacket.playerName} は既に使われていたぜ。出直してもらうぜ。");
+                        }
+                        //TODO プレイヤーが規定人数集まっていたらエラーコード2番
+
+                        //重複しないSessionIDを作る
+                        ushort sessionID;
+                        do
+                        {
+                            System.Random random = new System.Random(); //UnityEngine.Randomはマルチスレッドで使用できないのでSystemを使う
+                            sessionID = (ushort)random.Next(0, 65535); //0から65535までの整数を生成して2バイトにキャスト
+                        }
+                        while (usedID.Contains(sessionID)) //使用済IDと同じ値を生成してしまったならやり直し
+
+;                        //ActorControllerインスタンスを作りDictionaryに加える
+                        actorDictionary.Add(sessionID, new ActorController(rcvPacket.playerName));
+                        usedID.Add(sessionID); //このIDを使用済にする
+                        usedName.Add(rcvPacket.playerName); //登録したプレイヤーネームを使用済にする
+
+                        Debug.Log($"sessionID:{sessionID},プレイヤーネーム:{rcvPacket.playerName} でDictionaryに登録したぜ！");
+
+                        //パケットを返信する
+                        InitPacketServer myPacket = new InitPacketServer(rcvPacket.initSessionPass, udpGameServer.rcvPort, sessionID);
+                        Header myHeader = new Header(1, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT, myPacket.ToByte());
+
                         break;
-                    case (byte)PacketBuilder.PACKET_TYPE.ACTION_PACKET:
+                    case (byte)PacketDefiner.PACKET_TYPE.ACTION_PACKET:
                         //ActionPacketを受け取ったときの処理
                         break;
                     default:
-                        Debug.Log($"{(PacketBuilder.PACKET_TYPE)header.packetType}はサーバーでは処理できません。処理を終了します。");
+                        Debug.Log($"{(PacketDefiner.PACKET_TYPE)rcvHeader.packetType}はサーバーでは処理できないぜ。処理を終了するぜ。");
                         break;
                 }
             }

@@ -96,13 +96,15 @@ public class InitPacketClient : Packet
 {
     public ushort pass; //マッチング用パスワード
     public ushort rcvPort; //クライアントが受信用に空けているポートの番号
+    public ushort initSessionPass; ////初回通信時にプレイヤー側から送るセッションパス。得られたレスポンスがサーバーからのものであると断定するときに使う。
     public byte playerNameLength; //プレイヤー名のバイト数
     public string playerName; //プレイヤー名
 
-    public InitPacketClient(ushort pass, ushort rcvPort, string playerName)
+    public InitPacketClient(ushort pass, ushort rcvPort, ushort initSessionPass, string playerName)
     {
         this.pass = pass;
         this.rcvPort = rcvPort;
+        this.initSessionPass = initSessionPass;
         this.playerName = playerName;
         this.playerNameLength = (byte)playerName.Length;
     }
@@ -115,6 +117,8 @@ public class InitPacketClient : Packet
         index += sizeof(ushort);
         this.rcvPort = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
+        this.initSessionPass = BitConverter.ToUInt16(bytes, index);
+        index += sizeof(ushort);
         this.playerNameLength = bytes[index];
         index++;
         this.playerName = Encoding.UTF8.GetString(bytes, index, playerNameLength);
@@ -126,6 +130,7 @@ public class InitPacketClient : Packet
 
         ret = AddBytes(ret, BitConverter.GetBytes(pass));
         ret = AddBytes(ret, BitConverter.GetBytes(rcvPort));
+        ret = AddBytes(ret, BitConverter.GetBytes(initSessionPass));
         ret = AddByte(ret, playerNameLength);
         ret = AddBytes(ret, Encoding.UTF8.GetBytes(playerName));
 
@@ -135,14 +140,14 @@ public class InitPacketClient : Packet
 
 public class InitPacketServer : Packet
 {
-    public ushort pass; //マッチング用パスワード
+    public ushort initSessionPass; //マッチング用パスワード
     public ushort rcvPort; //サーバのポート番号
     public ushort sessionID; //サーバーから与えるID
     public byte error; //エラーコード　現在のサーバの状態を返すプレイヤー名の重複が起きたときなど
 
-    public InitPacketServer(ushort pass, ushort rcvPort, ushort sessionID, byte state, byte error)
+    public InitPacketServer(ushort initSessionPass, ushort rcvPort, ushort sessionID, byte error = 0)
     {
-        this.pass = pass;
+        this.initSessionPass = initSessionPass;
         this.rcvPort = rcvPort;
         this.sessionID = sessionID;
         this.error = error;
@@ -152,7 +157,7 @@ public class InitPacketServer : Packet
     {
         int index = 0;
 
-        this.pass = BitConverter.ToUInt16(bytes, index);
+        this.initSessionPass = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
         this.rcvPort = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
@@ -165,7 +170,7 @@ public class InitPacketServer : Packet
     {
         byte[] ret = new byte[0];
 
-        ret = AddBytes(ret, BitConverter.GetBytes(pass));
+        ret = AddBytes(ret, BitConverter.GetBytes(initSessionPass));
         ret = AddBytes(ret, BitConverter.GetBytes(rcvPort));
         ret = AddBytes(ret, BitConverter.GetBytes(sessionID));
         ret = AddByte(ret, error);
