@@ -57,6 +57,9 @@ public class GameServerManager : MonoBehaviour
 
     private void Start()
     {
+        usedID = new HashSet<ushort>();
+        usedName = new HashSet<string>();
+
         //sessionIDについて、0はsessionIDを持っていないクライアントを表すナンバーなので、予め使用済にしておく。
         usedID.Add(0);
         //同様に、1はサーバーを表すナンバーなので、予め使用済にしておく。
