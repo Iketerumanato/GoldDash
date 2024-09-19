@@ -5,8 +5,10 @@ using UnityEngine;
 /// <summary>
 /// プレイヤー達を管理するクラス。GameServerManagerでSessionIDをKeyとしてDictionaryで管理される
 /// </summary>
-public class ActorController : MonoBehaviour
+public class ActorController
 {
+    GameObject actor;
+
     string playerName;
 
     public ActorController(string playerName)

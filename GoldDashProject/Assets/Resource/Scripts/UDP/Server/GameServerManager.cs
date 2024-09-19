@@ -57,6 +57,7 @@ public class GameServerManager : MonoBehaviour
 
     private void Start()
     {
+        actorDictionary = new Dictionary<ushort, ActorController>();
         usedID = new HashSet<ushort>();
         usedName = new HashSet<string>();
 
@@ -89,7 +90,7 @@ public class GameServerManager : MonoBehaviour
                 //まずHeaderを取り出す
                 Header rcvHeader = new Header(receivedBytes);
 
-                Debug.Log($"ヘッダーを確認するぜ！パケット種別は{rcvHeader.packetType}だぜ！");
+                Debug.Log($"ヘッダーを確認するぜ！パケット種別は{(PacketDefiner.PACKET_TYPE)rcvHeader.packetType}だぜ！");
 
                 switch (rcvHeader.packetType)
                 {
@@ -118,9 +119,9 @@ public class GameServerManager : MonoBehaviour
                             System.Random random = new System.Random(); //UnityEngine.Randomはマルチスレッドで使用できないのでSystemを使う
                             sessionID = (ushort)random.Next(0, 65535); //0から65535までの整数を生成して2バイトにキャスト
                         }
-                        while (usedID.Contains(sessionID)) //使用済IDと同じ値を生成してしまったならやり直し
+                        while (usedID.Contains(sessionID)); //使用済IDと同じ値を生成してしまったならやり直し
 
-;                        //ActorControllerインスタンスを作りDictionaryに加える
+                        //ActorControllerインスタンスを作りDictionaryに加える
                         actorDictionary.Add(sessionID, new ActorController(rcvPacket.playerName));
                         usedID.Add(sessionID); //このIDを使用済にする
                         usedName.Add(rcvPacket.playerName); //登録したプレイヤーネームを使用済にする
@@ -131,6 +132,8 @@ public class GameServerManager : MonoBehaviour
                         InitPacketServer myPacket = new InitPacketServer(rcvPacket.initSessionPass, udpGameServer.rcvPort, sessionID);
                         Header myHeader = new Header(1, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT, myPacket.ToByte());
 
+                        udpGameServer.Send(myHeader.ToByte());
+                        Debug.Log($"パケット返信したぜ！");
                         break;
                     case (byte)PacketDefiner.PACKET_TYPE.ACTION_PACKET:
                         //ActionPacketを受け取ったときの処理
