@@ -7,16 +7,19 @@ using System.Threading.Tasks;
 
 public class GameClientManager : MonoBehaviour
 {
-    private bool isRunning;
+    private bool isRunning; //稼働中か
 
-    private UdpGameClient udpGameClient;
+    private UdpGameClient udpGameClient; //UdpCommunicatorを継承したUdpGameClientのインスタンス
 
-    private Queue<byte[]> packetQueue;
+    private Queue<Header> packetQueue; //udpGameClientは”勝手に”このキューにパケットを入れてくれる。不正パケット処理なども済んだ状態で入る。
 
-    [SerializeField] private ushort sessionPass;
+    [SerializeField] private ushort sessionPass; //サーバーに接続するためのパスコード
 
-    [SerializeField] private ushort initSessionPass;
+    [SerializeField] private ushort initSessionPass; //初回通信時、サーバーからの返信が安全なものか判別するためのパスコード
 
+    private ushort sessionID; //自分のセッションID。サーバー側で決めてもらう。
+
+    #region ボタンが押されたら有効化したり無効化したり
     public void InitObservation(UdpButtonManager udpUIManager)
     {
         udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
@@ -49,6 +52,7 @@ public class GameClientManager : MonoBehaviour
                 break;
         }
     }
+    #endregion
 
     private void Start()
     {
@@ -66,8 +70,34 @@ public class GameClientManager : MonoBehaviour
                 //キューにパケットが入るのを待つ
                 await UniTask.WaitUntil(() => packetQueue.Count > 0);
 
-                packetQueue.Dequeue();
-                Debug.Log("処理ィ！削除ォ！");
+                Header receivedHeader = packetQueue.Dequeue();
+
+                Debug.Log("パケットを受け取ったぜ！開封するぜ！");
+
+                Debug.Log($"ヘッダーを確認するぜ！パケット種別は{(PacketDefiner.PACKET_TYPE)receivedHeader.packetType}だぜ！");
+
+                switch (receivedHeader.packetType)
+                {
+                    case (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT:
+
+                        //InitPacketを受け取ったときの処理
+                        Debug.Log($"Initパケットを処理するぜ！ActorDictionaryに追加するぜ！");
+
+                        //クラスに変換する
+                        InitPacketServer receivedInitPacket = new InitPacketServer(receivedHeader.data);
+
+                        sessionID = receivedInitPacket.sessionID; //自分のsessionIDを受け取る
+                        Debug.Log($"sessionID:{sessionID}を受け取ったぜ。");
+
+                        //エラーコードがあればここで処理
+                        break;
+                    case (byte)PacketDefiner.PACKET_TYPE.ACTION_PACKET:
+                        //ActionPacketを受け取ったときの処理
+                        break;
+                    default:
+                        Debug.Log($"{(PacketDefiner.PACKET_TYPE)receivedHeader.packetType}はクライアントでは処理できないぜ。処理を終了するぜ。");
+                        break;
+                }
             }
         }
     }

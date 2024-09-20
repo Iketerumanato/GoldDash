@@ -12,6 +12,10 @@ public class GameServerManager : MonoBehaviour
     //GameServer関連のインスタンスがDisposeメソッド以外で破棄されることは想定していない。そのときはおしまいだろう。
     private UdpGameServer udpGameServer; //UdpCommunicatorを継承したUdpGameServerのインスタンス
 
+    private ushort rcvPort; //udPGameServerの受信用ポート番号
+
+    private ushort serverSessionID; //クライアントにサーバーを判別させるためのID
+
     private Queue<Header> packetQueue; //udpGameServerは”勝手に”このキューにパケットを入れてくれる。不正パケット処理なども済んだ状態で入る。
 
     [SerializeField] private ushort sessionPass; //サーバーに入るためのパスワード。udpGameServerのコンストラクタに渡す。
@@ -34,6 +38,9 @@ public class GameServerManager : MonoBehaviour
         {
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE:
                 udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
+                rcvPort = udpGameServer.GetReceivePort(); //受信用ポート番号とサーバーのセッションIDがここで決まるので取得
+                serverSessionID = udpGameServer.GetServerSessionID();
+                usedID.Add(serverSessionID); //サーバーIDを使用済に
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
                 if (udpGameServer == null) udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
@@ -62,8 +69,6 @@ public class GameServerManager : MonoBehaviour
 
         //sessionIDについて、0はsessionIDを持っていないクライアントを表すナンバーなので、予め使用済にしておく。
         usedID.Add(0);
-        //同様に、1はサーバーを表すナンバーなので、予め使用済にしておく。
-        usedID.Add(0);
 
         //パケットの処理をUpdateでやると1フレームの計算量が保障できなくなる（カクつきの原因になり得る）のでマルチスレッドで
         //スレッドが何個いるのかは試してみないと分からない
@@ -86,7 +91,6 @@ public class GameServerManager : MonoBehaviour
 
                 Debug.Log("パケットを受け取ったぜ！開封するぜ！");
 
-
                 Debug.Log($"ヘッダーを確認するぜ！パケット種別は{(PacketDefiner.PACKET_TYPE)receivedHeader.packetType}だぜ！");
 
                 switch (receivedHeader.packetType)
@@ -102,8 +106,8 @@ public class GameServerManager : MonoBehaviour
                         //送られてきたプレイヤーネームが使用済ならエラーコード1番を返す。sessionIDは登録しない。
                         if (usedName.Contains(receivedInitPacket.playerName))
                         {
-                            InitPacketServer errorPacket = new InitPacketServer(receivedInitPacket.initSessionPass, udpGameServer.rcvPort, receivedHeader.sessionID, 1);
-                            Header errorHeader = new Header(1, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_SERVER, errorPacket.ToByte());
+                            InitPacketServer errorPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID, 1);
+                            Header errorHeader = new Header(serverSessionID, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_SERVER, errorPacket.ToByte());
 
                             Debug.Log($"プレイヤーネーム:{receivedInitPacket.playerName} は既に使われていたぜ。出直してもらうぜ。");
                             break;
@@ -118,8 +122,8 @@ public class GameServerManager : MonoBehaviour
                         Debug.Log($"sessionID:{receivedHeader.sessionID},プレイヤーネーム:{receivedInitPacket.playerName} でDictionaryに登録したぜ！");
 
                         //パケットを返信する
-                        InitPacketServer myPacket = new InitPacketServer(receivedInitPacket.initSessionPass, udpGameServer.rcvPort, receivedHeader.sessionID);
-                        Header myHeader = new Header(1, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT, myPacket.ToByte());
+                        InitPacketServer myPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID);
+                        Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT, myPacket.ToByte());
 
                         udpGameServer.Send(myHeader.ToByte());
                         Debug.Log($"パケット返信したぜ！");

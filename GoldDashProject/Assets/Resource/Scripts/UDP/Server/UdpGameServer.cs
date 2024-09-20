@@ -15,9 +15,11 @@ public class UdpGameServer : UdpCommnicator
     //また、クライアントIPアドレスが変わってしまうケースは考慮しない。卒展の環境なら問題ない。甘える。
 
     private HashSet<ushort> usedID; //sessionIDの重複防止に使う。使用済IDを記録して新規発行時にはcontainsで調べる
-    //private List<ushort> reuseID; //IDのオーバーフロー対策
+                                    //private List<ushort> reuseID; //IDのオーバーフロー対策
 
-    public ushort rcvPort; //GameServerManagerから読み取るためpublic
+    private ushort serverSessionID; //クライアントにサーバーを判別させるためのsessionID
+
+    private ushort rcvPort; //受信用ポート番号
 
     public UdpGameServer(ref Queue<Header> output, ushort sessionPass)
     { 
@@ -26,7 +28,15 @@ public class UdpGameServer : UdpCommnicator
 
         //reuseID = new List<ushort>();
 
-        clientDictionary = new Dictionary<ushort, IPEndPoint>();
+        usedID = new HashSet<ushort>(); //ハッシュセットインスタンス生成
+
+        //サーバーIDの生成
+        Random random = new Random(); //Receiveメソッド内でSystem.Randomを使わなければならないのでここでもSystem.Randomで統一する
+        serverSessionID = (ushort)random.Next(0, 65535); //0から65535までの整数を生成して2バイトにキャスト
+
+        usedID.Add(serverSessionID); //サーバーIDと同じ値をクライアントに与えないように
+
+        clientDictionary = new Dictionary<ushort, IPEndPoint>(); //Dictionaryインスタンス生成
 
         //ローカルコンピュータのエンドポイント作成
         //ローカルのエンドポイントにバインドしたクライアント作成
@@ -151,6 +161,10 @@ public class UdpGameServer : UdpCommnicator
             return false;
         }
     }
+
+    public ushort GetReceivePort() { return rcvPort; }
+
+    public ushort GetServerSessionID() { return serverSessionID; }
 
     public override void Dispose()
     {

@@ -13,34 +13,32 @@ public class UdpGameClient : UdpCommnicator
 
     protected ushort initSessionPass; //初回通信時にプレイヤー側から送るセッションパス。得られたレスポンスがサーバーからのものであると断定するときに使う。その後は使わない。
 
-    private ushort mySessionID;
+    private ushort serverSessionID; //サーバーから渡された、サーバーのsessionID
 
-    IPEndPoint serverEndpoint;
+    private IPEndPoint serverEndpoint; //サーバの受信用エンドポイント
 
-    public ushort rcvPort;
+    public ushort rcvPort; //自分の受信用ポート番号。GameClientManagerから読み取るためpublic
 
-    public UdpGameClient(ref Queue<byte[]> output, ushort initSessionPass)
+    public UdpGameClient(ref Queue<Header> output, ushort initSessionPass)
     {
-        serverEndpoint = null;
-        this.output = output;
+        serverEndpoint = null; //サーバーを見つけていないときはnullになっていることを前提としているので明示的に代入
+        this.output = output; //パケット排出用キューをセット
         this.initSessionPass = initSessionPass;
 
         //ローカルコンピュータのエンドポイント作成
         //ローカルのエンドポイントにバインドしたクライアント作成
         this.localEndPointForSend = new IPEndPoint(GetMyIPAddressIPv4(), GetAvailablePort(START_PORT));
-        UnityEngine.Debug.Log($"送信用ローカルエンドポイントを生成しました。　IPアドレス：{localEndPointForSend.Address}　ポート：{localEndPointForSend.Port}");
+        UnityEngine.Debug.Log($"送信用ローカルエンドポイントを生成しました。 IPアドレス：{localEndPointForSend.Address} ポート：{localEndPointForSend.Port}");
         this.sender = new UdpClient(localEndPointForSend);
         UnityEngine.Debug.Log("送信用UDPクライアントを生成しました。");
 
         this.localEndPointForReceive = new IPEndPoint(GetMyIPAddressIPv4(), GetAvailablePort(START_PORT));
-        UnityEngine.Debug.Log($"受信用ローカルエンドポイントを生成。　IPアドレス：{localEndPointForReceive.Address}　ポート：{localEndPointForReceive.Port}");
+        UnityEngine.Debug.Log($"受信用ローカルエンドポイントを生成。 IPアドレス：{localEndPointForReceive.Address} ポート：{localEndPointForReceive.Port}");
         this.receiver = new UdpClient(localEndPointForReceive);
         UnityEngine.Debug.Log("受信用UDPクライアントを生成しました。");
         this.rcvPort = (ushort)localEndPointForReceive.Port;
 
-        //パケットを出力先（外部クラスの持つキューの参照）をセット
-        this.output = output;
-
+        //パケットの受信を非同期で行う
         Task.Run(() => Receive());
     }
 
@@ -49,11 +47,10 @@ public class UdpGameClient : UdpCommnicator
         //サーバーが登録されていないならブロードキャスト送信する
         if (serverEndpoint == null)
         {
-            UnityEngine.Debug.Log("サーバの登録がないため、ブロードキャスト送信を行います。");
+            UnityEngine.Debug.Log("サーバーの登録がないため、ブロードキャスト送信を行います。");
 
             //ポート番号を変えながらブロードキャスト　同じポート番号に対して数回送信するためfor文の変化式には何も書いていない
-            UnityEngine.Debug.Log("リモートエンドポイントの登録がないため、ブロードキャスト送信を行います。");
-
+            //START_PORTは送信用に使われていると考えられるので+1する
             for (int remotePort = START_PORT + 1; remotePort <= START_PORT + BROADCAST_RANGE;)
             {
                 UnityEngine.Debug.Log($"{remotePort}番のポートを対象にブロードキャスト送信を行います。");
@@ -89,6 +86,7 @@ public class UdpGameClient : UdpCommnicator
         else
         {
             sender.Send(sendData, sendData.Length, serverEndpoint);
+            UnityEngine.Debug.Log($"{sendData.Length}バイト以上のパケットをサーバーに送信しました。");
         }
     }
 
@@ -115,23 +113,27 @@ public class UdpGameClient : UdpCommnicator
             UnityEngine.Debug.Log("パケットを受信しました。処理します。");
 
             //サーバーのパケットならエンキューする、そうでないなら登録処理またはパケット破棄
-            if (remoteEndPoint.Equals(serverEndpoint))
+            //判別するためにHeaderを展開してsessionIDを調べる
+            Header receivedHeader = new Header(receivedData);
+
+            //ここはもともとIPEndPoint情報で判別していたのだが、クライアントに致命的な脆弱性をもたらすのでsessionIDを使う方向で
+            if (receivedHeader.sessionID == serverSessionID)
             {
                 UnityEngine.Debug.Log("サーバーからのパケットです。エンキューします。");
-                output.Enqueue(receivedData);
+                output.Enqueue(receivedHeader); //せっかく展開したので、Headerの状態でエンキューする
             }
             else if (serverEndpoint != null)
             {
-                UnityEngine.Debug.Log("サーバーを既に登録既なので、パケットを破棄します。");
+                UnityEngine.Debug.Log("サーバーからのパケットではありません。サーバーを既に登録既なので、パケットを破棄します。");
             }
             else
             {
                 UnityEngine.Debug.Log("未知のリモートコンピュータからのパケットです。パケットを精査します。");
 
-                if (RegisterServer(receivedData, remoteEndPoint.Address))
+                if (RegisterServer(receivedHeader, remoteEndPoint.Address))
                 {
                     UnityEngine.Debug.Log("該当リモートコンピュータをサーバーと確認し、登録しました。エンキューします。");
-                    output.Enqueue(receivedData);
+                    output.Enqueue(receivedHeader);
                 }
                 else
                 {
@@ -141,16 +143,22 @@ public class UdpGameClient : UdpCommnicator
         }
 
         //リモートをハッシュリストに登録
-        bool RegisterServer(byte[] receivedData, IPAddress addr)
+        bool RegisterServer(Header receivedHeader, IPAddress addr)
         {
-            //ここがこの通信の脆弱性。たまたま6000X番のポートに入ってきた無関係なパケットを1/65535の確率でサーバーと誤認する。
-            //initSessionPassをushortではなく64バイトの整数型などにすれば確実だろうが。。。
-            if (BitConverter.ToUInt16(receivedData, 0) == initSessionPass) //相手が自分の送信した初期化用セッションパスをそのまま返して来たら
+            //基本的にこのクラスでHeader.dataは参照しないのだが、InitパケットはsessionPassを見る必要がある
+            InitPacketServer receivedData = new InitPacketServer(receivedHeader.data);
+
+            if (receivedData.initSessionPass == initSessionPass) //相手が自分の送信した初期化用セッションパスをそのまま返して来たら
             {
                 //サーバーのエンドポイント情報を登録
-                serverEndpoint = new IPEndPoint(addr, BitConverter.ToUInt16(receivedData, 2));
+                serverEndpoint = new IPEndPoint(addr, receivedData.rcvPort);
+                //サーバーのsessionIDを記録
+                serverSessionID = receivedHeader.sessionID;
                 return true;
             }
+
+            //そうでないならsessionIDを知らないのにInitPacket以外を送ってきていることになるのでおかしい。
+            //ここでエラーコードを返すことは、ハッカーにヒントを与えることになるらしい。のでなにもしない。
             return false;
         }
     }
