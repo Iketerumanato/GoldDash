@@ -70,7 +70,7 @@ public class UdpGameClient : UdpCommnicator
                     {
                         UnityEngine.Debug.Log($"サーバーの登録が確認されました。ブロードキャスト送信を終了します。");
                         remotePort = START_PORT + BROADCAST_RANGE;
-                        break;
+                        return;
                     }
                     else
                     {

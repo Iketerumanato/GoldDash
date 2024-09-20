@@ -56,6 +56,8 @@ public class GameClientManager : MonoBehaviour
 
     private void Start()
     {
+        packetQueue = new Queue<Header>();
+
         Task.Run(() => ProcessPacket());
     }
 
@@ -78,10 +80,10 @@ public class GameClientManager : MonoBehaviour
 
                 switch (receivedHeader.packetType)
                 {
-                    case (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT:
+                    case (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_SERVER:
 
                         //InitPacketを受け取ったときの処理
-                        Debug.Log($"Initパケットを処理するぜ！ActorDictionaryに追加するぜ！");
+                        Debug.Log($"Initパケットを処理するぜ！SessionIDを受け取るぜ！");
 
                         //クラスに変換する
                         InitPacketServer receivedInitPacket = new InitPacketServer(receivedHeader.data);

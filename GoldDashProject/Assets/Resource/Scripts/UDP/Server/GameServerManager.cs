@@ -123,7 +123,7 @@ public class GameServerManager : MonoBehaviour
 
                         //パケットを返信する
                         InitPacketServer myPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID);
-                        Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT, myPacket.ToByte());
+                        Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_SERVER, myPacket.ToByte());
 
                         udpGameServer.Send(myHeader.ToByte());
                         Debug.Log($"パケット返信したぜ！");
