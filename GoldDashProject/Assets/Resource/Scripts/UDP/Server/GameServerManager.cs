@@ -119,7 +119,17 @@ public class GameServerManager : MonoBehaviour
                         usedID.Add(receivedHeader.sessionID); //このIDを使用済にする
                         usedName.Add(receivedInitPacket.playerName); //登録したプレイヤーネームを使用済にする
 
-                        Debug.Log($"sessionID:{receivedHeader.sessionID},プレイヤーネーム:{receivedInitPacket.playerName} でDictionaryに登録したぜ！");
+                        Debug.Log($"sessionID:{receivedHeader.sessionID},プレイヤーネーム:{receivedInitPacket.playerName} でactorDictionaryに登録したぜ！");
+
+                        Debug.Log($"actorDictionaryには現在、{actorDictionary.Count}人のプレイヤーが登録されているぜ！");
+                        if (actorDictionary.Count == 4)
+                        {
+                            Debug.Log($"十分なプレイヤーが集まったぜ。闇のゲームの始まりだぜ。");
+
+                            //Dictionaryへの登録を締め切る処理
+
+                            //ゲーム開始処理
+                        }
 
                         //パケットを返信する
                         InitPacketServer myPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID);
