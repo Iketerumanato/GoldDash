@@ -17,6 +17,8 @@ public class GameClientManager : MonoBehaviour
 
     [SerializeField] private ushort initSessionPass; //初回通信時、サーバーからの返信が安全なものか判別するためのパスコード
 
+    [SerializeField] private string myName; //仮です。登録に使うプレイヤーネーム
+
     private ushort sessionID; //自分のセッションID。サーバー側で決めてもらう。
 
     #region ボタンが押されたら有効化したり無効化したり
@@ -36,7 +38,7 @@ public class GameClientManager : MonoBehaviour
                 if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
 
                 //Initパケット送信
-                udpGameClient.Send(new Header(0, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, "").ToByte()).ToByte());
+                udpGameClient.Send(new Header(0, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte());
 
                 isRunning = true;
                 break;
