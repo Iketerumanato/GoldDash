@@ -106,7 +106,7 @@ public class InitPacketClient : Packet
         this.rcvPort = rcvPort;
         this.initSessionPass = initSessionPass;
         this.playerName = playerName;
-        this.playerNameLength = (byte)playerName.Length;
+        this.playerNameLength = (byte)Encoding.UTF8.GetByteCount(playerName);
     }
 
     public InitPacketClient(byte[] bytes)
