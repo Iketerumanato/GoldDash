@@ -2,22 +2,20 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [Header("ˆÚ“®‘¬“x")]
+    [Header("ç§»å‹•é€Ÿåº¦")]
     [SerializeField] float moveSpeed = 0.1f;
-    [Header("ƒWƒƒƒ“ƒv—Í")]
+    [SerializeField] float rotationSpeed = 200f;
+
+    [Header("ã‚¸ãƒ£ãƒ³ãƒ—åŠ›")]
     [SerializeField] float jumpPower = 0.2f;
 
-    [Header("ƒvƒŒƒCƒ„[‚ÌÅ‘åHP")]
+    [Header("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æœ€å¤§HP")]
     [SerializeField] int maxPlayerHP = 10;
     int PlayerCurrentHP;
 
-    [Header("‚±‚Ì‚‚³ˆÈ‰º‚É—‰º‚µ‚½‚çƒŠƒXƒ|[ƒ“")]
+    [Header("ã“ã®é«˜ã•ä»¥ä¸‹ã«è½ä¸‹ã—ãŸã‚‰ãƒªã‚¹ãƒãƒ¼ãƒ³")]
     [SerializeField] float fallThreshold = -10f;
     private Vector3 initialSpawnPosition;
-
-    private Rigidbody rig;
-
-    //private float verticalInput;
 
     [SerializeField] DrawCircle drawCircle;
     [SerializeField] CameraControll cameraControll;
@@ -25,58 +23,51 @@ public class Player : MonoBehaviour
     public VariableJoystick variableJoystick;
     private Vector3 inputVector;
 
-    #region ƒQ[ƒ€‹N“®•K‚¸ŒÄ‚Î‚ê‚é
+    #region ã‚²ãƒ¼ãƒ èµ·å‹•æ™‚å¿…ãšå‘¼ã°ã‚Œã‚‹
     void Start()
     {
         //variableJoystick = FindAnyObjectByType<VariableJoystick>();
-        rig = GetComponent<Rigidbody>();
         initialSpawnPosition = transform.position;
         PlayerCurrentHP = maxPlayerHP;
     }
     #endregion
 
     private void FixedUpdate()
-    {
-        //verticalInput = Input.GetAxis("Vertical"); // W/S ‚Ü‚½‚Í ã‰º–îˆóƒL[
-
-        // ˆÚ“®
+    {    
+        // ç§»å‹•
         MovePlayerJoystick(inputVector);
+        MoveKey();
 
-        // ƒWƒƒƒ“ƒv
-        if (Input.GetKey(KeyCode.Space)) Jump();
-
-        // —‰º‚ÌƒŠƒXƒ|[ƒ“
+        // è½ä¸‹æ™‚ã®ãƒªã‚¹ãƒãƒ¼ãƒ³
         if (transform.position.y < fallThreshold) PlayerRespawn();
     }
 
-    #region ƒvƒŒƒCƒ„[‚Ì‘€ì‚Æ—‰º
+    #region ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ“ä½œã¨è½ä¸‹
     private void MovePlayerJoystick(Vector3 input)
     {
-        // ˆÚ“®
+        // ç§»å‹•
         input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
         transform.position += moveSpeed * Time.deltaTime * input;
     }
 
-    //void Move(float vertical)
-    //{
-    //    // WASDƒL[‚Ì“ü—Í‚ÉŠî‚Ã‚­ˆÚ“®
-    //    Vector3 moveDirection = new Vector3(0, 0, vertical).normalized;
-    //    moveDirection = transform.TransformDirection(moveDirection);
-
-    //    // AddForce ‚ÅˆÚ“®
-    //    rig.AddForce(moveDirection * moveSpeed, ForceMode.VelocityChange);
-    //}
-
-    private void Jump()
+    void MoveKey()
     {
-        if (Mathf.Abs(rig.velocity.y) < 0.01f) // ’n–Ê‚É‚¢‚é‚Æ‚«‚¾‚¯ƒWƒƒƒ“ƒv
+        float moveDirection = 0;
+        if (Input.GetKey(KeyCode.W))
         {
-            rig.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+            moveDirection = 1;
         }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            moveDirection = -1;
+        }
+
+        // å‰é€²å¾Œé€€ã®ç§»å‹•
+        transform.Translate(Vector3.forward * moveDirection * moveSpeed * Time.deltaTime);
     }
     #endregion
 
-    #region ƒ_ƒ[ƒW‚ğó‚¯‚é
+    #region ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’å—ã‘ã‚‹
     public void CmdTakeDamage(int attackPoint)
     {
         PlayerCurrentHP -= attackPoint;
@@ -88,7 +79,7 @@ public class Player : MonoBehaviour
     }
     #endregion
 
-    #region ƒŠƒXƒ|[ƒ“
+    #region ãƒªã‚¹ãƒãƒ¼ãƒ³
     void PlayerRespawn()
     {
         transform.position = initialSpawnPosition;

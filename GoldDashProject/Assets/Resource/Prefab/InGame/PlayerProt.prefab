@@ -58,7 +58,7 @@ PrefabInstance:
       objectReference: {fileID: 8192705780347656187}
     - target: {fileID: 2284531435540352603, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3583865104637948081, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
       propertyPath: m_Name
@@ -88,6 +88,10 @@ PrefabInstance:
       propertyPath: magicManagement
       value: 
       objectReference: {fileID: 8192705780347656187}
+    - target: {fileID: 5492307516954813520, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5579519226577498700, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
       propertyPath: m_Type
       value: 0
@@ -333,13 +337,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: MagicManager
       objectReference: {fileID: 0}
+    - target: {fileID: 2640923811124408801, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3914094888245212085, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
       propertyPath: MagicButtons.Array.size
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3914094888245212085, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
       propertyPath: availabMagics.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3914094888245212085, guid: c68d4cbb898e5de4aad7ad6f1cc17dba, type: 3}
       propertyPath: MagicButtons.Array.data[0]
@@ -675,6 +683,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 1
+  rotationSpeed: 200
   jumpPower: 0.3
   maxPlayerHP: 10
   fallThreshold: -10

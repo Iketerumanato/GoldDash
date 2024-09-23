@@ -2442,6 +2442,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sessionPass: 9999
   initSessionPass: 1234
+  myName: P1ngW1n
 --- !u!1 &1467684026
 GameObject:
   m_ObjectHideFlags: 0
