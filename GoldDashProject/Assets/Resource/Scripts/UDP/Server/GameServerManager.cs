@@ -94,11 +94,11 @@ public class GameServerManager : MonoBehaviour
 
                 Debug.Log("パケットを受け取ったぜ！開封するぜ！");
 
-                Debug.Log($"ヘッダーを確認するぜ！パケット種別は{(PacketDefiner.PACKET_TYPE)receivedHeader.packetType}だぜ！");
+                Debug.Log($"ヘッダーを確認するぜ！パケット種別は{(Definer.PT)receivedHeader.packetType}だぜ！");
 
                 switch (receivedHeader.packetType)
                 {
-                    case (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT:
+                    case (byte)Definer.PT.IPC:
 
                         //InitPacketを受け取ったときの処理
                         Debug.Log($"Initパケットを処理するぜ！ActorDictionaryに追加するぜ！");
@@ -110,7 +110,7 @@ public class GameServerManager : MonoBehaviour
                         if (usedName.Contains(receivedInitPacket.playerName))
                         {
                             InitPacketServer errorPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID, 1);
-                            Header errorHeader = new Header(serverSessionID, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_SERVER, errorPacket.ToByte());
+                            Header errorHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, errorPacket.ToByte());
 
                             Debug.Log($"プレイヤーネーム:{receivedInitPacket.playerName} は既に使われていたぜ。出直してもらうぜ。");
                             break;
@@ -128,7 +128,7 @@ public class GameServerManager : MonoBehaviour
 
                         //パケットを返信する
                         InitPacketServer myIPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID);
-                        Header myIHeader = new Header(serverSessionID, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_SERVER, myIPacket.ToByte());
+                        Header myIHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, myIPacket.ToByte());
 
                         udpGameServer.Send(myIHeader.ToByte());
                         Debug.Log($"パケット返信したぜ！");
@@ -149,8 +149,8 @@ public class GameServerManager : MonoBehaviour
 
 
 
-                                ActionPacket myAPacket = new ActionPacket((byte)PacketDefiner.ACTION_ROUGH_ID.NOTICE, (byte)PacketDefiner.NOTICE_DETAIL_ID.MATCHING_COMPLETED, k.Key, new Vector3(9.5f, 0.2f, 9 + f));
-                                Header myAHeader = new Header(serverSessionID, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.ACTION_PACKET, myAPacket.ToByte());
+                                ActionPacket myAPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG, k.Key, new Vector3(9.5f, 0.2f, 9 + f));
+                                Header myAHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myAPacket.ToByte());
                                 udpGameServer.Send(myAHeader.ToByte());
                                 f += 0.5f;
 
@@ -160,12 +160,12 @@ public class GameServerManager : MonoBehaviour
                         }
                         
                         break;
-                    case (byte)PacketDefiner.PACKET_TYPE.ACTION_PACKET:
+                    case (byte)Definer.PT.AP:
                         //ActionPacketを受け取ったときの処理
                         break;
 
                     default:
-                        Debug.Log($"{(PacketDefiner.PACKET_TYPE)receivedHeader.packetType}はサーバーでは処理できないぜ。処理を終了するぜ。");
+                        Debug.Log($"{(Definer.PT)receivedHeader.packetType}はサーバーでは処理できないぜ。処理を終了するぜ。");
                         break;
                 }
             }

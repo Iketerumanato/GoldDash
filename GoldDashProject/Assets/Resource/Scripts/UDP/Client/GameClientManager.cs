@@ -40,7 +40,7 @@ public class GameClientManager : MonoBehaviour
                 if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
 
                 //Initパケット送信
-                udpGameClient.Send(new Header(0, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte());
+                udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte());
 
                 isRunning = true;
                 break;
@@ -80,11 +80,11 @@ public class GameClientManager : MonoBehaviour
 
                 Debug.Log("パケットを受け取ったぜ！開封するぜ！");
 
-                Debug.Log($"ヘッダーを確認するぜ！パケット種別は{(PacketDefiner.PACKET_TYPE)receivedHeader.packetType}だぜ！");
+                Debug.Log($"ヘッダーを確認するぜ！パケット種別は{(Definer.PT)receivedHeader.packetType}だぜ！");
 
                 switch (receivedHeader.packetType)
                 {
-                    case (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_SERVER:
+                    case (byte)Definer.PT.IPS:
 
                         //InitPacketを受け取ったときの処理
                         Debug.Log($"Initパケットを処理するぜ！SessionIDを受け取るぜ！");
@@ -97,7 +97,7 @@ public class GameClientManager : MonoBehaviour
 
                         //エラーコードがあればここで処理
                         break;
-                    case (byte)PacketDefiner.PACKET_TYPE.ACTION_PACKET:
+                    case (byte)Definer.PT.AP:
 
                         //InitPacketを受け取ったときの処理
                         Debug.Log($"Actionパケットを処理するぜ！SessionIDを受け取るぜ！");
@@ -114,7 +114,7 @@ public class GameClientManager : MonoBehaviour
                         //ActionPacketを受け取ったときの処理
                         break;
                     default:
-                        Debug.Log($"{(PacketDefiner.PACKET_TYPE)receivedHeader.packetType}はクライアントでは処理できないぜ。処理を終了するぜ。");
+                        Debug.Log($"{(Definer.PT)receivedHeader.packetType}はクライアントでは処理できないぜ。処理を終了するぜ。");
                         break;
                 }
             }
