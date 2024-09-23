@@ -26,6 +26,7 @@ public class GameServerManager : MonoBehaviour
 
     private HashSet<string> usedName; //プレイヤーネームの重複防止に使う。
 
+    [SerializeField] private int numOfPlayer; //何人のプレイヤーを募集するか
 
     private bool inGame = false; //ゲームが始まっているか
 
@@ -93,7 +94,6 @@ public class GameServerManager : MonoBehaviour
                 Header receivedHeader = packetQueue.Dequeue();
 
                 Debug.Log("パケットを受け取ったぜ！開封するぜ！");
-
                 Debug.Log($"ヘッダーを確認するぜ！パケット種別は{(Definer.PT)receivedHeader.packetType}だぜ！");
 
                 switch (receivedHeader.packetType)
@@ -123,17 +123,20 @@ public class GameServerManager : MonoBehaviour
                         usedName.Add(receivedInitPacket.playerName); //登録したプレイヤーネームを使用済にする
 
                         Debug.Log($"sessionID:{receivedHeader.sessionID},プレイヤーネーム:{receivedInitPacket.playerName} でactorDictionaryに登録したぜ！");
-
                         Debug.Log($"actorDictionaryには現在、{actorDictionary.Count}人のプレイヤーが登録されているぜ！");
 
                         //パケットを返信する
-                        InitPacketServer myIPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID);
-                        Header myIHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, myIPacket.ToByte());
+                        //ここ、myPacketだのmyHeaderだのという汎用的な変数名を使いたいけどスコープ内で競合してしまうのでスコープを分けています。
+                        //関数化するか迷ったけど、パケット種別によって内容が変わってくるのと、いちいち定義へ移動するのが極めて手間だと思うので長々と書きます。
+                        {
+                            InitPacketServer myPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID);
+                            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, myPacket.ToByte());
+                            udpGameServer.Send(myHeader.ToByte());
+                            Debug.Log($"パケット返信したぜ！");
+                        }
 
-                        udpGameServer.Send(myIHeader.ToByte());
-                        Debug.Log($"パケット返信したぜ！");
-
-                        if (actorDictionary.Count == 1)
+                        //規定人数のプレイヤーが集まった時の処理
+                        if (actorDictionary.Count == numOfPlayer)
                         {
                             Debug.Log($"十分なプレイヤーが集まったぜ。闇のゲームの始まりだぜ。");
 
@@ -149,9 +152,9 @@ public class GameServerManager : MonoBehaviour
 
 
 
-                                ActionPacket myAPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG, k.Key, new Vector3(9.5f, 0.2f, 9 + f));
-                                Header myAHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myAPacket.ToByte());
-                                udpGameServer.Send(myAHeader.ToByte());
+                                ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG, k.Key, new Vector3(9.5f, 0.2f, 9 + f));
+                                Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                                udpGameServer.Send(myHeader.ToByte());
                                 f += 0.5f;
 
                                 Debug.Log($"送りました");
