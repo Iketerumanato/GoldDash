@@ -145,10 +145,16 @@ public class GameServerManager : MonoBehaviour
                             float f = 0.5f;
                             foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
                             {
+                                Debug.Log($"パケット送ってゲームはじめます");
+
+
+
                                 ActionPacket myAPacket = new ActionPacket((byte)PacketDefiner.ACTION_ROUGH_ID.NOTICE, (byte)PacketDefiner.NOTICE_DETAIL_ID.MATCHING_COMPLETED, k.Key, new Vector3(9.5f, 0.2f, 9 + f));
-                                Header myAHeader = new Header(serverSessionID, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_SERVER, myAPacket.ToByte());
-                                udpGameServer.Send(myIHeader.ToByte());
+                                Header myAHeader = new Header(serverSessionID, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.ACTION_PACKET, myAPacket.ToByte());
+                                udpGameServer.Send(myAHeader.ToByte());
                                 f += 0.5f;
+
+                                Debug.Log($"送りました");
                             }
                             
                         }
