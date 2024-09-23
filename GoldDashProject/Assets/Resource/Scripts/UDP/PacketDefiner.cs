@@ -25,6 +25,7 @@ public static class PacketDefiner
 
     public enum NOTICE_DETAIL_ID : byte
     { 
+        NONE,
         HELLO, //定期的にハローパケットを飛ばして存在を確かめ合う
         MATCHING_COMPLETED, //マッチングが終わった
         //今後増やす

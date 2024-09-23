@@ -3,16 +3,16 @@ using UnityEngine;
 
 public class CameraControll : MonoBehaviour
 {
-    [Header("ƒvƒŒƒCƒ„[‚ÌƒIƒuƒWƒFƒNƒg")]
+    [Header("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ")]
     [SerializeField] GameObject playerBody;
-    [Header("ƒJƒƒ‰‘€ì—p‚ÌƒWƒ‡ƒCƒXƒeƒBƒbƒN")]
+    [Header("ã‚«ãƒ¡ãƒ©æ“ä½œç”¨ã®ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯")]
     [SerializeField] DynamicJoystick cameramoveJoystick;
-    [Header("ƒJƒƒ‰‚ÌŠ´“x")]
+    [Header("ã‚«ãƒ¡ãƒ©ã®æ„Ÿåº¦")]
     [Range(50f, 150f)]
     [SerializeField] float joystickSensitivity = 100f;
-    [Header("ƒJƒƒ‰‚ÌˆÊ’u’²®")]
+    [Header("ã‚«ãƒ¡ãƒ©ã®ä½ç½®èª¿æ•´")]
     [SerializeField] Vector3 cameraOffset = new(0f, 0.7f, 0.4f);
-    [Header("c‰ñ“]‚Ì§Œä")]
+    [Header("ç¸¦å›è»¢ã®åˆ¶å¾¡")]
     float xRotation = 0f;
     [Range(90f, 120f)]
     [SerializeField] float CamXMaxClanpRot = 90f;
@@ -31,7 +31,7 @@ public class CameraControll : MonoBehaviour
         CreateCamera();
     }
 
-    #region ƒJƒƒ‰‚Ì–ˆƒtƒŒ[ƒ€ˆ—
+    #region ã‚«ãƒ¡ãƒ©ã®æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å‡¦ç†
     void Update()
     {
         float horizontalInput = cameramoveJoystick.Horizontal * joystickSensitivity * Time.deltaTime;
@@ -42,18 +42,21 @@ public class CameraControll : MonoBehaviour
 
         xRotation -= verticalInput;
         xRotation = Mathf.Clamp(xRotation, CamXMinClanpRot, CamXMaxClanpRot);
-        // ƒJƒƒ‰‚Ìc‰ñ“]‚ğXV
+        // ã‚«ãƒ¡ãƒ©ã®ç¸¦å›è»¢ã‚’æ›´æ–°
         PlayerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
-        // ƒvƒŒƒCƒ„[‚Ì‰ñ“]‚ğXV(‰¡‰ñ“]‚àˆê‚É)
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å›è»¢ã‚’æ›´æ–°(æ¨ªå›è»¢ã‚‚ä¸€ç·’ã«)
         Vector3 direction = new(xRotation, yRotation, 0f);
-        Quaternion toRotation = Quaternion.LookRotation(direction, Vector3.up);
-        playerBody.transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotateSpeed * Time.deltaTime);
-        playerBody.transform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
+        if (direction.sqrMagnitude > 0.0001f)
+        {
+            Quaternion toRotation = Quaternion.LookRotation(direction, Vector3.up);
+            playerBody.transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotateSpeed * Time.deltaTime);
+            playerBody.transform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
+        }
     }
     #endregion
 
-    #region ƒJƒƒ‰‚Ì¶¬‚Æİ’è
+    #region ã‚«ãƒ¡ãƒ©ã®ç”Ÿæˆã¨è¨­å®š
     void CreateCamera()
     {
         cameramoveJoystick = FindObjectOfType<DynamicJoystick>();

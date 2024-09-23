@@ -26,6 +26,9 @@ public class GameServerManager : MonoBehaviour
 
     private HashSet<string> usedName; //プレイヤーネームの重複防止に使う。
 
+
+    private bool inGame = false; //ゲームが始まっているか
+
     #region ボタンが押されたらサーバーを有効化したり無効化したり
     public void InitObservation(UdpButtonManager udpUIManager)
     {
@@ -122,25 +125,45 @@ public class GameServerManager : MonoBehaviour
                         Debug.Log($"sessionID:{receivedHeader.sessionID},プレイヤーネーム:{receivedInitPacket.playerName} でactorDictionaryに登録したぜ！");
 
                         Debug.Log($"actorDictionaryには現在、{actorDictionary.Count}人のプレイヤーが登録されているぜ！");
-                        if (actorDictionary.Count == 4)
+
+                        //パケットを返信する
+                        InitPacketServer myIPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID);
+                        Header myIHeader = new Header(serverSessionID, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_SERVER, myIPacket.ToByte());
+
+                        udpGameServer.Send(myIHeader.ToByte());
+                        Debug.Log($"パケット返信したぜ！");
+
+                        if (actorDictionary.Count == 1)
                         {
                             Debug.Log($"十分なプレイヤーが集まったぜ。闇のゲームの始まりだぜ。");
 
                             //Dictionaryへの登録を締め切る処理
 
                             //ゲーム開始処理
+                            inGame = true;
+
+                            float f = 0.5f;
+                            foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+                            {
+                                Debug.Log($"パケット送ってゲームはじめます");
+
+
+
+                                ActionPacket myAPacket = new ActionPacket((byte)PacketDefiner.ACTION_ROUGH_ID.NOTICE, (byte)PacketDefiner.NOTICE_DETAIL_ID.MATCHING_COMPLETED, k.Key, new Vector3(9.5f, 0.2f, 9 + f));
+                                Header myAHeader = new Header(serverSessionID, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.ACTION_PACKET, myAPacket.ToByte());
+                                udpGameServer.Send(myAHeader.ToByte());
+                                f += 0.5f;
+
+                                Debug.Log($"送りました");
+                            }
+                            
                         }
-
-                        //パケットを返信する
-                        InitPacketServer myPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID);
-                        Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_SERVER, myPacket.ToByte());
-
-                        udpGameServer.Send(myHeader.ToByte());
-                        Debug.Log($"パケット返信したぜ！");
+                        
                         break;
                     case (byte)PacketDefiner.PACKET_TYPE.ACTION_PACKET:
                         //ActionPacketを受け取ったときの処理
                         break;
+
                     default:
                         Debug.Log($"{(PacketDefiner.PACKET_TYPE)receivedHeader.packetType}はサーバーでは処理できないぜ。処理を終了するぜ。");
                         break;
