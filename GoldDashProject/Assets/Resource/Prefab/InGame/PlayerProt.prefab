@@ -48,6 +48,10 @@ PrefabInstance:
       propertyPath: m_RenderMode
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1335806683341102721, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
+      propertyPath: m_SortingOrder
+      value: -10
+      objectReference: {fileID: 0}
     - target: {fileID: 1823201190502047317, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
       propertyPath: magicManagement
       value: 
