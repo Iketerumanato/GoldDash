@@ -21,6 +21,8 @@ public class GameClientManager : MonoBehaviour
 
     private ushort sessionID; //自分のセッションID。サーバー側で決めてもらう。
 
+    [SerializeField] private GameObject player;
+
     #region ボタンが押されたら有効化したり無効化したり
     public void InitObservation(UdpButtonManager udpUIManager)
     {
@@ -96,6 +98,13 @@ public class GameClientManager : MonoBehaviour
                         //エラーコードがあればここで処理
                         break;
                     case (byte)PacketDefiner.PACKET_TYPE.ACTION_PACKET:
+                        ActionPacket receivedActionPacket = new ActionPacket(receivedHeader.data);
+
+                        if (receivedActionPacket.targetID == this.sessionID)
+                        {
+                            player.transform.position = receivedActionPacket.pos;
+                        }
+
                         //ActionPacketを受け取ったときの処理
                         break;
                     default:
