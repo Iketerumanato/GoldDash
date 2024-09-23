@@ -98,12 +98,18 @@ public class GameClientManager : MonoBehaviour
                         //エラーコードがあればここで処理
                         break;
                     case (byte)PacketDefiner.PACKET_TYPE.ACTION_PACKET:
+
+                        //InitPacketを受け取ったときの処理
+                        Debug.Log($"Actionパケットを処理するぜ！SessionIDを受け取るぜ！");
+
                         ActionPacket receivedActionPacket = new ActionPacket(receivedHeader.data);
 
                         if (receivedActionPacket.targetID == this.sessionID)
                         {
                             player.transform.position = receivedActionPacket.pos;
                         }
+
+                        Debug.Log($"{receivedHeader.data}に移動したぜ。");
 
                         //ActionPacketを受け取ったときの処理
                         break;
