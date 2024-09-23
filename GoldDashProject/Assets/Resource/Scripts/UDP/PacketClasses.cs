@@ -1,15 +1,16 @@
 using System;
 using System.Linq;
+using System.Net;
 using System.Text;
 using UnityEngine;
 
-//ƒpƒPƒbƒgŒnƒNƒ‰ƒX‚ÌŠî’êƒNƒ‰ƒX
+//ãƒ‘ã‚±ãƒƒãƒˆç³»ã‚¯ãƒ©ã‚¹ã®åŸºåº•ã‚¯ãƒ©ã‚¹
 public abstract class Packet
 {
-    //ƒoƒCƒg”z—ñ‚Ö‚Ì•ÏŠ·ƒƒ\ƒbƒhÀ‘•‚ğ‹­§
+    //ãƒã‚¤ãƒˆé…åˆ—ã¸ã®å¤‰æ›ãƒ¡ã‚½ãƒƒãƒ‰å®Ÿè£…ã‚’å¼·åˆ¶
     public abstract byte[] ToByte();
 
-    //ƒoƒCƒg”z—ñA‚Ì––”ö‚ÉƒoƒCƒg”z—ñB‚ğ‚­‚Á‚Â‚¯‚é
+    //ãƒã‚¤ãƒˆé…åˆ—Aã®æœ«å°¾ã«ãƒã‚¤ãƒˆé…åˆ—Bã‚’ãã£ã¤ã‘ã‚‹
     protected byte[] AddBytes(byte[] originBytes, byte[] addBytes)
     {
         byte[] ret = new byte[originBytes.Length + addBytes.Length];
@@ -21,7 +22,7 @@ public abstract class Packet
 
         return ret;
     }
-    //ƒoƒCƒg”z—ñ‚Ì––”ö‚É”CˆÓ‚ÌƒoƒCƒg‚ğˆê‚Â‚­‚Á‚Â‚¯‚é
+    //ãƒã‚¤ãƒˆé…åˆ—ã®æœ«å°¾ã«ä»»æ„ã®ãƒã‚¤ãƒˆã‚’ä¸€ã¤ãã£ã¤ã‘ã‚‹
     protected byte[] AddByte(byte[] originBytes, byte addByte)
     {
         byte[] ret = new byte[originBytes.Length + 1];
@@ -35,28 +36,28 @@ public abstract class Packet
     }
 }
 
-//UDPClient‚©‚ç‘—M‚·‚éƒpƒPƒbƒg‚Ìæ“ª‚É•t—^‚·‚éƒJƒXƒ^ƒ€UDPƒwƒbƒ_B‘—M”Ô†‚ğ‚½‚¹‚Ä’ÊMŒğŠ·‚·‚é‚ÆRUDP‚Éi‰»B‚¨‚ß‚Å‚Æ‚¤I
+//UDPClientã‹ã‚‰é€ä¿¡ã™ã‚‹ãƒ‘ã‚±ãƒƒãƒˆã®å…ˆé ­ã«ä»˜ä¸ã™ã‚‹ã‚«ã‚¹ã‚¿ãƒ UDPãƒ˜ãƒƒãƒ€ã€‚é€ä¿¡ç•ªå·ã‚’æŒãŸã›ã¦é€šä¿¡äº¤æ›ã™ã‚‹ã¨RUDPã«é€²åŒ–ã€‚ãŠã‚ã§ã¨ã†ï¼
 public class Header : Packet
 {
-    private ushort sessionID; //ƒT[ƒo[‚©‚ç—^‚¦‚éIDBƒZƒLƒ…ƒŠƒeƒB‚ª—v‚é‚È‚çƒnƒbƒVƒ…‚ğg‚¤‚×‚«‚©B
-    private ushort indexDiff; //‚±‚ÌƒpƒPƒbƒgˆÈ~‚É‘±‚­ƒpƒPƒbƒg(RUDP—p‚ÌŒÃ‚¢ƒpƒPƒbƒg)‚ÌˆÊ’u‚ÆA‚±‚ÌƒpƒPƒbƒg‚Ìæ“ªƒCƒ“ƒfƒbƒNƒX‚Ì·‚ğ¦‚·
-    private uint sendNum; //‚±‚ÌƒpƒPƒbƒg‚Ì‘—M”Ô†
-    private uint ackNum; //ÅŒã‚É‘Šè‚©‚çó‚¯æ‚Á‚½ƒpƒPƒbƒg‚Ì‘—M”Ô†
-    private ushort packetType; //‚±‚ÌƒpƒPƒbƒg‚Ìƒ^ƒCƒv
-    private byte[] data; //ƒf[ƒ^–{‘Ì
+    public ushort sessionID; //ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰ä¸ãˆã‚‹IDã€‚ã‚»ã‚­ãƒ¥ãƒªãƒ†ã‚£ãŒè¦ã‚‹ãªã‚‰ãƒãƒƒã‚·ãƒ¥ã‚’ä½¿ã†ã¹ãã‹ã€‚
+    public ushort indexDiff; //ã“ã®ãƒ‘ã‚±ãƒƒãƒˆä»¥é™ã«ç¶šããƒ‘ã‚±ãƒƒãƒˆ(RUDPç”¨ã®å¤ã„ãƒ‘ã‚±ãƒƒãƒˆ)ã®ä½ç½®ã¨ã€ã“ã®ãƒ‘ã‚±ãƒƒãƒˆã®å…ˆé ­ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®å·®ã‚’ç¤ºã™
+    public uint sendNum; //ã“ã®ãƒ‘ã‚±ãƒƒãƒˆã®é€ä¿¡ç•ªå·
+    public uint ackNum; //æœ€å¾Œã«ç›¸æ‰‹ã‹ã‚‰å—ã‘å–ã£ãŸãƒ‘ã‚±ãƒƒãƒˆã®é€ä¿¡ç•ªå·
+    public byte packetType; //ã“ã®ãƒ‘ã‚±ãƒƒãƒˆã®ã‚¿ã‚¤ãƒ—
+    public byte[] data; //ãƒ‡ãƒ¼ã‚¿æœ¬ä½“
 
-    //ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚P@Še•Ï”‚Ì’l‚ğ’¼Úw’è‚·‚é
+    //ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ï¼‘ã€€å„å¤‰æ•°ã®å€¤ã‚’ç›´æ¥æŒ‡å®šã™ã‚‹
     public Header(ushort sessionID, ushort indexDiff, uint sendNum, uint ackNum, byte packetType, byte[] data)
     {
         this.sessionID = sessionID;
-        this.indexDiff = indexDiff; //ŒÃ‚¢ƒpƒPƒbƒg‚Æ‚ÌˆÊ’uŠÖŒW‚Í‘—M‚É•ª‚©‚é‚Ì‚ÅAˆø”‚©‚ç’¼Ú‚Æ‚ê‚Î‚æ‚¢
+        this.indexDiff = indexDiff; //å¤ã„ãƒ‘ã‚±ãƒƒãƒˆã¨ã®ä½ç½®é–¢ä¿‚ã¯é€ä¿¡æ™‚ã«åˆ†ã‹ã‚‹ã®ã§ã€å¼•æ•°ã‹ã‚‰ç›´æ¥ã¨ã‚Œã°ã‚ˆã„
         this.sendNum = sendNum;
         this.ackNum = ackNum;
         this.packetType = packetType;
         this.data = data;
     }
 
-    //ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Q@ƒoƒCƒg”z—ñ‚ğ“Ç‚ñ‚Å•Ï”‚ğ‰Šú‰»
+    //ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ï¼’ã€€ãƒã‚¤ãƒˆé…åˆ—ã‚’èª­ã‚“ã§å¤‰æ•°ã‚’åˆæœŸåŒ–
     public Header(byte[] bytes)
     {
         int index = 0;
@@ -69,12 +70,12 @@ public class Header : Packet
         index += sizeof(uint);
         this.ackNum = BitConverter.ToUInt32(bytes, index);
         index += sizeof(uint);
-        this.sessionID = BitConverter.ToUInt16(bytes, index);
-        index += sizeof(ushort);
+        this.packetType = bytes[index];
+        index++;
         data = bytes.Skip(index).ToArray();
     }
 
-    //•Ï”‚©‚çƒoƒCƒg”z—ñ‚ğo—Í‚·‚é
+    //å¤‰æ•°ã‹ã‚‰ãƒã‚¤ãƒˆé…åˆ—ã‚’å‡ºåŠ›ã™ã‚‹
     public override byte[] ToByte()
     {
         byte[] ret = new byte[0];
@@ -83,36 +84,40 @@ public class Header : Packet
         ret = AddBytes(ret, BitConverter.GetBytes(indexDiff));
         ret = AddBytes(ret, BitConverter.GetBytes(sendNum));
         ret = AddBytes(ret, BitConverter.GetBytes(ackNum));
-        ret = AddBytes(ret, BitConverter.GetBytes(packetType));
+        ret = AddByte(ret, packetType);
         ret = AddBytes(ret, data);
 
         return ret;
     }
 }
 
-//‰‰ñ’ÊM—pƒpƒPƒbƒg
+//åˆå›é€šä¿¡ç”¨ãƒ‘ã‚±ãƒƒãƒˆ
 public class InitPacketClient : Packet
 {
-    private ushort pass; //ƒ}ƒbƒ`ƒ“ƒO—pƒpƒXƒ[ƒh
-    private ushort rcvPort; //ƒNƒ‰ƒCƒAƒ“ƒg‚ªóM—p‚É‹ó‚¯‚Ä‚¢‚éƒ|[ƒg‚Ì”Ô†
-    private byte playerNameLength; //ƒvƒŒƒCƒ„[–¼‚ÌƒoƒCƒg”
-    private string playerName; //ƒvƒŒƒCƒ„[–¼
+    public ushort sessionPass; //ãƒãƒƒãƒãƒ³ã‚°ç”¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
+    public ushort rcvPort; //ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆãŒå—ä¿¡ç”¨ã«ç©ºã‘ã¦ã„ã‚‹ãƒãƒ¼ãƒˆã®ç•ªå·
+    public ushort initSessionPass; ////åˆå›é€šä¿¡æ™‚ã«ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å´ã‹ã‚‰é€ã‚‹ã‚»ãƒƒã‚·ãƒ§ãƒ³ãƒ‘ã‚¹ã€‚å¾—ã‚‰ã‚ŒãŸãƒ¬ã‚¹ãƒãƒ³ã‚¹ãŒã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰ã®ã‚‚ã®ã§ã‚ã‚‹ã¨æ–­å®šã™ã‚‹ã¨ãã«ä½¿ã†ã€‚
+    public byte playerNameLength; //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åã®ãƒã‚¤ãƒˆæ•°
+    public string playerName; //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å
 
-    public InitPacketClient(ushort pass, ushort rcvPort, string playerName)
+    public InitPacketClient(ushort pass, ushort rcvPort, ushort initSessionPass, string playerName)
     {
-        this.pass = pass;
+        this.sessionPass = pass;
         this.rcvPort = rcvPort;
+        this.initSessionPass = initSessionPass;
         this.playerName = playerName;
-        this.playerNameLength = (byte)playerName.Length;
+        this.playerNameLength = (byte)Encoding.UTF8.GetByteCount(playerName);
     }
 
     public InitPacketClient(byte[] bytes)
     {
         int index = 0;
 
-        this.pass = BitConverter.ToUInt16(bytes, index);
+        this.sessionPass = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
         this.rcvPort = BitConverter.ToUInt16(bytes, index);
+        index += sizeof(ushort);
+        this.initSessionPass = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
         this.playerNameLength = bytes[index];
         index++;
@@ -123,8 +128,9 @@ public class InitPacketClient : Packet
     {
         byte[] ret = new byte[0];
 
-        ret = AddBytes(ret, BitConverter.GetBytes(pass));
+        ret = AddBytes(ret, BitConverter.GetBytes(sessionPass));
         ret = AddBytes(ret, BitConverter.GetBytes(rcvPort));
+        ret = AddBytes(ret, BitConverter.GetBytes(initSessionPass));
         ret = AddByte(ret, playerNameLength);
         ret = AddBytes(ret, Encoding.UTF8.GetBytes(playerName));
 
@@ -134,16 +140,16 @@ public class InitPacketClient : Packet
 
 public class InitPacketServer : Packet
 {
-    private ushort rcvPort; //ƒT[ƒo‚Ìƒ|[ƒg”Ô†
-    private ushort sessionID; //ƒT[ƒo[‚©‚ç—^‚¦‚éID
-    private byte state; //Œ»İ‚ÌƒT[ƒo‚Ìó‘Ô‚ğ•Ô‚·ƒvƒŒƒCƒ„[–¼‚Ìd•¡‚ª‹N‚«‚½‚Æ‚«‚È‚Ç
-    private byte error; //ƒGƒ‰[ƒR[ƒh@Œ»İ‚ÌƒT[ƒo‚Ìó‘Ô‚ğ•Ô‚·ƒvƒŒƒCƒ„[–¼‚Ìd•¡‚ª‹N‚«‚½‚Æ‚«‚È‚Ç
+    public ushort initSessionPass; //ãƒãƒƒãƒãƒ³ã‚°ç”¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
+    public ushort rcvPort; //ã‚µãƒ¼ãƒã®ãƒãƒ¼ãƒˆç•ªå·
+    public ushort sessionID; //ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰ä¸ãˆã‚‹ID
+    public byte error; //ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰ã€€ç¾åœ¨ã®ã‚µãƒ¼ãƒã®çŠ¶æ…‹ã‚’è¿”ã™ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åã®é‡è¤‡ãŒèµ·ããŸã¨ããªã©
 
-    public InitPacketServer(ushort rcvPort, ushort sessionID, byte state, byte error)
+    public InitPacketServer(ushort initSessionPass, ushort rcvPort, ushort sessionID, byte error = 0)
     {
+        this.initSessionPass = initSessionPass;
         this.rcvPort = rcvPort;
         this.sessionID = sessionID;
-        this.state = state;
         this.error = error;
     }
 
@@ -151,21 +157,22 @@ public class InitPacketServer : Packet
     {
         int index = 0;
 
+        this.initSessionPass = BitConverter.ToUInt16(bytes, index);
+        index += sizeof(ushort);
         this.rcvPort = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
         this.sessionID = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
-        this.state = bytes[index];
-        index++;
         this.error = bytes[index];
     }
+
     public override byte[] ToByte()
     {
         byte[] ret = new byte[0];
 
+        ret = AddBytes(ret, BitConverter.GetBytes(initSessionPass));
         ret = AddBytes(ret, BitConverter.GetBytes(rcvPort));
         ret = AddBytes(ret, BitConverter.GetBytes(sessionID));
-        ret = AddByte(ret, state);
         ret = AddByte(ret, error);
 
         return ret;
@@ -174,12 +181,12 @@ public class InitPacketServer : Packet
 
 public class ActionPacket : Packet
 {
-    byte roughID; //ƒAƒNƒVƒ‡ƒ“‚ÌƒJƒeƒSƒŠ‚ğ¦‚·
-    byte detailID; //ƒAƒNƒVƒ‡ƒ“‚ÌÚ×‚Èí—Ş‚ğ¦‚·
-    byte targetID; //ƒAƒNƒVƒ‡ƒ“‚Ì‘ÎÛ‚ğ¦‚·
-    Vector3 pos; //À•Wƒf[ƒ^‚ğ‚ÂƒAƒNƒVƒ‡ƒ“‚ÅQÆ‚·‚é
+    public byte roughID; //ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã®ã‚«ãƒ†ã‚´ãƒªã‚’ç¤ºã™
+    public byte detailID; //ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã®è©³ç´°ãªç¨®é¡ã‚’ç¤ºã™
+    public ushort targetID; //ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã®å¯¾è±¡ã‚’ç¤ºã™
+    public Vector3 pos; //åº§æ¨™ãƒ‡ãƒ¼ã‚¿ã‚’æŒã¤ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã§å‚ç…§ã™ã‚‹
 
-    public ActionPacket(byte roughID, byte detailID, byte targetID, UnityEngine.Vector3 pos)
+    public ActionPacket(byte roughID, byte detailID, ushort targetID, Vector3 pos)
     {
         this.roughID = roughID;
         this.detailID = detailID;
@@ -196,8 +203,8 @@ public class ActionPacket : Packet
         index++;
         this.detailID = bytes[index];
         index++;
-        this.targetID = bytes[index];
-        index++;
+        this.targetID = BitConverter.ToUInt16(bytes, index);
+        index += sizeof(ushort);
         x = BitConverter.ToSingle(bytes, index);
         index += sizeof(float);
         y = BitConverter.ToSingle(bytes, index);
@@ -212,7 +219,7 @@ public class ActionPacket : Packet
 
         ret = AddByte(ret, roughID);
         ret = AddByte(ret, detailID);
-        ret = AddByte(ret, targetID);
+        ret = AddBytes(ret, BitConverter.GetBytes(targetID));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.x));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.y));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.z));
@@ -223,14 +230,14 @@ public class ActionPacket : Packet
 
 public class PositionPacket : Packet
 {
-    byte id0;
-    Vector3 pos0;
-    byte id1;
-    Vector3 pos1;
-    byte id2;
-    Vector3 pos2;
-    byte id3;
-    Vector3 pos3;
+    public byte id0;
+    public Vector3 pos0;
+    public byte id1;
+    public Vector3 pos1;
+    public byte id2;
+    public Vector3 pos2;
+    public byte id3;
+    public Vector3 pos3;
 
     public PositionPacket(byte id0, Vector3 pos0, byte id1, Vector3 pos1, byte id2, Vector3 pos2, byte id3, Vector3 pos3)
     {
@@ -249,7 +256,7 @@ public class PositionPacket : Packet
         int index = 0;
         float x, y, z;
 
-        //1l–Ú
+        //1äººç›®
         this.id0 = bytes[index];
         index++;
         x = BitConverter.ToSingle(bytes, index);
@@ -259,7 +266,7 @@ public class PositionPacket : Packet
         z = BitConverter.ToSingle(bytes, index);
         index += sizeof(float);
         pos0 = new Vector3(x, y, z);
-        //2l–Ú
+        //2äººç›®
         this.id1 = bytes[index];
         index++;
         x = BitConverter.ToSingle(bytes, index);
@@ -269,7 +276,7 @@ public class PositionPacket : Packet
         z = BitConverter.ToSingle(bytes, index);
         index += sizeof(float);
         pos1 = new Vector3(x, y, z);
-        //3l–Ú
+        //3äººç›®
         this.id2 = bytes[index];
         index++;
         x = BitConverter.ToSingle(bytes, index);
@@ -279,7 +286,7 @@ public class PositionPacket : Packet
         z = BitConverter.ToSingle(bytes, index);
         index += sizeof(float);
         pos2 = new Vector3(x, y, z);
-        //4l–Ú
+        //4äººç›®
         this.id3 = bytes[index];
         index++;
         x = BitConverter.ToSingle(bytes, index);
