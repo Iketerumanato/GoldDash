@@ -30,9 +30,18 @@ public class GameServerManager : MonoBehaviour
 
     private bool inGame = false; //ゲームが始まっているか
 
+    //サーバーが内部をコントロールするための通知　マップ生成など
+    public enum SERVER_INTERNAL_EVENT
+    { 
+        GENERATE_MAP = 0,
+    }
+
+    public Subject<SERVER_INTERNAL_EVENT> ServerInternalSubject;
+
     #region ボタンが押されたらサーバーを有効化したり無効化したり
     public void InitObservation(UdpButtonManager udpUIManager)
     {
+        ServerInternalSubject = new Subject<SERVER_INTERNAL_EVENT>();
         udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
     }
 
@@ -144,6 +153,8 @@ public class GameServerManager : MonoBehaviour
 
                             //ゲーム開始処理
                             inGame = true;
+                            //内部通知
+                            ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
 
                             float f = 0.5f;
                             foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)

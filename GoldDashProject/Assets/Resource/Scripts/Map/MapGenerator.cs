@@ -4,15 +4,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using R3;
 
-public class MapInfo : MonoBehaviour
+public class MapGenerator : MonoBehaviour
 {
-    public bool IsNetwork = false;//true = Server/false = Client
+    //å®šæ•°
+    private const int NUM_OF_PARTS = 4; //çµ„ã¿åˆã‚ã›ã‚‹ãƒãƒƒãƒ—ãƒ‘ãƒ¼ãƒ„ã®æ•°ã€‚4ã¤ã€‚
+    private const int MAP_SIZE = 19; //ãƒãƒƒãƒ—ã®ä¸€è¾ºã®ãƒã‚¹æ•°ã€‚å¶æ•°ã«ã—ãªã„ã§ãã ã•ã„ã€‚è‡ªå‹•ãƒ‡ãƒãƒƒã‚°ã—ã‚ˆã†ã¨ã—ãŸã‚‰unreachable codeè­¦å‘ŠãŒæ¶ˆãˆãªã„:(
+    private const int MAP_PART_SIZE = (MAP_SIZE - 1) / 2; //ãƒãƒƒãƒ—ãƒ‘ãƒ¼ãƒ„ã®ä¸€è¾ºã®ãƒã‚¹æ•°
 
-    // eƒIƒuƒWƒFƒNƒg
+    //ãƒ’ã‚¨ãƒ©ãƒ«ã‚­ãƒ¼ãŒè¦‹ã‚„ã™ã„ã‚ˆã†ã€ãƒãƒƒãƒ—ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¯ã“ã®è¦ªã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å­ã«ã™ã‚‹
     [SerializeField] Transform Parenttransform;
 
-    //¶¬‚·‚éƒIƒuƒWƒFƒNƒg
+    //ç”Ÿæˆã«ä½¿ç”¨ã™ã‚‹ãƒ‘ãƒ¼ãƒ„é¡
     [SerializeField] GameObject floorObj;
     [SerializeField] GameObject wallObj;
     [SerializeField] GameObject doorObj;
@@ -20,23 +24,33 @@ public class MapInfo : MonoBehaviour
     [SerializeField] GameObject respawnObj;
     [SerializeField] GameObject Player;
 
-    //‘g‚İ‡‚í‚¹‚éƒ}ƒbƒvƒp[ƒc‚Ì”B4‚ÂB
-    const int NUM_OF_PARTS = 4;
+    //ã‚»ãƒ«19*19å€‹ã‚’é›†ã‚ãŸé…åˆ—ã§ãƒãƒƒãƒ—ã‚’ä½œã‚‹
+    private CellInfo[,] map;
 
-    //ƒ}ƒbƒv‚Ìˆê•Ó‚Ìƒ}ƒX”
-    const int MAP_SIZE = 19;
-    //ƒ}ƒbƒvƒp[ƒc‚Ìˆê•Ó‚Ìƒ}ƒX”
-    const int MAP_PART_SIZE = (MAP_SIZE - 1) / 2;
-
-    //ƒZƒ‹19*19ŒÂ‚ğW‚ß‚½”z—ñ‚Åƒ}ƒbƒv‚ğì‚é
-    public CellInfo[,] map;
-
-    private void Start()
+    public void InitObservation(GameServerManager gameServerManager)
     {
-        //ƒ‰ƒ“ƒ_ƒ€‚É‘I‚ñ‚¾csvƒtƒ@ƒCƒ‹‚©‚ç19*19‚ÌcellInfo2ŸŒ³”z—ñ‚ğì¬‚·‚é
-        //map = MergeMap(SelectCSVFileRandomly(NUM_OF_PARTS));
+        gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
+    }
 
-        //ƒ‰ƒ“ƒ_ƒ€’Š‘I‚Í•Û—¯Bw’è‚µ‚½–¼‘O‚Ìƒtƒ@ƒCƒ‹‚ğ‚S‚Â“Ç‚İ‚Ş
+    private void ProcessServerInternalEvent(GameServerManager.SERVER_INTERNAL_EVENT e)
+    {
+        switch (e)
+        {
+            case GameServerManager.SERVER_INTERNAL_EVENT.GENERATE_MAP:
+                GenerateMap();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private CellInfo[,] ReturnMap() { return map; }
+
+    private void GenerateMap()
+    {
+        //ãƒ©ãƒ³ãƒ€ãƒ ã«é¸ã‚“ã csvãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰19*19ã®cellInfo2æ¬¡å…ƒé…åˆ—ã‚’ä½œæˆã™ã‚‹
+
+        //ãƒ©ãƒ³ãƒ€ãƒ æŠ½é¸ã¯ä¿ç•™ã€‚æŒ‡å®šã—ãŸåå‰ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ï¼”ã¤èª­ã¿è¾¼ã‚€
         TextAsset[] textAsset_array = {
             Resources.Load("MapPart06") as TextAsset,
             Resources.Load("MapPart07") as TextAsset,
@@ -45,48 +59,43 @@ public class MapInfo : MonoBehaviour
 
         map = MergeMap(textAsset_array);
 
-        // Player‚ª¶¬‚³‚ê‚éˆÊ’u‚ğŠi”[‚·‚é•Ï”
-        Vector3 playerSpawnPosition = Vector3.zero;
-
-        //TODO
-        //˜L‰º‚ğ¶¬()
-        //ã‚Ì˜L‰º
+        //ä¸Šã®å»Šä¸‹
         for (int row = 0; row < MAP_SIZE; row++)
         {
             map[row, MAP_PART_SIZE] = new CellInfo();
         }
-        //¶‚Ì˜L‰º
+        //å·¦ã®å»Šä¸‹
         for (int column = 0; column < MAP_SIZE; column++)
         {
             map[MAP_PART_SIZE, column] = new CellInfo();
         }
 
-        //ƒ}ƒbƒv’†‰›‚ÉLê¶¬()
+        //ãƒãƒƒãƒ—ä¸­å¤®ã«åºƒå ´ç”Ÿæˆ()
         map[8, 8] = new CellInfo();
         map[8, 10] = new CellInfo();
         map[10, 8] = new CellInfo();
         map[10, 10] = new CellInfo();
 
-        //d•¡‚µ‚½•Çƒf[ƒ^‚Ìíœ
+        //é‡è¤‡ã—ãŸå£ãƒ‡ãƒ¼ã‚¿ã®å‰Šé™¤
         DeleteDuplicatedWall(map);
 
         for (int i = 0; i < MAP_SIZE; i++)
         {
             for (int j = 0; j < MAP_SIZE; j++)
             {
-                // °
+                // åºŠ
                 if (map[i, j].cellType != CellInfo.CELL_TYPE.NONE)
                 {
                     GameObject floor = Instantiate(floorObj, new Vector3(i + 0.5f, 0, j + 0.5f), Quaternion.identity);
                     floor.transform.parent = Parenttransform;
                 }
-                // “Vˆä
+                // å¤©äº•
                 if (map[i, j].cellType != CellInfo.CELL_TYPE.NONE)
                 {
                     GameObject ceiling = Instantiate(floorObj, new Vector3(i + 0.5f, 1f, j + 0.5f), Quaternion.Euler(180f, 0f, 0f));
                     ceiling.transform.parent = Parenttransform;
                 }
-                // ¶‚Ì•Ç
+                // å·¦ã®å£
                 if (map[i, j].wallLeft == CellInfo.WALL_TYPE.WALL)
                 {
                     GameObject leftWall = Instantiate(wallObj, new Vector3(i + 0.5f, 0.5f, j), Quaternion.Euler(0f, 90f, 0f));
@@ -97,7 +106,7 @@ public class MapInfo : MonoBehaviour
                     GameObject leftDoor = Instantiate(doorObj, new Vector3(i + 0.5f, 0.5f, j), Quaternion.Euler(0f, 90f, 0f));
                     leftDoor.transform.parent = Parenttransform;
                 }
-                // ‰E‚Ì•Ç
+                // å³ã®å£
                 if (map[i, j].wallRight == CellInfo.WALL_TYPE.WALL)
                 {
                     GameObject rightWall = Instantiate(wallObj, new Vector3(i + 0.5f, 0.5f, j + 1f), Quaternion.Euler(0f, 90f, 0f));
@@ -108,7 +117,7 @@ public class MapInfo : MonoBehaviour
                     GameObject rightDoor = Instantiate(doorObj, new Vector3(i + 0.5f, 0.5f, j + 1f), Quaternion.Euler(0f, 90f, 0f));
                     rightDoor.transform.parent = Parenttransform;
                 }
-                // ã‚Ì•Ç
+                // ä¸Šã®å£
                 if (map[i, j].wallUpper == CellInfo.WALL_TYPE.WALL)
                 {
                     GameObject upperWall = Instantiate(wallObj, new Vector3(i, 0.5f, j + 0.5f), Quaternion.Euler(0f, 0f, 0f));
@@ -119,7 +128,7 @@ public class MapInfo : MonoBehaviour
                     GameObject upperDoor = Instantiate(doorObj, new Vector3(i, 0.5f, j + 0.5f), Quaternion.Euler(0f, 0f, 0f));
                     upperDoor.transform.parent = Parenttransform;
                 }
-                // ‰º‚Ì•Ç
+                // ä¸‹ã®å£
                 if (map[i, j].wallLower == CellInfo.WALL_TYPE.WALL)
                 {
                     GameObject lowerWall = Instantiate(wallObj, new Vector3(i + 1f, 0.5f, j + 0.5f), Quaternion.Euler(0f, 0f, 0f));
@@ -131,77 +140,69 @@ public class MapInfo : MonoBehaviour
                     lowerDoor.transform.parent = Parenttransform;
                 }
 
-                // •ó” ‚ÌƒXƒ|[ƒ“ˆÊ’u
+                // å®ç®±ã®ã‚¹ãƒãƒ¼ãƒ³ä½ç½®
                 if (map[i, j].spawnChest)
                 {
                     GameObject chest = Instantiate(chestObj, new Vector3(i + 0.5f, 0.2f, j + 0.5f), Quaternion.identity);
                     chest.transform.parent = Parenttransform;
                 }
 
-                // ƒvƒŒƒCƒ„[‚ÌƒXƒ|[ƒ“ˆÊ’u
+                // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¹ãƒãƒ¼ãƒ³ä½ç½®
                 if (map[i, j].spawnPlayer)
                 {
                     GameObject respawn = Instantiate(respawnObj, new Vector3(i + 0.5f, 0.4f, j + 0.5f), Quaternion.identity);
                     respawn.transform.parent = Parenttransform;
-
-                    // Player‚ªƒXƒ|[ƒ“‚·‚éˆÊ’u‚ğ•Û‘¶
-                    playerSpawnPosition = respawn.transform.position;
                 }
             }
         }
-
-        // Player‚ğƒXƒ|[ƒ“ˆÊ’u‚É¶¬
-        if (playerSpawnPosition != Vector3.zero && !IsNetwork)
-        {
-            Instantiate(Player, playerSpawnPosition, Quaternion.identity);
-        }
     }
 
-    //ƒ‰ƒ“ƒ_ƒ€’Š‘I—p
-    TextAsset[] SelectCSVFileRandomly(int size)
+    ////ãƒ©ãƒ³ãƒ€ãƒ æŠ½é¸ç”¨
+    //TextAsset[] SelectCSVFileRandomly(int size)
+    //{
+    //    //è¿”å´ç”¨
+    //    TextAsset[] ret = new TextAsset[size];
+
+    //    //LoadAllã§Resourcesãƒ•ã‚©ãƒ«ãƒ€ä¸‹ã®ã™ã¹ã¦ã®CSVãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ ¼ç´ã™ã‚‹
+    //    TextAsset[] csvMap_Array = Resources.LoadAll("", typeof(TextAsset)).Cast<TextAsset>().ToArray();
+
+    //    //â†‘ã®ã™ã¹ã¦ã®csvãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒªã‚¹ãƒˆã«æ ¼ç´ã™ã‚‹
+    //    List<TextAsset> csvMap_List = new List<TextAsset>();
+    //    csvMap_List.AddRange(csvMap_Array);
+
+    //    Debug.Log("ãƒªã‚¹ãƒˆã«" + csvMap_List.Count + "å€‹ã®ãƒ†ã‚­ã‚¹ãƒˆã‚¢ã‚»ãƒƒãƒˆã‚’æ ¼ç´");
+
+    //    //é‡è¤‡ãªã—ã§TextAssetã‚’4ã¤å–ã‚Šå‡ºã—ã¦é…åˆ—ã«æ ¼ç´ã™ã‚‹
+    //    for (int i = 0; i < size; i++)
+    //    {
+    //        int index = UnityEngine.Random.Range(0, csvMap_List.Count);
+    //        ret[i] = csvMap_List[index];
+    //        csvMap_List.RemoveAt(index);
+    //    }
+
+    //    //è¿”å´
+    //    return ret;
+    //}
+
+    //4ã¤ã®ãƒ†ã‚­ã‚¹ãƒˆã‚¢ã‚»ãƒƒãƒˆã‚’ãƒãƒ¼ã‚¸ã—ã¦ãƒãƒƒãƒ—ãƒ‡ãƒ¼ã‚¿ã‚’ä½œæˆ
+    private CellInfo[,] MergeMap(TextAsset[] textAsset_Array)
     {
-        //•Ô‹p—p
-        TextAsset[] ret = new TextAsset[size];
-
-        //LoadAll‚ÅResourcesƒtƒHƒ‹ƒ_‰º‚Ì‚·‚×‚Ä‚ÌCSVƒtƒ@ƒCƒ‹‚ğŠi”[‚·‚é
-        TextAsset[] csvMap_Array = Resources.LoadAll("", typeof(TextAsset)).Cast<TextAsset>().ToArray();
-
-        //ª‚Ì‚·‚×‚Ä‚Ìcsvƒtƒ@ƒCƒ‹‚ğƒŠƒXƒg‚ÉŠi”[‚·‚é
-        List<TextAsset> csvMap_List = new List<TextAsset>();
-        csvMap_List.AddRange(csvMap_Array);
-
-        Debug.Log("ƒŠƒXƒg‚É" + csvMap_List.Count + "ŒÂ‚ÌƒeƒLƒXƒgƒAƒZƒbƒg‚ğŠi”[");
-
-        //d•¡‚È‚µ‚ÅTextAsset‚ğ4‚Âæ‚èo‚µ‚Ä”z—ñ‚ÉŠi”[‚·‚é
-        for (int i = 0; i < size; i++)
-        {
-            int index = UnityEngine.Random.Range(0, csvMap_List.Count);
-            ret[i] = csvMap_List[index];
-            csvMap_List.RemoveAt(index);
-        }
-
-        //•Ô‹p
-        return ret;
-    }
-
-    CellInfo[,] MergeMap(TextAsset[] textAsset_Array)
-    {
-        //•Ô‹p—p
+        //è¿”å´ç”¨
         CellInfo[,] ret = new CellInfo[MAP_SIZE, MAP_SIZE];
 
         for (int index = 0; index < NUM_OF_PARTS; index++)
         {
             CellInfo[,] mapPart = ConvertTextAssetToCellInfo2DArray(textAsset_Array[index]);
 
-            //map‘¤‚Ì”z—ñ‚Íƒ|ƒCƒ“ƒ^‚ğ‚©‚È‚è‹C‚¿ˆ«‚­‘–‚ç‚¹‚é‚ªAmapPart‘¤‚Íˆê”Ê“I‚É‘–‚ç‚¹‚é‚Ì‚Åˆê”Ê“I‚Èƒ‹[ƒv‚ğg‚¤B‚»‚Ì‚½‚ß‚Ì•Ï”
+            //mapå´ã®é…åˆ—ã¯ãƒã‚¤ãƒ³ã‚¿ã‚’ã‹ãªã‚Šæ°—æŒã¡æ‚ªãèµ°ã‚‰ã›ã‚‹ãŒã€mapPartå´ã¯ä¸€èˆ¬çš„ã«èµ°ã‚‰ã›ã‚‹ã®ã§ä¸€èˆ¬çš„ãªãƒ«ãƒ¼ãƒ—ã‚’ä½¿ã†ã€‚ãã®ãŸã‚ã®å¤‰æ•°
             int partRow = 0;
             int partColumn = 0;
 
             switch (index)
             {
-                //¶ã
+                //å·¦ä¸Š
                 case 0:
-                    //‚»‚Ì‚Ü‚Ü¶ã‚ÉƒRƒs[Brow‚Íí‚Éi‚Æ“™‚µ‚­Acolumn‚Íí‚Éj‚Æ“™‚µ‚¢B
+                    //ãã®ã¾ã¾å·¦ä¸Šã«ã‚³ãƒ”ãƒ¼ã€‚rowã¯å¸¸ã«iã¨ç­‰ã—ãã€columnã¯å¸¸ã«jã¨ç­‰ã—ã„ã€‚
                     for (int row = 0; row < MAP_PART_SIZE; row++)
                     {
                         for (int column = 0; column < MAP_PART_SIZE; column++)
@@ -216,9 +217,9 @@ public class MapInfo : MonoBehaviour
                         partColumn = 0;
                     }
                     break;
-                //‰Eã
+                //å³ä¸Š
                 case 1:
-                    //Œv‰ñ‚è‚É90“x‰ñ‚µ‚È‚ª‚ç‰Eã‚ÉƒRƒs[Bƒ|ƒCƒ“ƒ^‚Í‰Eã‚©‚ç^‰º¨¶‚Ì—ñ‚Ö‘–‚ç‚¹‚é
+                    //æ™‚è¨ˆå›ã‚Šã«90åº¦å›ã—ãªãŒã‚‰å³ä¸Šã«ã‚³ãƒ”ãƒ¼ã€‚ãƒã‚¤ãƒ³ã‚¿ã¯å³ä¸Šã‹ã‚‰çœŸä¸‹â†’å·¦ã®åˆ—ã¸èµ°ã‚‰ã›ã‚‹
                     for (int column = MAP_SIZE - 1; column >= MAP_SIZE - MAP_PART_SIZE; column--)
                     {
                         for (int row = 0; row < MAP_PART_SIZE; row++)
@@ -226,7 +227,7 @@ public class MapInfo : MonoBehaviour
                             //Debug.Log(row + "," + row);
                             //Debug.Log(partRow + "," + partColumn);
 
-                            //mapPart‚ÌƒZƒ‹‚ğ‰ñ“]‚³‚¹‚Ä‚©‚ç‚Í‚ß‚Ä‚¢‚­
+                            //mapPartã®ã‚»ãƒ«ã‚’å›è»¢ã•ã›ã¦ã‹ã‚‰ã¯ã‚ã¦ã„ã
                             ret[row, column] = RotateCell(mapPart[partRow, partColumn], index);
                             partColumn++;
                         }
@@ -234,9 +235,9 @@ public class MapInfo : MonoBehaviour
                         partColumn = 0;
                     }
                     break;
-                //‰E‰º
+                //å³ä¸‹
                 case 2:
-                    //Œv‰ñ‚è‚É180“x‰ñ‚µ‚È‚ª‚ç‰E‰º‚ÉƒRƒs[Bƒ|ƒCƒ“ƒ^‚Í‰E‰º‚©‚ç¶¨ã‚Ìs‚Ö‘–‚ç‚¹‚é
+                    //æ™‚è¨ˆå›ã‚Šã«180åº¦å›ã—ãªãŒã‚‰å³ä¸‹ã«ã‚³ãƒ”ãƒ¼ã€‚ãƒã‚¤ãƒ³ã‚¿ã¯å³ä¸‹ã‹ã‚‰å·¦â†’ä¸Šã®è¡Œã¸èµ°ã‚‰ã›ã‚‹
                     for (int row = MAP_SIZE - 1; row >= MAP_SIZE - MAP_PART_SIZE; row--)
                     {
                         for (int column = MAP_SIZE - 1; column >= MAP_SIZE - MAP_PART_SIZE; column--)
@@ -244,7 +245,7 @@ public class MapInfo : MonoBehaviour
                             //Debug.Log(row + "," + row);
                             //Debug.Log(partRow + "," + partColumn);
 
-                            //mapPart‚ÌƒZƒ‹‚ğ‰ñ“]‚³‚¹‚Ä‚©‚ç‚Í‚ß‚Ä‚¢‚­
+                            //mapPartã®ã‚»ãƒ«ã‚’å›è»¢ã•ã›ã¦ã‹ã‚‰ã¯ã‚ã¦ã„ã
                             ret[row, column] = RotateCell(mapPart[partRow, partColumn], index);
                             partColumn++;
                         }
@@ -253,7 +254,7 @@ public class MapInfo : MonoBehaviour
                     }
                     break;
                 case 3:
-                    //Œv‰ñ‚è‚É270“x‰ñ‚µ‚È‚ª‚ç¶‰º‚ÉƒRƒs[Bƒ|ƒCƒ“ƒ^‚Í¶‰º‚©‚çã¨‰E‚Ì—ñ‚Ö‘–‚ç‚¹‚é
+                    //æ™‚è¨ˆå›ã‚Šã«270åº¦å›ã—ãªãŒã‚‰å·¦ä¸‹ã«ã‚³ãƒ”ãƒ¼ã€‚ãƒã‚¤ãƒ³ã‚¿ã¯å·¦ä¸‹ã‹ã‚‰ä¸Šâ†’å³ã®åˆ—ã¸èµ°ã‚‰ã›ã‚‹
                     for (int column = 0; column < MAP_PART_SIZE; column++)
                     {
                         for (int row = MAP_SIZE - 1; row >= MAP_SIZE - MAP_PART_SIZE; row--)
@@ -261,7 +262,7 @@ public class MapInfo : MonoBehaviour
                             //Debug.Log(row + "," + row);
                             //Debug.Log(partRow + "," + partColumn);
 
-                            //mapPart‚ÌƒZƒ‹‚ğ‰ñ“]‚³‚¹‚Ä‚©‚ç‚Í‚ß‚Ä‚¢‚­
+                            //mapPartã®ã‚»ãƒ«ã‚’å›è»¢ã•ã›ã¦ã‹ã‚‰ã¯ã‚ã¦ã„ã
                             ret[row, column] = RotateCell(mapPart[partRow, partColumn], index);
                             partColumn++;
                         }
@@ -276,28 +277,28 @@ public class MapInfo : MonoBehaviour
 
         CellInfo[,] ConvertTextAssetToCellInfo2DArray(TextAsset textAsset)
         {
-            //•Ô‹p—p
+            //è¿”å´ç”¨
             CellInfo[,] ret = new CellInfo[MAP_PART_SIZE, MAP_PART_SIZE];
 
-            //TextAsset‚Ìî•ñ‚ğŠi”[‚·‚é”z—ñ–ƒŠƒXƒg
-            //s‚Ìƒf[ƒ^‚ÍString.Split()‚Åæ‚èo‚·‚½‚ßstring[]Œ^‚Å‚ ‚é•K—v‚ª‚ ‚èA‚»‚ê‚ğList‚ÉAdd()‚µ‚Ä—ñ‚ğì‚è‚½‚¢‚Ì‚ÅƒŠƒXƒgŒ^‚ğg‚¤
+            //TextAssetã®æƒ…å ±ã‚’æ ¼ç´ã™ã‚‹é…åˆ—ï¼Šãƒªã‚¹ãƒˆ
+            //è¡Œã®ãƒ‡ãƒ¼ã‚¿ã¯String.Split()ã§å–ã‚Šå‡ºã™ãŸã‚string[]å‹ã§ã‚ã‚‹å¿…è¦ãŒã‚ã‚Šã€ãã‚Œã‚’Listã«Add()ã—ã¦åˆ—ã‚’ä½œã‚ŠãŸã„ã®ã§ãƒªã‚¹ãƒˆå‹ã‚’ä½¿ã†
             List<string[]> sheetData_List = new List<string[]>();
 
-            //æ“¾‚µ‚½TextAsset‚Ìtext‚ğStringreader‚É•ÏŠ·
+            //å–å¾—ã—ãŸTextAssetã®textã‚’Stringreaderã«å¤‰æ›
             StringReader sheetReader = new StringReader(textAsset.text);
 
-            //Peek‚ÍƒCƒ“ƒfƒbƒNƒX‚ÌŸ‚É‚ ‚é•¶š‚ğ•Ô‚·B‰½‚à‚È‚¢ê‡-1
-            //-1‚É‚È‚éA‚Â‚Ü‚è•¶š—ñ‚ÌÅŒã‚Ü‚ÅƒCƒ“ƒfƒbƒNƒX‚ªˆÚ“®‚·‚é‚Ü‚Åwhile‚ÅŒJ‚è•Ô‚·
+            //Peekã¯ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®æ¬¡ã«ã‚ã‚‹æ–‡å­—ã‚’è¿”ã™ã€‚ä½•ã‚‚ãªã„å ´åˆ-1
+            //-1ã«ãªã‚‹ã€ã¤ã¾ã‚Šæ–‡å­—åˆ—ã®æœ€å¾Œã¾ã§ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãŒç§»å‹•ã™ã‚‹ã¾ã§whileã§ç¹°ã‚Šè¿”ã™
             while (sheetReader.Peek() != -1)
             {
-                //ƒCƒ“ƒfƒbƒNƒX‚ÌŒ»İ’n‚©‚ç‰üs•¶š‚ª—ˆ‚é‚Ü‚Å‚Ì•¶š—ñ‚ğæ‚èo‚µi‰üs•¶š‚Í–³‹j
-                //‰üs•¶š‚ÌŸ‚ÌˆÊ’u‚ÉƒCƒ“ƒfƒbƒNƒX‚ğˆÚ“®‚³‚¹‚é
+                //ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®ç¾åœ¨åœ°ã‹ã‚‰æ”¹è¡Œæ–‡å­—ãŒæ¥ã‚‹ã¾ã§ã®æ–‡å­—åˆ—ã‚’å–ã‚Šå‡ºã—ï¼ˆæ”¹è¡Œæ–‡å­—ã¯ç„¡è¦–ï¼‰
+                //æ”¹è¡Œæ–‡å­—ã®æ¬¡ã®ä½ç½®ã«ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’ç§»å‹•ã•ã›ã‚‹
                 string str = sheetReader.ReadLine();
-                //æ‚èo‚µ‚½•¶š—ñ‚ğƒJƒ“ƒ}‚Å‹æØ‚è‚È‚ª‚çstring[]Œ^‚Ì”z—ñ‚ÉŠi”[‚·‚é
+                //å–ã‚Šå‡ºã—ãŸæ–‡å­—åˆ—ã‚’ã‚«ãƒ³ãƒã§åŒºåˆ‡ã‚ŠãªãŒã‚‰string[]å‹ã®é…åˆ—ã«æ ¼ç´ã™ã‚‹
                 sheetData_List.Add(str.Split(','));
             }
 
-            //Debug.Log("ƒŠƒXƒg‚É" + sheetData_List.Count + "—ñ‚Ìƒf[ƒ^‚ğ‘‚«‚İ");
+            //Debug.Log("ãƒªã‚¹ãƒˆã«" + sheetData_List.Count + "åˆ—ã®ãƒ‡ãƒ¼ã‚¿ã‚’æ›¸ãè¾¼ã¿");
 
             for (int i = 0; i < MAP_PART_SIZE; i++)
             {
@@ -305,16 +306,16 @@ public class MapInfo : MonoBehaviour
                 {
                     //Debug.Log(i + "," + j);
 
-                    //‚ ‚Æ‚ÍŠe—v‘f‚ğstringReader‚Å“Ç‚ñ‚ÅAƒCƒ“ƒfƒbƒNƒX‚ği‚ß‚È‚ª‚çcellInfo‚ğì‚Á‚Ä‚¢‚­
-                    //ƒZƒ‹“à‚Ì•¶š‚ğŠi”[
+                    //ã‚ã¨ã¯å„è¦ç´ ã‚’stringReaderã§èª­ã‚“ã§ã€ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’é€²ã‚ãªãŒã‚‰cellInfoã‚’ä½œã£ã¦ã„ã
+                    //ã‚»ãƒ«å†…ã®æ–‡å­—ã‚’æ ¼ç´
                     StringReader cellReader = new StringReader(sheetData_List[i][j]);
 
                     CellInfo cellInfo = new CellInfo();
 
-                    //“ª•¶š‚ğƒXƒLƒbƒv
+                    //é ­æ–‡å­—ã‚’ã‚¹ã‚­ãƒƒãƒ—
                     cellReader.Read();
 
-                    //1•¶š–Ú‚©‚ç‡‚É“Ç‚ñ‚Å•Ï”‚É‘ã“ü
+                    //1æ–‡å­—ç›®ã‹ã‚‰é †ã«èª­ã‚“ã§å¤‰æ•°ã«ä»£å…¥
                     cellInfo.wallLeft = (CellInfo.WALL_TYPE)(ConvertASCIIToInt(cellReader.Read()));
                     cellInfo.wallRight = (CellInfo.WALL_TYPE)(ConvertASCIIToInt(cellReader.Read()));
                     cellInfo.wallUpper = (CellInfo.WALL_TYPE)(ConvertASCIIToInt(cellReader.Read()));
@@ -325,7 +326,7 @@ public class MapInfo : MonoBehaviour
                     cellInfo.spawnChest = Convert.ToBoolean(ConvertASCIIToInt(cellReader.Read()));
                     cellInfo.spawnPlayer = Convert.ToBoolean(ConvertASCIIToInt(cellReader.Read()));
 
-                    //•Ô‹p—p”z—ñ‚É‘‚«‚Ş
+                    //è¿”å´ç”¨é…åˆ—ã«æ›¸ãè¾¼ã‚€
                     ret[i, j] = cellInfo;
 
                     //Debug.Log(i + "," + j);
@@ -333,7 +334,7 @@ public class MapInfo : MonoBehaviour
             }
 
 
-            //•Ô‹p
+            //è¿”å´
             return ret;
         }
 
@@ -343,10 +344,10 @@ public class MapInfo : MonoBehaviour
 
             char character = (char)charCode;
 
-            //•¶šƒR[ƒh‚Å0‚©‚ç9‚ÌŠÔ‚É‚ ‚é‚È‚ç
+            //æ–‡å­—ã‚³ãƒ¼ãƒ‰ã§0ã‹ã‚‰9ã®é–“ã«ã‚ã‚‹ãªã‚‰
             if (character >= '0' && character <= '9')
             {
-                //0‚Ì•¶šƒR[ƒh‚ğˆø‚­‚±‚Æ‚Å‘Î‰‚·‚é®”‚É•ÏŠ·
+                //0ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰ã‚’å¼•ãã“ã¨ã§å¯¾å¿œã™ã‚‹æ•´æ•°ã«å¤‰æ›
                 ret = character - '0';
             }
             else
@@ -357,37 +358,37 @@ public class MapInfo : MonoBehaviour
             return ret;
         }
 
-        //ƒZƒ‹‚PŒÂ‚Ì•Çƒf[ƒ^‚ğ90“xŠÔŠu‚Å‰ñ‚µ‚½‚à‚Ì‚ğVƒCƒ“ƒXƒ^ƒ“ƒX‚Å•Ô‹p‚·‚éŠÖ”BŒ³ƒf[ƒ^‚Í‘‚«Š·‚¦‚È‚¢B
-        //â‘Î‚É‚±‚±‚Å‚µ‚©g‚í‚È‚¢‚Ì‚Åƒ[ƒJƒ‹ŠÖ”‚É‚µ‚½B’P‚És”‚ğŒ¸‚ç‚·–Ú“I‚È‚Ì‚ÆAindex‚ğ’¼Úg‚¢‚½‚©‚Á‚½‚Ì‚à‚ ‚éB
+        //ã‚»ãƒ«ï¼‘å€‹ã®å£ãƒ‡ãƒ¼ã‚¿ã‚’90åº¦é–“éš”ã§å›ã—ãŸã‚‚ã®ã‚’æ–°ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã§è¿”å´ã™ã‚‹é–¢æ•°ã€‚å…ƒãƒ‡ãƒ¼ã‚¿ã¯æ›¸ãæ›ãˆãªã„ã€‚
+        //çµ¶å¯¾ã«ã“ã“ã§ã—ã‹ä½¿ã‚ãªã„ã®ã§ãƒ­ãƒ¼ã‚«ãƒ«é–¢æ•°ã«ã—ãŸã€‚å˜ã«è¡Œæ•°ã‚’æ¸›ã‚‰ã™ç›®çš„ãªã®ã¨ã€indexã‚’ç›´æ¥ä½¿ã„ãŸã‹ã£ãŸã®ã‚‚ã‚ã‚‹ã€‚
         CellInfo RotateCell(CellInfo cell, int index)
         {
-            //•Ô‹p—p‚É‚Ü‚¸•¡»
+            //è¿”å´ç”¨ã«ã¾ãšè¤‡è£½
             CellInfo ret = cell;
 
-            //•Ç‚Ìƒf[ƒ^‚ğ•¡»
+            //å£ã®ãƒ‡ãƒ¼ã‚¿ã‚’è¤‡è£½
             CellInfo.WALL_TYPE[] wallCopy = new CellInfo.WALL_TYPE[4];
-            //ƒf[ƒ^‚ğLeft‚©‚ç”½Œv‰ñ‚è‚É”z—ñ‚ÉŠi”[
+            //ãƒ‡ãƒ¼ã‚¿ã‚’Leftã‹ã‚‰åæ™‚è¨ˆå›ã‚Šã«é…åˆ—ã«æ ¼ç´
             wallCopy[0] = cell.wallLeft;
             wallCopy[1] = cell.wallLower;
             wallCopy[2] = cell.wallRight;
             wallCopy[3] = cell.wallUpper;
-            //Œv‰ñ‚è‚É90*index“xƒYƒŒ‚é‚æ‚¤‚Éƒf[ƒ^‚ğæ‚èo‚·
+            //æ™‚è¨ˆå›ã‚Šã«90*indexåº¦ã‚ºãƒ¬ã‚‹ã‚ˆã†ã«ãƒ‡ãƒ¼ã‚¿ã‚’å–ã‚Šå‡ºã™
             ret.wallLeft = wallCopy[(0 + index) % 4];
             ret.wallLower = wallCopy[(1 + index) % 4];
             ret.wallRight = wallCopy[(2 + index) % 4];
             ret.wallUpper = wallCopy[(3 + index) % 4];
 
-            //‘‚«Š·‚¦‚ªI‚í‚Á‚½‚ç•Ô‹p‚·‚é
+            //æ›¸ãæ›ãˆãŒçµ‚ã‚ã£ãŸã‚‰è¿”å´ã™ã‚‹
             return ret;
         }
 
         return ret;
     }
 
-    //¶ã‚ÌƒZƒ‹‚©‚ç‰E‰º‚ÌƒZƒ‹‚É‚©‚¯‚ÄA¶‘¤‚Ì•Ç‚Æ‰º‘¤‚Ì•Ç‚ªd•¡‚µ‚Ä¶¬‚³‚ê‚È‚¢‚æ‚¤ƒf[ƒ^‚ğ•ÒW‚·‚é
-    void DeleteDuplicatedWall(CellInfo[,] map)
+    //å·¦ä¸Šã®ã‚»ãƒ«ã‹ã‚‰å³ä¸‹ã®ã‚»ãƒ«ã«ã‹ã‘ã¦ã€å·¦å´ã®å£ã¨ä¸‹å´ã®å£ãŒé‡è¤‡ã—ã¦ç”Ÿæˆã•ã‚Œãªã„ã‚ˆã†ãƒ‡ãƒ¼ã‚¿ã‚’ç·¨é›†ã™ã‚‹
+    private void DeleteDuplicatedWall(CellInfo[,] map)
     {
-        //‰E‚Ì•Ç‚Æd•¡‚·‚é•Ç‚ğíœ
+        //å³ã®å£ã¨é‡è¤‡ã™ã‚‹å£ã‚’å‰Šé™¤
         for (int i = 0; i < MAP_SIZE; i++)
         {
             for (int j = 0; j < MAP_SIZE - 1; j++)
@@ -399,7 +400,7 @@ public class MapInfo : MonoBehaviour
             }
         }
 
-        //‰º‚Ì•Ç‚Æd•¡‚·‚é•Ç‚ğíœ
+        //ä¸‹ã®å£ã¨é‡è¤‡ã™ã‚‹å£ã‚’å‰Šé™¤
         for (int i = 0; i < MAP_SIZE - 1; i++)
         {
             for (int j = 0; j < MAP_SIZE; j++)
@@ -411,12 +412,4 @@ public class MapInfo : MonoBehaviour
             }
         }
     }
-
-#if UNITY_EDITOR
-    //ƒGƒfƒBƒ^[ŒÀ’è‚Ì©“®ƒfƒoƒbƒO
-    private void OnValidate()
-    {
-        if (MAP_SIZE % 2 == 0) Debug.LogError("MAP_SIZE‚ª‹ô”‚Å‘");
-    }
-#endif
 }

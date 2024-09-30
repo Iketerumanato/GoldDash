@@ -21,8 +21,6 @@ public class GameClientManager : MonoBehaviour
 
     private ushort sessionID; //自分のセッションID。サーバー側で決めてもらう。
 
-    [SerializeField] private GameObject player;
-
     #region ボタンが押されたら有効化したり無効化したり
     public void InitObservation(UdpButtonManager udpUIManager)
     {
@@ -106,7 +104,8 @@ public class GameClientManager : MonoBehaviour
 
                         if (receivedActionPacket.targetID == this.sessionID)
                         {
-                            player.transform.position = receivedActionPacket.pos;
+                            //自キャラを初期位置にやる処理だったが、キモすぎるためコメントアウト
+                            //player.transform.position = receivedActionPacket.pos;
                         }
 
                         Debug.Log($"{receivedHeader.data}に移動したぜ。");

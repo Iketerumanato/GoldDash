@@ -374,6 +374,7 @@ MonoBehaviour:
   udpUIColorChanger: {fileID: 377543648}
   gameServerManager: {fileID: 1385810818}
   gameClientManager: {fileID: 1385810820}
+  mapGenerator: {fileID: 1585246434}
   soundManager: {fileID: 863796698}
 --- !u!1 &346718029
 GameObject:
@@ -2413,6 +2414,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sessionPass: 9999
+  numOfPlayer: 1
 --- !u!4 &1385810819
 Transform:
   m_ObjectHideFlags: 0
@@ -2442,7 +2444,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sessionPass: 9999
   initSessionPass: 1234
-  myName: P1ngW1n
+  myName: Kirito
+  player: {fileID: 0}
 --- !u!1 &1467684026
 GameObject:
   m_ObjectHideFlags: 0
@@ -2989,7 +2992,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deda0f18708bc4e42837b70ff499d1f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsNetwork: 0
   Parenttransform: {fileID: 1585246435}
   floorObj: {fileID: 6506074169082892065, guid: 654ef1ba9ef1cc141b22e805380d48d9, type: 3}
   wallObj: {fileID: 3201486429960166728, guid: b794f629a45a4254b961bba1d1d9b8c5, type: 3}
