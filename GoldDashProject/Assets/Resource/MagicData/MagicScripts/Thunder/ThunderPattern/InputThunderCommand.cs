@@ -21,8 +21,6 @@ public class InputThunderCommand : MonoBehaviour
     [SerializeField, Range(0f, 0.05f)]
     float pressSpeed = 0.01f;
 
-    [SerializeField] TextAsset ThunderPatternCSVData;
-
     private CancellationTokenSource _cts;
 
     #region ボタンの処理群
