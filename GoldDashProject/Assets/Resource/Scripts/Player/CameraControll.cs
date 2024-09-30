@@ -11,8 +11,8 @@ public class CameraControll : MonoBehaviour
     [Range(50f, 150f)]
     [SerializeField] float joystickSensitivity = 100f;
     [Header("カメラの位置調整")]
-    [SerializeField] Vector3 cameraOffset = new(0f, 0.3f, -0.07f);
-    Vector3 cameraRata = new(0f, 0f, 0f);
+    //[SerializeField] Vector3 cameraOffset = new(0f, 0.3f, -0.07f);
+    //Vector3 cameraRata = new(0f, 0f, 0f);
     [Header("縦回転の制御")]
     float xRotation = 0f;
     [Range(90f, 120f)]
@@ -23,13 +23,22 @@ public class CameraControll : MonoBehaviour
 
     [SerializeField] float rotateSpeed = 100f;
 
-    Camera PlayerCamera;
+    [SerializeField] Camera PlayerCamera;
     readonly float CamNeer = 0.1f;
     readonly float CamFar = 1000f;
 
+    // 初期回転を保持する変数
+    Quaternion initialCameraRotation;
+
     private void Start()
     {
-        CreateCamera();
+        //CreateCamera();
+        cameramoveJoystick = FindObjectOfType<DynamicJoystick>();
+        // カメラの初期回転を保持 (0, 180, 0)
+        initialCameraRotation = Quaternion.Euler(0, 180, 0);
+        PlayerCamera.transform.localRotation = initialCameraRotation;
+        //PlayerCamera.AddComponent<CamTest>();
+        //SetClippingPlanes(CamNeer, CamFar);
     }
 
     #region カメラの毎フレーム処理
@@ -38,22 +47,18 @@ public class CameraControll : MonoBehaviour
         float horizontalInput = cameramoveJoystick.Horizontal * joystickSensitivity * Time.deltaTime;
         float verticalInput = cameramoveJoystick.Vertical * joystickSensitivity * Time.deltaTime;
 
+        // プレイヤーの左右回転（ヨー）
         yRotation += horizontalInput;
-        //yRotation = Mathf.Clamp(yRotation, CamYMinClanpRot, CamYMaxClanpRot);
 
+        // カメラの上下回転（ピッチ）
         xRotation -= verticalInput;
         xRotation = Mathf.Clamp(xRotation, CamXMinClanpRot, CamXMaxClanpRot);
-        // カメラの縦回転を更新
-        PlayerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
-        // プレイヤーの回転を更新(横回転も一緒に)
-        Vector3 direction = new(xRotation, yRotation, 0f);
-        if (direction.sqrMagnitude > 0.0001f)
-        {
-            Quaternion toRotation = Quaternion.LookRotation(direction, Vector3.up);
-            playerBody.transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotateSpeed * Time.deltaTime);
-            playerBody.transform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
-        }
+        // 初期の y と z を保持しつつ、xRotation のみ適用
+        PlayerCamera.transform.localRotation = initialCameraRotation * Quaternion.Euler(xRotation, 0f, 0f);
+
+        // プレイヤーの横回転を更新 (左右)
+        playerBody.transform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
     }
     #endregion
 
@@ -66,7 +71,8 @@ public class CameraControll : MonoBehaviour
         PlayerCamera.AddComponent<CamTest>();
         SetClippingPlanes(CamNeer, CamFar);
         PlayerCamera.transform.SetParent(transform);
-        //PlayerCamera.transform.localPosition = cameraOffset;
+        //// カメラの位置と回転を設定
+        //PlayerCamera.transform.localPosition = cameraOffset;  // カメラ位置を設定
         //PlayerCamera.transform.localRotation = Quaternion.Euler(cameraRata);
     }
 
