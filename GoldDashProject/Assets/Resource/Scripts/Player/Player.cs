@@ -20,7 +20,7 @@ public class Player : MonoBehaviour
     [SerializeField] DrawCircle drawCircle;
     [SerializeField] CameraControll cameraControll;
 
-    public VariableJoystick variableJoystick;
+    [SerializeField] VariableJoystick variableJoystick;
     private Vector3 inputVector;
 
     #region ゲーム起動時必ず呼ばれる
@@ -47,7 +47,7 @@ public class Player : MonoBehaviour
     {
         // 移動
         input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
-        transform.position += moveSpeed * Time.deltaTime * input;
+        transform.position -= moveSpeed * Time.deltaTime * input;
     }
 
     void MoveKey()
@@ -55,11 +55,11 @@ public class Player : MonoBehaviour
         float moveDirection = 0;
         if (Input.GetKey(KeyCode.W))
         {
-            moveDirection = 1;
+            moveDirection = -1;
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            moveDirection = -1;
+            moveDirection = 1;
         }
 
         // 前進後退の移動
