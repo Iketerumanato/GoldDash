@@ -30,6 +30,8 @@ public class GameServerManager : MonoBehaviour
 
     private bool inGame = false; //ゲームが始まっているか
 
+    private Dictionary<ushort, uint> sendNums; //各セッションIDを鍵として、送信番号を記録。受信管理（パケロス処理）はUDPGameServerでやる
+
     //サーバーが内部をコントロールするための通知　マップ生成など
     public enum SERVER_INTERNAL_EVENT
     { 
@@ -79,6 +81,8 @@ public class GameServerManager : MonoBehaviour
         actorDictionary = new Dictionary<ushort, ActorController>();
         usedID = new HashSet<ushort>();
         usedName = new HashSet<string>();
+
+        //sendNums = new Dictionary<ushort, uint>();
 
         //sessionIDについて、0はsessionIDを持っていないクライアントを表すナンバーなので、予め使用済にしておく。
         usedID.Add(0);
@@ -131,6 +135,9 @@ public class GameServerManager : MonoBehaviour
                         usedID.Add(receivedHeader.sessionID); //このIDを使用済にする
                         usedName.Add(receivedInitPacket.playerName); //登録したプレイヤーネームを使用済にする
 
+                        //送信番号の記録開始
+                        //sendNums.Add(receivedHeader.sessionID, 0);
+
                         Debug.Log($"sessionID:{receivedHeader.sessionID},プレイヤーネーム:{receivedInitPacket.playerName} でactorDictionaryに登録したぜ！");
                         Debug.Log($"actorDictionaryには現在、{actorDictionary.Count}人のプレイヤーが登録されているぜ！");
 
@@ -161,7 +168,7 @@ public class GameServerManager : MonoBehaviour
                             {
                                 Debug.Log($"パケット送ってゲームはじめます");
 
-
+                                //TODO リスポーン地点は決め打ちしているので、あらかじめstaticなmapをforeachでぶん回すなどしてくれ
 
                                 ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG, k.Key, new Vector3(9.5f, 0.2f, 9 + f));
                                 Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());

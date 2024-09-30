@@ -97,7 +97,7 @@ public class GameClientManager : MonoBehaviour
                         break;
                     case (byte)Definer.PT.AP:
 
-                        //InitPacketを受け取ったときの処理
+                        //ActionPacketを受け取ったときの処理
                         Debug.Log($"Actionパケットを処理するぜ！SessionIDを受け取るぜ！");
 
                         ActionPacket receivedActionPacket = new ActionPacket(receivedHeader.data);
@@ -110,7 +110,6 @@ public class GameClientManager : MonoBehaviour
 
                         Debug.Log($"{receivedHeader.data}に移動したぜ。");
 
-                        //ActionPacketを受け取ったときの処理
                         break;
                     default:
                         Debug.Log($"{(Definer.PT)receivedHeader.packetType}はクライアントでは処理できないぜ。処理を終了するぜ。");

@@ -25,7 +25,8 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] GameObject Player;
 
     //セル19*19個を集めた配列でマップを作る
-    private CellInfo[,] map;
+    //どこからでも情報を読み取れるように静的にする
+    public static CellInfo[,] map;
 
     public void InitObservation(GameServerManager gameServerManager)
     {
