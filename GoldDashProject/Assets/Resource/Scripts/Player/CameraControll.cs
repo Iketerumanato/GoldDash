@@ -11,7 +11,8 @@ public class CameraControll : MonoBehaviour
     [Range(50f, 150f)]
     [SerializeField] float joystickSensitivity = 100f;
     [Header("カメラの位置調整")]
-    [SerializeField] Vector3 cameraOffset = new(0f, 0.7f, 0.4f);
+    [SerializeField] Vector3 cameraOffset = new(0f, 0.3f, -0.07f);
+    Vector3 cameraRata = new(0f, 0f, 0f);
     [Header("縦回転の制御")]
     float xRotation = 0f;
     [Range(90f, 120f)]
@@ -65,7 +66,8 @@ public class CameraControll : MonoBehaviour
         PlayerCamera.AddComponent<CamTest>();
         SetClippingPlanes(CamNeer, CamFar);
         PlayerCamera.transform.SetParent(transform);
-        PlayerCamera.transform.localPosition = cameraOffset;
+        //PlayerCamera.transform.localPosition = cameraOffset;
+        //PlayerCamera.transform.localRotation = Quaternion.Euler(cameraRata);
     }
 
     void SetClippingPlanes(float near, float far)
