@@ -123,7 +123,7 @@ public class UdpGameServer : UdpCommnicator
             //未知のクライアントから送られてくるパケットの種類を調べる
             switch (receivedHeader.packetType)
             {
-                case (byte)PacketDefiner.PACKET_TYPE.INIT_PACKET_CLIENT: //initパケットなら開封する
+                case (byte)Definer.PT.IPC: //initパケットなら開封する
                     //基本的にこのクラスでHeader.dataは参照しないのだが、InitパケットはsessionPassを見る必要がある
                     InitPacketClient receivedData = new InitPacketClient(receivedHeader.data);
 

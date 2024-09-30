@@ -9,14 +9,18 @@ public class SubscribeOrderManager : MonoBehaviour
     [SerializeField] private GameServerManager gameServerManager;
     [SerializeField] private GameClientManager gameClientManager;
 
+    [SerializeField] private MapGenerator mapGenerator;
+
     //仮のサウンドマネージャー
     [SerializeField] private TmpSoundManager soundManager;
 
     //subjectの初期化および購読はNull参照頻発地点。ここにエントリーポイントを作って、そこで購買関係の構築順序を制御する
     private void Awake()
     {
+        //ここがエントリーポイントなのでFPSも指定しておく
         Application.targetFrameRate = 60;
 
+        //UI関連
         udpButtonManager.InitObservation();
 
         udpUIDisplayer.InitObservation(udpButtonManager);
@@ -27,5 +31,8 @@ public class SubscribeOrderManager : MonoBehaviour
 
         gameServerManager.InitObservation(udpButtonManager);
         gameClientManager.InitObservation(udpButtonManager);
+
+        //サーバー関連
+        mapGenerator.InitObservation(gameServerManager);
     }
 }

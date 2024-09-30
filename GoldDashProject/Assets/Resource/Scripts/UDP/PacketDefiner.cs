@@ -2,33 +2,79 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public static class PacketDefiner
+/// <summary>
+/// 定数宣言用クラス
+/// </summary>
+public static class Definer
 
 {
-    //パケットの種類
-    public enum PACKET_TYPE : byte
+    /// <summary>
+    /// PacketType, パケットの種類
+    /// </summary>
+    public enum PT : byte
     { 
-        INIT_PACKET_CLIENT = 0,
-        INIT_PACKET_SERVER,
-        ACTION_PACKET,
-        POSITION_PACKET,
+        /// <summary>
+        /// InitPacketClient, クライアントからサーバーへ送る初期設定用パケット。
+        /// </summary>
+        IPC = 0,
+        /// <summary>
+        /// InitPAcketServer, サーバーからクライアントへ送る初期設定用パケット。
+        /// </summary>
+        IPS,
+        /// <summary>
+        /// ActionPacket, 通知やアクションの実行申請・執行命令などを行う。
+        /// </summary>
+        AP,
+        /// <summary>
+        /// PositionPacket, 定期的に各プレイヤーキャラクターの座標をサーバーから全クライアントに送信するためのパケット
+        /// </summary>
+        PP, //P
     }
 
-    //アクションの種類
-    public enum ACTION_ROUGH_ID : byte
+    /// <summary>
+    /// RoughID, ActionPacketの種別を大まかに分類する
+    /// </summary>
+    public enum RID : byte
     { 
-        NOTICE = 0, //お知らせ
-        REQUEST, //プレイヤーからのアクションリクエスト
-        EXECUTE, //サーバーによって承認されたアクションの執行命令
-        MOVE, //プレイヤーの移動
+        /// <summary>
+        /// Move, プレイヤーが移動した
+        /// </summary>
+        MOV = 0,
+        /// <summary>
+        /// Notice, ゲーム開始・終了などを知らせる。
+        /// </summary>
+        NOT,
+        /// <summary>
+        /// Request, クライアントからサーバーにアクションをリクエストする
+        /// </summary>
+        REQ,
+        /// <summary>
+        /// Execute, サーバーで承認（実行結果を確認）したアクションを各クライアントへ反映させる。
+        /// </summary>
+        EXE,
     }
 
-    public enum NOTICE_DETAIL_ID : byte
+    /// <summary>
+    /// Notice Detail ID, お知らせの詳細な分類
+    /// </summary>
+    public enum NDID : byte
     { 
+        /// <summary>
+        /// MOVなど、DetailIDを必要としない場合
+        /// </summary>
         NONE,
-        HELLO, //定期的にハローパケットを飛ばして存在を確かめ合う
-        MATCHING_COMPLETED, //マッチングが終わった
-        //今後増やす
+        /// <summary>
+        /// ゲーム開始まではパケットを送信する用事が無いため、定期的にハローパケットを飛ばして存在を確かめ合う
+        /// </summary>
+        HELLO,
+        /// <summary>
+        /// ゲームを開始します
+        /// </summary>
+        STG,
+        /// <summary>
+        /// ゲームを終了します
+        /// </summary>
+        EDG,
     }
 
 
