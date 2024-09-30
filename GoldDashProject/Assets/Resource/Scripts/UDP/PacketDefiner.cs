@@ -14,7 +14,7 @@ public static class Definer
     public enum PT : byte
     { 
         /// <summary>
-        /// InitPacketServer, クライアントからサーバーへ送る初期設定用パケット。
+        /// InitPacketClient, クライアントからサーバーへ送る初期設定用パケット。
         /// </summary>
         IPC = 0,
         /// <summary>
