@@ -111,6 +111,7 @@ public class GameServerManager : MonoBehaviour
 
                 switch (receivedHeader.packetType)
                 {
+                    #region case (byte)Definer.PT.IPC: InitPacketの場合
                     case (byte)Definer.PT.IPC:
 
                         //InitPacketを受け取ったときの処理
@@ -181,10 +182,26 @@ public class GameServerManager : MonoBehaviour
                         }
                         
                         break;
+                    #endregion
+                    #region (byte)Definer.PT.AP: ActionPacketの場合
                     case (byte)Definer.PT.AP:
-                        //ActionPacketを受け取ったときの処理
-                        break;
 
+                        //ActionPacketを受け取ったときの処理
+                        Debug.Log($"Actionパケットを処理するぜ！SessionIDを受け取るぜ！");
+
+                        ActionPacket receivedActionPacket = new ActionPacket(receivedHeader.data);
+
+                        switch (receivedActionPacket.roughID)
+                        {
+                            case (byte)Definer.RID.MOV:
+                                //アクター辞書を更新　送信はFicedUpdateとかでやる
+                                break;
+                            case (byte)Definer.RID.REQ:
+                                break;
+                        }
+
+                        break;
+                    #endregion
                     default:
                         Debug.Log($"{(Definer.PT)receivedHeader.packetType}はサーバーでは処理できないぜ。処理を終了するぜ。");
                         break;

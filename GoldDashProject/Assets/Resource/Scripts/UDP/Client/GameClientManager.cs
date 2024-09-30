@@ -102,15 +102,35 @@ public class GameClientManager : MonoBehaviour
 
                         ActionPacket receivedActionPacket = new ActionPacket(receivedHeader.data);
 
-                        if (receivedActionPacket.targetID == this.sessionID)
+                        switch (receivedActionPacket.roughID)
                         {
-                            //自キャラを初期位置にやる処理だったが、キモすぎるためコメントアウト
-                            //player.transform.position = receivedActionPacket.pos;
+                            case (byte)Definer.RID.NOT:
+
+                                switch (receivedActionPacket.detailID)
+                                {
+                                    case (byte)Definer.NDID.NONE:
+                                        break;
+
+                                    case (byte)Definer.NDID.HELLO:
+                                        break;
+
+                                    case (byte)Definer.NDID.STG:
+                                        //ここでプレイヤーを有効化する
+                                        break;
+                                        
+                                    case (byte)Definer.NDID.EDG:
+                                        break;
+                                }
+                                break;
                         }
 
-                        Debug.Log($"{receivedHeader.data}に移動したぜ。");
-
                         break;
+                    case (byte)Definer.PT.PP:
+                        
+                        //PositionPacketを受け取ったときの処理
+                        //全アクターの位置を更新
+                        break;
+
                     default:
                         Debug.Log($"{(Definer.PT)receivedHeader.packetType}はクライアントでは処理できないぜ。処理を終了するぜ。");
                         break;
