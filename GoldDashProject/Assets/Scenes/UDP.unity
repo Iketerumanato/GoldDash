@@ -2445,7 +2445,6 @@ MonoBehaviour:
   sessionPass: 9999
   initSessionPass: 1234
   myName: Kirito
-  player: {fileID: 0}
 --- !u!1 &1467684026
 GameObject:
   m_ObjectHideFlags: 0
