@@ -138,12 +138,10 @@ public class GameServerManager : MonoBehaviour
                         ActorController actorController = Instantiate(ActorObject).GetComponent<ActorController>();
                         actorDictionary.Add(receivedHeader.sessionID, actorController);
 
-                        actorController.gameObject.transform.position = Vector3.zero;
-
                         usedID.Add(receivedHeader.sessionID); //このIDを使用済にする
                         usedName.Add(receivedInitPacket.playerName); //登録したプレイヤーネームを使用済にする
 
-                        //送信番号の記録開始
+                        //TODO 送信番号の記録開始
                         //sendNums.Add(receivedHeader.sessionID, 0);
 
                         Debug.Log($"sessionID:{receivedHeader.sessionID},プレイヤーネーム:{receivedInitPacket.playerName} でactorDictionaryに登録したぜ！");
@@ -164,7 +162,7 @@ public class GameServerManager : MonoBehaviour
                         {
                             Debug.Log($"十分なプレイヤーが集まったぜ。闇のゲームの始まりだぜ。");
 
-                            //Dictionaryへの登録を締め切る処理
+                            //TODO Dictionaryへの登録を締め切る処理
 
                             //ゲーム開始処理
                             //内部通知
