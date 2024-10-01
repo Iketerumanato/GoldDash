@@ -67,6 +67,7 @@ public class GameClientManager : MonoBehaviour
     {
         while (true)
         {
+            //稼働状態になるのを待つ
             await UniTask.WaitUntil(() => isRunning);
 
             while (isRunning)

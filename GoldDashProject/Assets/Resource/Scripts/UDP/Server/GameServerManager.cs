@@ -28,14 +28,15 @@ public class GameServerManager : MonoBehaviour
 
     [SerializeField] private int numOfPlayer; //何人のプレイヤーを募集するか
 
-    private bool inGame = false; //ゲームが始まっているか
-
     private Dictionary<ushort, uint> sendNums; //各セッションIDを鍵として、送信番号を記録。受信管理（パケロス処理）はUDPGameServerでやる
 
+    [SerializeField] private GameObject ActorObject;
+
     //サーバーが内部をコントロールするための通知　マップ生成など
+    //クライアントサーバーのクライアント部分の処理をここでやると機能過多になるため、通知を飛ばすだけにする。脳が体内の器官に命令を送るようなイメージ。実行するのはあくまで器官側。
     public enum SERVER_INTERNAL_EVENT
     { 
-        GENERATE_MAP = 0,
+        GENERATE_MAP = 0, //マップを生成せよ
     }
 
     public Subject<SERVER_INTERNAL_EVENT> ServerInternalSubject;
@@ -96,6 +97,7 @@ public class GameServerManager : MonoBehaviour
     {
         while (true)
         {
+            //稼働状態になるのを待つ
             await UniTask.WaitUntil(() => isRunning);
 
             while (isRunning)
@@ -132,7 +134,12 @@ public class GameServerManager : MonoBehaviour
                         //TODO プレイヤーが規定人数集まっていたらエラーコード2番
 
                         //ActorControllerインスタンスを作りDictionaryに加える
-                        actorDictionary.Add(receivedHeader.sessionID, new ActorController(receivedInitPacket.playerName));
+                        //Actorをインスタンス化しながらActorControllerを取得
+                        ActorController actorController = Instantiate(ActorObject).GetComponent<ActorController>();
+                        actorDictionary.Add(receivedHeader.sessionID, actorController);
+
+                        actorController.gameObject.transform.position = Vector3.zero;
+
                         usedID.Add(receivedHeader.sessionID); //このIDを使用済にする
                         usedName.Add(receivedInitPacket.playerName); //登録したプレイヤーネームを使用済にする
 
@@ -160,7 +167,6 @@ public class GameServerManager : MonoBehaviour
                             //Dictionaryへの登録を締め切る処理
 
                             //ゲーム開始処理
-                            inGame = true;
                             //内部通知
                             ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
 
@@ -194,7 +200,7 @@ public class GameServerManager : MonoBehaviour
                         switch (receivedActionPacket.roughID)
                         {
                             case (byte)Definer.RID.MOV:
-                                //アクター辞書を更新　送信はFicedUpdateとかでやる
+                                //アクター辞書を更新　送信はFixedUpdateとかでやる
                                 break;
                             case (byte)Definer.RID.REQ:
                                 break;
@@ -209,4 +215,6 @@ public class GameServerManager : MonoBehaviour
             }
         }
     }
+
+    public Dictionary<ushort, ActorController> propertyActorDictionary { get { return actorDictionary; } }
 }

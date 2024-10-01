@@ -11,11 +11,6 @@ public class ActorController : MonoBehaviour
 
     string playerName;
 
-    public ActorController(string playerName)
-    { 
-        this.playerName = playerName;
-    }
-
     //メソッドの例。正式実装ではない
     public void Kill()
     { 
