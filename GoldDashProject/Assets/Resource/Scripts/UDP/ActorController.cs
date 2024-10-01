@@ -7,9 +7,14 @@ using UnityEngine;
 /// </summary>
 public class ActorController : MonoBehaviour
 {
-    GameObject actor;
+    private string playerName { set; get; }
 
-    string playerName;
+    //このアクターの座標と向きを更新する
+    public void Move(Vector3 pos, Vector3 forward)
+    { 
+        this.gameObject.transform.position = pos;
+        this.gameObject.transform.forward = forward;
+    }
 
     //メソッドの例。正式実装ではない
     public void Kill()

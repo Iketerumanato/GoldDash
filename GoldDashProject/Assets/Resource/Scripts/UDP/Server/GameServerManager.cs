@@ -136,6 +136,11 @@ public class GameServerManager : MonoBehaviour
                         //ActorControllerインスタンスを作りDictionaryに加える
                         //Actorをインスタンス化しながらActorControllerを取得
                         ActorController actorController = Instantiate(ActorObject).GetComponent<ActorController>();
+
+                        //アクターの名前を書き込み
+                        actorController.name = receivedInitPacket.playerName;
+
+                        //アクター辞書に登録
                         actorDictionary.Add(receivedHeader.sessionID, actorController);
 
                         usedID.Add(receivedHeader.sessionID); //このIDを使用済にする
