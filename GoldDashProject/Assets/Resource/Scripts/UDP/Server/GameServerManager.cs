@@ -139,6 +139,8 @@ public class GameServerManager : MonoBehaviour
 
                         //アクターの名前を書き込み
                         actorController.PlayerName = receivedInitPacket.playerName;
+                        //アクターのゲームオブジェクト
+                        actorController.name = "Actor:" + receivedInitPacket.playerName; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
 
                         //アクター辞書に登録
                         actorDictionary.Add(receivedHeader.sessionID, actorController);
