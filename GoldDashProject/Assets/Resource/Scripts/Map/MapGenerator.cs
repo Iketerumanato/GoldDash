@@ -45,8 +45,6 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    private CellInfo[,] ReturnMap() { return map; }
-
     private void GenerateMap()
     {
         //ランダムに選んだcsvファイルから19*19のcellInfo2次元配列を作成する
