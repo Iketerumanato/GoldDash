@@ -7,7 +7,7 @@ using UnityEngine;
 /// </summary>
 public class ActorController : MonoBehaviour
 {
-    private string playerName { set; get; }
+    public string PlayerName { set; get; }
 
     //このアクターの座標と向きを更新する
     public void Move(Vector3 pos, Vector3 forward)

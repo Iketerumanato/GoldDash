@@ -138,7 +138,7 @@ public class GameServerManager : MonoBehaviour
                         ActorController actorController = Instantiate(ActorObject).GetComponent<ActorController>();
 
                         //アクターの名前を書き込み
-                        actorController.name = receivedInitPacket.playerName;
+                        actorController.PlayerName = receivedInitPacket.playerName;
 
                         //アクター辞書に登録
                         actorDictionary.Add(receivedHeader.sessionID, actorController);
