@@ -28,6 +28,13 @@ public class MapGenerator : MonoBehaviour
     //どこからでも情報を読み取れるように静的にする
     public static CellInfo[,] map;
 
+    //X軸とZ軸で仕切られた4つの象限に存在しているリスポーン地点のリスト。宣言順が気持ち悪いが、マップ生成処理等では第2,第1,第4,第3象限の順に処理しているので統一した。
+    private List<Vector3> respawnPointsInQuadrant2;
+    private List<Vector3> respawnPointsInQuadrant1;
+    private List<Vector3> respawnPointsInQuadrant4;
+    private List<Vector3> respawnPointsInQuadrant3;
+    private List<Vector3> allRespawnPoints; //全象限のリスポーン地点
+
     public void InitObservation(GameServerManager gameServerManager)
     {
         gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
@@ -43,6 +50,16 @@ public class MapGenerator : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    private void Start()
+    {
+        //コレクションのインスタンス生成
+        respawnPointsInQuadrant2 = new List<Vector3>();
+        respawnPointsInQuadrant1 = new List<Vector3>();
+        respawnPointsInQuadrant4 = new List<Vector3>();
+        respawnPointsInQuadrant3 = new List<Vector3>();
+        allRespawnPoints = new List<Vector3>();
     }
 
     private void GenerateMap()
@@ -146,11 +163,38 @@ public class MapGenerator : MonoBehaviour
                     chest.transform.parent = Parenttransform;
                 }
 
-                // プレイヤーのスポーン位置
+                // スポーン位置は別メソッドでサーバーに伝えられるためリスポーン地点を指定するオブジェクトの実装は要らなくなりました
+
+                // プレイヤーのスポーン位置をリストに追加
                 if (map[i, j].spawnPlayer)
                 {
-                    GameObject respawn = Instantiate(respawnObj, new Vector3(i + 0.5f, 0.4f, j + 0.5f), Quaternion.identity);
-                    respawn.transform.parent = Parenttransform;
+                    //第2または第1象限なら
+                    if (i < MAP_PART_SIZE)
+                    {
+                        if (j < MAP_PART_SIZE) //第2象限なら
+                        {
+                            respawnPointsInQuadrant2.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                        }
+                        else //第1象限なら
+                        {
+                            respawnPointsInQuadrant1.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                        }
+                    }
+                    else //第3または第4象限なら
+                    {
+                        if (j < MAP_PART_SIZE) //第3象限なら
+                        {
+                            respawnPointsInQuadrant3.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                        }
+                        else //第4象限なら
+                        {
+                            respawnPointsInQuadrant4.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                        }
+                    }
                 }
             }
         }
@@ -410,5 +454,27 @@ public class MapGenerator : MonoBehaviour
                 }
             }
         }
+    }
+
+    //ランダムなリスポーン地点を4個選んで返す。4つのリスポーン地点は、X軸とZ軸によって仕切られた4つの象限からひとつずつ選ばれる
+    public Vector3[] Get4RespawnPointsRandomly()
+    {
+        Vector3[] ret = new Vector3[4];
+
+        System.Random random = new System.Random(); //4回乱数を生成するが、1ミリ秒以内にrandomインスタンスを生成すると同じ値が出てしまうので一つのインスタンスを使いまわす
+        //参考： https://qiita.com/waokitsune/items/068be8e71cea59e0a703
+        //参考２： https://qiita.com/neko_the_shadow/items/72f0285324100a596979
+
+        ret[0] = respawnPointsInQuadrant2[random.Next(0, respawnPointsInQuadrant2.Count)]; //これはサブスレッドで実行される可能性があるのでSystemの乱数を使用
+        ret[1] = respawnPointsInQuadrant1[random.Next(0, respawnPointsInQuadrant1.Count)];
+        ret[2] = respawnPointsInQuadrant4[random.Next(0, respawnPointsInQuadrant4.Count)];
+        ret[3] = respawnPointsInQuadrant3[random.Next(0, respawnPointsInQuadrant3.Count)];
+
+        return ret;
+    }
+
+    public Vector3 GetRespawnPointRandomly()
+    {
+        return allRespawnPoints[new System.Random().Next(0, allRespawnPoints.Count)]; //これはサブスレッドで実行される可能性があるのでSystemの乱数を使用
     }
 }
