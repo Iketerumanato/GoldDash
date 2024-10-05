@@ -105,8 +105,8 @@ public class InitPacketClient : Packet
         this.sessionPass = pass;
         this.rcvPort = rcvPort;
         this.initSessionPass = initSessionPass;
-        this.playerName = playerName;
         this.playerNameLength = (byte)Encoding.UTF8.GetByteCount(playerName);
+        this.playerName = playerName;
     }
 
     public InitPacketClient(byte[] bytes)
@@ -185,13 +185,19 @@ public class ActionPacket : Packet
     public byte detailID; //アクションの詳細な種類を示す
     public ushort targetID; //アクションの対象を示す
     public Vector3 pos; //座標データを持つアクションで参照する
+    public Vector3 pos2; //座標データを2つ持つアクションで参照する
+    public byte msgLength; //msgのバイト数
+    public string msg; //文字列データを持つアクションで参照する
 
-    public ActionPacket(byte roughID, byte detailID, ushort targetID, Vector3 pos)
+    public ActionPacket(byte roughID, byte detailID, ushort targetID, Vector3 pos = new Vector3(), Vector3 pos2 = new Vector3(), string msg = "")
     {
         this.roughID = roughID;
         this.detailID = detailID;
         this.targetID = targetID;
         this.pos = pos;
+        this.pos2 = pos2;
+        this.msgLength = (byte)Encoding.UTF8.GetByteCount(msg);
+        this.msg = msg;
     }
 
     public ActionPacket(byte[] bytes)
@@ -210,7 +216,18 @@ public class ActionPacket : Packet
         y = BitConverter.ToSingle(bytes, index);
         index += sizeof(float);
         z = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
         pos = new Vector3(x, y, z);
+        x = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        y = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        z = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        pos2 = new Vector3(x, y, z);
+        this.msgLength = bytes[index];
+        index++;
+        this.msg = Encoding.UTF8.GetString(bytes, index, msgLength);
     }
 
     public override byte[] ToByte()
@@ -223,6 +240,11 @@ public class ActionPacket : Packet
         ret = AddBytes(ret, BitConverter.GetBytes(pos.x));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.y));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.z));
+        ret = AddBytes(ret, BitConverter.GetBytes(pos2.x));
+        ret = AddBytes(ret, BitConverter.GetBytes(pos2.y));
+        ret = AddBytes(ret, BitConverter.GetBytes(pos2.z));
+        ret = AddByte(ret, msgLength);
+        ret = AddBytes(ret, Encoding.UTF8.GetBytes(msg));
 
         return ret;
     }
@@ -232,23 +254,31 @@ public class PositionPacket : Packet
 {
     public byte id0;
     public Vector3 pos0;
+    public Vector3 forward0;
     public byte id1;
     public Vector3 pos1;
+    public Vector3 forward1;
     public byte id2;
     public Vector3 pos2;
+    public Vector3 forward2;
     public byte id3;
     public Vector3 pos3;
+    public Vector3 forward3;
 
-    public PositionPacket(byte id0, Vector3 pos0, byte id1, Vector3 pos1, byte id2, Vector3 pos2, byte id3, Vector3 pos3)
+    public PositionPacket(byte id0, Vector3 pos0, Vector3 forward0, byte id1, Vector3 pos1, Vector3 forward1, byte id2, Vector3 pos2, Vector3 forward2, byte id3, Vector3 pos3, Vector3 forward3)
     {
         this.id0 = id0;
         this.pos0 = pos0;
+        this.forward0 = forward0;
         this.id1 = id1;
         this.pos1 = pos1;
+        this.forward1 = forward1;
         this.id2 = id2;
         this.pos2 = pos2;
+        this.forward2 = forward2;
         this.id3 = id3;
         this.pos3 = pos3;
+        this.forward3 = forward3;
     }
 
     public PositionPacket(byte[] bytes)
@@ -265,7 +295,14 @@ public class PositionPacket : Packet
         index += sizeof(float);
         z = BitConverter.ToSingle(bytes, index);
         index += sizeof(float);
-        pos0 = new Vector3(x, y, z);
+        this.pos0 = new Vector3(x, y, z);
+        x = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        y = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        z = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        this.forward0 = new Vector3(x, y, z);
         //2人目
         this.id1 = bytes[index];
         index++;
@@ -275,7 +312,14 @@ public class PositionPacket : Packet
         index += sizeof(float);
         z = BitConverter.ToSingle(bytes, index);
         index += sizeof(float);
-        pos1 = new Vector3(x, y, z);
+        this.pos1 = new Vector3(x, y, z);
+        x = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        y = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        z = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        this.forward1 = new Vector3(x, y, z);
         //3人目
         this.id2 = bytes[index];
         index++;
@@ -285,7 +329,14 @@ public class PositionPacket : Packet
         index += sizeof(float);
         z = BitConverter.ToSingle(bytes, index);
         index += sizeof(float);
-        pos2 = new Vector3(x, y, z);
+        this.pos2 = new Vector3(x, y, z);
+        x = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        y = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        z = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        this.forward2 = new Vector3(x, y, z);
         //4人目
         this.id3 = bytes[index];
         index++;
@@ -295,7 +346,13 @@ public class PositionPacket : Packet
         index += sizeof(float);
         z = BitConverter.ToSingle(bytes, index);
         index += sizeof(float);
-        pos3 = new Vector3(x, y, z);
+        this.pos3 = new Vector3(x, y, z);
+        x = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        y = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        z = BitConverter.ToSingle(bytes, index);
+        this.forward3 = new Vector3(x, y, z);
     }
 
     public override byte[] ToByte()
@@ -306,18 +363,30 @@ public class PositionPacket : Packet
         ret = AddBytes(ret, BitConverter.GetBytes(pos0.x));
         ret = AddBytes(ret, BitConverter.GetBytes(pos0.y));
         ret = AddBytes(ret, BitConverter.GetBytes(pos0.z));
+        ret = AddBytes(ret, BitConverter.GetBytes(forward0.x));
+        ret = AddBytes(ret, BitConverter.GetBytes(forward0.y));
+        ret = AddBytes(ret, BitConverter.GetBytes(forward0.z));
         ret = AddByte(ret, id1);
         ret = AddBytes(ret, BitConverter.GetBytes(pos1.x));
         ret = AddBytes(ret, BitConverter.GetBytes(pos1.y));
         ret = AddBytes(ret, BitConverter.GetBytes(pos1.z));
+        ret = AddBytes(ret, BitConverter.GetBytes(forward1.x));
+        ret = AddBytes(ret, BitConverter.GetBytes(forward1.y));
+        ret = AddBytes(ret, BitConverter.GetBytes(forward1.z));
         ret = AddByte(ret, id2);
         ret = AddBytes(ret, BitConverter.GetBytes(pos2.x));
         ret = AddBytes(ret, BitConverter.GetBytes(pos2.y));
         ret = AddBytes(ret, BitConverter.GetBytes(pos2.z));
+        ret = AddBytes(ret, BitConverter.GetBytes(forward2.x));
+        ret = AddBytes(ret, BitConverter.GetBytes(forward2.y));
+        ret = AddBytes(ret, BitConverter.GetBytes(forward2.z));
         ret = AddByte(ret, id3);
         ret = AddBytes(ret, BitConverter.GetBytes(pos3.x));
         ret = AddBytes(ret, BitConverter.GetBytes(pos3.y));
         ret = AddBytes(ret, BitConverter.GetBytes(pos3.z));
+        ret = AddBytes(ret, BitConverter.GetBytes(forward3.x));
+        ret = AddBytes(ret, BitConverter.GetBytes(forward3.y));
+        ret = AddBytes(ret, BitConverter.GetBytes(forward3.z));
 
         return ret;
     }
