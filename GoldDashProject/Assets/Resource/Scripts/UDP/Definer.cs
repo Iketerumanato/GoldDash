@@ -62,7 +62,7 @@ public static class Definer
         /// <summary>
         /// MOVなど、DetailIDを必要としない場合
         /// </summary>
-        NONE,
+        NONE = 0,
         /// <summary>
         /// ゲーム開始まではパケットを送信する用事が無いため、定期的にハローパケットを飛ばして存在を確かめ合う
         /// </summary>
@@ -77,5 +77,14 @@ public static class Definer
         EDG,
     }
 
-
+    /// <summary>
+    /// Execute Detail ID, 執行命令の詳細な内容
+    /// </summary>
+    public enum EDID : byte
+    { 
+        /// <summary>
+        /// Actorをスポーンさせろ
+        /// </summary>
+        SPAWN = 0,
+    }
 }
