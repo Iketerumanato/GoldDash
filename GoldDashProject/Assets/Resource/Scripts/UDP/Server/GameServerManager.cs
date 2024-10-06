@@ -4,6 +4,8 @@ using UnityEngine;
 using R3;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using System.Xml.Linq;
+using JetBrains.Annotations;
 
 public class GameServerManager : MonoBehaviour
 {
@@ -32,6 +34,8 @@ public class GameServerManager : MonoBehaviour
     //private Dictionary<ushort, uint> sendNums; //各セッションIDを鍵として、送信番号を記録。受信管理（パケロス処理）はUDPGameServerでやる
 
     [SerializeField] private GameObject ActorObject; //アクターのプレハブ
+
+    private bool inGame; //ゲームは始まっているか
 
     //サーバーが内部をコントロールするための通知　マップ生成など
     //クライアントサーバーのクライアント部分の処理をここでやると機能過多になるため、通知を飛ばすだけにする。脳が体内の器官に命令を送るようなイメージ。実行するのはあくまで器官側。
@@ -89,9 +93,36 @@ public class GameServerManager : MonoBehaviour
         //sessionIDについて、0はsessionIDを持っていないクライアントを表すナンバーなので、予め使用済にしておく。
         usedID.Add(0);
 
+        inGame = false;
+
         //パケットの処理をUpdateでやると1フレームの計算量が保障できなくなる（カクつきの原因になり得る）のでマルチスレッドで
         //スレッドが何個いるのかは試してみないと分からない
         Task.Run(() => ProcessPacket());
+        Task.Run(() => SendAllActorsPosition());
+    }
+
+    private async void SendAllActorsPosition()
+    {
+        //ゲーム開始を待つ
+        await UniTask.WaitUntil(() => inGame); //ここは本来ハローパケットの送信処理から切り替えるべきだがまだ実装しない
+
+        while (true)
+        {
+            //インスタンスを生成
+            PositionPacket myPacket = new PositionPacket();
+
+            int index = 0; //foreachしながら配列に順にアクセスするためのindex
+            //アクターの座標をPPで送信
+            foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+            {
+                //DictionaryコレクションはHashSet同様登録順が保持されないが、この配列への書き込みは順不同でよい。ご安心を。
+                myPacket.posDatas[index] = new PositionPacket.PosData(k.Key, k.Value.transform.position, k.Value.transform.forward);
+            }
+            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.PP, myPacket.ToByte());
+            udpGameServer.Send(myHeader.ToByte());
+
+            await UniTask.Delay(100);
+        }
     }
 
     private async void ProcessPacket()
@@ -238,6 +269,8 @@ public class GameServerManager : MonoBehaviour
                                             {
                                                 k.Value.gameObject.SetActive(true);
                                             }
+                                            //ゲーム開始
+                                            inGame = true;
                                         }
                                         break;
                                 }
