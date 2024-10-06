@@ -166,6 +166,18 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5458756175342590463, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458756175342590463, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458756175342590463, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458756175342590463, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -204,6 +216,10 @@ PrefabInstance:
     - target: {fileID: 5458756175342590463, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458756175342590463, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -276,7 +292,6 @@ MonoBehaviour:
   playerBody: {fileID: 5261510850691686513}
   cameramoveJoystick: {fileID: 1801865194650558693}
   joystickSensitivity: 100
-  cameraOffset: {x: 0, y: 0.37, z: -0.2}
   CamXMaxClanpRot: 90
   CamXMinClanpRot: -90
   rotateSpeed: 100
