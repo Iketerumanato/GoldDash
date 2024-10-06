@@ -21,6 +21,8 @@ public class GameClientManager : MonoBehaviour
 
     private ushort sessionID; //自分のセッションID。サーバー側で決めてもらう。
 
+    private int numOfActors; //アクターの人数
+
     #region ボタンが押されたら有効化したり無効化したり
     public void InitObservation(UdpButtonManager udpUIManager)
     {

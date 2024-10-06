@@ -28,7 +28,7 @@ public static class Definer
         /// <summary>
         /// PositionPacket, 定期的に各プレイヤーキャラクターの座標をサーバーから全クライアントに送信するためのパケット
         /// </summary>
-        PP, //P
+        PP,
     }
 
     /// <summary>
@@ -68,11 +68,15 @@ public static class Definer
         /// </summary>
         HELLO,
         /// <summary>
-        /// ゲームを開始します
+        /// Prepare(d) for Start Game, （サーバーからクライアントへ）ゲーム開始の準備をしてください。または（クライアントからサーバーへ）ゲーム開始の準備ができました。
+        /// </summary>
+        PSG,
+        /// <summary>
+        /// Start Game, ゲームを開始します
         /// </summary>
         STG,
         /// <summary>
-        /// ゲームを終了します
+        /// End Game, ゲームを終了します
         /// </summary>
         EDG,
     }

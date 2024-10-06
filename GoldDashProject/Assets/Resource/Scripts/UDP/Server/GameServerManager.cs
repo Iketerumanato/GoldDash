@@ -176,23 +176,30 @@ public class GameServerManager : MonoBehaviour
                             //内部通知
                             ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
 
-                            float f = 0.5f;
+                            //全クライアントにアクターの生成命令を送る
+
+                            Debug.Log($"パケット送ってゲームはじめるぜ。");
+
+                            //何人分のアクターを生成すべきか伝える
+                            ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.PSG, (ushort)actorDictionary.Count);
+                            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                            udpGameServer.Send(myHeader.ToByte());
+
+                            Debug.Log($"{actorDictionary.Count}人分のアクターを生成すべきだと伝えたぜ。");
+
+                            //4つのリスポーン地点を取得する
+                            Vector3[] respawnPoints = MapGenerator.instance.Get4RespawnPointsRandomly(); //テストプレイでは4人未満でデバッグするかもしれないが、そのときは先頭の要素だけ使う
+                            int index = 0;
+
                             foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
                             {
-                                Debug.Log($"パケット送ってゲームはじめます");
-
-                                //TODO リスポーン地点は決め打ちしているので、あらかじめstaticなmapをforeachでぶん回すなどしてくれ
-
-                                ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG, k.Key, new Vector3(9.5f, 0.2f, 9 + f));
-                                Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
-                                udpGameServer.Send(myHeader.ToByte());
-                                f += 0.5f;
-
-                                Debug.Log($"送りました");
+                                //リスポーン地点を参照しながら各プレイヤーの名前とIDを載せてアクター生成命令を飛ばす
+                                myPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN, k.Key, respawnPoints[index], default, k.Value.PlayerName);
+                                index++;
                             }
-                            
+
+                            Debug.Log($"アクターを生成命令を出したぜ。");
                         }
-                        
                         break;
                     #endregion
                     #region (byte)Definer.PT.AP: ActionPacketの場合
@@ -222,5 +229,5 @@ public class GameServerManager : MonoBehaviour
         }
     }
 
-    public Dictionary<ushort, ActorController> propertyActorDictionary { get { return actorDictionary; } }
+    public Dictionary<ushort, ActorController> PropertyActorDictionary { get { return actorDictionary; } }
 }

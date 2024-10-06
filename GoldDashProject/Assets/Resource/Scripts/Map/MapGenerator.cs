@@ -24,6 +24,9 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] GameObject respawnObj;
     [SerializeField] GameObject Player;
 
+    //MapGeneratorはシングルトンにする
+    public static MapGenerator instance;
+
     //セル19*19個を集めた配列でマップを作る
     //どこからでも情報を読み取れるように静的にする
     public static CellInfo[,] map;
@@ -54,6 +57,16 @@ public class MapGenerator : MonoBehaviour
 
     private void Start()
     {
+        //シングルトンな静的変数の初期化
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
         //コレクションのインスタンス生成
         respawnPointsInQuadrant2 = new List<Vector3>();
         respawnPointsInQuadrant1 = new List<Vector3>();
