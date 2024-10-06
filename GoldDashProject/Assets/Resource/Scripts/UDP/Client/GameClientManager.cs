@@ -111,7 +111,7 @@ public class GameClientManager : MonoBehaviour
 
                         ActionPacket receivedActionPacket = new ActionPacket(receivedHeader.data);
 
-                        Debug.Log($"{receivedActionPacket.roughID}を処理するぜ！");
+                        Debug.Log($"{(Definer.RID)receivedActionPacket.roughID}を処理するぜ！");
 
                         switch (receivedActionPacket.roughID)
                         {
