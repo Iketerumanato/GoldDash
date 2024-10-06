@@ -75,6 +75,7 @@ public class GameClientManager : MonoBehaviour
     private void Start()
     {
         packetQueue = new Queue<Header>();
+        actorDictionary = new Dictionary<ushort, ActorController>();
 
         Task.Run(() => ProcessPacket());
     }
