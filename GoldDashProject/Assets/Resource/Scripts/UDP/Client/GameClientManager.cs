@@ -85,16 +85,23 @@ public class GameClientManager : MonoBehaviour
         actorDictionary = new Dictionary<ushort, ActorController>();
 
         Task.Run(() => ProcessPacket());
+        Task.Run(() => SendPlayerPosition());
     }
 
-    private void FixedUpdate()
+    private async void SendPlayerPosition()
     {
-        if (!inGame) return; //ここは本来ハローパケットの送信処理に切り替えるべきだがまだ実装しないでreturnする
+        //ゲーム開始を待つ
+        await UniTask.WaitUntil(() => inGame); //ここは本来ハローパケットの送信処理から切り替えるべきだがまだ実装しない
 
-        //プレイヤーアクターの座標をMOVで送信
-        ActionPacket myPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, playerActor.transform.position, playerActor.transform.forward);
-        Header myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
-        udpGameClient.Send(myHeader.ToByte());
+        while (true) 
+        {
+            //プレイヤーアクターの座標をMOVで送信
+            ActionPacket myPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, playerActor.transform.position, playerActor.transform.forward);
+            Header myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+            udpGameClient.Send(myHeader.ToByte());
+
+            await UniTask.Delay(200);
+        }
     }
 
     private async void ProcessPacket()
