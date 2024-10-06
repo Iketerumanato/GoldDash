@@ -196,6 +196,8 @@ public class GameServerManager : MonoBehaviour
                             {
                                 //リスポーン地点を参照しながら各プレイヤーの名前とIDを載せてアクター生成命令を飛ばす
                                 myPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN, k.Key, respawnPoints[index], default, k.Value.PlayerName);
+                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                                udpGameServer.Send(myHeader.ToByte());
                                 index++;
                             }
 
