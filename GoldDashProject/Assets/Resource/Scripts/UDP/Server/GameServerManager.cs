@@ -26,7 +26,8 @@ public class GameServerManager : MonoBehaviour
 
     private HashSet<string> usedName; //プレイヤーネームの重複防止に使う。
 
-    [SerializeField] private int numOfPlayer; //何人のプレイヤーを募集するか
+    [SerializeField] private int numOfPlayers; //何人のプレイヤーを募集するか
+    private int preparedPlayers;
 
     private Dictionary<ushort, uint> sendNums; //各セッションIDを鍵として、送信番号を記録。受信管理（パケロス処理）はUDPGameServerでやる
 
@@ -166,7 +167,7 @@ public class GameServerManager : MonoBehaviour
                         }
 
                         //規定人数のプレイヤーが集まった時の処理
-                        if (actorDictionary.Count == numOfPlayer)
+                        if (actorDictionary.Count == numOfPlayers)
                         {
                             Debug.Log($"十分なプレイヤーが集まったぜ。闇のゲームの始まりだぜ。");
 
@@ -206,7 +207,7 @@ public class GameServerManager : MonoBehaviour
                     case (byte)Definer.PT.AP:
 
                         //ActionPacketを受け取ったときの処理
-                        Debug.Log($"Actionパケットを処理するぜ！SessionIDを受け取るぜ！");
+                        Debug.Log($"Actionパケットを処理するぜ！");
 
                         ActionPacket receivedActionPacket = new ActionPacket(receivedHeader.data);
 
@@ -214,6 +215,21 @@ public class GameServerManager : MonoBehaviour
                         {
                             case (byte)Definer.RID.MOV:
                                 //アクター辞書を更新　送信はFixedUpdateとかでやる
+                                break;
+                            case (byte)Definer.RID.NOT:
+                                switch (receivedActionPacket.detailID)
+                                {
+                                    case (byte)Definer.NDID.PSG:
+                                        preparedPlayers++; //準備ができたプレイヤーの人数を加算
+                                        if (preparedPlayers == numOfPlayers) //全プレイヤーの準備ができたら
+                                        {
+                                            //ゲーム開始命令を送る
+                                            ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
+                                            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
+                                        }
+                                        break;
+                                }
                                 break;
                             case (byte)Definer.RID.REQ:
                                 break;
