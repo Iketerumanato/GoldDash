@@ -278,6 +278,8 @@ public class PositionPacket : Packet
 
     public PositionPacket(byte[] bytes) //バイト配列からのコンストラクタは配列に要素を代入するためfor文を使っているものの、やっていることは他と同じ。
     {
+        posDatas = new PosData[MAX_NUM_OF_PLAYER];
+
         int index = 0;
         ushort sessionID;
         float x, y, z;

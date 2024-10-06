@@ -219,9 +219,25 @@ public class GameClientManager : MonoBehaviour
                         break;
 
                     case (byte)Definer.PT.PP:
-                        
                         //PositionPacketを受け取ったときの処理
+                        Debug.Log($"Positionパケットを処理するぜ！");
+
                         //全アクターの位置を更新
+                        PositionPacket positionPacket = new PositionPacket(receivedHeader.data); //バイト配列から変換
+                        foreach (PositionPacket.PosData p in positionPacket.posDatas) //座標情報を格納している配列にforeachでアクセス
+                        {
+                            if (p.sessionID == this.sessionID) continue;//もし自分のIDと紐づいた座標情報なら無視する。画面がガタガタしてしまうので。
+                            else
+                            {
+                                ActorController actorController = null;
+                                //4人未満でプレイするとき、p.sessionIDが0になっている箇所がある。このときdictionaryが例外「KeyNotFoundException」をスローするのを防ぐため、TryGetValueを用いる。
+                                actorDictionary.TryGetValue(p.sessionID, out actorController); //key: sessionIDに対応したvalueが見つからなければoutには何も代入されない。
+                                if (actorController != null) //valueが見つかったなら
+                                {
+                                    actorController.Move(p.pos, p.forward); //そのまま座標をいただいて、対応するアクターの座標を書き換える。
+                                }
+                            }
+                        }
                         break;
 
                     default:
