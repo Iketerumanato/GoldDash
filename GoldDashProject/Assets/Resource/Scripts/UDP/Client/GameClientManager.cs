@@ -201,7 +201,7 @@ public class GameClientManager : MonoBehaviour
                                         actorController.gameObject.SetActive(false); //初期設定が済んだら無効化して処理を止める。ゲーム開始時に有効化して座標などをセットする
 
                                         //アクター辞書に登録
-                                        actorDictionary.Add(receivedHeader.sessionID, actorController);
+                                        actorDictionary.Add(receivedActionPacket.targetID, actorController);
 
                                         //準備が完了したアクターの数を加算
                                         preparedActors++;
