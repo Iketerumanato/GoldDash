@@ -189,7 +189,7 @@ public class ActionPacket : Packet
     public byte msgLength; //msgのバイト数
     public string msg; //文字列データを持つアクションで参照する
 
-    public ActionPacket(byte roughID, byte detailID, ushort targetID = 0, Vector3 pos = new Vector3(), Vector3 pos2 = new Vector3(), string msg = "")
+    public ActionPacket(byte roughID, byte detailID = 0, ushort targetID = 0, Vector3 pos = new Vector3(), Vector3 pos2 = new Vector3(), string msg = "")
     {
         this.roughID = roughID;
         this.detailID = detailID;

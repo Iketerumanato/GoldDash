@@ -58,11 +58,7 @@ public static class Definer
     /// Notice Detail ID, お知らせの詳細な分類
     /// </summary>
     public enum NDID : byte
-    { 
-        /// <summary>
-        /// MOVなど、DetailIDを必要としない場合
-        /// </summary>
-        NONE = 0,
+    {
         /// <summary>
         /// ゲーム開始まではパケットを送信する用事が無いため、定期的にハローパケットを飛ばして存在を確かめ合う
         /// </summary>

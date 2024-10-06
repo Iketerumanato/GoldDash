@@ -23,11 +23,15 @@ public class GameClientManager : MonoBehaviour
 
     private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを保管。自分以外のプレイヤー（アクター）のセッションIDも記録していく
 
+    private ActorController playerActor; //プレイヤーが操作するキャラクターのActorController
+
     private int numOfActors; //アクターの人数
     private int preparedActors; //生成し終わったアクターの数
 
     [SerializeField] private GameObject ActorObject; //アクターのプレハブ
     [SerializeField] private GameObject PlayerObject; //プレイヤーのプレハブ
+
+    private bool inGame; //ゲームは始まっているか
 
     //クライアントが内部をコントロールするための通知　マップ生成など
     public enum CLIENT_INTERNAL_EVENT
@@ -75,10 +79,22 @@ public class GameClientManager : MonoBehaviour
 
     private void Start()
     {
+        inGame = false;
+
         packetQueue = new Queue<Header>();
         actorDictionary = new Dictionary<ushort, ActorController>();
 
         Task.Run(() => ProcessPacket());
+    }
+
+    private void FixedUpdate()
+    {
+        if (!inGame) return; //ここは本来ハローパケットの送信処理に切り替えるべきだがまだ実装しないでreturnする
+
+        //プレイヤーアクターの座標をMOVで送信
+        ActionPacket myPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, playerActor.transform.position, playerActor.transform.forward);
+        Header myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+        udpGameClient.Send(myHeader.ToByte());
     }
 
     private async void ProcessPacket()
@@ -129,9 +145,6 @@ public class GameClientManager : MonoBehaviour
 
                                 switch (receivedActionPacket.detailID)
                                 {
-                                    case (byte)Definer.NDID.NONE:
-                                        break;
-
                                     case (byte)Definer.NDID.HELLO:
                                         break;
                                     case (byte)Definer.NDID.PSG:
@@ -146,6 +159,7 @@ public class GameClientManager : MonoBehaviour
                                         { 
                                             k.Value.gameObject.SetActive(true);
                                         }
+                                        inGame = true;
                                         break;
                                     case (byte)Definer.NDID.EDG:
                                         break;
@@ -164,6 +178,7 @@ public class GameClientManager : MonoBehaviour
                                         {
                                             //プレイヤーをインスタンス化しながらActorControllerを取得
                                             actorController = Instantiate(PlayerObject).GetComponent<ActorController>();
+                                            playerActor = actorController; //プレイヤーのActorControllerはアクセスしやすいように取得しておく
                                         }
                                         else //他人のIDなら
                                         {
