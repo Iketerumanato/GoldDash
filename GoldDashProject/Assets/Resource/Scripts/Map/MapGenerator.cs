@@ -38,9 +38,10 @@ public class MapGenerator : MonoBehaviour
     private List<Vector3> respawnPointsInQuadrant3;
     private List<Vector3> allRespawnPoints; //全象限のリスポーン地点
 
-    public void InitObservation(GameServerManager gameServerManager)
+    public void InitObservation(GameServerManager gameServerManager, GameClientManager gameClientManager)
     {
         gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
+        gameClientManager.ClientInternalSubject.Subscribe(e => ProcessClientInternalEvent(e));
     }
 
     private void ProcessServerInternalEvent(GameServerManager.SERVER_INTERNAL_EVENT e)
@@ -48,6 +49,18 @@ public class MapGenerator : MonoBehaviour
         switch (e)
         {
             case GameServerManager.SERVER_INTERNAL_EVENT.GENERATE_MAP:
+                GenerateMap();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void ProcessClientInternalEvent(GameClientManager.CLIENT_INTERNAL_EVENT e)
+    {
+        switch (e)
+        {
+            case GameClientManager.CLIENT_INTERNAL_EVENT.GENERATE_MAP:
                 GenerateMap();
                 break;
             default:

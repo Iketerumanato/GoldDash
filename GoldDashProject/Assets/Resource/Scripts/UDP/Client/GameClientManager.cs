@@ -29,6 +29,14 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private GameObject ActorObject; //アクターのプレハブ
     [SerializeField] private GameObject PlayerObject; //プレイヤーのプレハブ
 
+    //クライアントが内部をコントロールするための通知　マップ生成など
+    public enum CLIENT_INTERNAL_EVENT
+    {
+        GENERATE_MAP = 0, //マップを生成せよ
+    }
+
+    public Subject<CLIENT_INTERNAL_EVENT> ClientInternalSubject;
+
     #region ボタンが押されたら有効化したり無効化したり
     public void InitObservation(UdpButtonManager udpUIManager)
     {
@@ -130,8 +138,13 @@ public class GameClientManager : MonoBehaviour
                                         break;
                                     case (byte)Definer.NDID.STG:
                                         //ここでプレイヤーを有効化してゲーム開始
+                                        ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
+                                        //全アクターの有効化
+                                        foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+                                        { 
+                                            k.Value.gameObject.SetActive(true);
+                                        }
                                         break;
-                                        
                                     case (byte)Definer.NDID.EDG:
                                         break;
                                 }
