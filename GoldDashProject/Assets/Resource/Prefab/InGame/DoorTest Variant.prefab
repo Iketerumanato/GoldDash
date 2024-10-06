@@ -52,7 +52,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: DoorTest2 Variant
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3730309723901927228, guid: 59e2dd93afc8c7e49b9c4140d7659f68, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -114,7 +115,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: DoorTest1 Variant
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4526445954784282184, guid: 256a056455de708409956906d4cafcfc, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
