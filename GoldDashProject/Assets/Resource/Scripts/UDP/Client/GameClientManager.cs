@@ -40,6 +40,7 @@ public class GameClientManager : MonoBehaviour
     #region ボタンが押されたら有効化したり無効化したり
     public void InitObservation(UdpButtonManager udpUIManager)
     {
+        ClientInternalSubject = new Subject<CLIENT_INTERNAL_EVENT>();
         udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
     }
 
