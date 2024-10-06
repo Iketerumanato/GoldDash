@@ -216,7 +216,8 @@ public class GameServerManager : MonoBehaviour
                         switch (receivedActionPacket.roughID)
                         {
                             case (byte)Definer.RID.MOV:
-                                //アクター辞書を更新　送信はFixedUpdateとかでやる
+                                //アクター辞書からアクターの座標を更新
+                                actorDictionary[receivedActionPacket.targetID].Move(receivedActionPacket.pos, receivedActionPacket.pos2);
                                 break;
                             case (byte)Definer.RID.NOT:
                                 switch (receivedActionPacket.detailID)
