@@ -15,13 +15,19 @@ public class GameClientManager : MonoBehaviour
 
     [SerializeField] private ushort sessionPass; //サーバーに接続するためのパスコード
 
-    [SerializeField] private ushort initSessionPass; //初回通信時、サーバーからの返信が安全なものか判別するためのパスコード
+    [SerializeField] private ushort initSessionPass; //初回通信時、サーバーからの返信が安全なものか判別するためのパスコード。今後乱数化する
 
     [SerializeField] private string myName; //仮です。登録に使うプレイヤーネーム
 
     private ushort sessionID; //自分のセッションID。サーバー側で決めてもらう。
 
+    private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを保管。自分以外のプレイヤー（アクター）のセッションIDも記録していく
+
     private int numOfActors; //アクターの人数
+    private int preparedActors; //生成し終わったアクターの数
+
+    [SerializeField] private GameObject ActorObject; //アクターのプレハブ
+    [SerializeField] private GameObject PlayerObject; //プレイヤーのプレハブ
 
     #region ボタンが押されたら有効化したり無効化したり
     public void InitObservation(UdpButtonManager udpUIManager)
@@ -101,9 +107,11 @@ public class GameClientManager : MonoBehaviour
                     case (byte)Definer.PT.AP:
 
                         //ActionPacketを受け取ったときの処理
-                        Debug.Log($"Actionパケットを処理するぜ！SessionIDを受け取るぜ！");
+                        Debug.Log($"Actionパケットを処理するぜ！");
 
                         ActionPacket receivedActionPacket = new ActionPacket(receivedHeader.data);
+
+                        Debug.Log($"{receivedActionPacket.roughID}を処理するぜ！");
 
                         switch (receivedActionPacket.roughID)
                         {
@@ -116,18 +124,63 @@ public class GameClientManager : MonoBehaviour
 
                                     case (byte)Definer.NDID.HELLO:
                                         break;
-
+                                    case (byte)Definer.NDID.PSG:
+                                        //生成すべきアクターの数を受け取る
+                                        numOfActors = receivedActionPacket.targetID;
+                                        break;
                                     case (byte)Definer.NDID.STG:
-                                        //ここでプレイヤーを有効化する
+                                        //ここでプレイヤーを有効化してゲーム開始
                                         break;
                                         
                                     case (byte)Definer.NDID.EDG:
                                         break;
                                 }
                                 break;
-                        }
+                            case (byte)Definer.RID.EXE:
+                                switch (receivedActionPacket.detailID)
+                                {
+                                    case (byte)Definer.EDID.SPAWN:
+                                        //アクターをスポーンさせる
 
+                                        //ActorControllerインスタンスを作りDictionaryに加える
+                                        ActorController actorController;
+
+                                        if (receivedActionPacket.targetID == this.sessionID) //targetIDが自分のsessionIDと同じなら
+                                        {
+                                            //プレイヤーをインスタンス化しながらActorControllerを取得
+                                            actorController = Instantiate(PlayerObject).GetComponent<ActorController>();
+                                        }
+                                        else //他人のIDなら
+                                        {
+                                            //アクターををインスタンス化しながらActorControllerを取得
+                                            actorController = Instantiate(ActorObject).GetComponent<ActorController>();
+                                        }
+                                        //アクターを指定地点へ移動させる
+                                        actorController.Move(receivedActionPacket.pos, Vector3.forward);
+                                        //アクターの名前を書き込み
+                                        actorController.PlayerName = receivedActionPacket.msg;
+                                        //アクターのゲームオブジェクト
+                                        actorController.name = "Actor: " + receivedActionPacket.msg; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
+                                        actorController.gameObject.SetActive(false); //初期設定が済んだら無効化して処理を止める。ゲーム開始時に有効化して座標などをセットする
+
+                                        //アクター辞書に登録
+                                        actorDictionary.Add(receivedHeader.sessionID, actorController);
+
+                                        //準備が完了したアクターの数を加算
+                                        preparedActors++;
+                                        if (preparedActors == numOfActors) //準備完了通知をサーバに送る
+                                        {
+
+                                            ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.PSG);
+                                            Header myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                                            udpGameClient.Send(myHeader.ToByte());
+                                        }
+                                        break;
+                                }
+                                break;
+                        }
                         break;
+
                     case (byte)Definer.PT.PP:
                         
                         //PositionPacketを受け取ったときの処理

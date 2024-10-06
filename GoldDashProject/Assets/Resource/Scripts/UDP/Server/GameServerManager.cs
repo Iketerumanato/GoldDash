@@ -27,11 +27,11 @@ public class GameServerManager : MonoBehaviour
     private HashSet<string> usedName; //プレイヤーネームの重複防止に使う。
 
     [SerializeField] private int numOfPlayers; //何人のプレイヤーを募集するか
-    private int preparedPlayers;
+    private int preparedPlayers; //準備が完了したプレイヤーの数
 
-    private Dictionary<ushort, uint> sendNums; //各セッションIDを鍵として、送信番号を記録。受信管理（パケロス処理）はUDPGameServerでやる
+    //private Dictionary<ushort, uint> sendNums; //各セッションIDを鍵として、送信番号を記録。受信管理（パケロス処理）はUDPGameServerでやる
 
-    [SerializeField] private GameObject ActorObject;
+    [SerializeField] private GameObject ActorObject; //アクターのプレハブ
 
     //サーバーが内部をコントロールするための通知　マップ生成など
     //クライアントサーバーのクライアント部分の処理をここでやると機能過多になるため、通知を飛ばすだけにする。脳が体内の器官に命令を送るようなイメージ。実行するのはあくまで器官側。
@@ -227,6 +227,8 @@ public class GameServerManager : MonoBehaviour
                                             ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
                                             Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
                                             udpGameServer.Send(myHeader.ToByte());
+
+                                            Debug.Log("やったー！全プレイヤーの準備ができたよ！");
                                         }
                                         break;
                                 }
