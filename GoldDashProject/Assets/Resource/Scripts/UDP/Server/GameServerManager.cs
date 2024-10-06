@@ -232,6 +232,12 @@ public class GameServerManager : MonoBehaviour
                                             udpGameServer.Send(myHeader.ToByte());
 
                                             Debug.Log("やったー！全プレイヤーの準備ができたよ！");
+
+                                            //全アクターの有効化
+                                            foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+                                            {
+                                                k.Value.gameObject.SetActive(true);
+                                            }
                                         }
                                         break;
                                 }
