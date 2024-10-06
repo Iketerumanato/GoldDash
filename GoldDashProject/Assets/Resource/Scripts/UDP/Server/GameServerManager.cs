@@ -117,6 +117,7 @@ public class GameServerManager : MonoBehaviour
             {
                 //DictionaryコレクションはHashSet同様登録順が保持されないが、この配列への書き込みは順不同でよい。ご安心を。
                 myPacket.posDatas[index] = new PositionPacket.PosData(k.Key, k.Value.transform.position, k.Value.transform.forward);
+                index++;
             }
             Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.PP, myPacket.ToByte());
             udpGameServer.Send(myHeader.ToByte());
