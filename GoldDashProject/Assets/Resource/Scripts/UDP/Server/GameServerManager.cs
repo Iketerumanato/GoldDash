@@ -234,6 +234,11 @@ public class GameServerManager : MonoBehaviour
                             }
 
                             Debug.Log($"アクターを生成命令を出したぜ。");
+
+                            foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+                            {
+                                Debug.Log($"辞書の内容{k.Key}:{k.Value.PlayerName}");
+                            }
                         }
                         break;
                     #endregion

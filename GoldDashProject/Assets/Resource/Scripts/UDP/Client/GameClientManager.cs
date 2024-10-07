@@ -127,7 +127,12 @@ public class GameClientManager : MonoBehaviour
                     case (byte)Definer.PT.IPS:
 
                         //InitPacketを受け取ったときの処理
-                        Debug.Log($"Initパケットを処理するぜ！SessionIDを受け取るぜ！");
+                        Debug.Log($"Initパケットを処理するぜ！");
+
+                        if (this.sessionID != 0)
+                        {
+                            Debug.Log("既にsessionIDは割り振られているぜ。このInitパケットは破棄するぜ。");
+                        }
 
                         //クラスに変換する
                         InitPacketServer receivedInitPacket = new InitPacketServer(receivedHeader.data);
@@ -207,7 +212,7 @@ public class GameClientManager : MonoBehaviour
                                         preparedActors++;
                                         if (preparedActors == numOfActors) //準備完了通知をサーバに送る
                                         {
-
+                                            Debug.Log("PSGを送信しました。");
                                             ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.PSG);
                                             Header myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
                                             udpGameClient.Send(myHeader.ToByte());
