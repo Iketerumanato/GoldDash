@@ -71,7 +71,7 @@ public class Player : MonoBehaviour
     [SerializeField] VariableJoystick variableJoystick;
 
     private IPlayerState _playerCurrentState;
-    public Animator playerAnimator;
+    [SerializeField] Animator playerAnimator;
 
     #region ゲーム起動時必ず呼ばれる
     void Start()

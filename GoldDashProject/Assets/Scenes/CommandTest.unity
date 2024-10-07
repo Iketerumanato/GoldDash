@@ -796,6 +796,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 95bacd2e0287f3d48b1ae9a7539a6238, type: 3}
+--- !u!95 &723045559 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 1490507058994929841, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+  m_PrefabInstance: {fileID: 725757754}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &725757754
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -812,6 +817,10 @@ PrefabInstance:
       propertyPath: m_WarningMessage
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 4695047622233530533, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+      propertyPath: PlayerAnimator
+      value: 
+      objectReference: {fileID: 723045559}
     - target: {fileID: 4778165897659890379, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
