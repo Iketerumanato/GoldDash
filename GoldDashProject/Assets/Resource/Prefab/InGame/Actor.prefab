@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Actor
       objectReference: {fileID: 0}
+    - target: {fileID: 5261510850691686513, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7022430352512958979, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
     - {fileID: 2312801285971285685, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
