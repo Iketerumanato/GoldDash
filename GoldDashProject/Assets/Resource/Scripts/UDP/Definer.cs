@@ -28,7 +28,7 @@ public static class Definer
         /// <summary>
         /// PositionPacket, 定期的に各プレイヤーキャラクターの座標をサーバーから全クライアントに送信するためのパケット
         /// </summary>
-        PP, //P
+        PP,
     }
 
     /// <summary>
@@ -58,24 +58,33 @@ public static class Definer
     /// Notice Detail ID, お知らせの詳細な分類
     /// </summary>
     public enum NDID : byte
-    { 
-        /// <summary>
-        /// MOVなど、DetailIDを必要としない場合
-        /// </summary>
-        NONE,
+    {
         /// <summary>
         /// ゲーム開始まではパケットを送信する用事が無いため、定期的にハローパケットを飛ばして存在を確かめ合う
         /// </summary>
         HELLO,
         /// <summary>
-        /// ゲームを開始します
+        /// Prepare(d) for Start Game, （サーバーからクライアントへ）ゲーム開始の準備をしてください。または（クライアントからサーバーへ）ゲーム開始の準備ができました。
+        /// </summary>
+        PSG,
+        /// <summary>
+        /// Start Game, ゲームを開始します
         /// </summary>
         STG,
         /// <summary>
-        /// ゲームを終了します
+        /// End Game, ゲームを終了します
         /// </summary>
         EDG,
     }
 
-
+    /// <summary>
+    /// Execute Detail ID, 執行命令の詳細な内容
+    /// </summary>
+    public enum EDID : byte
+    { 
+        /// <summary>
+        /// Actorをスポーンさせろ
+        /// </summary>
+        SPAWN = 0,
+    }
 }

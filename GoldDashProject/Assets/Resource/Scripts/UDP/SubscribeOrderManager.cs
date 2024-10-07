@@ -33,6 +33,6 @@ public class SubscribeOrderManager : MonoBehaviour
         gameClientManager.InitObservation(udpButtonManager);
 
         //サーバー関連
-        mapGenerator.InitObservation(gameServerManager);
+        mapGenerator.InitObservation(gameServerManager, gameClientManager);
     }
 }

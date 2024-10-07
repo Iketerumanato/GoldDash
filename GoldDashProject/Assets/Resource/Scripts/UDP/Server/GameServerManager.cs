@@ -4,6 +4,8 @@ using UnityEngine;
 using R3;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using System.Xml.Linq;
+using JetBrains.Annotations;
 
 public class GameServerManager : MonoBehaviour
 {
@@ -26,16 +28,20 @@ public class GameServerManager : MonoBehaviour
 
     private HashSet<string> usedName; //プレイヤーネームの重複防止に使う。
 
-    [SerializeField] private int numOfPlayer; //何人のプレイヤーを募集するか
+    [SerializeField] private int numOfPlayers; //何人のプレイヤーを募集するか
+    private int preparedPlayers; //準備が完了したプレイヤーの数
 
-    private bool inGame = false; //ゲームが始まっているか
+    //private Dictionary<ushort, uint> sendNums; //各セッションIDを鍵として、送信番号を記録。受信管理（パケロス処理）はUDPGameServerでやる
 
-    private Dictionary<ushort, uint> sendNums; //各セッションIDを鍵として、送信番号を記録。受信管理（パケロス処理）はUDPGameServerでやる
+    [SerializeField] private GameObject ActorObject; //アクターのプレハブ
+
+    private bool inGame; //ゲームは始まっているか
 
     //サーバーが内部をコントロールするための通知　マップ生成など
+    //クライアントサーバーのクライアント部分の処理をここでやると機能過多になるため、通知を飛ばすだけにする。脳が体内の器官に命令を送るようなイメージ。実行するのはあくまで器官側。
     public enum SERVER_INTERNAL_EVENT
     { 
-        GENERATE_MAP = 0,
+        GENERATE_MAP = 0, //マップを生成せよ
     }
 
     public Subject<SERVER_INTERNAL_EVENT> ServerInternalSubject;
@@ -87,15 +93,44 @@ public class GameServerManager : MonoBehaviour
         //sessionIDについて、0はsessionIDを持っていないクライアントを表すナンバーなので、予め使用済にしておく。
         usedID.Add(0);
 
+        inGame = false;
+
         //パケットの処理をUpdateでやると1フレームの計算量が保障できなくなる（カクつきの原因になり得る）のでマルチスレッドで
         //スレッドが何個いるのかは試してみないと分からない
         Task.Run(() => ProcessPacket());
+        Task.Run(() => SendAllActorsPosition());
+    }
+
+    private async void SendAllActorsPosition()
+    {
+        //ゲーム開始を待つ
+        await UniTask.WaitUntil(() => inGame); //ここは本来ハローパケットの送信処理から切り替えるべきだがまだ実装しない
+
+        while (true)
+        {
+            //インスタンスを生成
+            PositionPacket myPacket = new PositionPacket();
+
+            int index = 0; //foreachしながら配列に順にアクセスするためのindex
+            //アクターの座標をPPで送信
+            foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+            {
+                //DictionaryコレクションはHashSet同様登録順が保持されないが、この配列への書き込みは順不同でよい。ご安心を。
+                myPacket.posDatas[index] = new PositionPacket.PosData(k.Key, k.Value.transform.position, k.Value.transform.forward);
+                index++;
+            }
+            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.PP, myPacket.ToByte());
+            udpGameServer.Send(myHeader.ToByte());
+
+            await UniTask.Delay(100);
+        }
     }
 
     private async void ProcessPacket()
     {
         while (true)
         {
+            //稼働状態になるのを待つ
             await UniTask.WaitUntil(() => isRunning);
 
             while (isRunning)
@@ -132,11 +167,22 @@ public class GameServerManager : MonoBehaviour
                         //TODO プレイヤーが規定人数集まっていたらエラーコード2番
 
                         //ActorControllerインスタンスを作りDictionaryに加える
-                        actorDictionary.Add(receivedHeader.sessionID, new ActorController(receivedInitPacket.playerName));
+                        //Actorをインスタンス化しながらActorControllerを取得
+                        ActorController actorController = Instantiate(ActorObject).GetComponent<ActorController>();
+
+                        //アクターの名前を書き込み
+                        actorController.PlayerName = receivedInitPacket.playerName;
+                        //アクターのゲームオブジェクト
+                        actorController.name = "Actor: " + receivedInitPacket.playerName; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
+                        actorController.gameObject.SetActive(false); //初期設定が済んだら無効化して処理を止める。ゲーム開始時に有効化して座標などをセットする
+
+                        //アクター辞書に登録
+                        actorDictionary.Add(receivedHeader.sessionID, actorController);
+
                         usedID.Add(receivedHeader.sessionID); //このIDを使用済にする
                         usedName.Add(receivedInitPacket.playerName); //登録したプレイヤーネームを使用済にする
 
-                        //送信番号の記録開始
+                        //TODO 送信番号の記録開始
                         //sendNums.Add(receivedHeader.sessionID, 0);
 
                         Debug.Log($"sessionID:{receivedHeader.sessionID},プレイヤーネーム:{receivedInitPacket.playerName} でactorDictionaryに登録したぜ！");
@@ -153,48 +199,87 @@ public class GameServerManager : MonoBehaviour
                         }
 
                         //規定人数のプレイヤーが集まった時の処理
-                        if (actorDictionary.Count == numOfPlayer)
+                        if (actorDictionary.Count == numOfPlayers)
                         {
                             Debug.Log($"十分なプレイヤーが集まったぜ。闇のゲームの始まりだぜ。");
 
-                            //Dictionaryへの登録を締め切る処理
+                            //TODO Dictionaryへの登録を締め切る処理
 
                             //ゲーム開始処理
-                            inGame = true;
                             //内部通知
                             ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
 
-                            float f = 0.5f;
+                            //全クライアントにアクターの生成命令を送る
+
+                            Debug.Log($"パケット送ってゲームはじめるぜ。");
+
+                            //何人分のアクターを生成すべきか伝える
+                            ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.PSG, (ushort)actorDictionary.Count);
+                            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                            udpGameServer.Send(myHeader.ToByte());
+
+                            Debug.Log($"{actorDictionary.Count}人分のアクターを生成すべきだと伝えたぜ。");
+
+                            //4つのリスポーン地点を取得する
+                            Vector3[] respawnPoints = MapGenerator.instance.Get4RespawnPointsRandomly(); //テストプレイでは4人未満でデバッグするかもしれないが、そのときは先頭の要素だけ使う
+                            int index = 0;
+
                             foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
                             {
-                                Debug.Log($"パケット送ってゲームはじめます");
-
-                                //TODO リスポーン地点は決め打ちしているので、あらかじめstaticなmapをforeachでぶん回すなどしてくれ
-
-                                ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG, k.Key, new Vector3(9.5f, 0.2f, 9 + f));
-                                Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                                //リスポーン地点を参照しながら各プレイヤーの名前とIDを載せてアクター生成命令を飛ばす
+                                myPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN, k.Key, respawnPoints[index], default, k.Value.PlayerName);
+                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
                                 udpGameServer.Send(myHeader.ToByte());
-                                f += 0.5f;
-
-                                Debug.Log($"送りました");
+                                index++;
                             }
-                            
+
+                            Debug.Log($"アクターを生成命令を出したぜ。");
+
+                            foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+                            {
+                                Debug.Log($"辞書の内容{k.Key}:{k.Value.PlayerName}");
+                            }
                         }
-                        
                         break;
                     #endregion
                     #region (byte)Definer.PT.AP: ActionPacketの場合
                     case (byte)Definer.PT.AP:
 
                         //ActionPacketを受け取ったときの処理
-                        Debug.Log($"Actionパケットを処理するぜ！SessionIDを受け取るぜ！");
+                        Debug.Log($"Actionパケットを処理するぜ！");
 
                         ActionPacket receivedActionPacket = new ActionPacket(receivedHeader.data);
 
                         switch (receivedActionPacket.roughID)
                         {
                             case (byte)Definer.RID.MOV:
-                                //アクター辞書を更新　送信はFicedUpdateとかでやる
+                                //アクター辞書からアクターの座標を更新
+                                actorDictionary[receivedActionPacket.targetID].Move(receivedActionPacket.pos, receivedActionPacket.pos2);
+                                break;
+                            case (byte)Definer.RID.NOT:
+                                switch (receivedActionPacket.detailID)
+                                {
+                                    case (byte)Definer.NDID.PSG:
+                                        preparedPlayers++; //準備ができたプレイヤーの人数を加算
+                                        if (preparedPlayers == numOfPlayers) //全プレイヤーの準備ができたら
+                                        {
+                                            //ゲーム開始命令を送る
+                                            ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
+                                            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
+
+                                            Debug.Log("やったー！全プレイヤーの準備ができたよ！");
+
+                                            //全アクターの有効化
+                                            foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+                                            {
+                                                k.Value.gameObject.SetActive(true);
+                                            }
+                                            //ゲーム開始
+                                            inGame = true;
+                                        }
+                                        break;
+                                }
                                 break;
                             case (byte)Definer.RID.REQ:
                                 break;
@@ -209,4 +294,6 @@ public class GameServerManager : MonoBehaviour
             }
         }
     }
+
+    public Dictionary<ushort, ActorController> PropertyActorDictionary { get { return actorDictionary; } }
 }

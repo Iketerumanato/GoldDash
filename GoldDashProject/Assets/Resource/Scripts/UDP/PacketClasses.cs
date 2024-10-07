@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using UnityEngine;
+using UnityEngine.XR;
 
 //パケット系クラスの基底クラス
 public abstract class Packet
@@ -105,8 +106,8 @@ public class InitPacketClient : Packet
         this.sessionPass = pass;
         this.rcvPort = rcvPort;
         this.initSessionPass = initSessionPass;
-        this.playerName = playerName;
         this.playerNameLength = (byte)Encoding.UTF8.GetByteCount(playerName);
+        this.playerName = playerName;
     }
 
     public InitPacketClient(byte[] bytes)
@@ -185,13 +186,19 @@ public class ActionPacket : Packet
     public byte detailID; //アクションの詳細な種類を示す
     public ushort targetID; //アクションの対象を示す
     public Vector3 pos; //座標データを持つアクションで参照する
+    public Vector3 pos2; //座標データを2つ持つアクションで参照する
+    public byte msgLength; //msgのバイト数
+    public string msg; //文字列データを持つアクションで参照する
 
-    public ActionPacket(byte roughID, byte detailID, ushort targetID, Vector3 pos)
+    public ActionPacket(byte roughID, byte detailID = 0, ushort targetID = 0, Vector3 pos = new Vector3(), Vector3 pos2 = new Vector3(), string msg = "")
     {
         this.roughID = roughID;
         this.detailID = detailID;
         this.targetID = targetID;
         this.pos = pos;
+        this.pos2 = pos2;
+        this.msgLength = (byte)Encoding.UTF8.GetByteCount(msg);
+        this.msg = msg;
     }
 
     public ActionPacket(byte[] bytes)
@@ -210,7 +217,18 @@ public class ActionPacket : Packet
         y = BitConverter.ToSingle(bytes, index);
         index += sizeof(float);
         z = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
         pos = new Vector3(x, y, z);
+        x = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        y = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        z = BitConverter.ToSingle(bytes, index);
+        index += sizeof(float);
+        pos2 = new Vector3(x, y, z);
+        this.msgLength = bytes[index];
+        index++;
+        this.msg = Encoding.UTF8.GetString(bytes, index, msgLength);
     }
 
     public override byte[] ToByte()
@@ -223,6 +241,11 @@ public class ActionPacket : Packet
         ret = AddBytes(ret, BitConverter.GetBytes(pos.x));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.y));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.z));
+        ret = AddBytes(ret, BitConverter.GetBytes(pos2.x));
+        ret = AddBytes(ret, BitConverter.GetBytes(pos2.y));
+        ret = AddBytes(ret, BitConverter.GetBytes(pos2.z));
+        ret = AddByte(ret, msgLength);
+        ret = AddBytes(ret, Encoding.UTF8.GetBytes(msg));
 
         return ret;
     }
@@ -230,94 +253,75 @@ public class ActionPacket : Packet
 
 public class PositionPacket : Packet
 {
-    public byte id0;
-    public Vector3 pos0;
-    public byte id1;
-    public Vector3 pos1;
-    public byte id2;
-    public Vector3 pos2;
-    public byte id3;
-    public Vector3 pos3;
+    const int MAX_NUM_OF_PLAYER = 4; //プレイヤーの最大人数。4人未満でプレイするときも必ず4で処理する。パケット種別ごとにバイト数は一定でなければならないので。
 
-    public PositionPacket(byte id0, Vector3 pos0, byte id1, Vector3 pos1, byte id2, Vector3 pos2, byte id3, Vector3 pos3)
+    public struct PosData //sessionIDと、2つのVector3をまとめるための構造体。4人未満でプレイする場合、値が代入されない領域がnullになることを避けるため、参照型のクラスではなく値型の構造体を使う。
     {
-        this.id0 = id0;
-        this.pos0 = pos0;
-        this.id1 = id1;
-        this.pos1 = pos1;
-        this.id2 = id2;
-        this.pos2 = pos2;
-        this.id3 = id3;
-        this.pos3 = pos3;
+        public ushort sessionID;
+        public Vector3 pos;
+        public Vector3 forward;
+
+        public PosData(ushort sessionID, Vector3 pos, Vector3 forward) //コンストラクタの引数で変数を初期化可能
+        { 
+            this.sessionID = sessionID;
+            this.pos = pos;
+            this.forward = forward;
+        }
     }
 
-    public PositionPacket(byte[] bytes)
+    public PosData[] posDatas; //変数はこれだけ！
+
+    public PositionPacket() //コンストラクタでコレクションのインスタンスを生成
+    { 
+        posDatas = new PosData[MAX_NUM_OF_PLAYER]; //必ず4人分の枠を確保する。代入されない部分は初期値で補完される、はずだ。
+    }
+
+    public PositionPacket(byte[] bytes) //バイト配列からのコンストラクタは配列に要素を代入するためfor文を使っているものの、やっていることは他と同じ。
     {
+        posDatas = new PosData[MAX_NUM_OF_PLAYER];
+
         int index = 0;
+        ushort sessionID;
         float x, y, z;
+        float x2, y2, z2;
 
-        //1人目
-        this.id0 = bytes[index];
-        index++;
-        x = BitConverter.ToSingle(bytes, index);
-        index += sizeof(float);
-        y = BitConverter.ToSingle(bytes, index);
-        index += sizeof(float);
-        z = BitConverter.ToSingle(bytes, index);
-        index += sizeof(float);
-        pos0 = new Vector3(x, y, z);
-        //2人目
-        this.id1 = bytes[index];
-        index++;
-        x = BitConverter.ToSingle(bytes, index);
-        index += sizeof(float);
-        y = BitConverter.ToSingle(bytes, index);
-        index += sizeof(float);
-        z = BitConverter.ToSingle(bytes, index);
-        index += sizeof(float);
-        pos1 = new Vector3(x, y, z);
-        //3人目
-        this.id2 = bytes[index];
-        index++;
-        x = BitConverter.ToSingle(bytes, index);
-        index += sizeof(float);
-        y = BitConverter.ToSingle(bytes, index);
-        index += sizeof(float);
-        z = BitConverter.ToSingle(bytes, index);
-        index += sizeof(float);
-        pos2 = new Vector3(x, y, z);
-        //4人目
-        this.id3 = bytes[index];
-        index++;
-        x = BitConverter.ToSingle(bytes, index);
-        index += sizeof(float);
-        y = BitConverter.ToSingle(bytes, index);
-        index += sizeof(float);
-        z = BitConverter.ToSingle(bytes, index);
-        index += sizeof(float);
-        pos3 = new Vector3(x, y, z);
+        //配列posDatasのサイズ分繰り返す。4回。
+        for (int i = 0; i < MAX_NUM_OF_PLAYER; i++)
+        {
+            sessionID = BitConverter.ToUInt16(bytes, index);
+            index += sizeof(ushort);
+            x = BitConverter.ToSingle(bytes, index);
+            index += sizeof(float);
+            y = BitConverter.ToSingle(bytes, index);
+            index += sizeof(float);
+            z = BitConverter.ToSingle(bytes, index);
+            index += sizeof(float);
+            x2 = BitConverter.ToSingle(bytes, index);
+            index += sizeof(float);
+            y2 = BitConverter.ToSingle(bytes, index);
+            index += sizeof(float);
+            z2 = BitConverter.ToSingle(bytes, index);
+            index += sizeof(float);
+
+            posDatas[i] = new PosData(sessionID, new Vector3(x, y, z), new Vector3(x2, y2, z2));
+        }
     }
 
-    public override byte[] ToByte()
+    public override byte[] ToByte() //配列から要素を読み取るためfor文を使っているものの、やっていることは他と同じ。
     {
         byte[] ret = new byte[0];
 
-        ret = AddByte(ret, id0);
-        ret = AddBytes(ret, BitConverter.GetBytes(pos0.x));
-        ret = AddBytes(ret, BitConverter.GetBytes(pos0.y));
-        ret = AddBytes(ret, BitConverter.GetBytes(pos0.z));
-        ret = AddByte(ret, id1);
-        ret = AddBytes(ret, BitConverter.GetBytes(pos1.x));
-        ret = AddBytes(ret, BitConverter.GetBytes(pos1.y));
-        ret = AddBytes(ret, BitConverter.GetBytes(pos1.z));
-        ret = AddByte(ret, id2);
-        ret = AddBytes(ret, BitConverter.GetBytes(pos2.x));
-        ret = AddBytes(ret, BitConverter.GetBytes(pos2.y));
-        ret = AddBytes(ret, BitConverter.GetBytes(pos2.z));
-        ret = AddByte(ret, id3);
-        ret = AddBytes(ret, BitConverter.GetBytes(pos3.x));
-        ret = AddBytes(ret, BitConverter.GetBytes(pos3.y));
-        ret = AddBytes(ret, BitConverter.GetBytes(pos3.z));
+        //配列posDatasのサイズ分繰り返す。4回。
+        for (int i = 0; i < MAX_NUM_OF_PLAYER; i++)
+        {
+            ret = AddBytes(ret, BitConverter.GetBytes(posDatas[i].sessionID));
+            ret = AddBytes(ret, BitConverter.GetBytes(posDatas[i].pos.x));
+            ret = AddBytes(ret, BitConverter.GetBytes(posDatas[i].pos.y));
+            ret = AddBytes(ret, BitConverter.GetBytes(posDatas[i].pos.z));
+            ret = AddBytes(ret, BitConverter.GetBytes(posDatas[i].forward.x));
+            ret = AddBytes(ret, BitConverter.GetBytes(posDatas[i].forward.y));
+            ret = AddBytes(ret, BitConverter.GetBytes(posDatas[i].forward.z));
+        }
 
         return ret;
     }
