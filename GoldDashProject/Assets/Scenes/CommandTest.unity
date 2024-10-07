@@ -848,10 +848,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 7022430352512958979, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+      propertyPath: playerAnimator
+      value: 
+      objectReference: {fileID: 1255322757}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1017880904152216999, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1472329663}
   m_SourcePrefab: {fileID: 100100000, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
 --- !u!1 &810993914
 GameObject:
@@ -1256,6 +1263,11 @@ RectTransform:
   m_AnchoredPosition: {x: 448.739, y: 3}
   m_SizeDelta: {x: 247.9379, y: 117.5824}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!95 &1255322757 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 1490507058994929841, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+  m_PrefabInstance: {fileID: 725757754}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1388731681
 GameObject:
   m_ObjectHideFlags: 0
@@ -1390,6 +1402,34 @@ RectTransform:
   m_AnchoredPosition: {x: -13.9728, y: -160.89185}
   m_SizeDelta: {x: 308.1903, y: 115.9967}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1472329661 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1017880904152216999, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+  m_PrefabInstance: {fileID: 725757754}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1472329663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1472329661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
 --- !u!1 &1487509335
 GameObject:
   m_ObjectHideFlags: 0
