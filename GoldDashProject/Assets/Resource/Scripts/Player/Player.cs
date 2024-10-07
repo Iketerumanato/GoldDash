@@ -96,7 +96,7 @@ public class Player : MonoBehaviour
         // 移動
         input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
         transform.position -= moveSpeed * Time.deltaTime * input;
-        playerAnimator.SetFloat("PlayerBlend", Mathf.Max(Mathf.Abs(input.x), Mathf.Abs(input.z)));
+        playerAnimator.SetFloat("BlendSpeed", Mathf.Max(Mathf.Abs(input.x), Mathf.Abs(input.z)));
     }
 
     public void MoveKey()
