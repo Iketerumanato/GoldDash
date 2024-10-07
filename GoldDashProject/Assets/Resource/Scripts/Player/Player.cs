@@ -7,6 +7,7 @@ public interface IPlayerState
     void ExitState(Player player);
 }
 
+//通常の状態
 public class NormalState : IPlayerState
 {
     private Vector3 inputVector;
@@ -28,6 +29,7 @@ public class NormalState : IPlayerState
     }
 }
 
+//プレイヤーが動けなくなった時
 public class IncapacitatedState : IPlayerState
 {
     public void EnterState(Player player)
@@ -134,6 +136,7 @@ public class Player : MonoBehaviour
     }
     #endregion
 
+    //Stateの切り替え
     public void ChangePlayerState(IPlayerState newState)
     {
         if (_playerCurrentState != null) _playerCurrentState.ExitState(this);
@@ -141,6 +144,7 @@ public class Player : MonoBehaviour
         _playerCurrentState.EnterState(this);
     }
 
+    //宝箱に接触したとき
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Tresure")) drawCircle.enabled = true;
