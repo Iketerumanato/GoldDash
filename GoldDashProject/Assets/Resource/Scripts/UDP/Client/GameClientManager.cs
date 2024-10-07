@@ -132,6 +132,7 @@ public class GameClientManager : MonoBehaviour
                         if (this.sessionID != 0)
                         {
                             Debug.Log("既にsessionIDは割り振られているぜ。このInitパケットは破棄するぜ。");
+                            break;
                         }
 
                         //クラスに変換する
