@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8487728444368147303}
   - component: {fileID: 6003139775697989714}
+  - component: {fileID: 2522981629493424940}
   m_Layer: 0
   m_Name: Point Light
   m_TagString: Untagged
@@ -94,6 +95,29 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &2522981629493424940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1017880904152216999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
 --- !u!1 &6705999087864998464
 GameObject:
   m_ObjectHideFlags: 0
@@ -243,6 +267,20 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2099039188761314181, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 734658f5655032245a1511db61de1b2e, type: 2}
+    - target: {fileID: 2099039188761314181, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'Hips3'\n\tTransform 'Spine'\n\tTransform
+        'Hips3'\n\tTransform 'RightHandRing3'\n\tTransform 'RightForeArm'\n\tTransform
+        'LeftFoot'\n\tTransform 'RightHandRing1'\n\tTransform 'LeftHandMiddle3'\n\tTransform
+        'RightHandMiddle3'\n\tTransform 'LeftArm'\n\tand more ...\n\tFrom animation
+        clip 'Waiting'\n\tFrom animation clip 'Run'"
+      objectReference: {fileID: 0}
     - target: {fileID: 2209280097867766916, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -344,6 +382,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 6219492299270100026}
   m_SourcePrefab: {fileID: 100100000, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
+--- !u!95 &1490507058994929841 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 2099039188761314181, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
+  m_PrefabInstance: {fileID: 688506762648937268}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4778165897659890379 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5458756175342590463, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
@@ -374,6 +417,7 @@ MonoBehaviour:
   drawCircle: {fileID: 4719895290581266130}
   cameraControll: {fileID: 2312801285971285685}
   variableJoystick: {fileID: 4576237364704138686}
+  playerAnimator: {fileID: 1490507058994929841}
 --- !u!114 &2312801285971285685
 MonoBehaviour:
   m_ObjectHideFlags: 0
