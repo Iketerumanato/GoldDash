@@ -1,5 +1,53 @@
 using UnityEngine;
 
+public interface IPlayerState
+{
+    void EnterState(Player player);
+    void UpdateProcess(Player player);
+    void ExitState(Player player);
+}
+
+//通常の状態
+public class NormalState : IPlayerState
+{
+    private Vector3 inputVector;
+
+    public void EnterState(Player player)
+    {
+        Debug.Log("Player操作中");
+    }
+
+    public void UpdateProcess(Player player)
+    {
+        player.MovePlayerJoystick(inputVector);
+        player.MoveKey();
+    }
+
+    public void ExitState(Player player)
+    {
+        Debug.Log("Playerの状態変更");
+    }
+}
+
+//プレイヤーが動けなくなった時
+public class IncapacitatedState : IPlayerState
+{
+    public void EnterState(Player player)
+    {
+        Debug.Log("Playerに対して何かしらのアクション");
+    }
+
+    public void UpdateProcess(Player player)
+    {
+        Debug.Log("Player行動不能中");
+    }
+
+    public void ExitState(Player player)
+    {
+        Debug.Log("Playerの気絶解除");
+    }
+}
+
 public class Player : MonoBehaviour
 {
     [Header("移動速度")]
@@ -21,36 +69,37 @@ public class Player : MonoBehaviour
     [SerializeField] CameraControll cameraControll;
 
     [SerializeField] VariableJoystick variableJoystick;
-    private Vector3 inputVector;
+
+    private IPlayerState _playerCurrentState;
+    public Animator playerAnimator;
 
     #region ゲーム起動時必ず呼ばれる
     void Start()
     {
-        //variableJoystick = FindAnyObjectByType<VariableJoystick>();
-        initialSpawnPosition = transform.position;
+        ChangePlayerState(new NormalState());
+       //variableJoystick = FindAnyObjectByType<VariableJoystick>();
+       initialSpawnPosition = transform.position;
         PlayerCurrentHP = maxPlayerHP;
     }
     #endregion
 
     private void FixedUpdate()
-    {    
-        // 移動
-        MovePlayerJoystick(inputVector);
-        MoveKey();
-
+    {
+        _playerCurrentState.UpdateProcess(this);
         // 落下時のリスポーン
         if (transform.position.y < fallThreshold) PlayerRespawn();
     }
 
     #region プレイヤーの操作と落下
-    private void MovePlayerJoystick(Vector3 input)
+    public void MovePlayerJoystick(Vector3 input)
     {
         // 移動
         input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
         transform.position -= moveSpeed * Time.deltaTime * input;
+        playerAnimator.SetFloat("PlayerBlend", Mathf.Max(Mathf.Abs(input.x), Mathf.Abs(input.z)));
     }
 
-    void MoveKey()
+    public void MoveKey()
     {
         float moveDirection = 0;
         if (Input.GetKey(KeyCode.W))
@@ -87,6 +136,15 @@ public class Player : MonoBehaviour
     }
     #endregion
 
+    //Stateの切り替え
+    public void ChangePlayerState(IPlayerState newState)
+    {
+        if (_playerCurrentState != null) _playerCurrentState.ExitState(this);
+        _playerCurrentState = newState;
+        _playerCurrentState.EnterState(this);
+    }
+
+    //宝箱に接触したとき
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Tresure")) drawCircle.enabled = true;
