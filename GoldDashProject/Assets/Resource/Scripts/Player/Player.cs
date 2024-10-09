@@ -72,6 +72,7 @@ public class Player : MonoBehaviour
 
     private IPlayerState _playerCurrentState;
     [SerializeField] Animator playerAnimator;
+    readonly string RunAnimation = "IsRun";
 
     #region ゲーム起動時必ず呼ばれる
     void Start()
@@ -96,7 +97,13 @@ public class Player : MonoBehaviour
         // 移動
         input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
         transform.position -= moveSpeed * Time.deltaTime * input;
-        playerAnimator.SetFloat("BlendSpeed", Mathf.Max(Mathf.Abs(input.x), Mathf.Abs(input.z)));
+        float inputMagnitude = input.magnitude;
+
+        if (inputMagnitude > 0.5f)
+            playerAnimator.SetBool(RunAnimation, true); 
+        else
+            playerAnimator.SetBool(RunAnimation, false); // 走るアニメーション解除
+
     }
 
     public void MoveKey()
