@@ -52,10 +52,6 @@ public class Player : MonoBehaviour
 {
     [Header("移動速度")]
     [SerializeField] float moveSpeed = 0.1f;
-    [SerializeField] float rotationSpeed = 200f;
-
-    [Header("ジャンプ力")]
-    [SerializeField] float jumpPower = 0.2f;
 
     [Header("プレイヤーの最大HP")]
     [SerializeField] int maxPlayerHP = 10;
@@ -71,7 +67,8 @@ public class Player : MonoBehaviour
     [SerializeField] VariableJoystick variableJoystick;
 
     private IPlayerState _playerCurrentState;
-    public Animator playerAnimator;
+    [SerializeField] Animator playerAnimator;
+    readonly string RunAnimation = "IsRun";
 
     #region ゲーム起動時必ず呼ばれる
     void Start()
@@ -96,7 +93,12 @@ public class Player : MonoBehaviour
         // 移動
         input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
         transform.position -= moveSpeed * Time.deltaTime * input;
-        playerAnimator.SetFloat("BlendSpeed", Mathf.Max(Mathf.Abs(input.x), Mathf.Abs(input.z)));
+        float inputMagnitude = input.magnitude;
+
+        if (inputMagnitude > 0.5f)
+            playerAnimator.SetBool(RunAnimation, true);
+        else
+            playerAnimator.SetBool(RunAnimation, false); // 走るアニメーション解除
     }
 
     public void MoveKey()
