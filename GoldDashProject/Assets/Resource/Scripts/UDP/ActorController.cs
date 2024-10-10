@@ -35,6 +35,7 @@ public class ActorController : MonoBehaviour
             IsRun = false; // 停止フラグを設定
             PlayerAnimator.SetBool(RunAnimation, false);
         }
+        oldPos = pos;
     }
 
     //メソッドの例。正式実装ではない
