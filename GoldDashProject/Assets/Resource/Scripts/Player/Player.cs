@@ -67,6 +67,8 @@ public class Player : MonoBehaviour
     [SerializeField] VariableJoystick variableJoystick;
 
     private IPlayerState _playerCurrentState;
+    [SerializeField] Animator playerAnimator;
+    readonly string RunAnimation = "IsRun";
 
     #region ゲーム起動時必ず呼ばれる
     void Start()
@@ -91,6 +93,12 @@ public class Player : MonoBehaviour
         // 移動
         input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
         transform.position -= moveSpeed * Time.deltaTime * input;
+        float inputMagnitude = input.magnitude;
+
+        if (inputMagnitude > 0.5f)
+            playerAnimator.SetBool(RunAnimation, true);
+        else
+            playerAnimator.SetBool(RunAnimation, false); // 走るアニメーション解除
     }
 
     public void MoveKey()
