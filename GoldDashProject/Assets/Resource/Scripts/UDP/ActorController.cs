@@ -21,21 +21,20 @@ public class ActorController : MonoBehaviour
         this.gameObject.transform.position = pos;
         this.gameObject.transform.forward = forward;
 
-        SQR_RunThreshold = runThreshold * runThreshold;
-        Vector3 moveVec = pos - oldPos;
-        oldPos = pos;
+        // 位置の変化を計算
+        float distance = (pos - oldPos).sqrMagnitude;
 
-        if (moveVec.sqrMagnitude > SQR_RunThreshold)
+        // しきい値を超えた場合にアニメーションを再生
+        if (distance > SQR_RunThreshold)
         {
-            PlayerAnimator.SetBool(RunAnimation, true);
+            IsRun = true; // 移動中フラグを設定
+            PlayerAnimator.SetBool(RunAnimation, true); 
         }
-
         else
         {
+            IsRun = false; // 停止フラグを設定
             PlayerAnimator.SetBool(RunAnimation, false);
-            return;
         }
-        float moveAngle = Vector3.Angle(moveVec, forward);
     }
 
     //メソッドの例。正式実装ではない
