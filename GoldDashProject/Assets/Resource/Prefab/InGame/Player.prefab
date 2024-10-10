@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 2836263348838075324}
   - component: {fileID: 478076272536700500}
   - component: {fileID: 323247268949992821}
+  - component: {fileID: 8003950490500218308}
   m_Layer: 0
   m_Name: PlayerCamera
   m_TagString: MainCamera
@@ -255,6 +256,18 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &8003950490500218308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6705999087864998464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a963fe73be28be45806cb29a7972c82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &688506762648937268
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -408,8 +421,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 1
-  rotationSpeed: 200
-  jumpPower: 0.3
   maxPlayerHP: 10
   fallThreshold: -10
   drawCircle: {fileID: 4719895290581266130}

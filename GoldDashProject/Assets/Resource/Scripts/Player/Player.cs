@@ -52,10 +52,6 @@ public class Player : MonoBehaviour
 {
     [Header("移動速度")]
     [SerializeField] float moveSpeed = 0.1f;
-    [SerializeField] float rotationSpeed = 200f;
-
-    [Header("ジャンプ力")]
-    [SerializeField] float jumpPower = 0.2f;
 
     [Header("プレイヤーの最大HP")]
     [SerializeField] int maxPlayerHP = 10;
