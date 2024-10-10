@@ -434,7 +434,7 @@ MonoBehaviour:
   drawCircle: {fileID: 4719895290581266130}
   cameraControll: {fileID: 2312801285971285685}
   variableJoystick: {fileID: 4576237364704138686}
-  playerAnimator: {fileID: 0}
+  playerAnimator: {fileID: 1490507058994929841}
 --- !u!114 &2312801285971285685
 MonoBehaviour:
   m_ObjectHideFlags: 0

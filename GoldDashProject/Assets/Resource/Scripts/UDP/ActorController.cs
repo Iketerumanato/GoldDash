@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 /// <summary>
 /// プレイヤー達を管理するクラス。GameServerManagerでSessionIDをKeyとしてDictionaryで管理される
@@ -20,22 +21,30 @@ public class ActorController : MonoBehaviour
     {
         this.gameObject.transform.position = pos;
         this.gameObject.transform.forward = forward;
+    }
 
+    private void Update()
+    {
+        CheckPlayerMove();
+    }
+
+    void CheckPlayerMove()
+    {
         // 位置の変化を計算
-        float distance = (pos - oldPos).sqrMagnitude;
+        float distance = (transform.position - oldPos).sqrMagnitude;
 
         // しきい値を超えた場合にアニメーションを再生
         if (distance > SQR_RunThreshold)
         {
             IsRun = true; // 移動中フラグを設定
-            PlayerAnimator.SetBool(RunAnimation, true); 
+            PlayerAnimator.SetBool(RunAnimation, true);
         }
         else
         {
             IsRun = false; // 停止フラグを設定
             PlayerAnimator.SetBool(RunAnimation, false);
         }
-        oldPos = pos;
+        oldPos = transform.position;
     }
 
     //メソッドの例。正式実装ではない
