@@ -76,7 +76,7 @@ public class Player : MonoBehaviour
         ChangePlayerState(new NormalState());
        //variableJoystick = FindAnyObjectByType<VariableJoystick>();
        initialSpawnPosition = transform.position;
-        PlayerCurrentHP = maxPlayerHP;
+       PlayerCurrentHP = maxPlayerHP;
     }
     #endregion
 
