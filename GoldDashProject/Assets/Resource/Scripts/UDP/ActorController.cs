@@ -5,17 +5,22 @@ using UnityEngine;
 /// </summary>
 public class ActorController : MonoBehaviour
 {
-    public string PlayerName { set; get; }
+    //ユーザーに見えるパラメータ
+    public string PlayerName { set; get; } //プレイヤー名
+    public int GoldCount; //所持金 ２１億ゴールドくらい持てる
+
+    //モーション管理
     public bool IsRun { set; get; }
     Vector3 oldPos;
     [SerializeField] float runThreshold = 0.01f;
-    private float SQR_RunThreshold;
+    private float SQR_RUN_THRESHOLD;
     [SerializeField] Animator PlayerAnimator;
     readonly string RunAnimation = "IsRun";
 
+
     private void Start()
     {
-        SQR_RunThreshold = runThreshold * runThreshold;
+        SQR_RUN_THRESHOLD = runThreshold * runThreshold;
         oldPos = transform.position; // 初期位置を設定
     }
 
@@ -24,7 +29,7 @@ public class ActorController : MonoBehaviour
     {
         Vector3 distance = pos - oldPos;
 
-        if (distance.sqrMagnitude > SQR_RunThreshold) PlayerAnimator.SetBool(RunAnimation, true);
+        if (distance.sqrMagnitude > SQR_RUN_THRESHOLD) PlayerAnimator.SetBool(RunAnimation, true);
         else PlayerAnimator.SetBool(RunAnimation, false);
 
         // 座標と向きを更新
