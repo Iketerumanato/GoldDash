@@ -10,7 +10,7 @@ public class MapGenerator : MonoBehaviour
 {
     //定数
     private const int NUM_OF_PARTS = 4; //組み合わせるマップパーツの数。4つ。
-    private const int MAP_SIZE = 11; //マップの一辺のマス数。偶数にしないでください。自動デバッグしようとしたらunreachable code警告が消えない:(
+    private const int MAP_SIZE = 13; //マップの一辺のマス数。偶数にしないでください。自動デバッグしようとしたらunreachable code警告が消えない:(
     private const int MAP_PART_SIZE = (MAP_SIZE - 1) / 2; //マップパーツの一辺のマス数
 
     //ヒエラルキーが見やすいよう、マップのオブジェクトはこの親オブジェクトの子にする
@@ -94,10 +94,10 @@ public class MapGenerator : MonoBehaviour
 
         //ランダム抽選は保留。指定した名前のファイルを４つ読み込む
         TextAsset[] textAsset_array = {
-            Resources.Load("MapPart5x5_1") as TextAsset,
-            Resources.Load("MapPart5x5_2") as TextAsset,
-            Resources.Load("MapPart5x5_3") as TextAsset,
-            Resources.Load("MapPart5x5_4") as TextAsset};
+            Resources.Load("MapPart6x6_1") as TextAsset,
+            Resources.Load("MapPart6x6_2") as TextAsset,
+            Resources.Load("MapPart6x6_3") as TextAsset,
+            Resources.Load("MapPart6x6_4") as TextAsset};
 
         map = MergeMap(textAsset_array);
 
