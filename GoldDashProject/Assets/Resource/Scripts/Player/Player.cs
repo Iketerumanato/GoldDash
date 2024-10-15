@@ -94,11 +94,12 @@ public class Player : MonoBehaviour
         input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
         transform.position -= moveSpeed * Time.deltaTime * input;
         float inputMagnitude = input.magnitude;
+        playerAnimator.SetFloat("BlendSpeed", inputMagnitude);
 
-        if (inputMagnitude > 0.5f)
-            playerAnimator.SetBool(RunAnimation, true);
-        else
-            playerAnimator.SetBool(RunAnimation, false); // 走るアニメーション解除
+        //if (inputMagnitude > 0.5f)
+        //playerAnimator.SetBool(RunAnimation, true);
+        //else
+        //playerAnimator.SetBool(RunAnimation, false); // 走るアニメーション解除
     }
 
     public void MoveKey()

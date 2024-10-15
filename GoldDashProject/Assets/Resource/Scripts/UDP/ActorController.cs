@@ -19,9 +19,10 @@ public class ActorController : MonoBehaviour
         SQR_RunThreshold = runThreshold * runThreshold;
         oldPos = transform.position; // 初期位置を設定
         Vector3 distance = pos - oldPos;
+        PlayerAnimator.SetFloat("BlendSpeed", distance.sqrMagnitude);
 
-        if (distance.sqrMagnitude > SQR_RunThreshold) PlayerAnimator.SetBool(RunAnimation, true);
-        else PlayerAnimator.SetBool(RunAnimation, false);
+        //if (distance.sqrMagnitude > SQR_RunThreshold) PlayerAnimator.SetBool(RunAnimation, true);
+        //else PlayerAnimator.SetBool(RunAnimation, false);
 
         // 座標と向きを更新
         this.gameObject.transform.position = pos;
