@@ -14,16 +14,14 @@ public class ActorController : MonoBehaviour
     [SerializeField] Animator PlayerAnimator;
     [SerializeField] float positionCorrectionSpeed = 5.0f; // 位置補正のスムーズさを制御する変数
     [SerializeField] float interpolationTime = 0.1f; // 補間時間を設定
-    float timeSinceLastUpdate;
+    float timeSinceLastUpdate = 0f;
     readonly string MoveAnimationStr = "BlendSpeed";
 
     private void Start()
     {
         SQR_RunThreshold = runThreshold * runThreshold;
-        oldPos = this.transform.position; // 初期位置を設定
         targetPos = this.transform.position; // 初期のターゲット位置を現在位置と同じにする
         predictedPos = this.transform.position;
-        timeSinceLastUpdate = 0f;
     }
 
     private void Update()
@@ -52,8 +50,6 @@ public class ActorController : MonoBehaviour
         predictedPos = Vector3.Lerp(predictedPos, serverPos, Time.deltaTime * positionCorrectionSpeed);
 
         this.gameObject.transform.position = predictedPos;
-        PlayerAnimator.SetFloat("BlendSpeed", speed);
-
 
         // キャラクターの向きを更新
         this.gameObject.transform.forward = forward;
