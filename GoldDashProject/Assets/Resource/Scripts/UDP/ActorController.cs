@@ -1,4 +1,5 @@
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 /// <summary>
 /// プレイヤー達を管理するクラス。GameServerManagerでSessionIDをKeyとしてDictionaryで管理される
@@ -11,26 +12,35 @@ public class ActorController : MonoBehaviour
     [SerializeField] float runThreshold = 0.01f;
     private float SQR_RunThreshold;
     [SerializeField] Animator PlayerAnimator;
-    [SerializeField] float positionCorrectionSpeed = 5.0f; // 位置補正のスムーズさを制御する変数
-    readonly string MoveAnimationStr = "BlendSpeed";
+    [SerializeField] float positionCorrectionSpeed = 5.0f;
+    readonly string BlendSpeedStr = "BlendSpeed"; 
 
     private void Start()
     {
         SQR_RunThreshold = runThreshold * runThreshold;
-        oldPos = transform.position; // 初期位置を設定
-        predictedPos = transform.position; // 初期の推測位置を現在位置と同じにする
+        oldPos = transform.position;
+        predictedPos = transform.position;
     }
 
-    // このアクターの座標と向きを更新する
-    public void Move(Vector3 serverPos, Vector3 forward)
+    public void Move(Vector3 pos, Vector3 forward)
     {
-        float distance = (serverPos - oldPos).sqrMagnitude;
+        float distance = (pos - oldPos).sqrMagnitude;
         float speed = Mathf.Clamp01(distance / SQR_RunThreshold);
-        PlayerAnimator.SetFloat(MoveAnimationStr, speed);
 
-        // 古い位置を更新
-        oldPos = serverPos;
+        // アニメーションのブレンド速度を設定
+        PlayerAnimator.SetFloat(BlendSpeedStr, speed);
+
+        Vector3 moveDirection = oldPos - predictedPos;
+        predictedPos += moveDirection;
+
+        predictedPos = Vector3.Lerp(predictedPos, pos, Time.deltaTime * positionCorrectionSpeed);
+
+        this.gameObject.transform.position = predictedPos;
+
+        this.gameObject.transform.forward = forward;
+        oldPos = pos;
     }
+
     //メソッドの例。正式実装ではない
     public void Kill()
     {
