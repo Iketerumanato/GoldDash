@@ -13,15 +13,11 @@ public class ActorController : MonoBehaviour
     [SerializeField] Animator PlayerAnimator;
     readonly string RunAnimation = "IsRun";
 
-    private void Start()
-    {
-        SQR_RunThreshold = runThreshold * runThreshold;
-        oldPos = transform.position; // 初期位置を設定
-    }
-
     // このアクターの座標と向きを更新する
     public void Move(Vector3 pos, Vector3 forward)
     {
+        SQR_RunThreshold = runThreshold * runThreshold;
+        oldPos = transform.position; // 初期位置を設定
         Vector3 distance = pos - oldPos;
 
         if (distance.sqrMagnitude > SQR_RunThreshold) PlayerAnimator.SetBool(RunAnimation, true);
