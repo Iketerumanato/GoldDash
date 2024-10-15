@@ -20,9 +20,9 @@ public class ActorController : MonoBehaviour
     private void Start()
     {
         SQR_RunThreshold = runThreshold * runThreshold;
-        oldPos = transform.position; // 初期位置を設定
-        targetPos = transform.position; // 初期のターゲット位置を現在位置と同じにする
-        predictedPos = transform.position;
+        oldPos = this.transform.position; // 初期位置を設定
+        targetPos = this.transform.position; // 初期のターゲット位置を現在位置と同じにする
+        predictedPos = this.transform.position;
         timeSinceLastUpdate = 0f;
     }
 
