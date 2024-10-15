@@ -6,10 +6,6 @@ using UnityEngine;
 public class ActorController : MonoBehaviour
 {
     public string PlayerName { set; get; }
-    private Vector3 targetPos;//目標の地点
-    private Vector3 currentPos;//現在の地点
-    private Quaternion targetRot;
-    private Quaternion currentRot;
     [SerializeField] float runThreshold = 0.01f;
     [SerializeField] float interpolationSpeed = 5.0f;//動きを補間する速度
     private float SQR_RunThreshold;
@@ -19,19 +15,6 @@ public class ActorController : MonoBehaviour
     private void Start()
     {
         SQR_RunThreshold = runThreshold * runThreshold;
-
-        targetPos = this.gameObject.transform.position;
-        currentPos = this.gameObject.transform.position;
-        targetRot = this.gameObject.transform.rotation;
-        currentRot = this.gameObject.transform.rotation;
-    }
-
-    private void Update()
-    {
-        currentPos = Vector3.Lerp(currentPos, targetPos, Time.deltaTime * interpolationSpeed);
-        currentRot = Quaternion.Lerp(currentRot, targetRot, Time.deltaTime * interpolationSpeed);
-        this.transform.position = currentPos;
-        this.transform.rotation = currentRot;
     }
 
     // このアクターの座標と向きを更新する
