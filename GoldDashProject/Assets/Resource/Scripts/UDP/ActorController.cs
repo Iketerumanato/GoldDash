@@ -7,38 +7,49 @@ using static UnityEditor.PlayerSettings;
 public class ActorController : MonoBehaviour
 {
     public string PlayerName { set; get; }
-    Vector3 oldPos;
-    Vector3 predictedPos;
-    [SerializeField] float runThreshold = 0.01f;
-    private float SQR_RunThreshold;
+    private Vector3 targetPosition; // サーバーから受信した目標位置
+    private Vector3 predictedPos;   // 予測位置
+    private Vector3 oldPos;         // 前回の位置
+    [SerializeField] float positionCorrectionSpeed = 5.0f; // 補正のスピード
     [SerializeField] Animator PlayerAnimator;
-    [SerializeField] float positionCorrectionSpeed = 5.0f;
-    readonly string BlendSpeedStr = "BlendSpeed"; 
+    readonly string MoveAnimationStr = "BlendSpeed";
 
     private void Start()
     {
-        SQR_RunThreshold = runThreshold * runThreshold;
-        oldPos = transform.position;
-        predictedPos = transform.position;
+        oldPos = transform.position; // 初期位置を設定
+        predictedPos = transform.position; // 初期の推測位置を現在位置と同じにする
+        targetPosition = transform.position; // 初期目標位置
     }
 
-    public void Move(Vector3 pos, Vector3 forward)
+    private void Update()
     {
-        float distance = (pos - oldPos).sqrMagnitude;
-        float speed = Mathf.Clamp01(distance / SQR_RunThreshold);
+        // サーバーからの目標位置に向けて滑らかに補間
+        predictedPos = Vector3.Lerp(predictedPos, targetPosition, Time.deltaTime * positionCorrectionSpeed);
+        transform.position = predictedPos;
 
-        // アニメーションのブレンド速度を設定
-        PlayerAnimator.SetFloat(BlendSpeedStr, speed);
+        // アニメーションのブレンド
+        UpdateAnimationBlend();
+    }
 
-        Vector3 moveDirection = oldPos - predictedPos;
-        predictedPos += moveDirection;
+    // サーバーから受け取った位置を設定するメソッド
+    public void Move(Vector3 serverPos, Vector3 forward)
+    {
+        // サーバーから受信した新しい位置を目標位置として設定
+        targetPosition = serverPos;
 
-        predictedPos = Vector3.Lerp(predictedPos, pos, Time.deltaTime * positionCorrectionSpeed);
+        // キャラクターの向きを更新
+        transform.forward = forward;
 
-        this.gameObject.transform.position = predictedPos;
+        // 古い位置を更新
+        oldPos = serverPos;
+    }
 
-        this.gameObject.transform.forward = forward;
-        oldPos = pos;
+    private void UpdateAnimationBlend()
+    {
+        // 前回位置との距離を計算し、アニメーションのブレンドを更新
+        float distance = (targetPosition - oldPos).sqrMagnitude;
+        float speed = Mathf.Clamp01(distance); // 適切なスピードを計算
+        PlayerAnimator.SetFloat(MoveAnimationStr, speed);
     }
 
     //メソッドの例。正式実装ではない
