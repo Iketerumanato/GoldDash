@@ -68,7 +68,6 @@ public class Player : MonoBehaviour
 
     private IPlayerState _playerCurrentState;
     [SerializeField] Animator playerAnimator;
-    readonly string RunAnimation = "IsRun";
 
     #region ゲーム起動時必ず呼ばれる
     void Start()

@@ -13,11 +13,15 @@ public class ActorController : MonoBehaviour
     [SerializeField] Animator PlayerAnimator;
     readonly string RunAnimation = "IsRun";
 
-    // このアクターの座標と向きを更新する
-    public void Move(Vector3 pos, Vector3 forward)
+    private void Start()
     {
         SQR_RunThreshold = runThreshold * runThreshold;
         oldPos = transform.position; // 初期位置を設定
+    }
+
+    // このアクターの座標と向きを更新する
+    public void Move(Vector3 pos, Vector3 forward)
+    {
         Vector3 distance = pos - oldPos;
         PlayerAnimator.SetFloat("BlendSpeed", distance.sqrMagnitude);
 
