@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using UnityEngine;
 
 public abstract class UdpCommnicator : IDisposable
 {
@@ -47,6 +48,29 @@ public abstract class UdpCommnicator : IDisposable
     //使用可能なポート番号を返す。参考：https://note.dokeep.jp/post/csharp-get-active-port/
     protected int GetAvailablePort(int startPort)
     {
+        #region Andorid向け
+        //Windows環境でないなら = Androidなら
+        if (Application.platform != RuntimePlatform.WindowsPlayer && Application.platform != RuntimePlatform.WindowsEditor)
+        {
+            //startPort以降で使用可能なポートを探す
+            for (int port = startPort; port <= 65535; port++)
+            {
+                //ソケットを開けるか試す
+                try
+                {
+                    TcpListener listener = new TcpListener(IPAddress.Any, port);
+                    listener.Start();
+                    listener.Stop(); // ポートが使えるなら閉じる
+                    return port; // 使用可能なポート
+                }
+                catch (SocketException)
+                {
+                    //ポートが使用中の場合は例外が発生するので無視して次のポートを確認
+                }
+            }
+        }
+        #endregion
+
         //ローカルのネットワーク接続情報を取得
         IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
 
@@ -79,3 +103,4 @@ public abstract class UdpCommnicator : IDisposable
 
     public abstract void Dispose();
 }
+
