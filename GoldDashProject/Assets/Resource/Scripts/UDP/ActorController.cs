@@ -25,16 +25,18 @@ public class ActorController : MonoBehaviour
 
     public void Move(Vector3 pos, Vector3 forward)
     {
-        transform.position = Vector3.Lerp(transform.position, pos, Time.deltaTime * 0.1f);
-        transform.forward = forward;
+        targetPosition = pos;
 
-        float distance = (transform.position - oldPos).sqrMagnitude;
+        // 補間処理
+        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, soomthSpeed); // 0.1fはスムーズさの調整値
 
-        // スピードを計算
+        float distance = (targetPosition - oldPos).sqrMagnitude;
         float speed = Mathf.Clamp01(distance / SQR_RunThreshold);
         PlayerAnimator.SetFloat(MoveAnimationStr, speed);
 
-        oldPos = transform.position;
+        transform.forward = forward;
+
+        oldPos = targetPosition;
     }
 
     //メソッドの例。正式実装ではない
