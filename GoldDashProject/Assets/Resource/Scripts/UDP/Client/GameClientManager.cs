@@ -240,7 +240,7 @@ public class GameClientManager : MonoBehaviour
                                 actorDictionary.TryGetValue(p.sessionID, out actorController); //key: sessionIDに対応したvalueが見つからなければoutには何も代入されない。
                                 if (actorController != null) //valueが見つかったなら
                                 {
-                                    actorController.UpdateFromServer(p.pos, p.forward); //そのまま座標をいただいて、対応するアクターの座標を書き換える。
+                                    actorController.Move(p.pos, p.forward); //そのまま座標をいただいて、対応するアクターの座標を書き換える。
                                 }
                             }
                         }
