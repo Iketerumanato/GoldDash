@@ -31,7 +31,7 @@ public class ActorController : MonoBehaviour
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, soomthSpeed); // 0.1fはスムーズさの調整値
 
         float distance = (targetPosition - oldPos).sqrMagnitude;
-        float speed = Mathf.Clamp01(distance / SQR_RunThreshold);
+        float speed = Mathf.Lerp(PlayerAnimator.GetFloat(MoveAnimationStr), Mathf.Clamp01(distance / SQR_RunThreshold), Time.deltaTime * 1f);
         PlayerAnimator.SetFloat(MoveAnimationStr, speed);
 
         transform.forward = forward;
