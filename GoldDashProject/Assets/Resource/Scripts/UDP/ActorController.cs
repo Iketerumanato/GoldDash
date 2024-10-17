@@ -7,45 +7,34 @@ using static UnityEditor.PlayerSettings;
 public class ActorController : MonoBehaviour
 {
     public string PlayerName { set; get; }
-    private Vector3 targetPosition; // サーバーから受信した目標位置
-    private Vector3 oldPos;         // 前回の位置
+    private Vector3 targetPosition;
+    private Vector3 oldPos;         
     [SerializeField] Animator PlayerAnimator;
+    [SerializeField] float runThreshold = 0.01f;
     readonly string MoveAnimationStr = "BlendSpeed";
+    float SQR_RunThreshold;
 
     private void Start()
     {
-        oldPos = transform.position; // 初期位置を設定
-        targetPosition = transform.position; // 初期目標位置
+        SQR_RunThreshold = runThreshold * runThreshold;
+        oldPos = transform.position;
     }
 
-    private void Update()
+    // このアクターの座標と向きを更新する
+    public void Move(Vector3 pos, Vector3 forward)
     {
-        // キャラクターを目標位置に移動
-        transform.position = targetPosition;
+        float distance = (pos - oldPos).sqrMagnitude;
+        float speed = Mathf.Clamp01(distance / SQR_RunThreshold);
+        PlayerAnimator.SetFloat(MoveAnimationStr, distance);
 
-        // アニメーションのブレンドを更新
-        UpdateAnimationBlend();
-    }
+        //if (distance.sqrMagnitude > SQR_RunThreshold) PlayerAnimator.SetBool(RunAnimation, true);
+        //else PlayerAnimator.SetBool(RunAnimation, false);
 
-    // サーバーから受け取った位置を設定するメソッド
-    public void Move(Vector3 serverPos, Vector3 forward)
-    {
-        // サーバーから受信した新しい位置を目標位置として設定
-        targetPosition = serverPos;
+        // 座標と向きを更新
+        this.gameObject.transform.position = pos;
+        this.gameObject.transform.forward = forward;
 
-        // キャラクターの向きを更新
-        transform.forward = forward;
-
-        // 古い位置を更新
-        oldPos = serverPos;
-    }
-
-    private void UpdateAnimationBlend()
-    {
-        // 前回位置との距離を計算し、アニメーションのブレンドを更新
-        float distance = (targetPosition - oldPos).sqrMagnitude;
-        float speed = Mathf.Clamp01(distance); // 適切なスピードを計算
-        PlayerAnimator.SetFloat(MoveAnimationStr, speed);
+        oldPos = pos;
     }
 
     //メソッドの例。正式実装ではない
