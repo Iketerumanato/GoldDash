@@ -12,7 +12,7 @@ public class ActorController : MonoBehaviour
     private Vector3 currentVelocity;
     [SerializeField] Animator PlayerAnimator;
     [SerializeField] float runThreshold = 0.01f;
-    [SerializeField] float soomthSpeed = 0.05f;
+    //[SerializeField] float soomthSpeed = 0.05f;
     readonly string MoveAnimationStr = "BlendSpeed";
     float SQR_RunThreshold;
 
@@ -27,12 +27,14 @@ public class ActorController : MonoBehaviour
     {
         targetPosition = pos;
 
-        // 補間処理
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, soomthSpeed); // 0.1fはスムーズさの調整値
+        // 移動の差が大きい場合は補間を速くする
+        float distance = Vector3.Distance(transform.position, targetPosition);
+        float smoothTime = distance > 1.0f ? 0.1f : 0.2f; // 距離によってスムーズさを変更
 
-        float distance = (targetPosition - oldPos).sqrMagnitude;
-        float speed = Mathf.Clamp01(distance / SQR_RunThreshold);
-        PlayerAnimator.SetFloat(MoveAnimationStr, speed);
+        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothTime);
+
+        // アニメーションの更新
+        PlayerAnimator.SetFloat(MoveAnimationStr, distance > 0.01f ? 1.0f : 0.0f);
 
         transform.forward = forward;
 
