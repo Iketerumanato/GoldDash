@@ -7,49 +7,36 @@ using static UnityEditor.PlayerSettings;
 public class ActorController : MonoBehaviour
 {
     public string PlayerName { set; get; }
+    private Vector3 targetPosition;
     private Vector3 oldPos;
-
+    private Vector3 currentVelocity;
     [SerializeField] Animator PlayerAnimator;
-    [SerializeField] float runThreshold = 0.01f; // 移動速度のしきい値
-    [SerializeField] float speed = 5.0f;         // 移動速度
+    [SerializeField] float runThreshold = 0.01f;
+    [SerializeField] float soomthSpeed = 0.05f;
     readonly string MoveAnimationStr = "BlendSpeed";
-    private Rigidbody rb;
+    float SQR_RunThreshold;
 
-    private void Start()
+    private void Awake()
     {
+        SQR_RunThreshold = runThreshold * runThreshold;
         oldPos = transform.position;
-        rb = GetComponent<Rigidbody>();
+        targetPosition = oldPos;
     }
 
-    private void Update()
+    public void Move(Vector3 pos, Vector3 forward)
     {
-        // ジョイスティックの入力を取得
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        targetPosition = pos;
 
-        // 移動量に基づいてアニメーションのブレンド速度を決定
-        HandleMovementAndAnimation(movement);
-    }
+        // 補間処理
+        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, soomthSpeed); // 0.1fはスムーズさの調整値
 
-    // 移動とアニメーションの処理
-    private void HandleMovementAndAnimation(Vector3 movement)
-    {
-        // ジョイスティックの入力の大きさを計算
-        float joystickMagnitude = Mathf.Clamp01(movement.magnitude);
+        float distance = (targetPosition - oldPos).sqrMagnitude;
+        float speed = Mathf.Lerp(PlayerAnimator.GetFloat(MoveAnimationStr), Mathf.Clamp01(distance / SQR_RunThreshold), Time.deltaTime * 1f);
+        PlayerAnimator.SetFloat(MoveAnimationStr, speed);
 
-        // アニメーションのブレンド速度をセット (0:待機, 0.5:歩き, 1:走り)
-        PlayerAnimator.SetFloat(MoveAnimationStr, joystickMagnitude);
+        transform.forward = forward;
 
-        // キャラクターを移動させる処理
-        if (joystickMagnitude > 0)
-        {
-            // Rigidbodyを使って移動
-            rb.MovePosition(transform.position + movement * speed * Time.deltaTime);
-
-            // 移動方向に応じてキャラクターの向きを変更
-            transform.rotation = Quaternion.LookRotation(movement);
-        }
+        oldPos = targetPosition;
     }
 
     //メソッドの例。正式実装ではない
