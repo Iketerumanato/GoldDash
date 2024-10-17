@@ -23,16 +23,16 @@ public class ActorController : MonoBehaviour
     // このアクターの座標と向きを更新する
     public void Move(Vector3 pos, Vector3 forward)
     {
+        transform.position = Vector3.Lerp(transform.position, pos, 0.1f);
+        transform.forward = Vector3.Lerp(transform.forward, forward, 0.1f);
+
         float distance = (pos - oldPos).sqrMagnitude;
-        float speed = Mathf.Clamp01(distance / SQR_RunThreshold);
-        PlayerAnimator.SetFloat(MoveAnimationStr, speed);
+        float speed = distance / Time.deltaTime;
+        float smoothSpeed = Mathf.Lerp(PlayerAnimator.GetFloat(MoveAnimationStr), speed, 0.1f);
+        PlayerAnimator.SetFloat(MoveAnimationStr, smoothSpeed);
 
         //if (distance.sqrMagnitude > SQR_RunThreshold) PlayerAnimator.SetBool(RunAnimation, true);
         //else PlayerAnimator.SetBool(RunAnimation, false);
-
-        // 座標と向きを更新
-        this.gameObject.transform.position = pos;
-        this.gameObject.transform.forward = forward;
 
         oldPos = pos;
     }
