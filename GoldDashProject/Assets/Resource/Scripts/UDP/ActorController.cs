@@ -25,7 +25,7 @@ public class ActorController : MonoBehaviour
     {
         float distance = (pos - oldPos).sqrMagnitude;
         float speed = Mathf.Clamp01(distance / SQR_RunThreshold);
-        PlayerAnimator.SetFloat(MoveAnimationStr, distance);
+        PlayerAnimator.SetFloat(MoveAnimationStr, speed);
 
         //if (distance.sqrMagnitude > SQR_RunThreshold) PlayerAnimator.SetBool(RunAnimation, true);
         //else PlayerAnimator.SetBool(RunAnimation, false);
