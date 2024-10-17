@@ -435,6 +435,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5234935042456765329, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
+      propertyPath: soomthSpeed
+      value: 0.0001
+      objectReference: {fileID: 0}
+    - target: {fileID: 5234935042456765329, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
       propertyPath: runThreshold
       value: 0.01
       objectReference: {fileID: 0}
