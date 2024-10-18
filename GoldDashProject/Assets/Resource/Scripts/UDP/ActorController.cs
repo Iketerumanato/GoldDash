@@ -28,22 +28,24 @@ public class ActorController : MonoBehaviour
     {
         targetPosition = pos;
 
-        // 補間処理。スムーズな位置の更新
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
         // 速度の計算: 現在のフレームの位置変化量を使って速度を計算
         float distance = (targetPosition - oldPos).magnitude;
         float speed = Mathf.Clamp01(distance / runThreshold);
 
-        // アニメーションブレンドの反映速度を改善
         float currentSpeed = PlayerAnimator.GetFloat(MoveAnimationStr);
         float newSpeed = Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
-        PlayerAnimator.SetFloat(MoveAnimationStr, newSpeed);  // アニメーションのブレンド速度を反映
+        PlayerAnimator.SetFloat(MoveAnimationStr, newSpeed);
 
         // 向きの更新
-        transform.forward = forward;
+        if (forward != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(forward);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+        }
 
-        oldPos = targetPosition;  // 前フレームの位置を更新
+        oldPos = targetPosition;
     }
 
     //メソッドの例。正式実装ではない

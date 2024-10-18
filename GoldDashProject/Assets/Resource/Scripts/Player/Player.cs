@@ -83,7 +83,7 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         _playerCurrentState.UpdateProcess(this);
-        // 落下時のリスポーン
+
         if (transform.position.y < fallThreshold) PlayerRespawn();
     }
 
@@ -92,14 +92,11 @@ public class Player : MonoBehaviour
     {
         input = new Vector3(variableJoystick.Horizontal, 0, variableJoystick.Vertical);
 
-        // 移動処理
         Vector3 moveDirection = input.normalized * moveSpeed * Time.deltaTime;
         transform.position -= moveDirection;
 
-        // ジョイスティックの入力の大きさを取得
         float inputMagnitude = input.magnitude;
 
-        // アニメーションのBlendSpeed値をLerpでスムーズに補間
         float currentBlendSpeed = playerAnimator.GetFloat("BlendSpeed");
         float targetBlendSpeed = Mathf.Clamp01(inputMagnitude);
         float smoothBlendSpeed = Mathf.Lerp(currentBlendSpeed, targetBlendSpeed, animationSmoothing * Time.deltaTime);
