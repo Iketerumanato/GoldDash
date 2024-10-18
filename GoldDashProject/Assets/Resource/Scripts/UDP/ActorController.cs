@@ -38,16 +38,11 @@ public class ActorController : MonoBehaviour
         float newSpeed = Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
         PlayerAnimator.SetFloat(MoveAnimationStr, newSpeed);
 
-        // Y軸を中心とした回転角を計算 (-180 ~ 180)
-        float angle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
-
-        // 回転が必要な場合のみ回転処理を行う
-        if (Mathf.Abs(angle) > 0.1f) // 0.1fは回転しない閾値
+        // 向きの更新
+        if (forward != Vector3.zero)
         {
-            // Y軸方向の回転角度を徐々に適用する
-            float rotationSpeed = 5f; // 回転速度の調整
-            float step = Mathf.Clamp(rotationSpeed * Time.deltaTime, 0f, Mathf.Abs(angle));
-            transform.Rotate(Vector3.up, Mathf.Sign(angle) * step);
+            Quaternion targetRotation = Quaternion.LookRotation(forward);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
         }
 
         oldPos = targetPosition;
