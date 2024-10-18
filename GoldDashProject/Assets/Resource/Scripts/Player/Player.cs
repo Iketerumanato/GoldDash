@@ -89,11 +89,31 @@ public class Player : MonoBehaviour
     #region プレイヤーの操作と落下
     public void MovePlayerJoystick(Vector3 input)
     {
-        // 移動
+        // 移動方向をジョイスティックの入力に基づいて計算
         input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
-        transform.position -= moveSpeed * Time.deltaTime * input;
-        float inputMagnitude = input.magnitude;
-        playerAnimator.SetFloat("BlendSpeed", inputMagnitude);
+
+        // 移動処理
+        if (input.magnitude > 0)
+        {
+            // プレイヤーの向きを移動方向にスムーズに回転させる
+            Quaternion targetRotation = Quaternion.LookRotation(input);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f); // 回転速度調整
+
+            // プレイヤーの移動
+            transform.position += input * moveSpeed * Time.deltaTime;
+
+            // アニメーションの遷移 (BlendSpeedの補間)
+            float inputMagnitude = input.magnitude;
+            float currentBlendSpeed = playerAnimator.GetFloat("BlendSpeed");
+            float newBlendSpeed = Mathf.Lerp(currentBlendSpeed, inputMagnitude, Time.deltaTime * 10f); // 補間速度調整
+            playerAnimator.SetFloat("BlendSpeed", newBlendSpeed);
+        }
+        else
+        {
+            // プレイヤーが停止した場合、アニメーションのBlendSpeedをゆっくり0に戻す
+            float currentBlendSpeed = playerAnimator.GetFloat("BlendSpeed");
+            playerAnimator.SetFloat("BlendSpeed", Mathf.Lerp(currentBlendSpeed, 0f, Time.deltaTime * 10f));
+        }
     }
 
     public void MoveKey()
