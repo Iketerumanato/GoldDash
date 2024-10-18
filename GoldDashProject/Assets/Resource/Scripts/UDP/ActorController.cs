@@ -46,29 +46,10 @@ public class ActorController : MonoBehaviour
         // プレイヤーの向きを移動方向に向ける
         if (forward.magnitude > 0)
         {
-            UpdateRotation(forward);
+            transform.forward = Vector3.Slerp(transform.forward, forward, Time.deltaTime * rotationSmooth);
         }
 
         oldPos = targetPosition;
-    }
-
-    private void UpdateRotation(Vector3 forward)
-    {
-        float signedAngle = GetSignedAngle(transform.forward, forward, Vector3.up);
-        Quaternion targetRotation = Quaternion.Euler(0, signedAngle, 0);
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), Time.deltaTime * rotationSmooth);
-    }
-
-    private float GetSignedAngle(Vector3 from, Vector3 to, Vector3 up)
-    {
-        float angle = Vector3.Angle(from, to);
-
-        Vector3 cross = Vector3.Cross(from, to);
-        if (Vector3.Dot(cross, up) < 0)
-        {
-            angle = -angle;
-        }
-        return angle;
     }
 
     //メソッドの例。正式実装ではない
