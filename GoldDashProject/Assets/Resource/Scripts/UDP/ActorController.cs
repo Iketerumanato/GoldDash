@@ -46,14 +46,19 @@ public class ActorController : MonoBehaviour
         // プレイヤーの向きを移動方向に向ける
         if (forward.magnitude > 0f)
         {
-            // 回転の角度をSignedAngleで-180~180度の範囲で取得し、スムーズに回転させる
-            float targetAngle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
+            // 現在の向きと目標向きの角度を取得
+            float angleDifference = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
 
-            // カクつきを抑えるためにSlerpで滑らかに回転
-            if (Mathf.Abs(targetAngle) > 0.1f)
-            {
-                transform.forward = Vector3.Slerp(transform.forward, forward, Time.deltaTime * rotationSmooth);
-            }
+            // カクつきを抑えるために回転を制限する
+            float maxRotationSpeed = 180f; // 最大回転速度（度/秒）
+            float rotationAmount = Mathf.Clamp(angleDifference, -maxRotationSpeed * Time.deltaTime, maxRotationSpeed * Time.deltaTime);
+
+            // 新しい向きを計算
+            Quaternion targetRotation = Quaternion.LookRotation(forward);
+            Quaternion newRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationAmount);
+
+            // プレイヤーの向きを更新
+            transform.rotation = newRotation;
         }
 
         oldPos = targetPosition;
