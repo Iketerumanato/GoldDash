@@ -94,7 +94,7 @@ public class Player : MonoBehaviour
 
         // 移動処理
         Vector3 moveDirection = input.normalized * moveSpeed * Time.deltaTime;
-        transform.position += moveDirection;
+        transform.position -= moveDirection;
 
         // ジョイスティックの入力の大きさを取得
         float inputMagnitude = input.magnitude;
