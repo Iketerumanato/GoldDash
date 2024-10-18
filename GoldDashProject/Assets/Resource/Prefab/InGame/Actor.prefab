@@ -14,7 +14,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4695047622233530533, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
       propertyPath: animationLerpSpeed
-      value: 10
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4778165897659890379, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
       propertyPath: m_LocalPosition.x
