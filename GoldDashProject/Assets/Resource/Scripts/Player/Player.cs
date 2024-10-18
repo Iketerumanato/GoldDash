@@ -68,7 +68,6 @@ public class Player : MonoBehaviour
 
     private IPlayerState _playerCurrentState;
     [SerializeField] Animator playerAnimator;
-    [SerializeField] float animationSmoothing = 0.1f;
 
     #region ゲーム起動時必ず呼ばれる
     void Start()
@@ -83,26 +82,18 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         _playerCurrentState.UpdateProcess(this);
-
+        // 落下時のリスポーン
         if (transform.position.y < fallThreshold) PlayerRespawn();
     }
 
     #region プレイヤーの操作と落下
     public void MovePlayerJoystick(Vector3 input)
     {
-        input = new Vector3(variableJoystick.Horizontal, 0, variableJoystick.Vertical);
-
-        Vector3 moveDirection = input.normalized * moveSpeed * Time.deltaTime;
-        transform.position -= moveDirection;
-
+        // 移動
+        input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
+        transform.position -= moveSpeed * Time.deltaTime * input;
         float inputMagnitude = input.magnitude;
-
-        float currentBlendSpeed = playerAnimator.GetFloat("BlendSpeed");
-        float targetBlendSpeed = Mathf.Clamp01(inputMagnitude);
-        float smoothBlendSpeed = Mathf.Lerp(currentBlendSpeed, targetBlendSpeed, animationSmoothing * Time.deltaTime);
-
-        // アニメーションのスムージング
-        playerAnimator.SetFloat("BlendSpeed", smoothBlendSpeed);
+        playerAnimator.SetFloat("BlendSpeed", inputMagnitude);
     }
 
     public void MoveKey()

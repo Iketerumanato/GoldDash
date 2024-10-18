@@ -39,12 +39,6 @@ public class ActorController : MonoBehaviour
         float newSpeed = Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
         PlayerAnimator.SetFloat(MoveAnimationStr, newSpeed);
 
-        if (forward.sqrMagnitude > 0.01f) // forwardが正しい値を持っているか確認
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(forward);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmooth);
-        }
-
         oldPos = targetPosition;
     }
 
