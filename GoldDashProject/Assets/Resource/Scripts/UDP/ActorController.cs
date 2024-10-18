@@ -44,9 +44,16 @@ public class ActorController : MonoBehaviour
         PlayerAnimator.SetFloat(MoveAnimationStr, blendSpeed);
 
         // プレイヤーの向きを移動方向に向ける
-        if (forward.magnitude > 0)
+        if (forward.magnitude > 0f)
         {
-            transform.forward = Vector3.Slerp(transform.forward, forward, Time.deltaTime * rotationSmooth);
+            // 回転の角度をSignedAngleで-180~180度の範囲で取得し、スムーズに回転させる
+            float targetAngle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
+
+            // カクつきを抑えるためにSlerpで滑らかに回転
+            if (Mathf.Abs(targetAngle) > 0.1f)
+            {
+                transform.forward = Vector3.Slerp(transform.forward, forward, Time.deltaTime * rotationSmooth);
+            }
         }
 
         oldPos = targetPosition;
