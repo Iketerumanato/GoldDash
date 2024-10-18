@@ -14,12 +14,13 @@ public class ActorController : MonoBehaviour
     [SerializeField] float runThreshold = 0.01f;
     [SerializeField] float smoothSpeed = 0.1f; // 0.05fから改善。スムーズさの速度を少し早める
     [SerializeField] float animationLerpSpeed = 10f; // アニメーションブレンドの速度調整
+    [SerializeField] float rotationSmooth = 5f;
     readonly string MoveAnimationStr = "BlendSpeed";
-    float SQR_RunThreshold;
+    //float SQR_RunThreshold;
 
     private void Awake()
     {
-        SQR_RunThreshold = runThreshold * runThreshold;
+        //SQR_RunThreshold = runThreshold * runThreshold;
         oldPos = transform.position;
         targetPosition = oldPos;
     }
@@ -37,6 +38,12 @@ public class ActorController : MonoBehaviour
         float currentSpeed = PlayerAnimator.GetFloat(MoveAnimationStr);
         float newSpeed = Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
         PlayerAnimator.SetFloat(MoveAnimationStr, newSpeed);
+
+        if (forward.sqrMagnitude > 0.01f) // forwardが正しい値を持っているか確認
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(forward);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmooth);
+        }
 
         oldPos = targetPosition;
     }

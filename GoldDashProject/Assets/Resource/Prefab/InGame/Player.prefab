@@ -440,7 +440,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5234935042456765329, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
       propertyPath: runThreshold
-      value: 0.01
+      value: 0.005
       objectReference: {fileID: 0}
     - target: {fileID: 5234935042456765329, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
       propertyPath: PlayerAnimator
