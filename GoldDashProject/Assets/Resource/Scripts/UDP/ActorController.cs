@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Windows;
 using static UnityEditor.PlayerSettings;
 
 /// <summary>
@@ -16,11 +17,9 @@ public class ActorController : MonoBehaviour
     [SerializeField] float animationLerpSpeed = 10f;
     [SerializeField] float rotationSmooth = 5f;
     readonly string MoveAnimationStr = "BlendSpeed";
-    //float SQR_RunThreshold;
 
     private void Awake()
     {
-        //SQR_RunThreshold = runThreshold * runThreshold;
         oldPos = transform.position;
         targetPosition = oldPos;
     }
@@ -29,7 +28,7 @@ public class ActorController : MonoBehaviour
     {
         targetPosition = pos;
 
-        // プレイヤーの移動補間
+        // プレイヤーの位置を補間
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
         float distance = (targetPosition - oldPos).magnitude;
@@ -37,17 +36,18 @@ public class ActorController : MonoBehaviour
 
         float currentSpeed = PlayerAnimator.GetFloat(MoveAnimationStr);
 
-        float targetSpeed = Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
+        // 上昇時と下降時で別々にLerpの速度を調整する
+        float blendSpeed = (speed > currentSpeed)
+                            ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed * 1.5f)
+                            : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed * 1.5f);
 
-        if (speed < 0.01f)
+        PlayerAnimator.SetFloat(MoveAnimationStr, blendSpeed);
+
+        // プレイヤーの向きを移動方向に向ける
+        if (forward.magnitude > 0)
         {
-            targetSpeed = Mathf.Lerp(currentSpeed, 0f, Time.deltaTime * animationLerpSpeed * 0.5f);  // よりゆっくり減少
+            transform.forward = Vector3.Slerp(transform.forward, forward, Time.deltaTime * rotationSmooth);
         }
-
-        PlayerAnimator.SetFloat(MoveAnimationStr, targetSpeed);
-
-        // プレイヤーの向きも補間してスムーズに回転させる
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), Time.deltaTime * 5f);
 
         oldPos = targetPosition;
     }
