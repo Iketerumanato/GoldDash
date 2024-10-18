@@ -100,7 +100,7 @@ public class Player : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f); // 回転速度調整
 
             // プレイヤーの移動
-            transform.position += input * moveSpeed * Time.deltaTime;
+            transform.position -= input * moveSpeed * Time.deltaTime;
 
             // アニメーションの遷移 (BlendSpeedの補間)
             float inputMagnitude = input.magnitude;

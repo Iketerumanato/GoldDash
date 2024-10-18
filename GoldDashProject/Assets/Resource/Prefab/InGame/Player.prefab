@@ -448,7 +448,7 @@ PrefabInstance:
       objectReference: {fileID: 1490507058994929841}
     - target: {fileID: 5234935042456765329, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
       propertyPath: animationLerpSpeed
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5458756175342590463, guid: 1dfc399ad53e2514c825e1679c8e46b5, type: 3}
       propertyPath: m_LocalScale.x
@@ -569,7 +569,6 @@ MonoBehaviour:
   cameraControll: {fileID: 2312801285971285685}
   variableJoystick: {fileID: 4576237364704138686}
   playerAnimator: {fileID: 1490507058994929841}
-  animationSmoothing: 2
 --- !u!114 &2312801285971285685
 MonoBehaviour:
   m_ObjectHideFlags: 0
