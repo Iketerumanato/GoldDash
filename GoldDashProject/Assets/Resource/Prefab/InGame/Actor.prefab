@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Actor
       objectReference: {fileID: 0}
+    - target: {fileID: 6219492299270100026, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8788558572746536305, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
       propertyPath: m_UseGravity
       value: 0
