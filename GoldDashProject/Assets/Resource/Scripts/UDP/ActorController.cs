@@ -38,15 +38,17 @@ public class ActorController : MonoBehaviour
 
         // 上昇時と下降時で別々にLerpの速度を調整する
         float blendSpeed = (speed > currentSpeed)
-                            ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed * 3f)
-                            : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed * 2f);
+                            ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed * 7f)
+                            : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed * 7f);
 
         PlayerAnimator.SetFloat(MoveAnimationStr, blendSpeed);
 
         // プレイヤーの向きを移動方向に向ける
         if (forward.magnitude > 0)
         {
-            transform.forward = Vector3.Slerp(transform.forward, forward, Time.deltaTime * rotationSmooth);
+            // 現在の回転とターゲットの回転をスムーズに補間
+            Quaternion targetRotation = Quaternion.LookRotation(forward);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmooth);
         }
 
         oldPos = targetPosition;
