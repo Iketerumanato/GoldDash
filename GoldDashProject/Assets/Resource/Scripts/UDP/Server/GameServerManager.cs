@@ -122,7 +122,7 @@ public class GameServerManager : MonoBehaviour
             Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.PP, myPacket.ToByte());
             udpGameServer.Send(myHeader.ToByte());
 
-            await UniTask.Delay(100);
+            await UniTask.Delay(150);
         }
     }
 
