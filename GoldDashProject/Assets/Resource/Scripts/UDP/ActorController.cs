@@ -38,8 +38,8 @@ public class ActorController : MonoBehaviour
 
         // 上昇時と下降時で別々にLerpの速度を調整する
         float blendSpeed = (speed > currentSpeed)
-                            ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed * 1.5f)
-                            : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed * 1.5f);
+                            ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed * 3f)
+                            : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed * 2f);
 
         PlayerAnimator.SetFloat(MoveAnimationStr, blendSpeed);
 
