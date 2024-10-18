@@ -38,8 +38,10 @@ public class ActorController : MonoBehaviour
         float newSpeed = Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
         PlayerAnimator.SetFloat(MoveAnimationStr, newSpeed);
 
-        // 向きの更新
-        if (forward != Vector3.zero)
+        float angle = Vector3.Angle(transform.forward, forward);
+
+        // もし回転角が大きければスムーズに回転
+        if (angle > 0.1f) // 0.1f は回転しない閾値
         {
             Quaternion targetRotation = Quaternion.LookRotation(forward);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
