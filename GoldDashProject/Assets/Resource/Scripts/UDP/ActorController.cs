@@ -38,11 +38,22 @@ public class ActorController : MonoBehaviour
         float newSpeed = Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
         PlayerAnimator.SetFloat(MoveAnimationStr, newSpeed);
 
-        // 向きの更新
-        if (forward != Vector3.zero)
+        // 目標の前方ベクトル（目的の向き）と現在の前方ベクトル（現在の向き）を使って角度を計算
+        float angle = Vector3.Angle(transform.forward, forward);
+
+        // 外積を使って回転方向を判定
+        Vector3 cross = Vector3.Cross(transform.forward, forward); // 外積を計算
+
+        // 外積のY成分が正なら反時計回り、負なら時計回り
+        if (cross.y < 0)  angle = -angle; // 時計回りなら負の角度にする
+
+        // 回転が必要な場合のみ回転処理を行う
+        if (Mathf.Abs(angle) > 0.1f) // 0.1fは回転しない閾値
         {
-            Quaternion targetRotation = Quaternion.LookRotation(forward);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+            // 回転速度を調整して、徐々に回転させる
+            float rotationSpeed = 5f; // 回転速度の調整
+            float step = Mathf.Clamp(rotationSpeed * Time.deltaTime, 0f, Mathf.Abs(angle)); // 1フレームで回りすぎないように制限
+            transform.Rotate(Vector3.up, Mathf.Sign(angle) * step); // 回転方向に応じて回転
         }
 
         oldPos = targetPosition;
