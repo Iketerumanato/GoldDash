@@ -49,8 +49,21 @@ public class ActorController : MonoBehaviour
             Quaternion currentRotation = transform.rotation;
             Quaternion targetRotation = Quaternion.LookRotation(forward);
 
-            // 回転を補間 (スムーズに回転)
-            transform.rotation = Quaternion.Slerp(currentRotation, targetRotation, Time.deltaTime * rotationSmooth);
+            // 回転角度を180度~-180度の範囲に制限する
+            float targetYAngle = targetRotation.eulerAngles.y;
+            if (targetYAngle > 180f) targetYAngle -= 360f; // 180度超えたら-180度側に調整
+            else if (targetYAngle < -180f) targetYAngle += 360f; // -180度以下なら180度側に調整
+
+            // 現在のY軸の角度も同様に調整
+            float currentYAngle = currentRotation.eulerAngles.y;
+            if (currentYAngle > 180f) currentYAngle -= 360f;
+            else if (currentYAngle < -180f) currentYAngle += 360f;
+
+            // 新たな回転をY軸にのみ適用
+            Quaternion smoothedRotation = Quaternion.Euler(0, Mathf.LerpAngle(currentYAngle, targetYAngle, Time.deltaTime * rotationSmooth), 0);
+
+            // スムーズな回転を適用
+            transform.rotation = smoothedRotation;
         }
 
         oldPos = targetPosition;
