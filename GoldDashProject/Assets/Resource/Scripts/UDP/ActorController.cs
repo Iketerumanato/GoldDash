@@ -46,13 +46,20 @@ public class ActorController : MonoBehaviour
         // プレイヤーの向きを移動方向に向ける
         if (forward.magnitude > 0f)
         {
-            // 現在の向きと目標向きの角度を取得
-            float angleDifference = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
-
-            // 補間処理
             Quaternion targetRotation = Quaternion.LookRotation(forward);
-            // 角度差分をそのまま回転量として使用
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, Mathf.Abs(angleDifference) * Time.deltaTime * 10f);
+            float targetYRotation = Mathf.Repeat(targetRotation.eulerAngles.y, 360f);
+            float currentYRotation = transform.eulerAngles.y;
+
+            // 急激な回転を避けるため、補間処理
+            float angleDifference = Mathf.DeltaAngle(currentYRotation, targetYRotation);
+            if (Mathf.Abs(angleDifference) > 180)
+            {
+                angleDifference = angleDifference > 0 ? angleDifference - 360 : angleDifference + 360;
+            }
+
+            // 新しい回転をスムーズに補間
+            float newYRotation = currentYRotation + angleDifference * Time.deltaTime * rotationSmooth;
+            transform.rotation = Quaternion.Euler(0, newYRotation, 0);
         }
 
         oldPos = targetPosition;
