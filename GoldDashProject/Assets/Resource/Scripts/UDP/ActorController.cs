@@ -43,34 +43,19 @@ public class ActorController : MonoBehaviour
 
         PlayerAnimator.SetFloat(MoveAnimationStr, blendSpeed);
 
-        // プレイヤーの向きを移動方向に向ける
-        if (forward.magnitude > 0f)
+        if (forward.magnitude > 0)
         {
-            // ターゲットの回転角を計算 (Y軸の角度)
-            Quaternion targetRotation = Quaternion.LookRotation(forward);
-            float targetYAngle = targetRotation.eulerAngles.y;
+            // 現在の向きとターゲットの向きの角度を-180~180で計算
+            float angle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
 
-            // 現在の回転角度を取得し、-180度~180度に正規化
-            float currentYAngle = transform.rotation.eulerAngles.y;
-            currentYAngle = NormalizeAngle(currentYAngle);
-
-            // ターゲットのY軸回転角度を正規化
-            targetYAngle = NormalizeAngle(targetYAngle);
-
-            // Mathf.LerpAngleを使用してスムーズに回転
-            float smoothedYAngle = Mathf.LerpAngle(currentYAngle, targetYAngle, Time.deltaTime * rotationSmooth);
-
-            // 回転を適用 (Y軸の回転のみ)
-            transform.rotation = Quaternion.Euler(0, smoothedYAngle, 0);
+            // 回転をSlerpで補間しつつ、カクつきを軽減
+            if (Mathf.Abs(angle) > 0.01f) // 小さい角度は無視してカクつき軽減
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), Time.deltaTime * rotationSmooth);
+            }
         }
 
         oldPos = targetPosition;
-    }
-    private float NormalizeAngle(float angle)
-    {
-        if (angle > 180f) angle -= 360f;
-        if (angle < -180f) angle += 360f;
-        return angle;
     }
 
     //メソッドの例。正式実装ではない
