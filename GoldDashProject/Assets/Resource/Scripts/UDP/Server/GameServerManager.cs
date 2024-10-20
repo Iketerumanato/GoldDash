@@ -297,8 +297,23 @@ public class GameServerManager : MonoBehaviour
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
                                         break;
-                                    case (byte)Definer.REID.HIT_FRONT:
+                                    case (byte)Definer.REID.HIT_FRONT: //正面に命中
+                                        //パンチの同期
                                         myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.PUNCH, receivedHeader.sessionID);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+                                        //被パンチ者に通達
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.HIT_FRONT, receivedActionPacket.targetID);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+                                        break;
+                                    case (byte)Definer.REID.HIT_BACK: //背面に命中
+                                        //パンチの同期
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.PUNCH, receivedHeader.sessionID);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+                                        //被パンチ者に通達
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.HIT_BACK, receivedActionPacket.targetID);
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
                                         break;
