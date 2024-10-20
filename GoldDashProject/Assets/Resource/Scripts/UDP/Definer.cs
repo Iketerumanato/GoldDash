@@ -16,7 +16,7 @@ public static class Definer
         /// <summary>
         /// InitPacketClient, クライアントからサーバーへ送る初期設定用パケット。
         /// </summary>
-        IPC = 0,
+        IPC,
         /// <summary>
         /// InitPAcketServer, サーバーからクライアントへ送る初期設定用パケット。
         /// </summary>
@@ -39,7 +39,7 @@ public static class Definer
         /// <summary>
         /// Move, プレイヤーが移動した
         /// </summary>
-        MOV = 0,
+        MOV,
         /// <summary>
         /// Notice, ゲーム開始・終了などを知らせる。
         /// </summary>
@@ -78,13 +78,44 @@ public static class Definer
     }
 
     /// <summary>
+    /// Request Detail ID, リクエスト内容の詳細な内容
+    /// </summary>
+    public enum REID : byte
+    {
+        /// <summary>
+        /// 空振りました
+        /// </summary>
+        MISS,
+        /// <summary>
+        /// 正面からパンチしました
+        /// </summary>
+        HIT_FRONT,
+        /// <summary>
+        /// 背面からパンチしました
+        /// </summary>
+        HIT_BACK,
+    }
+
+    /// <summary>
     /// Execute Detail ID, 執行命令の詳細な内容
     /// </summary>
     public enum EDID : byte
     { 
         /// <summary>
-        /// Actorをスポーンさせろ
+        /// このActorをスポーンさせろ
         /// </summary>
-        SPAWN = 0,
+        SPAWN,
+        /// <summary>
+        /// このActorにパンチさせろ
+        /// </summary>
+        PUNCH,
+        /// <summary>
+        /// このActorにパンチを正面からヒットさせろ
+        /// </summary>
+        HIT_FRONT,
+        /// <summary>
+        /// このActorにパンチを背面からヒットさせろ
+        /// </summary>
+        HIT_BACK,
     }
 }

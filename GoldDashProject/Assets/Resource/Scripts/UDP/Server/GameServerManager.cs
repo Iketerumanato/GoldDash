@@ -106,20 +106,21 @@ public class GameServerManager : MonoBehaviour
         //ゲーム開始を待つ
         await UniTask.WaitUntil(() => inGame); //ここは本来ハローパケットの送信処理から切り替えるべきだがまだ実装しない
 
+        //返信用の変数宣言
+        PositionPacket myPositionPacket = new PositionPacket();
+        Header myHeader;
+
         while (true)
         {
-            //インスタンスを生成
-            PositionPacket myPacket = new PositionPacket();
-
             int index = 0; //foreachしながら配列に順にアクセスするためのindex
             //アクターの座標をPPで送信
             foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
             {
                 //DictionaryコレクションはHashSet同様登録順が保持されないが、この配列への書き込みは順不同でよい。ご安心を。
-                myPacket.posDatas[index] = new PositionPacket.PosData(k.Key, k.Value.transform.position, k.Value.transform.forward);
+                myPositionPacket.posDatas[index] = new PositionPacket.PosData(k.Key, k.Value.transform.position, k.Value.transform.forward);
                 index++;
             }
-            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.PP, myPacket.ToByte());
+            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.PP, myPositionPacket.ToByte());
             udpGameServer.Send(myHeader.ToByte());
 
             await UniTask.Delay(100);
@@ -128,6 +129,11 @@ public class GameServerManager : MonoBehaviour
 
     private async void ProcessPacket()
     {
+        //返信用クラスを外側のスコープで宣言しておく
+        InitPacketServer myInitPacket;
+        ActionPacket myActionPacket;
+        Header myHeader;
+
         while (true)
         {
             //稼働状態になるのを待つ
@@ -158,8 +164,9 @@ public class GameServerManager : MonoBehaviour
                         //送られてきたプレイヤーネームが使用済ならエラーコード1番を返す。sessionIDは登録しない。
                         if (usedName.Contains(receivedInitPacket.playerName))
                         {
-                            InitPacketServer errorPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID, 1);
-                            Header errorHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, errorPacket.ToByte());
+                            myInitPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID, 1);
+                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, myInitPacket.ToByte());
+                            udpGameServer.Send(myHeader.ToByte());
 
                             Debug.Log($"プレイヤーネーム:{receivedInitPacket.playerName} は既に使われていたぜ。出直してもらうぜ。");
                             break;
@@ -189,14 +196,10 @@ public class GameServerManager : MonoBehaviour
                         Debug.Log($"actorDictionaryには現在、{actorDictionary.Count}人のプレイヤーが登録されているぜ！");
 
                         //パケットを返信する
-                        //ここ、myPacketだのmyHeaderだのという汎用的な変数名を使いたいけどスコープ内で競合してしまうのでスコープを分けています。
-                        //関数化するか迷ったけど、パケット種別によって内容が変わってくるのと、いちいち定義へ移動するのが極めて手間だと思うので長々と書きます。
-                        {
-                            InitPacketServer myPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID);
-                            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, myPacket.ToByte());
-                            udpGameServer.Send(myHeader.ToByte());
-                            Debug.Log($"パケット返信したぜ！");
-                        }
+                        myInitPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID);
+                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, myInitPacket.ToByte());
+                        udpGameServer.Send(myHeader.ToByte());
+                        Debug.Log($"パケット返信したぜ！");
 
                         //規定人数のプレイヤーが集まった時の処理
                         if (actorDictionary.Count == numOfPlayers)
@@ -214,8 +217,8 @@ public class GameServerManager : MonoBehaviour
                             Debug.Log($"パケット送ってゲームはじめるぜ。");
 
                             //何人分のアクターを生成すべきか伝える
-                            ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.PSG, (ushort)actorDictionary.Count);
-                            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.PSG, (ushort)actorDictionary.Count);
+                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                             udpGameServer.Send(myHeader.ToByte());
 
                             Debug.Log($"{actorDictionary.Count}人分のアクターを生成すべきだと伝えたぜ。");
@@ -227,8 +230,8 @@ public class GameServerManager : MonoBehaviour
                             foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
                             {
                                 //リスポーン地点を参照しながら各プレイヤーの名前とIDを載せてアクター生成命令を飛ばす
-                                myPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN, k.Key, respawnPoints[index], default, k.Value.PlayerName);
-                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN, k.Key, respawnPoints[index], default, k.Value.PlayerName);
+                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                 udpGameServer.Send(myHeader.ToByte());
                                 index++;
                             }
@@ -252,10 +255,13 @@ public class GameServerManager : MonoBehaviour
 
                         switch (receivedActionPacket.roughID)
                         {
+                            #region case (byte)Definer.RID.MOV: Moveの場合
                             case (byte)Definer.RID.MOV:
                                 //アクター辞書からアクターの座標を更新
                                 actorDictionary[receivedActionPacket.targetID].Move(receivedActionPacket.pos, receivedActionPacket.pos2);
                                 break;
+                            #endregion
+                            #region case (byte)Definer.RID.NOT: Noticeの場合
                             case (byte)Definer.RID.NOT:
                                 switch (receivedActionPacket.detailID)
                                 {
@@ -264,8 +270,8 @@ public class GameServerManager : MonoBehaviour
                                         if (preparedPlayers == numOfPlayers) //全プレイヤーの準備ができたら
                                         {
                                             //ゲーム開始命令を送る
-                                            ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
-                                            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameServer.Send(myHeader.ToByte());
 
                                             Debug.Log("やったー！全プレイヤーの準備ができたよ！");
@@ -281,8 +287,39 @@ public class GameServerManager : MonoBehaviour
                                         break;
                                 }
                                 break;
+                            #endregion
+                            #region (byte)Definer.RID.REQ: Requestの場合
                             case (byte)Definer.RID.REQ:
+                                switch (receivedActionPacket.detailID)
+                                {
+                                    case (byte)Definer.REID.MISS: //空振り
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.PUNCH, receivedHeader.sessionID);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+                                        break;
+                                    case (byte)Definer.REID.HIT_FRONT: //正面に命中
+                                        //パンチの同期
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.PUNCH, receivedHeader.sessionID);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+                                        //被パンチ者に通達
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.HIT_FRONT, receivedActionPacket.targetID);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+                                        break;
+                                    case (byte)Definer.REID.HIT_BACK: //背面に命中
+                                        //パンチの同期
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.PUNCH, receivedHeader.sessionID);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+                                        //被パンチ者に通達
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.HIT_BACK, receivedActionPacket.targetID, receivedActionPacket.pos);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+                                        break;
+                                }
                                 break;
+                            #endregion
                         }
 
                         break;
