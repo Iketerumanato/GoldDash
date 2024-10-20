@@ -43,4 +43,33 @@ public class ActorController : MonoBehaviour
     public void GiveStatus()
     { 
     }
+
+    //以下手動マージ
+    public void PunchAnimation()
+    { 
+        //パンチモーション再生
+    }
+
+    public void RecoiledAnimation()
+    { 
+        //怯みアニメーション再生
+    }
+
+    public void BlownAnimation()
+    { 
+        //吹っ飛ぶアニメーション再生
+    }
+
+    public void DropGold()
+    { 
+        //金貨の山を落とす
+    }
+
+    public void Blown(Vector3 vector)
+    {
+        //引数の方向にAddForceで吹っ飛ぶ
+        //仮
+        float blowDistance = 3.0f;
+        transform.position += Vector3.Normalize(vector) * blowDistance;
+    }
 }

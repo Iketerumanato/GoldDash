@@ -234,7 +234,7 @@ public class Player : MonoBehaviour
             else
             {
                 //背面に命中させたことをパケット送信
-                ActionPacket myPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
+                ActionPacket myPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID, punchVec);
                 Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
             }

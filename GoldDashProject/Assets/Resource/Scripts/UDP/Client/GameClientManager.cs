@@ -162,6 +162,7 @@ public class GameClientManager : MonoBehaviour
 
                         switch (receivedActionPacket.roughID)
                         {
+                            #region case (byte)Definer.RID.NOT: Noticeの場合
                             case (byte)Definer.RID.NOT:
 
                                 switch (receivedActionPacket.detailID)
@@ -186,9 +187,11 @@ public class GameClientManager : MonoBehaviour
                                         break;
                                 }
                                 break;
+                            #endregion
                             case (byte)Definer.RID.EXE:
                                 switch (receivedActionPacket.detailID)
                                 {
+                                    #region case (byte)Definer.EDID.SPAWN:の場合
                                     case (byte)Definer.EDID.SPAWN:
                                         //アクターをスポーンさせる
 
@@ -221,6 +224,7 @@ public class GameClientManager : MonoBehaviour
                                         actorDictionary.Add(receivedActionPacket.targetID, actorController);
 
                                         //準備が完了したアクターの数を加算
+                                        //ここバグ疑惑あり
                                         preparedActors++;
                                         if (preparedActors == numOfActors) //準備完了通知をサーバに送る
                                         {
@@ -228,6 +232,36 @@ public class GameClientManager : MonoBehaviour
                                             myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.PSG);
                                             myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameClient.Send(myHeader.ToByte());
+                                        }
+                                        break;
+                                    #endregion
+                                    case (byte)Definer.EDID.PUNCH:
+                                        if (receivedActionPacket.targetID == this.sessionID) break; //自分が行ったパンチなら無視
+                                        actorDictionary[receivedActionPacket.targetID].PunchAnimation();
+                                        break;
+                                    case (byte)Definer.EDID.HIT_FRONT:
+                                        //殴られたのが自分なら
+                                        if (receivedActionPacket.targetID == this.sessionID)
+                                        {
+                                            //プレイヤー側で演出
+                                        }
+                                        else
+                                        {
+                                            //他人が殴られたならモーション同期
+                                            actorDictionary[receivedActionPacket.targetID].RecoiledAnimation();
+                                        }
+                                        break;
+                                    case (byte)Definer.EDID.HIT_BACK:
+                                        //殴られたのが自分なら
+                                        if (receivedActionPacket.targetID == this.sessionID)
+                                        {
+                                            //プレイヤー側で演出
+                                            playerActor.Blown(receivedActionPacket.pos); //パンチの方向に吹っ飛ぶ
+                                        }
+                                        else
+                                        {
+                                            //他人が殴られたならモーション同期。吹っ飛びの同期はPositionPacketで自動的になされる
+                                            actorDictionary[receivedActionPacket.targetID].BlownAnimation();
                                         }
                                         break;
                                 }
