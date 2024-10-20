@@ -106,6 +106,9 @@ public class GameClientManager : MonoBehaviour
 
     private async void ProcessPacket()
     {
+        ActionPacket myActionPacket;
+        Header myHeader;
+
         while (true)
         {
             //稼働状態になるのを待つ
@@ -217,8 +220,8 @@ public class GameClientManager : MonoBehaviour
                                         if (preparedActors == numOfActors) //準備完了通知をサーバに送る
                                         {
                                             Debug.Log("PSGを送信しました。");
-                                            ActionPacket myPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.PSG);
-                                            Header myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.PSG);
+                                            myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameClient.Send(myHeader.ToByte());
                                         }
                                         break;
