@@ -155,6 +155,7 @@ public class Player : MonoBehaviour
 
     //以下手動マージ予定
     UdpGameClient udpGameClient = null; //パケット送信用。
+    ushort SessionID { set; get; } //パケットに差出人情報を書くため必要
 
     Camera fpsCamera; //playerカメラ。Start()内でGetComponentInChildren<Camera>()して取得
 
@@ -162,10 +163,13 @@ public class Player : MonoBehaviour
 
     const float PUNCH_REACHABLE_DISTANCE = 1f;
 
+    const float FRONT_RANGE = 120f; //正面から左右に何度までをキャラクターの正面と見做すか
+
     //GameClientManagerからプレイヤーの生成タイミングで呼び出してudpGameClientへのアクセスを得る。
-    public void GetUdpGameClient(UdpGameClient udpGameClient)
+    public void GetUdpGameClient(UdpGameClient udpGameClient, ushort sessionID)
     { 
         this.udpGameClient = udpGameClient;
+        this.SessionID = sessionID;
     }
 
     //以下UIの操作などで呼び出されるメソッド。R3でやろっかな
@@ -184,7 +188,7 @@ public class Player : MonoBehaviour
             switch (hit.collider.gameObject.tag)
             {
                 case "Enemy": //プレイヤーならパンチ
-                    Punch(hit.point, hit.distance);
+                    Punch(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ActorController>());
                     break;
                 case "Chest": //宝箱なら開錠を試みる
                     TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ChestController>());
@@ -199,25 +203,39 @@ public class Player : MonoBehaviour
     }
 
     //パンチ。パンチを成立させたRaycastHit構造体のPointとDistanceを引数にもらおう
-    private void Punch(Vector3 hitPoint, float distance)
+    private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
     {
         //distanceを調べてしきい値を調べる
         if (distance < PUNCH_REACHABLE_DISTANCE)
         {
             //射程外なら一人称のスカモーション再生
 
-            ////プレイヤーアクターの座標をMOVで送信
-            //ActionPacket myPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, playerActor.transform.position, playerActor.transform.forward);
-            //Header myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
-
             //スカしたことをパケット送信
-            ActionPacket myPacket = new 
+            ActionPacket myPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
+            Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
         }
+        else
+        {
+            //射程内なら一人称のパンチモーション再生
+            //カメラを非同期で敵に向ける処理開始 UniTask
 
-        //射程内なら一人称のパンチモーション再生
-        //カメラを非同期で敵に向ける処理開始 UniTask
+            //パンチが正面に当たったのか背面に当たったのか調べる
+            Vector3 punchVec = hitPoint - this.transform.position;
+            float angle = Vector3.Angle(punchVec, actorController.transform.forward);
 
-        //パケット送信
+            if (angle < FRONT_RANGE)
+            {
+                //正面に命中させたことをパケット送信
+                ActionPacket myPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
+                Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+            }
+            else
+            {
+                //背面に命中させたことをパケット送信
+                ActionPacket myPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
+                Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+            }
+        }
     }
 
     //宝箱なら開錠を試みる。パンチと同様RaycastHit構造体から引数をもらう。消えゆく宝箱だったり、他プレイヤーが使用中の宝箱は開錠できない。

@@ -6,6 +6,7 @@ using UnityEngine;
 public class ActorController : MonoBehaviour
 {
     public string PlayerName { set; get; }
+    public ushort SessionID { set; get; } //MonoBehaviourからすると、いちいちDictionaryからIDを取るより目の前のアクターのIDを取得した方が速そうなので
     public bool IsRun { set; get; }
     Vector3 oldPos;
     [SerializeField] float runThreshold = 0.01f;
