@@ -7,7 +7,10 @@ using static UnityEditor.PlayerSettings;
 /// </summary>
 public class ActorController : MonoBehaviour
 {
+    //プロパティ
     public string PlayerName { set; get; }
+    public ushort SessionID { set; get; } //MonoBehaviourからすると、いちいちDictionaryからIDを取るより目の前のアクターのIDを取得した方が速そうなので
+
     private Vector3 targetPosition;
     private Vector3 oldPos;
     private Vector3 currentVelocity;
@@ -70,8 +73,7 @@ public class ActorController : MonoBehaviour
     {
     }
     
-    //以下手動マージ
-    public ushort SessionID { set; get; } //MonoBehaviourからすると、いちいちDictionaryからIDを取るより目の前のアクターのIDを取得した方が速そうなので
+    //モーション関連
     public void PunchAnimation()
     { 
         //パンチモーション再生
@@ -87,11 +89,13 @@ public class ActorController : MonoBehaviour
         //吹っ飛ぶアニメーション再生
     }
 
+    //所持金関連
     public void DropGold()
     { 
         //金貨の山を落とす
     }
 
+    //吹っ飛び処理
     public void Blown(Vector3 vector)
     {
         //引数の方向にAddForceで吹っ飛ぶ

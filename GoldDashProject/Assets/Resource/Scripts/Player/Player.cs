@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public interface IPlayerState
@@ -51,6 +50,23 @@ public class IncapacitatedState : IPlayerState
 
 public class Player : MonoBehaviour
 {
+    //パケット関連
+    UdpGameClient udpGameClient = null; //パケット送信用。
+    public ushort SessionID { set; get; } //パケットに差出人情報を書くため必要
+
+    //playerの一人称カメラ
+    Camera fpsCamera;
+
+    //パラメータ
+    [Header("インタラクト可能な距離")]
+    [SerializeField] float interactableDistance = 10.0f;
+
+    [Header("パンチの射程")]
+    [SerializeField] float punchReachableDistance = 1f;
+
+    [Header("正面から左右に何度までをキャラクターの正面と見做すか")]
+    [SerializeField] float flontRange = 120f; //例えばこの値が一時的に180になれば、敵をどの角度からパンチしても金を奪える状態になる
+
     [Header("移動速度")]
     [SerializeField] float moveSpeed = 0.1f;
 
@@ -75,9 +91,12 @@ public class Player : MonoBehaviour
     void Start()
     {
         ChangePlayerState(new NormalState());
-       //variableJoystick = FindAnyObjectByType<VariableJoystick>();
-       initialSpawnPosition = transform.position;
+        //variableJoystick = FindAnyObjectByType<VariableJoystick>();
+        initialSpawnPosition = transform.position;
         PlayerCurrentHP = maxPlayerHP;
+
+        //カメラ取得
+        fpsCamera = GetComponentInChildren<Camera>();
     }
     #endregion
 
@@ -170,16 +189,6 @@ public class Player : MonoBehaviour
     }
 
     //以下手動マージ予定
-    UdpGameClient udpGameClient = null; //パケット送信用。
-    public ushort SessionID { set; get; } //パケットに差出人情報を書くため必要
-
-    Camera fpsCamera; //playerカメラ。Start()内でGetComponentInChildren<Camera>()して取得
-
-    const float INTERACTABLE_DISTANCE = 10.0f;//この値は今すっげ～適当です。
-
-    const float PUNCH_REACHABLE_DISTANCE = 1f;
-
-    const float FRONT_RANGE = 120f; //正面から左右に何度までをキャラクターの正面と見做すか
 
     //GameClientManagerからプレイヤーの生成タイミングで呼び出してudpGameClientへのアクセスを得る。
     public void GetUdpGameClient(UdpGameClient udpGameClient, ushort sessionID)
@@ -199,7 +208,7 @@ public class Player : MonoBehaviour
 
         //rayがなにかに当たったら調べる
         //定数INTERACTABLE_DISTANCEでrayの長さを調整することでインタラクト可能な距離を制限できる
-        if (Physics.Raycast(ray, out hit, INTERACTABLE_DISTANCE))
+        if (Physics.Raycast(ray, out hit, interactableDistance))
         {
             switch (hit.collider.gameObject.tag)
             {
@@ -222,7 +231,7 @@ public class Player : MonoBehaviour
     private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
     {
         //distanceを調べてしきい値を調べる
-        if (distance < PUNCH_REACHABLE_DISTANCE)
+        if (distance < punchReachableDistance)
         {
             //射程外なら一人称のスカモーション再生
 
@@ -240,7 +249,7 @@ public class Player : MonoBehaviour
             Vector3 punchVec = hitPoint - this.transform.position;
             float angle = Vector3.Angle(punchVec, actorController.transform.forward);
 
-            if (angle < FRONT_RANGE)
+            if (angle < flontRange)
             {
                 //正面に命中させたことをパケット送信
                 ActionPacket myPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
