@@ -10,14 +10,14 @@ public class CameraControll : MonoBehaviour
     [Header("カメラの感度")]
     [Range(50f, 150f)]
     [SerializeField] float joystickSensitivity = 100f;
-    [Header("カメラの位置調整")]
+    //[Header("カメラの位置調整")]
     //[SerializeField] Vector3 cameraOffset = new(0f, 0.3f, -0.07f);
     //Vector3 cameraRata = new(0f, 0f, 0f);
     [Header("縦回転の制御")]
     float xRotation = 0f;
-    [Range(90f, 120f)]
+    [Range(50f, 90f)]
     [SerializeField] float CamXMaxClanpRot = 90f;
-    [Range(-90f, -120f)]
+    [Range(-90f, -50f)]
     [SerializeField] float CamXMinClanpRot = -90f;
     float yRotation = 0f;
 
@@ -33,7 +33,6 @@ public class CameraControll : MonoBehaviour
     private void Start()
     {
         //CreateCamera();
-        cameramoveJoystick = FindObjectOfType<DynamicJoystick>();
         // カメラの初期回転を保持 (0, 180, 0)
         initialCameraRotation = Quaternion.Euler(0, 180, 0);
         PlayerCamera.transform.localRotation = initialCameraRotation;
@@ -47,17 +46,13 @@ public class CameraControll : MonoBehaviour
         float horizontalInput = cameramoveJoystick.Horizontal * joystickSensitivity * Time.deltaTime;
         float verticalInput = cameramoveJoystick.Vertical * joystickSensitivity * Time.deltaTime;
 
-        // プレイヤーの左右回転（ヨー）
         yRotation += horizontalInput;
 
-        // カメラの上下回転（ピッチ）
         xRotation -= verticalInput;
         xRotation = Mathf.Clamp(xRotation, CamXMinClanpRot, CamXMaxClanpRot);
 
-        // 初期の y と z を保持しつつ、xRotation のみ適用
         PlayerCamera.transform.localRotation = initialCameraRotation * Quaternion.Euler(xRotation, 0f, 0f);
 
-        // プレイヤーの横回転を更新 (左右)
         playerBody.transform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
     }
     #endregion

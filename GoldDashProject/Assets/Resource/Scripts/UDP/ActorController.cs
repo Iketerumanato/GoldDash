@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.Windows;
+using static UnityEditor.PlayerSettings;
 
 /// <summary>
 /// プレイヤー達を管理するクラス。GameServerManagerでSessionIDをKeyとしてDictionaryで管理される
@@ -6,40 +8,64 @@ using UnityEngine;
 public class ActorController : MonoBehaviour
 {
     public string PlayerName { set; get; }
-    public bool IsRun { set; get; }
-    Vector3 oldPos;
-    [SerializeField] float runThreshold = 0.01f;
-    private float SQR_RunThreshold;
+    private Vector3 targetPosition;
+    private Vector3 oldPos;
+    private Vector3 currentVelocity;
     [SerializeField] Animator PlayerAnimator;
-    readonly string RunAnimation = "IsRun";
+    [SerializeField] float runThreshold = 0.01f;
+    [SerializeField] float smoothSpeed = 0.1f;
+    [SerializeField] float animationLerpSpeed = 70f;
+    [SerializeField] float rotationSmooth = 10f;
+    readonly string MoveAnimationStr = "BlendSpeed";
 
-    // このアクターの座標と向きを更新する
+
+    private void Awake()
+    {
+        oldPos = transform.position;
+        targetPosition = oldPos;
+    }
+
     public void Move(Vector3 pos, Vector3 forward)
     {
-        SQR_RunThreshold = runThreshold * runThreshold;
-        oldPos = transform.position; // 初期位置を設定
-        Vector3 distance = pos - oldPos;
+        targetPosition = pos;
 
-        if (distance.sqrMagnitude > SQR_RunThreshold) PlayerAnimator.SetBool(RunAnimation, true);
-        else PlayerAnimator.SetBool(RunAnimation, false);
+        // プレイヤーの位置を補間
+        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
-        // 座標と向きを更新
-        this.gameObject.transform.position = pos;
-        this.gameObject.transform.forward = forward;
+        float distance = (targetPosition - oldPos).magnitude;
+        float speed = Mathf.Clamp01(distance / runThreshold);
 
-        oldPos = pos;
+        float currentSpeed = PlayerAnimator.GetFloat(MoveAnimationStr);
+
+        // 上昇時と下降時で別々にLerpの速度を調整する
+        float blendSpeed = (speed > currentSpeed)
+                            ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed)
+                            : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
+
+        PlayerAnimator.SetFloat(MoveAnimationStr, blendSpeed);
+
+        // 現在の向きとターゲットの向きの角度を-180~180で計算
+        float angle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
+
+        // 回転を補間
+        if (Mathf.Abs(angle) > 0.01f)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), Time.deltaTime * rotationSmooth);
+        }
+
+        oldPos = targetPosition;
     }
 
     //メソッドの例。正式実装ではない
     public void Kill()
-    { 
+    {
     }
 
     public void GiveItem()
-    { 
+    {
     }
 
     public void GiveStatus()
-    { 
+    {
     }
 }
