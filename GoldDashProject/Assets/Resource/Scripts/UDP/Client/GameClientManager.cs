@@ -93,11 +93,15 @@ public class GameClientManager : MonoBehaviour
         //ゲーム開始を待つ
         await UniTask.WaitUntil(() => inGame); //ここは本来ハローパケットの送信処理から切り替えるべきだがまだ実装しない
 
+        //返信用クラスを外側のスコープで宣言しておく
+        ActionPacket myActionPacket;
+        Header myHeader;
+
         while (true) 
         {
             //プレイヤーアクターの座標をMOVで送信
-            ActionPacket myPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, playerActor.transform.position, playerActor.transform.forward);
-            Header myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+            myActionPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, playerActor.transform.position, playerActor.transform.forward);
+            myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             udpGameClient.Send(myHeader.ToByte());
 
             await UniTask.Delay(100);
@@ -106,6 +110,7 @@ public class GameClientManager : MonoBehaviour
 
     private async void ProcessPacket()
     {
+        //返信用クラスを外側のスコープで宣言しておく
         ActionPacket myActionPacket;
         Header myHeader;
 
