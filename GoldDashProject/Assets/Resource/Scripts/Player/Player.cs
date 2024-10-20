@@ -156,6 +156,12 @@ public class Player : MonoBehaviour
     //以下手動マージ予定
     UdpGameClient udpGameClient = null; //パケット送信用。
 
+    Camera fpsCamera; //playerカメラ。Start()内でGetComponentInChildren<Camera>()して取得
+
+    const float INTERACTABLE_DISTANCE = 10.0f;//この値は今すっげ～適当です。
+
+    const float PUNCH_REACHABLE_DISTANCE = 1f;
+
     //GameClientManagerからプレイヤーの生成タイミングで呼び出してudpGameClientへのアクセスを得る。
     public void GetUdpGameClient(UdpGameClient udpGameClient)
     { 
@@ -163,29 +169,50 @@ public class Player : MonoBehaviour
     }
 
     //以下UIの操作などで呼び出されるメソッド。R3でやろっかな
-    //画面を「タッチしたとき」呼ばれる。オブジェクトに触ったかどうか判定
-    private void Interact()
+
+    //画面を「タッチしたとき」呼ばれる。オブジェクトに触ったかどうか判定 UpdateProcess -> if (Input.GetMouseButtonDown(0))
+    private void Interact(GameObject obj)
     {
-        //カメラの位置からレイを飛ばす
-        //RaycastHit hit
+        //カメラの位置からタッチした位置に向けrayを飛ばす
+        RaycastHit hit;
+        Ray ray = fpsCamera.ScreenPointToRay(Input.mousePosition);
 
-        //インタラクト対象でないならreturn。tagで判断　...A
-        //インタラクト対象なら距離を調べる。しきい値より遠いならreturn. ...B
-        //AとB,多分Aの方が処理高速だと思うのでAを先に実行しています
+        //rayがなにかに当たったら調べる
+        //定数INTERACTABLE_DISTANCEでrayの長さを調整することでインタラクト可能な距離を制限できる
+        if (Physics.Raycast(ray, out hit, INTERACTABLE_DISTANCE))
+        {
+            switch (hit.collider.gameObject.tag)
+            {
+                case "Enemy": //プレイヤーならパンチ
+                    Punch(hit.point, hit.distance);
+                    break;
+                case "Chest": //宝箱なら開錠を試みる
+                    TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ChestController>());
+                    break;
+                
+                //ドアをタッチで開けるならココ
 
-        //プレイヤーならパンチ
-        //Punch(hit.point, hit.distance)
-        //宝箱なら開錠を試みる。消えゆく宝箱だったり、他プレイヤーが使用中の宝箱は開錠できない。
-        //TryOpenChest(hit.point, hit.distance hit.collider.gameObject.GetComponent<ChestController>())
+                default: //そうでないものはインタラクト不可能なオブジェクトなので無視
+                    break;
+            }
+        }
     }
 
     //パンチ。パンチを成立させたRaycastHit構造体のPointとDistanceを引数にもらおう
     private void Punch(Vector3 hitPoint, float distance)
-    { 
+    {
         //distanceを調べてしきい値を調べる
+        if (distance < PUNCH_REACHABLE_DISTANCE)
+        {
+            //射程外なら一人称のスカモーション再生
 
-        //射程外なら一人称のスカモーション再生
-        //スカしたことをパケット送信
+            ////プレイヤーアクターの座標をMOVで送信
+            //ActionPacket myPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, playerActor.transform.position, playerActor.transform.forward);
+            //Header myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+
+            //スカしたことをパケット送信
+            ActionPacket myPacket = new 
+        }
 
         //射程内なら一人称のパンチモーション再生
         //カメラを非同期で敵に向ける処理開始 UniTask
@@ -194,7 +221,7 @@ public class Player : MonoBehaviour
     }
 
     //宝箱なら開錠を試みる。パンチと同様RaycastHit構造体から引数をもらう。消えゆく宝箱だったり、他プレイヤーが使用中の宝箱は開錠できない。
-    private void TryOpenChest(Vector3 hitPoint, float distance /*ChestController chestController*/)
+    private void TryOpenChest(Vector3 hitPoint, float distance, ChestController chestController)
     {
         //既に空いていないたらなにもしない
 
