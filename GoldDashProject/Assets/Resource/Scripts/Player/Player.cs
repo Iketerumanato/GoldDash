@@ -155,7 +155,7 @@ public class Player : MonoBehaviour
 
     //以下手動マージ予定
     UdpGameClient udpGameClient = null; //パケット送信用。
-    ushort SessionID { set; get; } //パケットに差出人情報を書くため必要
+    public ushort SessionID { set; get; } //パケットに差出人情報を書くため必要
 
     Camera fpsCamera; //playerカメラ。Start()内でGetComponentInChildren<Camera>()して取得
 

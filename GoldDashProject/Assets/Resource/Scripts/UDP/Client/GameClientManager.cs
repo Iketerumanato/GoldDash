@@ -191,6 +191,7 @@ public class GameClientManager : MonoBehaviour
                                         {
                                             //プレイヤーをインスタンス化しながらActorControllerを取得
                                             actorController = Instantiate(PlayerObject).GetComponent<ActorController>();
+                                            actorController.gameObject.GetComponent<Player>().SessionID = this.sessionID; //PlayerクラスにはActorControllerとは別にSessionIDを渡しておく。パケット送信を楽にするため。
                                             playerActor = actorController; //プレイヤーのActorControllerはアクセスしやすいように取得しておく
                                         }
                                         else //他人のIDなら
@@ -202,8 +203,10 @@ public class GameClientManager : MonoBehaviour
                                         actorController.Move(receivedActionPacket.pos, Vector3.forward);
                                         //アクターの名前を書き込み
                                         actorController.PlayerName = receivedActionPacket.msg;
-                                        //アクターのゲームオブジェクト
-                                        actorController.name = "Actor: " + receivedActionPacket.msg; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
+                                        //アクターのSessionIDを書き込み
+                                        actorController.SessionID = receivedActionPacket.targetID;
+                                        //アクターのゲームオブジェクト設定
+                                        actorController.name = $"Actor: {actorController.PlayerName} ({actorController.SessionID})"; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
                                         actorController.gameObject.SetActive(false); //初期設定が済んだら無効化して処理を止める。ゲーム開始時に有効化して座標などをセットする
 
                                         //アクター辞書に登録
