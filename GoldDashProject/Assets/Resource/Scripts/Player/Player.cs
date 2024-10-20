@@ -69,7 +69,7 @@ public class Player : MonoBehaviour
 
     private IPlayerState _playerCurrentState;
     [SerializeField] Animator playerAnimator;
-    readonly string RunAnimation = "IsRun";
+    [SerializeField] float smoothSpeed = 10f;
 
     #region ゲーム起動時必ず呼ばれる
     void Start()
@@ -91,15 +91,31 @@ public class Player : MonoBehaviour
     #region プレイヤーの操作と落下
     public void MovePlayerJoystick(Vector3 input)
     {
-        // 移動
+        // 移動方向をジョイスティックの入力に基づいて計算
         input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
-        transform.position -= moveSpeed * Time.deltaTime * input;
-        float inputMagnitude = input.magnitude;
 
-        if (inputMagnitude > 0.5f)
-            playerAnimator.SetBool(RunAnimation, true);
+        // 移動処理
+        if (input.magnitude > 0)
+        {
+            // プレイヤーの向きを移動方向にスムーズに回転させる
+            Quaternion targetRotation = Quaternion.LookRotation(input);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * smoothSpeed); // 回転速度調整
+
+            // プレイヤーの移動
+            transform.position -= input * moveSpeed * Time.deltaTime;
+
+            // アニメーションの遷移 (BlendSpeedの補間)
+            float inputMagnitude = input.magnitude;
+            float currentBlendSpeed = playerAnimator.GetFloat("BlendSpeed");
+            float newBlendSpeed = Mathf.Lerp(currentBlendSpeed, inputMagnitude, Time.deltaTime * smoothSpeed); // 補間速度調整
+            playerAnimator.SetFloat("BlendSpeed", newBlendSpeed);
+        }
         else
-            playerAnimator.SetBool(RunAnimation, false); // 走るアニメーション解除
+        {
+            // プレイヤーが停止した場合、アニメーションのBlendSpeedをゆっくり0に戻す
+            float currentBlendSpeed = playerAnimator.GetFloat("BlendSpeed");
+            playerAnimator.SetFloat("BlendSpeed", Mathf.Lerp(currentBlendSpeed, 0f, Time.deltaTime * smoothSpeed));
+        }
     }
 
     public void MoveKey()
