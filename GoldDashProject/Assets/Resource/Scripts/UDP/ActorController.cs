@@ -14,9 +14,10 @@ public class ActorController : MonoBehaviour
     [SerializeField] Animator PlayerAnimator;
     [SerializeField] float runThreshold = 0.01f;
     [SerializeField] float smoothSpeed = 0.1f;
-    [SerializeField] float animationLerpSpeed = 10f;
-    [SerializeField] float rotationSmooth = 5f;
+    [SerializeField] float animationLerpSpeed = 70f;
+    [SerializeField] float rotationSmooth = 10f;
     readonly string MoveAnimationStr = "BlendSpeed";
+
 
     private void Awake()
     {
@@ -38,21 +39,18 @@ public class ActorController : MonoBehaviour
 
         // 上昇時と下降時で別々にLerpの速度を調整する
         float blendSpeed = (speed > currentSpeed)
-                            ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed * 7f)
-                            : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed * 7f);
+                            ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed)
+                            : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
 
         PlayerAnimator.SetFloat(MoveAnimationStr, blendSpeed);
 
-        if (forward.magnitude > 0)
-        {
-            // 現在の向きとターゲットの向きの角度を-180~180で計算
-            float angle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
+        // 現在の向きとターゲットの向きの角度を-180~180で計算
+        float angle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
 
-            // 回転をSlerpで補間しつつ、カクつきを軽減
-            if (Mathf.Abs(angle) > 0.01f) // 小さい角度は無視してカクつき軽減
-            {
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), Time.deltaTime * rotationSmooth);
-            }
+        // 回転を補間
+        if (Mathf.Abs(angle) > 0.01f)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), Time.deltaTime * rotationSmooth);
         }
 
         oldPos = targetPosition;
