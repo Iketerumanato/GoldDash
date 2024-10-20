@@ -32,8 +32,9 @@ public class ActorController : MonoBehaviour
         // プレイヤーの位置を補間
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
-        float distance = (targetPosition - oldPos).magnitude;
-        float speed = Mathf.Clamp01(distance / runThreshold);
+        float distance = (targetPosition - oldPos).sqrMagnitude;
+        var sqrRunThreshold = runThreshold * runThreshold;
+        float speed = Mathf.Clamp01(distance / sqrRunThreshold);
 
         float currentSpeed = PlayerAnimator.GetFloat(MoveAnimationStr);
 
