@@ -213,6 +213,7 @@ public class Player : MonoBehaviour
             //スカしたことをパケット送信
             ActionPacket myPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
             Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+            udpGameClient.Send(myHeader.ToByte());
         }
         else
         {
@@ -228,12 +229,14 @@ public class Player : MonoBehaviour
                 //正面に命中させたことをパケット送信
                 ActionPacket myPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
                 Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                udpGameClient.Send(myHeader.ToByte());
             }
             else
             {
                 //背面に命中させたことをパケット送信
                 ActionPacket myPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
                 Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                udpGameClient.Send(myHeader.ToByte());
             }
         }
     }

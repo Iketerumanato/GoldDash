@@ -252,10 +252,13 @@ public class GameServerManager : MonoBehaviour
 
                         switch (receivedActionPacket.roughID)
                         {
+                            #region case (byte)Definer.RID.MOV: Moveの場合
                             case (byte)Definer.RID.MOV:
                                 //アクター辞書からアクターの座標を更新
                                 actorDictionary[receivedActionPacket.targetID].Move(receivedActionPacket.pos, receivedActionPacket.pos2);
                                 break;
+                            #endregion
+                            #region case (byte)Definer.RID.NOT: Noticeの場合
                             case (byte)Definer.RID.NOT:
                                 switch (receivedActionPacket.detailID)
                                 {
@@ -281,8 +284,24 @@ public class GameServerManager : MonoBehaviour
                                         break;
                                 }
                                 break;
+                            #endregion
+                            #region (byte)Definer.RID.REQ: Requestの場合
                             case (byte)Definer.RID.REQ:
+                                switch (receivedActionPacket.detailID)
+                                {
+                                    case (byte)Definer.REID.MISS: //空振り
+                                        ActionPacket myPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.PUNCH, receivedHeader.sessionID);
+                                        Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+                                        break;
+                                    case (byte)Definer.REID.HIT_FRONT:
+                                        myPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.PUNCH, receivedHeader.sessionID);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+                                        break;
+                                }
                                 break;
+                            #endregion
                         }
 
                         break;
