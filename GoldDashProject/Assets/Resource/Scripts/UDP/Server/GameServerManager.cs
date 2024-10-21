@@ -13,7 +13,7 @@ public class GameServerManager : MonoBehaviour
 
     //GameServer関連のインスタンスがDisposeメソッド以外で破棄されることは想定していない。そのときはおしまいだろう。
     private UdpGameServer udpGameServer; //UdpCommunicatorを継承したUdpGameServerのインスタンス
-    private ushort rcvPort; //udPGameServerの受信用ポート番号
+    private ushort rcvPort; //udpGameServerの受信用ポート番号
     private ushort serverSessionID; //クライアントにサーバーを判別させるためのID
     private Queue<Header> packetQueue; //udpGameServerは”勝手に”このキューにパケットを入れてくれる。不正パケット処理なども済んだ状態で入る。
 
@@ -316,14 +316,15 @@ public class GameServerManager : MonoBehaviour
                                         myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedActionPacket.targetID, -lostGold);
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
-                                        //金貨の山を生成
-                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, receivedActionPacket.targetID, -lostGold);
+                                        //重複しないentityIDを作り、金額を指定して金貨の山を生成
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, GetUniqueEntityID(), lostGold);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
                                         break;
                                 }
                                 break;
                             #endregion
                         }
-
                         break;
                     #endregion
                     default:
@@ -334,5 +335,17 @@ public class GameServerManager : MonoBehaviour
         }
     }
 
-    public Dictionary<ushort, ActorController> PropertyActorDictionary { get { return actorDictionary; } }
+    //重複しないentityIDを作る
+    private ushort GetUniqueEntityID()
+    {
+        ushort entityID;
+        do
+        {
+            System.Random random = new System.Random(); //UnityEngine.Randomはマルチスレッドで使用できないのでSystemを使う
+            entityID = (ushort)random.Next(0, 65535); //0から65535までの整数を生成して2バイトにキャスト
+        }
+        while (usedEntityID.Contains(entityID)); //使用済IDと同じ値を生成してしまったならやり直し
+        usedEntityID.Add(entityID); //このIDは使用済にする。
+        return entityID;
+    }
 }
