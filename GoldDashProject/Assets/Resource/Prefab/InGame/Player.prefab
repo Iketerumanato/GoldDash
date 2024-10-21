@@ -566,6 +566,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 757b274c65ebb024c9c4ba1726d212fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  interactableDistance: 4
+  punchReachableDistance: 1
+  flontRange: 120
   moveSpeed: 1
   maxPlayerHP: 10
   fallThreshold: -10
@@ -573,6 +576,7 @@ MonoBehaviour:
   cameraControll: {fileID: 2312801285971285685}
   variableJoystick: {fileID: 4576237364704138686}
   playerAnimator: {fileID: 1490507058994929841}
+  smoothSpeed: 10
 --- !u!114 &2312801285971285685
 MonoBehaviour:
   m_ObjectHideFlags: 0

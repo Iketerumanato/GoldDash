@@ -263,7 +263,7 @@ public class Player : MonoBehaviour
         Header myHeader;
 
         //distanceを調べてしきい値を調べる
-        if (distance < punchReachableDistance)
+        if (distance > punchReachableDistance)
         {
             //射程外なら一人称のスカモーション再生
 
