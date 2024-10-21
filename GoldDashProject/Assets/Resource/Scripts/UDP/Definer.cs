@@ -83,6 +83,10 @@ public static class Definer
     public enum REID : byte
     {
         /// <summary>
+        /// 金貨の山を手に入れようとしました
+        /// </summary>
+        GET_GOLDPILE,
+        /// <summary>
         /// 空振りました
         /// </summary>
         MISS,
@@ -104,7 +108,23 @@ public static class Definer
         /// <summary>
         /// このActorをスポーンさせろ
         /// </summary>
-        SPAWN,
+        SPAWN_ACTOR,
+        /// <summary>
+        /// 金貨の山をスポーンさせろ
+        /// </summary>
+        SPAWN_GOLDPILE,
+        /// <summary>
+        /// この金貨の山を削除しろ
+        /// </summary>
+        DESTROY_GOLDPILE,
+        /// <summary>
+        /// このActorの所持金を増やせ
+        /// </summary>
+        INCREACE_GOLD,
+        /// <summary>
+        /// このActorの所持金を減らせ
+        /// </summary>
+        DECREACE_GOLD,
         /// <summary>
         /// このActorにパンチさせろ
         /// </summary>

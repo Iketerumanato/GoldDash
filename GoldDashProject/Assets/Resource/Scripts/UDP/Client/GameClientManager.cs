@@ -192,7 +192,7 @@ public class GameClientManager : MonoBehaviour
                                 switch (receivedActionPacket.detailID)
                                 {
                                     #region case (byte)Definer.EDID.SPAWN:の場合
-                                    case (byte)Definer.EDID.SPAWN:
+                                    case (byte)Definer.EDID.SPAWN_ACTOR:
                                         //アクターをスポーンさせる
 
                                         //ActorControllerインスタンスを作りDictionaryに加える

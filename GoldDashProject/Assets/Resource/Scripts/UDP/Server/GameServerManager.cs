@@ -230,7 +230,7 @@ public class GameServerManager : MonoBehaviour
                             foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
                             {
                                 //リスポーン地点を参照しながら各プレイヤーの名前とIDを載せてアクター生成命令を飛ばす
-                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN, k.Key, respawnPoints[index], default, k.Value.PlayerName);
+                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_ACTOR, k.Key, respawnPoints[index], default, k.Value.PlayerName);
                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                 udpGameServer.Send(myHeader.ToByte());
                                 index++;
