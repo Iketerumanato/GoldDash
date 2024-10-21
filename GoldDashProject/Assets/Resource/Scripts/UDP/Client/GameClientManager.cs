@@ -10,20 +10,19 @@ public class GameClientManager : MonoBehaviour
     private bool isRunning; //稼働中か
 
     private UdpGameClient udpGameClient; //UdpCommunicatorを継承したUdpGameClientのインスタンス
-
     private Queue<Header> packetQueue; //udpGameClientは”勝手に”このキューにパケットを入れてくれる。不正パケット処理なども済んだ状態で入る。
 
     [SerializeField] private ushort sessionPass; //サーバーに接続するためのパスコード
-
     [SerializeField] private ushort initSessionPass; //初回通信時、サーバーからの返信が安全なものか判別するためのパスコード。今後乱数化する
-
     [SerializeField] private string myName; //仮です。登録に使うプレイヤーネーム
 
     private ushort sessionID; //自分のセッションID。サーバー側で決めてもらう。
 
     private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを保管。自分以外のプレイヤー（アクター）のセッションIDも記録していく
+    private Dictionary<ushort, Entity> entityDictionary; //entityIDを鍵としてentityインスタンスを管理
 
     private ActorController playerActor; //プレイヤーが操作するキャラクターのActorController
+
 
     private int numOfActors; //アクターの人数
     private int preparedActors; //生成し終わったアクターの数
@@ -83,6 +82,7 @@ public class GameClientManager : MonoBehaviour
 
         packetQueue = new Queue<Header>();
         actorDictionary = new Dictionary<ushort, ActorController>();
+        entityDictionary = new Dictionary<ushort, Entity>();
 
         Task.Run(() => ProcessPacket());
         Task.Run(() => SendPlayerPosition());

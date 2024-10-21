@@ -110,13 +110,17 @@ public static class Definer
         /// </summary>
         SPAWN_ACTOR,
         /// <summary>
+        /// 宝箱をスポーンさせろ
+        /// </summary>
+        SPAWN_CHEST,
+        /// <summary>
         /// 金貨の山をスポーンさせろ
         /// </summary>
         SPAWN_GOLDPILE,
         /// <summary>
-        /// この金貨の山を削除しろ
+        /// このエンティティを削除しろ
         /// </summary>
-        DESTROY_GOLDPILE,
+        DESTROY_ENTITY,
         /// <summary>
         /// このActorの所持金を増やせ
         /// </summary>
