@@ -89,6 +89,8 @@ public class Player : MonoBehaviour
 
     private IPlayerState _playerCurrentState;
     [SerializeField] Animator playerAnimator;
+    readonly string strPlayerBlend = "BlendSpeed";
+    readonly string strPunchTrigger = "PunchTrigger";
     [SerializeField] float smoothSpeed = 10f;
 
     #region ゲーム起動時必ず呼ばれる
@@ -129,15 +131,15 @@ public class Player : MonoBehaviour
 
             // アニメーションの遷移 (BlendSpeedの補間)
             float inputMagnitude = input.magnitude;
-            float currentBlendSpeed = playerAnimator.GetFloat("BlendSpeed");
+            float currentBlendSpeed = playerAnimator.GetFloat(strPlayerBlend);
             float newBlendSpeed = Mathf.Lerp(currentBlendSpeed, inputMagnitude, Time.deltaTime * smoothSpeed); // 補間速度調整
             playerAnimator.SetFloat("BlendSpeed", newBlendSpeed);
         }
         else
         {
             // プレイヤーが停止した場合、アニメーションのBlendSpeedをゆっくり0に戻す
-            float currentBlendSpeed = playerAnimator.GetFloat("BlendSpeed");
-            playerAnimator.SetFloat("BlendSpeed", Mathf.Lerp(currentBlendSpeed, 0f, Time.deltaTime * smoothSpeed));
+            float currentBlendSpeed = playerAnimator.GetFloat(strPlayerBlend);
+            playerAnimator.SetFloat(strPlayerBlend, Mathf.Lerp(currentBlendSpeed, 0f, Time.deltaTime * smoothSpeed));
         }
     }
 
@@ -257,6 +259,7 @@ public class Player : MonoBehaviour
     private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
     {
         Debug.Log("Punch入った");
+        playerAnimator.SetTrigger(strPunchTrigger);
 
         //送信用クラスを外側のスコープで宣言しておく
         ActionPacket myActionPacket;
