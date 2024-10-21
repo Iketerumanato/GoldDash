@@ -328,17 +328,24 @@ public class GameServerManager : MonoBehaviour
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
 
-                                        ////重複しないentityIDを作り、オブジェクトを生成しつつ、エンティティのコンポーネントを取得
-                                        //entityID = GetUniqueEntityID();
-                                        //entity = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
-                                        //entityDictionary.Add(entityID, entity); //管理用のIDと共に辞書へ
-                                        //entityDictionary[entityID].EntityID = entityID; //値を書き込み
-                                        //entityDictionary[entityID].Value = lostGold;
+                                        //重複しないentityIDを作り、オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                        Debug.Log("ユニークID取得");
+                                        entityID = GetUniqueEntityID();
+                                        Debug.Log("インスタンス作成");
+                                        entity = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
+                                        Debug.Log("辞書書き込み");
+                                        entityDictionary.Add(entityID, entity); //管理用のIDと共に辞書へ
+                                        Debug.Log("ID書き込み");
+                                        entityDictionary[entityID].EntityID = entityID; //値を書き込み
+                                        Debug.Log("金額書き込み");
+                                        entityDictionary[entityID].Value = lostGold;
 
-                                        ////金額を指定して、殴られた人の足元に金貨の山を生成する命令
-                                        //myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, lostGold, actorDictionary[receivedActionPacket.targetID].transform.position);
-                                        //myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                        //udpGameServer.Send(myHeader.ToByte());
+                                        //金額を指定して、殴られた人の足元に金貨の山を生成する命令
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, lostGold, actorDictionary[receivedActionPacket.targetID].transform.position);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+
+                                        Debug.Log("完");
                                         break;
                                     case (byte)Definer.REID.GET_GOLDPILE:
                                         //エンティティが存在するか確かめる。存在しないなら何もしない。エラーコードも返さない。エラーコードを返すとチーターは喜ぶ
@@ -373,6 +380,9 @@ public class GameServerManager : MonoBehaviour
         {
             System.Random random = new System.Random(); //UnityEngine.Randomはマルチスレッドで使用できないのでSystemを使う
             entityID = (ushort)random.Next(0, 65535); //0から65535までの整数を生成して2バイトにキャスト
+
+
+            Debug.Log($"乱数つくった{entityID}");
         }
         while (usedEntityID.Contains(entityID)); //使用済IDと同じ値を生成してしまったならやり直し
         usedEntityID.Add(entityID); //このIDは使用済にする。
