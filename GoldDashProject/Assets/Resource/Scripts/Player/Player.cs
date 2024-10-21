@@ -90,7 +90,7 @@ public class Player : MonoBehaviour
     private IPlayerState _playerCurrentState;
     [SerializeField] Animator playerAnimator;
     readonly string strPlayerBlend = "BlendSpeed";
-    readonly string strPunchTrigger = "PunchTrigger";
+    readonly string strPunchTrigger = "ArmPunchTrigger";
     [SerializeField] float smoothSpeed = 10f;
 
     #region ゲーム起動時必ず呼ばれる
