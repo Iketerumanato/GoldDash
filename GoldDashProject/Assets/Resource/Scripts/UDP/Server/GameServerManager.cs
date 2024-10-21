@@ -13,25 +13,20 @@ public class GameServerManager : MonoBehaviour
 
     //GameServer関連のインスタンスがDisposeメソッド以外で破棄されることは想定していない。そのときはおしまいだろう。
     private UdpGameServer udpGameServer; //UdpCommunicatorを継承したUdpGameServerのインスタンス
-
     private ushort rcvPort; //udPGameServerの受信用ポート番号
-
     private ushort serverSessionID; //クライアントにサーバーを判別させるためのID
-
     private Queue<Header> packetQueue; //udpGameServerは”勝手に”このキューにパケットを入れてくれる。不正パケット処理なども済んだ状態で入る。
 
-    [SerializeField] private ushort sessionPass; //サーバーに入るためのパスワード。udpGameServerのコンストラクタに渡す。
+    private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを管理
+    private Dictionary<ushort, Entity> entityDictionary; //entityIDを鍵としてentityインスタンスを管理
 
-    private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを保管
-
-    private HashSet<ushort> usedID; //sessionIDの重複防止に使う。使用済IDを記録して新規発行時にはcontainsで調べる
-
+    private HashSet<ushort> usedSessionID; //sessionIDの重複防止に使う。使用済IDを記録して新規発行時にはcontainsで調べる
     private HashSet<string> usedName; //プレイヤーネームの重複防止に使う。
+    private HashSet<ushort> usedEntityID; //プレイヤーネームの重複防止に使う。
 
+    [SerializeField] private ushort sessionPass; //サーバーに入るためのパスワード。udpGameServerのコンストラクタに渡す。
     [SerializeField] private int numOfPlayers; //何人のプレイヤーを募集するか
     private int preparedPlayers; //準備が完了したプレイヤーの数
-
-    //private Dictionary<ushort, uint> sendNums; //各セッションIDを鍵として、送信番号を記録。受信管理（パケロス処理）はUDPGameServerでやる
 
     [SerializeField] private GameObject ActorObject; //アクターのプレハブ
 
@@ -61,7 +56,7 @@ public class GameServerManager : MonoBehaviour
                 udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
                 rcvPort = udpGameServer.GetReceivePort(); //受信用ポート番号とサーバーのセッションIDがここで決まるので取得
                 serverSessionID = udpGameServer.GetServerSessionID();
-                usedID.Add(serverSessionID); //サーバーIDを使用済に
+                usedSessionID.Add(serverSessionID); //サーバーIDを使用済に
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
                 if (udpGameServer == null) udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
@@ -85,13 +80,14 @@ public class GameServerManager : MonoBehaviour
     {
         packetQueue = new Queue<Header>();
         actorDictionary = new Dictionary<ushort, ActorController>();
-        usedID = new HashSet<ushort>();
-        usedName = new HashSet<string>();
+        entityDictionary = new Dictionary<ushort, Entity>();
 
-        //sendNums = new Dictionary<ushort, uint>();
+        usedSessionID = new HashSet<ushort>();
+        usedName = new HashSet<string>();
+        usedEntityID = new HashSet<ushort>();
 
         //sessionIDについて、0はsessionIDを持っていないクライアントを表すナンバーなので、予め使用済にしておく。
-        usedID.Add(0);
+        usedSessionID.Add(0);
 
         inGame = false;
 
@@ -186,7 +182,7 @@ public class GameServerManager : MonoBehaviour
                         //アクター辞書に登録
                         actorDictionary.Add(receivedHeader.sessionID, actorController);
 
-                        usedID.Add(receivedHeader.sessionID); //このIDを使用済にする
+                        usedSessionID.Add(receivedHeader.sessionID); //このIDを使用済にする
                         usedName.Add(receivedInitPacket.playerName); //登録したプレイヤーネームを使用済にする
 
                         //TODO 送信番号の記録開始
