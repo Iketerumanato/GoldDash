@@ -335,8 +335,11 @@ public class GameServerManager : MonoBehaviour
                                         entity = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
                                         Debug.Log("辞書書き込み");
                                         entityDictionary.Add(entityID, entity); //管理用のIDと共に辞書へ
+
+                                        ushort copiedID = entityID;
+
                                         Debug.Log("ID書き込み");
-                                        entityDictionary[entityID].EntityID = entityID; //値を書き込み
+                                        entityDictionary[entityID].EntityID = copiedID; //値を書き込み
                                         Debug.Log("金額書き込み");
                                         entityDictionary[entityID].Value = lostGold;
 
