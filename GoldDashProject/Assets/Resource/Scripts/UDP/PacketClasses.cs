@@ -185,16 +185,18 @@ public class ActionPacket : Packet
     public byte roughID; //アクションのカテゴリを示す
     public byte detailID; //アクションの詳細な種類を示す
     public ushort targetID; //アクションの対象を示す
+    public int value; //整数型データを持つアクションで参照する
     public Vector3 pos; //座標データを持つアクションで参照する
     public Vector3 pos2; //座標データを2つ持つアクションで参照する
     public byte msgLength; //msgのバイト数
     public string msg; //文字列データを持つアクションで参照する
 
-    public ActionPacket(byte roughID, byte detailID = 0, ushort targetID = 0, Vector3 pos = new Vector3(), Vector3 pos2 = new Vector3(), string msg = "")
+    public ActionPacket(byte roughID, byte detailID = 0, ushort targetID = 0, int value = 0, Vector3 pos = new Vector3(), Vector3 pos2 = new Vector3(), string msg = "")
     {
         this.roughID = roughID;
         this.detailID = detailID;
         this.targetID = targetID;
+        this.value = value; 
         this.pos = pos;
         this.pos2 = pos2;
         this.msgLength = (byte)Encoding.UTF8.GetByteCount(msg);
@@ -212,6 +214,8 @@ public class ActionPacket : Packet
         index++;
         this.targetID = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
+        this.value = BitConverter.ToInt32(bytes, index);
+        index += sizeof(int);
         x = BitConverter.ToSingle(bytes, index);
         index += sizeof(float);
         y = BitConverter.ToSingle(bytes, index);
@@ -238,6 +242,7 @@ public class ActionPacket : Packet
         ret = AddByte(ret, roughID);
         ret = AddByte(ret, detailID);
         ret = AddBytes(ret, BitConverter.GetBytes(targetID));
+        ret = AddBytes(ret, BitConverter.GetBytes(value));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.x));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.y));
         ret = AddBytes(ret, BitConverter.GetBytes(pos.z));

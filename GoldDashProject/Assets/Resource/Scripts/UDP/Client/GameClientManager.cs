@@ -100,7 +100,7 @@ public class GameClientManager : MonoBehaviour
         while (true) 
         {
             //プレイヤーアクターの座標をMOVで送信
-            myActionPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, playerActor.transform.position, playerActor.transform.forward);
+            myActionPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, default, playerActor.transform.position, playerActor.transform.forward);
             myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             udpGameClient.Send(myHeader.ToByte());
 

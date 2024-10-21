@@ -122,13 +122,9 @@ public static class Definer
         /// </summary>
         DESTROY_ENTITY,
         /// <summary>
-        /// このActorの所持金を増やせ
+        /// このActorの所持金を変更しろ
         /// </summary>
-        INCREACE_GOLD,
-        /// <summary>
-        /// このActorの所持金を減らせ
-        /// </summary>
-        DECREACE_GOLD,
+        EDIT_GOLD,
         /// <summary>
         /// このActorにパンチさせろ
         /// </summary>

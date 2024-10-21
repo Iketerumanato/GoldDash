@@ -226,7 +226,7 @@ public class GameServerManager : MonoBehaviour
                             foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
                             {
                                 //リスポーン地点を参照しながら各プレイヤーの名前とIDを載せてアクター生成命令を飛ばす
-                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_ACTOR, k.Key, respawnPoints[index], default, k.Value.PlayerName);
+                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_ACTOR, k.Key, default, respawnPoints[index], default, k.Value.PlayerName);
                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                 udpGameServer.Send(myHeader.ToByte());
                                 index++;
@@ -309,9 +309,22 @@ public class GameServerManager : MonoBehaviour
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
                                         //被パンチ者に通達
-                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.HIT_BACK, receivedActionPacket.targetID, receivedActionPacket.pos);
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.HIT_BACK, receivedActionPacket.targetID, default, receivedActionPacket.pos);
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
+
+                                        //所持金の計算
+                                        int gold = actorDictionary[receivedActionPacket.targetID].Gold;
+                                        int lostGold = gold / 2; //所持金半減。小数点以下切り捨て。
+
+                                        if (lostGold == 0) break;//lostGoldが0なら処理終了
+
+                                        //被パンチ者の所持金を減らす
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedActionPacket.targetID, -lostGold);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+                                        //金貨の山を生成
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, receivedActionPacket.targetID, -lostGold);
                                         break;
                                 }
                                 break;
