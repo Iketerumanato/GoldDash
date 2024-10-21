@@ -323,6 +323,7 @@ public class GameServerManager : MonoBehaviour
                                         if (lostGold == 0) break;//lostGoldが0なら処理終了
 
                                         //被パンチ者の所持金を減らす
+                                        actorDictionary[receivedActionPacket.targetID].Gold -= lostGold;//まずサーバー側で
                                         myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedActionPacket.targetID, -lostGold);
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
