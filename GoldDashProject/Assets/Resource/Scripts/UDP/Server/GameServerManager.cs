@@ -332,19 +332,18 @@ public class GameServerManager : MonoBehaviour
                                         Debug.Log("ユニークID取得");
                                         entityID = GetUniqueEntityID();
                                         Debug.Log("インスタンス作成");
-                                        GoldPile gp = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
-                                        Debug.Log("辞書書き込み");
-                                        entityDictionary.Add(entityID, gp); //管理用のIDと共に辞書へ
+                                        entity = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
+                                        Debug.Log("先にID書き込み");
+                                        entity.EntityID = entityID; //値を書き込み
+                                        Debug.Log("先に金額書き込み");
+                                        entity.Value = lostGold;
 
-                                        //ushort copiedID = entityID;
+
+                                        Debug.Log("辞書書き込み");
+                                        entityDictionary.Add(entityID, entity); //管理用のIDと共に辞書へ
 
                                         Debug.Log("ID書き込み");
-                                        //Debug.Log(entityDictionary.TryGetValue(entityID, out entity));
-                                        Debug.Log(gp.test);
-
-                                        //Debug.Log(entityDictionary[entityID].test);
-
-                                        //entityDictionary[entityID].EntityID; //値を書き込み
+                                        entityDictionary[entityID].EntityID = entityID; //値を書き込み
                                         Debug.Log("金額書き込み");
                                         entityDictionary[entityID].Value = lostGold;
 
