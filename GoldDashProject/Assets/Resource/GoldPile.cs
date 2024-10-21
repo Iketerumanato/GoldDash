@@ -17,5 +17,6 @@ public class GoldPile : Entity
 
     public override void Destroy()
     {
+        Destroy(this.gameObject);
     }
 }

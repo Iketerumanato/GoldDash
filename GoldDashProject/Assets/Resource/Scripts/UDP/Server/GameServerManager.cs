@@ -28,6 +28,7 @@ public class GameServerManager : MonoBehaviour
     private int preparedPlayers; //準備が完了したプレイヤーの数
 
     [SerializeField] private GameObject ActorObject; //アクターのプレハブ
+    [SerializeField] private GameObject GoldPileObject; //金貨の山のプレハブ
 
     private bool inGame; //ゲームは始まっているか
 
@@ -123,6 +124,10 @@ public class GameServerManager : MonoBehaviour
         InitPacketServer myInitPacket;
         ActionPacket myActionPacket;
         Header myHeader;
+        //オブジェクト生成用の変数を外側のスコープで宣言しておく
+        GameObject gameObject;
+        ushort entityID;
+        Entity entity;
 
         while (true)
         {
@@ -316,10 +321,28 @@ public class GameServerManager : MonoBehaviour
                                         myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedActionPacket.targetID, -lostGold);
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
-                                        //重複しないentityIDを作り、金額を指定して、殴られた人の足元に金貨の山を生成
-                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, GetUniqueEntityID(), lostGold, actorDictionary[receivedActionPacket.targetID].transform.position);
+
+                                        //重複しないentityIDを作り、オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                        entityID = GetUniqueEntityID();
+                                        gameObject = Instantiate(GoldPileObject, actorDictionary[receivedActionPacket.targetID].transform.position, Quaternion.identity);
+                                        entityDictionary.Add(entityID, gameObject.GetComponent<GoldPile>());
+
+                                        //値を書き込み
+                                        entityDictionary[entityID].EntityID = entityID;
+                                        gameObject.GetComponent<GoldPile>().Value = lostGold; //ここ、Dictionaryからvalue取ってGoldPileにキャストしてプロパティ参照する動きが1行ではできないので強引に。
+
+                                        //金額を指定して、殴られた人の足元に金貨の山を生成する命令
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, lostGold, actorDictionary[receivedActionPacket.targetID].transform.position);
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
+                                        break;
+                                    case (byte)Definer.REID.GET_GOLDPILE:
+                                        //エンティティが存在するか確かめる。存在しないなら何もしない。エラーコードも返さない。エラーコードを返すとチーターは喜ぶ
+                                        if (entityDictionary.TryGetValue(receivedActionPacket.targetID, out entity))
+                                        {
+                                            //存在するなら入手したプレイヤーにゴールドを振り込む
+
+                                        }
                                         break;
                                 }
                                 break;
