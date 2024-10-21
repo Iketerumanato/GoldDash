@@ -25,6 +25,18 @@ public class ActorController : MonoBehaviour
     private void Update()
     {
         Debug.Log(Gold);
+    }
+
+    private void Awake()
+    {
+        oldPos = transform.position;
+        targetPosition = oldPos;
+    }
+
+    public void Move(Vector3 pos, Vector3 forward)
+    {
+        targetPosition = pos;
+
         // プレイヤーの位置を補間
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
@@ -40,33 +52,6 @@ public class ActorController : MonoBehaviour
                             : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
 
         PlayerAnimator.SetFloat(MoveAnimationStr, blendSpeed);
-    }
-
-    private void Awake()
-    {
-        oldPos = transform.position;
-        targetPosition = oldPos;
-    }
-
-    public void Move(Vector3 pos, Vector3 forward)
-    {
-        targetPosition = pos;
-
-        //// プレイヤーの位置を補間
-        //transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
-
-        //float distance = (targetPosition - oldPos).sqrMagnitude;
-        //var sqrRunThreshold = runThreshold * runThreshold;
-        //float speed = Mathf.Clamp01(distance / sqrRunThreshold);
-
-        //float currentSpeed = PlayerAnimator.GetFloat(MoveAnimationStr);
-
-        //// 上昇時と下降時で別々にLerpの速度を調整する
-        //float blendSpeed = (speed > currentSpeed)
-        //                    ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed)
-        //                    : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
-
-        //PlayerAnimator.SetFloat(MoveAnimationStr, blendSpeed);
 
         // 現在の向きとターゲットの向きの角度を-180~180で計算
         float angle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
