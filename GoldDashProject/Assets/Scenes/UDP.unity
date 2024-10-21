@@ -2416,7 +2416,7 @@ MonoBehaviour:
   sessionPass: 9999
   numOfPlayers: 2
   ActorObject: {fileID: 5703939729677495424, guid: 8145896d58e7e6b49a27f9ce769cdd62, type: 3}
-  GoldPileObject: {fileID: 0}
+  GoldPileObject: {fileID: 4623404360768636731, guid: 9f40ff61e3be277469e7143e2a6666d1, type: 3}
 --- !u!4 &1385810819
 Transform:
   m_ObjectHideFlags: 0
