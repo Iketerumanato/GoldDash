@@ -8,6 +8,7 @@ TagManager:
   - CameraJoystick
   - MoveJoystick
   - MagicList
+  - Enemy
   layers:
   - Default
   - TransparentFX

@@ -222,6 +222,8 @@ public class Player : MonoBehaviour
     //画面を「タッチしたとき」呼ばれる。オブジェクトに触ったかどうか判定 UpdateProcess -> if (Input.GetMouseButtonDown(0))
     public void Interact()
     {
+        Debug.Log("レイ飛ばします");
+
         //カメラの位置からタッチした位置に向けrayを飛ばす
         RaycastHit hit;
         Ray ray = fpsCamera.ScreenPointToRay(Input.mousePosition);
@@ -230,9 +232,13 @@ public class Player : MonoBehaviour
         //定数INTERACTABLE_DISTANCEでrayの長さを調整することでインタラクト可能な距離を制限できる
         if (Physics.Raycast(ray, out hit, interactableDistance))
         {
+
+            Debug.Log(hit.collider.gameObject.name);
+
             switch (hit.collider.gameObject.tag)
             {
                 case "Enemy": //プレイヤーならパンチ
+                    Debug.Log("Punch入りたい");
                     Punch(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ActorController>());
                     break;
                 case "Chest": //宝箱なら開錠を試みる
@@ -250,6 +256,8 @@ public class Player : MonoBehaviour
     //パンチ。パンチを成立させたRaycastHit構造体のPointとDistanceを引数にもらおう
     private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
     {
+        Debug.Log("Punch入った");
+
         //送信用クラスを外側のスコープで宣言しておく
         ActionPacket myActionPacket;
         Header myHeader;
@@ -263,6 +271,8 @@ public class Player : MonoBehaviour
             myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
             myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             udpGameClient.Send(myHeader.ToByte());
+
+            Debug.Log("スカ送信");
         }
         else
         {
@@ -279,6 +289,9 @@ public class Player : MonoBehaviour
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
+
+
+                Debug.Log("正面送信");
             }
             else
             {
@@ -286,6 +299,9 @@ public class Player : MonoBehaviour
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_BACK, actorController.SessionID, default, punchVec);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
+
+
+                Debug.Log("背面送信");
             }
         }
     }
