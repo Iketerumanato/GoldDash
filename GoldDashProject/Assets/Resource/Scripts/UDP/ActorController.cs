@@ -21,7 +21,7 @@ public class ActorController : MonoBehaviour
     [SerializeField] float animationLerpSpeed = 70f;
     [SerializeField] float rotationSmooth = 10f;
     readonly string strMoveAnimation = "BlendSpeed";
-    readonly string strPunchTrigger = "ArmPunchTrigger";
+    readonly string strPunchTrigger = "PunchTrigger";
 
     private void Update()
     {
