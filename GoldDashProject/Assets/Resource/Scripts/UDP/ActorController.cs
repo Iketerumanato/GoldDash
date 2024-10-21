@@ -103,9 +103,10 @@ public class ActorController : MonoBehaviour
     //吹っ飛び処理
     public void Blown(Vector3 vector)
     {
+        transform.position = new Vector3(6.5f, 0f, 6.5f);
         //引数の方向にAddForceで吹っ飛ぶ
         //仮
-        float blowDistance = 3.0f;
-        transform.position += Vector3.Normalize(vector) * blowDistance;
+        //float blowDistance = 3.0f;
+        //transform.position += Vector3.Normalize(vector) * blowDistance;
     }
 }

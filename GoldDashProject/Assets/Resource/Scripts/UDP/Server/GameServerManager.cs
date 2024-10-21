@@ -315,7 +315,10 @@ public class GameServerManager : MonoBehaviour
 
                                         //所持金の計算
                                         int gold = actorDictionary[receivedActionPacket.targetID].Gold;
+                                        Debug.Log($"{actorDictionary[receivedActionPacket.targetID].name}のGold:{actorDictionary[receivedActionPacket.targetID].Gold}");
                                         int lostGold = gold / 2; //所持金半減。小数点以下切り捨て。
+                                        Debug.Log($"{actorDictionary[receivedActionPacket.targetID].name}の取得されたgold:{gold}");
+                                        Debug.Log($"{actorDictionary[receivedActionPacket.targetID].name}のLostGold:{lostGold}");
 
                                         if (lostGold == 0) break;//lostGoldが0なら処理終了
 
