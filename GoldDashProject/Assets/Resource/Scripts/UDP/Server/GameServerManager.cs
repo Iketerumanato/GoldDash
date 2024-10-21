@@ -20,9 +20,8 @@ public class GameServerManager : MonoBehaviour
     private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを管理
     private Dictionary<ushort, Entity> entityDictionary; //entityIDを鍵としてentityインスタンスを管理
 
-    private HashSet<ushort> usedSessionID; //sessionIDの重複防止に使う。使用済IDを記録して新規発行時にはcontainsで調べる
     private HashSet<string> usedName; //プレイヤーネームの重複防止に使う。
-    private HashSet<ushort> usedEntityID; //プレイヤーネームの重複防止に使う。
+    private HashSet<ushort> usedEntityID; //EntityIDの重複防止に使う。
 
     [SerializeField] private ushort sessionPass; //サーバーに入るためのパスワード。udpGameServerのコンストラクタに渡す。
     [SerializeField] private int numOfPlayers; //何人のプレイヤーを募集するか
@@ -56,7 +55,6 @@ public class GameServerManager : MonoBehaviour
                 udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
                 rcvPort = udpGameServer.GetReceivePort(); //受信用ポート番号とサーバーのセッションIDがここで決まるので取得
                 serverSessionID = udpGameServer.GetServerSessionID();
-                usedSessionID.Add(serverSessionID); //サーバーIDを使用済に
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
                 if (udpGameServer == null) udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
@@ -82,12 +80,8 @@ public class GameServerManager : MonoBehaviour
         actorDictionary = new Dictionary<ushort, ActorController>();
         entityDictionary = new Dictionary<ushort, Entity>();
 
-        usedSessionID = new HashSet<ushort>();
         usedName = new HashSet<string>();
         usedEntityID = new HashSet<ushort>();
-
-        //sessionIDについて、0はsessionIDを持っていないクライアントを表すナンバーなので、予め使用済にしておく。
-        usedSessionID.Add(0);
 
         inGame = false;
 
@@ -182,7 +176,6 @@ public class GameServerManager : MonoBehaviour
                         //アクター辞書に登録
                         actorDictionary.Add(receivedHeader.sessionID, actorController);
 
-                        usedSessionID.Add(receivedHeader.sessionID); //このIDを使用済にする
                         usedName.Add(receivedInitPacket.playerName); //登録したプレイヤーネームを使用済にする
 
                         //TODO 送信番号の記録開始
