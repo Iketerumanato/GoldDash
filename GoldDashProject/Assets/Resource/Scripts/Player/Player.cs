@@ -133,7 +133,7 @@ public class Player : MonoBehaviour
             float inputMagnitude = input.magnitude;
             float currentBlendSpeed = playerAnimator.GetFloat(strPlayerBlend);
             float newBlendSpeed = Mathf.Lerp(currentBlendSpeed, inputMagnitude, Time.deltaTime * smoothSpeed); // 補間速度調整
-            playerAnimator.SetFloat("BlendSpeed", newBlendSpeed);
+            playerAnimator.SetFloat(strPlayerBlend, newBlendSpeed);
         }
         else
         {
