@@ -216,7 +216,7 @@ public class Player : MonoBehaviour
                     Punch(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ActorController>());
                     break;
                 case "Chest": //宝箱なら開錠を試みる
-                    TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ChestController>());
+                    TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
                     break;
                 
                 //ドアをタッチで開けるならココ
@@ -267,7 +267,7 @@ public class Player : MonoBehaviour
     }
 
     //宝箱なら開錠を試みる。パンチと同様RaycastHit構造体から引数をもらう。消えゆく宝箱だったり、他プレイヤーが使用中の宝箱は開錠できない。
-    private void TryOpenChest(Vector3 hitPoint, float distance, ChestController chestController)
+    private void TryOpenChest(Vector3 hitPoint, float distance, Chest chestController)
     {
         //既に空いていないたらなにもしない
 

@@ -2,17 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GoldPile : MonoBehaviour
+public class GoldPile : Entity
 {
-    // Start is called before the first frame update
-    void Start()
+    public int Value { set; get; } //この金貨の山に触れたとき入手できるゴールド
+
+    public override void Init()
     {
-        
+
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void Activate()
     {
-        
+    }
+
+    public override void Destroy()
+    {
     }
 }

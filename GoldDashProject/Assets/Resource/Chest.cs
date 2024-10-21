@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChestController : Entity
+public class Chest : Entity
 {
     public override void Init()
     {

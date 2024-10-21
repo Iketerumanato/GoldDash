@@ -29,6 +29,7 @@ public class GameClientManager : MonoBehaviour
 
     [SerializeField] private GameObject ActorObject; //アクターのプレハブ
     [SerializeField] private GameObject PlayerObject; //プレイヤーのプレハブ
+    [SerializeField] private GameObject GoldPileObject; //金貨の山のプレハブ
 
     private bool inGame; //ゲームは始まっているか
 
@@ -236,11 +237,11 @@ public class GameClientManager : MonoBehaviour
                                         break;
                                     #endregion
                                     case (byte)Definer.EDID.PUNCH:
-                                        if (receivedActionPacket.targetID == this.sessionID) break; //自分が行ったパンチなら無視
+                                        if (receivedActionPacket.targetID == this.sessionID) break; //プレイヤーが行ったパンチなら無視
                                         actorDictionary[receivedActionPacket.targetID].PunchAnimation();
                                         break;
                                     case (byte)Definer.EDID.HIT_FRONT:
-                                        //殴られたのが自分なら
+                                        //殴られたのがプレイヤーなら
                                         if (receivedActionPacket.targetID == this.sessionID)
                                         {
                                             //プレイヤー側で演出
@@ -252,7 +253,7 @@ public class GameClientManager : MonoBehaviour
                                         }
                                         break;
                                     case (byte)Definer.EDID.HIT_BACK:
-                                        //殴られたのが自分なら
+                                        //殴られたのがプレイヤーなら
                                         if (receivedActionPacket.targetID == this.sessionID)
                                         {
                                             //プレイヤー側で演出
@@ -263,6 +264,22 @@ public class GameClientManager : MonoBehaviour
                                             //他人が殴られたならモーション同期。吹っ飛びの同期はPositionPacketで自動的になされる
                                             actorDictionary[receivedActionPacket.targetID].BlownAnimation();
                                         }
+                                        break;
+                                    case (byte)Definer.EDID.EDIT_GOLD:
+                                        //所持金変更の対象がプレイヤーなら
+                                        if (receivedActionPacket.targetID == this.sessionID)
+                                        {
+                                            //プレイヤー側で演出
+                                        }
+                                        //指定されたアクターの所持金を編集
+                                        actorDictionary[receivedActionPacket.targetID].Gold += receivedActionPacket.value;
+                                        break;
+                                    case (byte)Definer.EDID.SPAWN_GOLDPILE:
+                                        //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                        GoldPile goldPile = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
+                                        entityDictionary.Add(receivedActionPacket.targetID, goldPile); //管理用のIDと共に辞書へ
+                                        goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
+                                        goldPile.Value = receivedActionPacket.value; //金額設定
                                         break;
                                 }
                                 break;
