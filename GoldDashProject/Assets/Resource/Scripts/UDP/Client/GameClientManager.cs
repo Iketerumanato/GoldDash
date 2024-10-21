@@ -10,26 +10,26 @@ public class GameClientManager : MonoBehaviour
     private bool isRunning; //稼働中か
 
     private UdpGameClient udpGameClient; //UdpCommunicatorを継承したUdpGameClientのインスタンス
-
     private Queue<Header> packetQueue; //udpGameClientは”勝手に”このキューにパケットを入れてくれる。不正パケット処理なども済んだ状態で入る。
 
     [SerializeField] private ushort sessionPass; //サーバーに接続するためのパスコード
-
     [SerializeField] private ushort initSessionPass; //初回通信時、サーバーからの返信が安全なものか判別するためのパスコード。今後乱数化する
-
     [SerializeField] private string myName; //仮です。登録に使うプレイヤーネーム
 
     private ushort sessionID; //自分のセッションID。サーバー側で決めてもらう。
 
     private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを保管。自分以外のプレイヤー（アクター）のセッションIDも記録していく
+    private Dictionary<ushort, Entity> entityDictionary; //entityIDを鍵としてentityインスタンスを管理
 
     private ActorController playerActor; //プレイヤーが操作するキャラクターのActorController
+
 
     private int numOfActors; //アクターの人数
     private int preparedActors; //生成し終わったアクターの数
 
     [SerializeField] private GameObject ActorObject; //アクターのプレハブ
     [SerializeField] private GameObject PlayerObject; //プレイヤーのプレハブ
+    [SerializeField] private GameObject GoldPileObject; //金貨の山のプレハブ
 
     private bool inGame; //ゲームは始まっているか
 
@@ -83,6 +83,7 @@ public class GameClientManager : MonoBehaviour
 
         packetQueue = new Queue<Header>();
         actorDictionary = new Dictionary<ushort, ActorController>();
+        entityDictionary = new Dictionary<ushort, Entity>();
 
         Task.Run(() => ProcessPacket());
         Task.Run(() => SendPlayerPosition());
@@ -100,7 +101,7 @@ public class GameClientManager : MonoBehaviour
         while (true) 
         {
             //プレイヤーアクターの座標をMOVで送信
-            myActionPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, playerActor.transform.position, playerActor.transform.forward);
+            myActionPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, default, playerActor.transform.position, playerActor.transform.forward);
             myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             udpGameClient.Send(myHeader.ToByte());
 
@@ -192,7 +193,7 @@ public class GameClientManager : MonoBehaviour
                                 switch (receivedActionPacket.detailID)
                                 {
                                     #region case (byte)Definer.EDID.SPAWN:の場合
-                                    case (byte)Definer.EDID.SPAWN:
+                                    case (byte)Definer.EDID.SPAWN_ACTOR:
                                         //アクターをスポーンさせる
 
                                         //ActorControllerインスタンスを作りDictionaryに加える
@@ -236,11 +237,11 @@ public class GameClientManager : MonoBehaviour
                                         break;
                                     #endregion
                                     case (byte)Definer.EDID.PUNCH:
-                                        if (receivedActionPacket.targetID == this.sessionID) break; //自分が行ったパンチなら無視
+                                        if (receivedActionPacket.targetID == this.sessionID) break; //プレイヤーが行ったパンチなら無視
                                         actorDictionary[receivedActionPacket.targetID].PunchAnimation();
                                         break;
                                     case (byte)Definer.EDID.HIT_FRONT:
-                                        //殴られたのが自分なら
+                                        //殴られたのがプレイヤーなら
                                         if (receivedActionPacket.targetID == this.sessionID)
                                         {
                                             //プレイヤー側で演出
@@ -252,7 +253,7 @@ public class GameClientManager : MonoBehaviour
                                         }
                                         break;
                                     case (byte)Definer.EDID.HIT_BACK:
-                                        //殴られたのが自分なら
+                                        //殴られたのがプレイヤーなら
                                         if (receivedActionPacket.targetID == this.sessionID)
                                         {
                                             //プレイヤー側で演出
@@ -263,6 +264,22 @@ public class GameClientManager : MonoBehaviour
                                             //他人が殴られたならモーション同期。吹っ飛びの同期はPositionPacketで自動的になされる
                                             actorDictionary[receivedActionPacket.targetID].BlownAnimation();
                                         }
+                                        break;
+                                    case (byte)Definer.EDID.EDIT_GOLD:
+                                        //所持金変更の対象がプレイヤーなら
+                                        if (receivedActionPacket.targetID == this.sessionID)
+                                        {
+                                            //プレイヤー側で演出
+                                        }
+                                        //指定されたアクターの所持金を編集
+                                        actorDictionary[receivedActionPacket.targetID].Gold += receivedActionPacket.value;
+                                        break;
+                                    case (byte)Definer.EDID.SPAWN_GOLDPILE:
+                                        //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                        GoldPile goldPile = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
+                                        entityDictionary.Add(receivedActionPacket.targetID, goldPile); //管理用のIDと共に辞書へ
+                                        goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
+                                        goldPile.Value = receivedActionPacket.value; //金額設定
                                         break;
                                 }
                                 break;

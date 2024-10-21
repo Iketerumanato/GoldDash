@@ -13,27 +13,22 @@ public class GameServerManager : MonoBehaviour
 
     //GameServer関連のインスタンスがDisposeメソッド以外で破棄されることは想定していない。そのときはおしまいだろう。
     private UdpGameServer udpGameServer; //UdpCommunicatorを継承したUdpGameServerのインスタンス
-
-    private ushort rcvPort; //udPGameServerの受信用ポート番号
-
+    private ushort rcvPort; //udpGameServerの受信用ポート番号
     private ushort serverSessionID; //クライアントにサーバーを判別させるためのID
-
     private Queue<Header> packetQueue; //udpGameServerは”勝手に”このキューにパケットを入れてくれる。不正パケット処理なども済んだ状態で入る。
 
-    [SerializeField] private ushort sessionPass; //サーバーに入るためのパスワード。udpGameServerのコンストラクタに渡す。
-
-    private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを保管
-
-    private HashSet<ushort> usedID; //sessionIDの重複防止に使う。使用済IDを記録して新規発行時にはcontainsで調べる
+    private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを管理
+    private Dictionary<ushort, Entity> entityDictionary; //entityIDを鍵としてentityインスタンスを管理
 
     private HashSet<string> usedName; //プレイヤーネームの重複防止に使う。
+    private HashSet<ushort> usedEntityID; //EntityIDの重複防止に使う。
 
+    [SerializeField] private ushort sessionPass; //サーバーに入るためのパスワード。udpGameServerのコンストラクタに渡す。
     [SerializeField] private int numOfPlayers; //何人のプレイヤーを募集するか
     private int preparedPlayers; //準備が完了したプレイヤーの数
 
-    //private Dictionary<ushort, uint> sendNums; //各セッションIDを鍵として、送信番号を記録。受信管理（パケロス処理）はUDPGameServerでやる
-
     [SerializeField] private GameObject ActorObject; //アクターのプレハブ
+    [SerializeField] private GameObject GoldPileObject; //金貨の山のプレハブ
 
     private bool inGame; //ゲームは始まっているか
 
@@ -61,7 +56,6 @@ public class GameServerManager : MonoBehaviour
                 udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
                 rcvPort = udpGameServer.GetReceivePort(); //受信用ポート番号とサーバーのセッションIDがここで決まるので取得
                 serverSessionID = udpGameServer.GetServerSessionID();
-                usedID.Add(serverSessionID); //サーバーIDを使用済に
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
                 if (udpGameServer == null) udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
@@ -85,13 +79,10 @@ public class GameServerManager : MonoBehaviour
     {
         packetQueue = new Queue<Header>();
         actorDictionary = new Dictionary<ushort, ActorController>();
-        usedID = new HashSet<ushort>();
+        entityDictionary = new Dictionary<ushort, Entity>();
+
         usedName = new HashSet<string>();
-
-        //sendNums = new Dictionary<ushort, uint>();
-
-        //sessionIDについて、0はsessionIDを持っていないクライアントを表すナンバーなので、予め使用済にしておく。
-        usedID.Add(0);
+        usedEntityID = new HashSet<ushort>();
 
         inGame = false;
 
@@ -133,6 +124,10 @@ public class GameServerManager : MonoBehaviour
         InitPacketServer myInitPacket;
         ActionPacket myActionPacket;
         Header myHeader;
+        //オブジェクト生成用の変数を外側のスコープで宣言しておく
+        GameObject gameObject;
+        ushort entityID;
+        Entity entity;
 
         while (true)
         {
@@ -186,7 +181,6 @@ public class GameServerManager : MonoBehaviour
                         //アクター辞書に登録
                         actorDictionary.Add(receivedHeader.sessionID, actorController);
 
-                        usedID.Add(receivedHeader.sessionID); //このIDを使用済にする
                         usedName.Add(receivedInitPacket.playerName); //登録したプレイヤーネームを使用済にする
 
                         //TODO 送信番号の記録開始
@@ -230,7 +224,7 @@ public class GameServerManager : MonoBehaviour
                             foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
                             {
                                 //リスポーン地点を参照しながら各プレイヤーの名前とIDを載せてアクター生成命令を飛ばす
-                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN, k.Key, respawnPoints[index], default, k.Value.PlayerName);
+                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_ACTOR, k.Key, default, respawnPoints[index], default, k.Value.PlayerName);
                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                 udpGameServer.Send(myHeader.ToByte());
                                 index++;
@@ -313,15 +307,47 @@ public class GameServerManager : MonoBehaviour
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
                                         //被パンチ者に通達
-                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.HIT_BACK, receivedActionPacket.targetID, receivedActionPacket.pos);
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.HIT_BACK, receivedActionPacket.targetID, default, receivedActionPacket.pos);
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
+
+                                        //所持金の計算
+                                        int gold = actorDictionary[receivedActionPacket.targetID].Gold;
+                                        int lostGold = gold / 2; //所持金半減。小数点以下切り捨て。
+
+                                        if (lostGold == 0) break;//lostGoldが0なら処理終了
+
+                                        //被パンチ者の所持金を減らす
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedActionPacket.targetID, -lostGold);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+
+                                        //重複しないentityIDを作り、オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                        entityID = GetUniqueEntityID();
+                                        gameObject = Instantiate(GoldPileObject, actorDictionary[receivedActionPacket.targetID].transform.position, Quaternion.identity);
+                                        entityDictionary.Add(entityID, gameObject.GetComponent<GoldPile>());
+
+                                        //値を書き込み
+                                        entityDictionary[entityID].EntityID = entityID;
+                                        gameObject.GetComponent<GoldPile>().Value = lostGold; //ここ、Dictionaryからvalue取ってGoldPileにキャストしてプロパティ参照する動きが1行ではできないので強引に。
+
+                                        //金額を指定して、殴られた人の足元に金貨の山を生成する命令
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, lostGold, actorDictionary[receivedActionPacket.targetID].transform.position);
+                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                        udpGameServer.Send(myHeader.ToByte());
+                                        break;
+                                    case (byte)Definer.REID.GET_GOLDPILE:
+                                        //エンティティが存在するか確かめる。存在しないなら何もしない。エラーコードも返さない。エラーコードを返すとチーターは喜ぶ
+                                        if (entityDictionary.TryGetValue(receivedActionPacket.targetID, out entity))
+                                        {
+                                            //存在するなら入手したプレイヤーにゴールドを振り込む
+
+                                        }
                                         break;
                                 }
                                 break;
                             #endregion
                         }
-
                         break;
                     #endregion
                     default:
@@ -332,5 +358,17 @@ public class GameServerManager : MonoBehaviour
         }
     }
 
-    public Dictionary<ushort, ActorController> PropertyActorDictionary { get { return actorDictionary; } }
+    //重複しないentityIDを作る
+    private ushort GetUniqueEntityID()
+    {
+        ushort entityID;
+        do
+        {
+            System.Random random = new System.Random(); //UnityEngine.Randomはマルチスレッドで使用できないのでSystemを使う
+            entityID = (ushort)random.Next(0, 65535); //0から65535までの整数を生成して2バイトにキャスト
+        }
+        while (usedEntityID.Contains(entityID)); //使用済IDと同じ値を生成してしまったならやり直し
+        usedEntityID.Add(entityID); //このIDは使用済にする。
+        return entityID;
+    }
 }
