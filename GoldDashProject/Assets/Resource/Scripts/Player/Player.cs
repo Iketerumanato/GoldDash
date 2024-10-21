@@ -21,6 +21,10 @@ public class NormalState : IPlayerState
     {
         player.MovePlayerJoystick(inputVector);
         player.MoveKey();
+        if (Input.GetMouseButtonDown(0))
+        {
+            player.Interact();
+        }
     }
 
     public void ExitState(Player player)
@@ -65,7 +69,7 @@ public class Player : MonoBehaviour
     [SerializeField] float punchReachableDistance = 1f;
 
     [Header("正面から左右に何度までをキャラクターの正面と見做すか")]
-    [SerializeField] float flontRange = 120f; //例えばこの値が一時的に180になれば、敵をどの角度からパンチしても金を奪える状態になる
+    [SerializeField] float flontRange = 120f; //例えばこの値が一時的に0になれば、敵をどの角度からパンチしても金を奪える状態になる
 
     [Header("移動速度")]
     [SerializeField] float moveSpeed = 0.1f;
@@ -216,7 +220,7 @@ public class Player : MonoBehaviour
     //以下UIの操作などで呼び出されるメソッド。R3でやろっかな
 
     //画面を「タッチしたとき」呼ばれる。オブジェクトに触ったかどうか判定 UpdateProcess -> if (Input.GetMouseButtonDown(0))
-    private void Interact(GameObject obj)
+    public void Interact()
     {
         //カメラの位置からタッチした位置に向けrayを飛ばす
         RaycastHit hit;
@@ -232,7 +236,7 @@ public class Player : MonoBehaviour
                     Punch(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ActorController>());
                     break;
                 case "Chest": //宝箱なら開錠を試みる
-                    TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
+                    //TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
                     break;
                 
                 //ドアをタッチで開けるならココ

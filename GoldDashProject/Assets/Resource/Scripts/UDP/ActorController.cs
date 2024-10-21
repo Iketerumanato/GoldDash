@@ -10,7 +10,7 @@ public class ActorController : MonoBehaviour
     //プロパティ
     public string PlayerName { set; get; }
     public ushort SessionID { set; get; } //MonoBehaviourからすると、いちいちDictionaryからIDを取るより目の前のアクターのIDを取得した方が速そうなので
-    public int Gold { set; get; } = 0; //所持金
+    public int Gold { set; get; } = 100; //所持金
 
     private Vector3 targetPosition;
     private Vector3 oldPos;
