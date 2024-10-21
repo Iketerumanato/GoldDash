@@ -329,7 +329,7 @@ public class GameServerManager : MonoBehaviour
 
                                         //値を書き込み
                                         entityDictionary[entityID].EntityID = entityID;
-                                        gameObject.GetComponent<GoldPile>().Value = lostGold; //ここ、Dictionaryからvalue取ってGoldPileにキャストしてプロパティ参照する動きが1行ではできないので強引に。
+                                        entityDictionary[entityID].Value = lostGold;
 
                                         //金額を指定して、殴られた人の足元に金貨の山を生成する命令
                                         myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, lostGold, actorDictionary[receivedActionPacket.targetID].transform.position);
@@ -341,7 +341,10 @@ public class GameServerManager : MonoBehaviour
                                         if (entityDictionary.TryGetValue(receivedActionPacket.targetID, out entity))
                                         {
                                             //存在するなら入手したプレイヤーにゴールドを振り込む
-
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, entityDictionary[receivedActionPacket.targetID].Value);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
+                                            //その金貨の山を消す
                                         }
                                         break;
                                 }
