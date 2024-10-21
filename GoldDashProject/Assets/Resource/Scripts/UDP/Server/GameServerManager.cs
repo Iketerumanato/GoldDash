@@ -125,7 +125,6 @@ public class GameServerManager : MonoBehaviour
         ActionPacket myActionPacket;
         Header myHeader;
         //オブジェクト生成用の変数を外側のスコープで宣言しておく
-        GameObject gameObject;
         ushort entityID;
         Entity entity;
 
@@ -324,11 +323,9 @@ public class GameServerManager : MonoBehaviour
 
                                         //重複しないentityIDを作り、オブジェクトを生成しつつ、エンティティのコンポーネントを取得
                                         entityID = GetUniqueEntityID();
-                                        gameObject = Instantiate(GoldPileObject, actorDictionary[receivedActionPacket.targetID].transform.position, Quaternion.identity);
-                                        entityDictionary.Add(entityID, gameObject.GetComponent<GoldPile>());
-
-                                        //値を書き込み
-                                        entityDictionary[entityID].EntityID = entityID;
+                                        entity = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
+                                        entityDictionary.Add(entityID, entity); //管理用のIDと共に辞書へ
+                                        entityDictionary[entityID].EntityID = entityID; //値を書き込み
                                         entityDictionary[entityID].Value = lostGold;
 
                                         //金額を指定して、殴られた人の足元に金貨の山を生成する命令
@@ -341,7 +338,7 @@ public class GameServerManager : MonoBehaviour
                                         if (entityDictionary.TryGetValue(receivedActionPacket.targetID, out entity))
                                         {
                                             //存在するなら入手したプレイヤーにゴールドを振り込む
-                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, entityDictionary[receivedActionPacket.targetID].Value);
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, entity.Value);
                                             myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameServer.Send(myHeader.ToByte());
                                             //その金貨の山を消す

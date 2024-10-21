@@ -114,6 +114,8 @@ public class GameClientManager : MonoBehaviour
         //返信用クラスを外側のスコープで宣言しておく
         ActionPacket myActionPacket;
         Header myHeader;
+        //オブジェクト生成用の変数を外側のスコープで宣言しておく
+        Entity entity;
 
         while (true)
         {
@@ -276,10 +278,10 @@ public class GameClientManager : MonoBehaviour
                                         break;
                                     case (byte)Definer.EDID.SPAWN_GOLDPILE:
                                         //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
-                                        GoldPile goldPile = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
-                                        entityDictionary.Add(receivedActionPacket.targetID, goldPile); //管理用のIDと共に辞書へ
-                                        goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
-                                        goldPile.Value = receivedActionPacket.value; //金額設定
+                                        entity = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
+                                        entityDictionary.Add(receivedActionPacket.targetID, entity); //管理用のIDと共に辞書へ
+                                        entity.EntityID = receivedActionPacket.targetID; //ID割り当て
+                                        entity.Value = receivedActionPacket.value; //金額設定
                                         break;
                                 }
                                 break;
