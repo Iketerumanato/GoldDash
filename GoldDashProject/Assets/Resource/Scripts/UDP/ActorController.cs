@@ -10,7 +10,7 @@ public class ActorController : MonoBehaviour
     //プロパティ
     public string PlayerName { set; get; }
     public ushort SessionID { set; get; } //MonoBehaviourからすると、いちいちDictionaryからIDを取るより目の前のアクターのIDを取得した方が速そうなので
-    public int Gold { set; get; } = 100; //所持金
+    public int Gold { set; get; } = 0; //所持金
 
     private Vector3 targetPosition;
     private Vector3 oldPos;
@@ -29,15 +29,13 @@ public class ActorController : MonoBehaviour
         targetPosition = oldPos;
     }
 
-    public void Move(Vector3 pos, Vector3 forward)
+    private void Update()
     {
-        targetPosition = pos;
-
         // プレイヤーの位置を補間
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
         float distance = (targetPosition - oldPos).sqrMagnitude;
-        var sqrRunThreshold = runThreshold * runThreshold;
+        float sqrRunThreshold = runThreshold * runThreshold;
         float speed = Mathf.Clamp01(distance / sqrRunThreshold);
 
         float currentSpeed = PlayerAnimator.GetFloat(MoveAnimationStr);
@@ -47,7 +45,12 @@ public class ActorController : MonoBehaviour
                             ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed)
                             : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
 
-        PlayerAnimator.SetFloat(MoveAnimationStr, blendSpeed);
+        MoveAnimation(blendSpeed);
+    }
+
+    public void Move(Vector3 pos, Vector3 forward)
+    {
+        targetPosition = pos;
 
         // 現在の向きとターゲットの向きの角度を-180~180で計算
         float angle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
@@ -75,6 +78,12 @@ public class ActorController : MonoBehaviour
     }
     
     //モーション関連
+    public void MoveAnimation(float blendSpeed)
+    {
+        PlayerAnimator.SetFloat(MoveAnimationStr, blendSpeed);
+    }
+
+
     public void PunchAnimation()
     { 
         //パンチモーション再生
