@@ -22,6 +22,10 @@ public class ActorController : MonoBehaviour
     [SerializeField] float rotationSmooth = 10f;
     readonly string MoveAnimationStr = "BlendSpeed";
 
+    private void Update()
+    {
+        Debug.Log(Gold);
+    }
 
     private void Awake()
     {

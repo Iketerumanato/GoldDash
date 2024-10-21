@@ -283,6 +283,9 @@ public class GameServerManager : MonoBehaviour
                             #endregion
                             #region (byte)Definer.RID.REQ: Requestの場合
                             case (byte)Definer.RID.REQ:
+
+                                Debug.Log($"REQ受信:{(Definer.REID)receivedActionPacket.detailID}");
+
                                 switch (receivedActionPacket.detailID)
                                 {
                                     case (byte)Definer.REID.MISS: //空振り
