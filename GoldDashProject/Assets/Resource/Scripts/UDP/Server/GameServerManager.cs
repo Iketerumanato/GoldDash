@@ -340,10 +340,11 @@ public class GameServerManager : MonoBehaviour
 
                                         Debug.Log("ID書き込み");
                                         //Debug.Log(entityDictionary.TryGetValue(entityID, out entity));
-                                        Debug.Log(gp.EntityID);
-                                        Debug.Log(entityDictionary[entityID].EntityID);
+                                        Debug.Log(gp.test);
 
-                                        entityDictionary[entityID].EntityID = entityID; //値を書き込み
+                                        //Debug.Log(entityDictionary[entityID].test);
+
+                                        //entityDictionary[entityID].EntityID; //値を書き込み
                                         Debug.Log("金額書き込み");
                                         entityDictionary[entityID].Value = lostGold;
 

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GoldPile : Entity
 {
+    public ushort test;
+
     public override void Init()
     {
 
