@@ -316,8 +316,8 @@ public class GameServerManager : MonoBehaviour
                                         myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedActionPacket.targetID, -lostGold);
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
-                                        //重複しないentityIDを作り、金額を指定して金貨の山を生成
-                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, GetUniqueEntityID(), lostGold);
+                                        //重複しないentityIDを作り、金額を指定して、殴られた人の足元に金貨の山を生成
+                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, GetUniqueEntityID(), lostGold, actorDictionary[receivedActionPacket.targetID].transform.position);
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                         udpGameServer.Send(myHeader.ToByte());
                                         break;
