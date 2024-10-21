@@ -25,6 +25,8 @@ public class ActorController : MonoBehaviour
     private void Update()
     {
         Debug.Log(Gold);
+        // プレイヤーの位置を補間
+        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
         float distance = (targetPosition - oldPos).sqrMagnitude;
         var sqrRunThreshold = runThreshold * runThreshold;
@@ -51,7 +53,7 @@ public class ActorController : MonoBehaviour
         targetPosition = pos;
 
         //// プレイヤーの位置を補間
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
+        //transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
         //float distance = (targetPosition - oldPos).sqrMagnitude;
         //var sqrRunThreshold = runThreshold * runThreshold;
