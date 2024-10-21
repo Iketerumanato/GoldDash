@@ -105,7 +105,7 @@ public class GameClientManager : MonoBehaviour
             myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             udpGameClient.Send(myHeader.ToByte());
 
-            await UniTask.Delay(100);
+            await UniTask.Delay(1000);
         }
     }
 
