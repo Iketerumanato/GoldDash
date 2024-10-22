@@ -281,8 +281,7 @@ public class GameClientManager : MonoBehaviour
                                         //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
                                         //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
                                         {
-                                            GoldPile goldPile;
-                                            goldPile = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
+                                            GoldPile goldPile = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
                                             entityDictionary.Add(receivedActionPacket.targetID, goldPile); //管理用のIDと共に辞書へ
                                             goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
                                             goldPile.Value = receivedActionPacket.value; //金額設定

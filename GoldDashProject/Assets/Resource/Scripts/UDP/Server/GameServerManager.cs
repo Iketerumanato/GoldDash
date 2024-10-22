@@ -333,16 +333,17 @@ public class GameServerManager : MonoBehaviour
                                         //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
                                         {
                                             entityID = GetUniqueEntityID();
-                                            GoldPile goldPile = Instantiate(GoldPileObject, actorDictionary[receivedActionPacket.targetID].transform.position, Quaternion.identity).GetComponent<GoldPile>();
+                                            Vector3 goldPos = new Vector3(actorDictionary[receivedActionPacket.targetID].transform.position.x, 0, actorDictionary[receivedActionPacket.targetID].transform.position.z);
+                                            GoldPile goldPile = Instantiate(GoldPileObject, goldPos, Quaternion.identity).GetComponent<GoldPile>();
                                             goldPile.EntityID = entityID; //値を書き込み
                                             goldPile.Value = lostGold;
                                             entityDictionary.Add(entityID, goldPile); //管理用のIDと共に辞書へ
-                                        }
 
-                                        //金額を指定して、殴られた人の足元に金貨の山を生成する命令
-                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, lostGold, actorDictionary[receivedActionPacket.targetID].transform.position);
-                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                        udpGameServer.Send(myHeader.ToByte());
+                                            //金額を指定して、殴られた人の足元に金貨の山を生成する命令
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, lostGold, goldPos);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
+                                        }
                                         break;
                                     case (byte)Definer.REID.GET_GOLDPILE:
                                         //エンティティが存在するか確かめる。存在しないなら何もしない。エラーコードも返さない。エラーコードを返すとチーターは喜ぶ
