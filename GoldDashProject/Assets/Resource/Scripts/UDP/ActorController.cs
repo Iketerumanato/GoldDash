@@ -22,9 +22,16 @@ public class ActorController : MonoBehaviour
     [SerializeField] float rotationSmooth = 10f;
     readonly string MoveAnimationStr = "BlendSpeed";
 
+    int DebugCoolDown = 120;
+    int cd;
     private void Update()
     {
-        Debug.Log(Gold);
+        if (cd >= DebugCoolDown)
+        {
+            Debug.Log(Gold);
+            cd = 0;
+        } 
+        else cd++;
     }
 
     private void Awake()

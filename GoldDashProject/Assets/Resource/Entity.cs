@@ -5,7 +5,6 @@ using UnityEngine;
 public abstract class Entity : MonoBehaviour
 {
     public ushort EntityID; //サーバーから割り振られたID。
-    public int Value { set; get; } //整数でデータが必要ならここに格納
 
     public abstract void Init(); //初期化する。変数の初期化など
 
