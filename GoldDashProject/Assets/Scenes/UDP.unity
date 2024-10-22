@@ -1289,7 +1289,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 7
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2415,6 +2415,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sessionPass: 9999
   numOfPlayers: 1
+  maxNumOfChests: 10
   ActorPrefab: {fileID: 5703939729677495424, guid: 8145896d58e7e6b49a27f9ce769cdd62, type: 3}
   GoldPilePrefab: {fileID: 4623404360768636731, guid: 9f40ff61e3be277469e7143e2a6666d1, type: 3}
   ChestPrefab: {fileID: 5283063881264726642, guid: f99816d4e2a842047bc8f89cd40346a8, type: 3}
