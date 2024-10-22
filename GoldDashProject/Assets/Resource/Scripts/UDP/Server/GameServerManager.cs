@@ -156,15 +156,15 @@ public class GameServerManager : MonoBehaviour
                         InitPacketClient receivedInitPacket = new InitPacketClient(receivedHeader.data);
 
                         //送られてきたプレイヤーネームが使用済ならエラーコード1番を返す。sessionIDは登録しない。
-                        if (usedName.Contains(receivedInitPacket.playerName))
-                        {
-                            myInitPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID, 1);
-                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, myInitPacket.ToByte());
-                            udpGameServer.Send(myHeader.ToByte());
+                        //if (usedName.Contains(receivedInitPacket.playerName))
+                        //{
+                        //    myInitPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID, 1);
+                        //    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, myInitPacket.ToByte());
+                        //    udpGameServer.Send(myHeader.ToByte());
 
-                            Debug.Log($"プレイヤーネーム:{receivedInitPacket.playerName} は既に使われていたぜ。出直してもらうぜ。");
-                            break;
-                        }
+                        //    Debug.Log($"プレイヤーネーム:{receivedInitPacket.playerName} は既に使われていたぜ。出直してもらうぜ。");
+                        //    break;
+                        //}
                         //TODO プレイヤーが規定人数集まっていたらエラーコード2番
 
                         //ActorControllerインスタンスを作りDictionaryに加える

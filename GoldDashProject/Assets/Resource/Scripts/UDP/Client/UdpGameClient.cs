@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 public class UdpGameClient : UdpCommnicator
 {
     private const int BROADCAST_RANGE = 4; //ブロードキャスト送信時相手のポート番号がわからないのでSTART_PORT番～START_PORT + BROADCAST_RANGE番までのポートに一つずつ送って反応を伺う
-    private const int WAIT_RESPONSE_TIME = 1000; //ブロードキャスト送信時、リモートコンピュータからのレスポンスをWAIT_RESPONSE_TIMEミリ秒待ち、レスポンスがなければ新たなポートにブロードキャスト送信をする
+    private const int WAIT_RESPONSE_TIME = 100; //ブロードキャスト送信時、リモートコンピュータからのレスポンスをWAIT_RESPONSE_TIMEミリ秒待ち、レスポンスがなければ新たなポートにブロードキャスト送信をする
     private const int NUM_OF_RETRY_BROADCAST = 2; //ブロードキャスト送信時、リモートコンピュータからのレスポンスが確認できなかったときNUM_OF_RETRY_BROADCAST回再送する
 
     protected ushort initSessionPass; //初回通信時にプレイヤー側から送るセッションパス。得られたレスポンスがサーバーからのものであると断定するときに使う。その後は使わない。
