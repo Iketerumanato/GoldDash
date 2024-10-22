@@ -241,7 +241,7 @@ public class GameClientManager : MonoBehaviour
                                     #endregion
                                     case (byte)Definer.EDID.PUNCH:
                                         if (receivedActionPacket.targetID == this.sessionID) break; //プレイヤーが行ったパンチなら無視
-                                        actorDictionary[receivedActionPacket.targetID].PlayPunchAnimation();
+                                        actorDictionary[receivedActionPacket.targetID].PunchAnimation();
                                         break;
                                     case (byte)Definer.EDID.HIT_FRONT:
                                         //殴られたのがプレイヤーなら

@@ -85,7 +85,7 @@ public class ActorController : MonoBehaviour
         PlayerAnimator.SetFloat(strMoveAnimation, blendSpeed);
     }
 
-    public void PlayPunchAnimation()
+    public void PunchAnimation()
     {
         PlayerAnimator.SetTrigger(strPunchTrigger);
     }

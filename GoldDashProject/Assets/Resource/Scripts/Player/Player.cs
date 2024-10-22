@@ -248,7 +248,6 @@ public class Player : MonoBehaviour
     private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
     {
         Debug.Log("Punch入った");
-        playerAnimator.SetTrigger(strPunchTrigger);
 
         //送信用クラスを外側のスコープで宣言しておく
         ActionPacket myActionPacket;
@@ -257,8 +256,8 @@ public class Player : MonoBehaviour
         //distanceを調べてしきい値を調べる
         if (distance > punchReachableDistance)
         {
-            //射程外なら一人称のスカモーション再生
-
+            //射程外なら一人称のスカモーション再生(現在通常のパンチのモーションを再生)
+            playerAnimator.SetTrigger(strPunchTrigger);
             //スカしたことをパケット送信
             myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
             myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
@@ -269,6 +268,7 @@ public class Player : MonoBehaviour
         else
         {
             //射程内なら一人称のパンチモーション再生
+            playerAnimator.SetTrigger(strPunchTrigger);
             //カメラを非同期で敵に向ける処理開始 UniTask
 
             //パンチが正面に当たったのか背面に当たったのか調べる
