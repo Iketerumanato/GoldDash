@@ -89,7 +89,7 @@ public class Player : MonoBehaviour
 
     private IPlayerState _playerCurrentState;
     [SerializeField] Animator playerAnimator;
-    readonly string strPlayerBlend = "BlendSpeed";
+    readonly string strPlayerAnimSpeed = "ArmAnimationSpeed";
     readonly string strPunchTrigger = "ArmPunchTrigger";
     [SerializeField] float smoothSpeed = 10f;
 
@@ -116,31 +116,21 @@ public class Player : MonoBehaviour
     #region プレイヤーの操作と落下
     public void MovePlayerJoystick(Vector3 input)
     {
-        // 移動方向をジョイスティックの入力に基づいて計算
         input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
 
-        // 移動処理
         if (input.magnitude > 0)
         {
-            // プレイヤーの向きを移動方向にスムーズに回転させる
             Quaternion targetRotation = Quaternion.LookRotation(input);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * smoothSpeed); // 回転速度調整
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * smoothSpeed);
 
             // プレイヤーの移動
-            transform.position -= input * moveSpeed * Time.deltaTime;
+            transform.position -= moveSpeed * Time.deltaTime * input;
 
             // アニメーションの遷移 (BlendSpeedの補間)
-            float inputMagnitude = input.magnitude;
-            float currentBlendSpeed = playerAnimator.GetFloat(strPlayerBlend);
-            float newBlendSpeed = Mathf.Lerp(currentBlendSpeed, inputMagnitude, Time.deltaTime * smoothSpeed); // 補間速度調整
-            playerAnimator.SetFloat(strPlayerBlend, newBlendSpeed);
+            float inputMagnitude = Mathf.Sqrt(input.sqrMagnitude); ;
+            playerAnimator.SetFloat(strPlayerAnimSpeed, inputMagnitude);
         }
-        else
-        {
-            // プレイヤーが停止した場合、アニメーションのBlendSpeedをゆっくり0に戻す
-            float currentBlendSpeed = playerAnimator.GetFloat(strPlayerBlend);
-            playerAnimator.SetFloat(strPlayerBlend, Mathf.Lerp(currentBlendSpeed, 0f, Time.deltaTime * smoothSpeed));
-        }
+        else playerAnimator.SetFloat(strPlayerAnimSpeed, 0f);//動きが止まった時はアニメーションの停止
     }
 
     public void MoveKey()
@@ -155,7 +145,6 @@ public class Player : MonoBehaviour
             moveDirection = 1;
         }
 
-        // 前進後退の移動
         transform.Translate(Vector3.forward * moveDirection * moveSpeed * Time.deltaTime);
     }
     #endregion
