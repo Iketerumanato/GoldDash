@@ -28,8 +28,12 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private int numOfPlayers; //何人のプレイヤーを募集するか
     private int preparedPlayers; //準備が完了したプレイヤーの数
 
-    [SerializeField] private GameObject ActorObject; //アクターのプレハブ
-    [SerializeField] private GameObject GoldPileObject; //金貨の山のプレハブ
+    [SerializeField] private int maxNumOfChests; //現在の（ゲーム開始時もそう）宝箱の同時出現数の上限。この値より少なければ生成される。
+                                              //動的に減らしたり増やしたりしても問題ないが、宝箱の出現候補地点の数より多くならないように注意が必要。宝箱が同じ位置に重なって生成されてしまう。
+
+    [SerializeField] private GameObject ActorPrefab; //アクターのプレハブ
+    [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
+    [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
 
     private bool inGame; //ゲームは始まっているか
 
@@ -170,7 +174,7 @@ public class GameServerManager : MonoBehaviour
 
                         //ActorControllerインスタンスを作りDictionaryに加える
                         //Actorをインスタンス化しながらActorControllerを取得
-                        ActorController actorController = Instantiate(ActorObject).GetComponent<ActorController>();
+                        ActorController actorController = Instantiate(ActorPrefab).GetComponent<ActorController>();
 
                         //アクターの名前を書き込み
                         actorController.PlayerName = receivedInitPacket.playerName;
@@ -232,9 +236,20 @@ public class GameServerManager : MonoBehaviour
 
                             Debug.Log($"アクターを生成命令を出したぜ。");
 
-                            foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+                            for (int i = 0; i < maxNumOfChests; i++) //宝箱が上限数に達するまで宝箱を生成する
                             {
-                                Debug.Log($"辞書の内容{k.Key}:{k.Value.PlayerName}");
+                                //まずサーバー側のシーンで
+                                entityID = GetUniqueEntityID(); //エンティティID生成
+                                Vector3 chestPos = MapGenerator.instance.GetUniqueChestPointRandomly(); //座標決め
+                                Chest chest = Instantiate(ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>();
+                                chest.EntityID = entityID; //ID書き込み
+                                chest.Tier = 1; //レア度はまだ適当に1
+                                entityDictionary.Add(entityID, chest); //辞書に登録
+
+                                //ティア（１）と座標を指定して、宝箱を生成する命令
+                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
+                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                udpGameServer.Send(myHeader.ToByte());
                             }
                         }
                         break;
@@ -334,7 +349,7 @@ public class GameServerManager : MonoBehaviour
                                         {
                                             entityID = GetUniqueEntityID();
                                             Vector3 goldPos = new Vector3(actorDictionary[receivedActionPacket.targetID].transform.position.x, 0, actorDictionary[receivedActionPacket.targetID].transform.position.z);
-                                            GoldPile goldPile = Instantiate(GoldPileObject, goldPos, Quaternion.identity).GetComponent<GoldPile>();
+                                            GoldPile goldPile = Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
                                             goldPile.EntityID = entityID; //値を書き込み
                                             goldPile.Value = lostGold;
                                             entityDictionary.Add(entityID, goldPile); //管理用のIDと共に辞書へ

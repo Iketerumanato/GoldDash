@@ -39,11 +39,8 @@ public class MapGenerator : MonoBehaviour
     private List<Vector3> allRespawnPoints; //全象限のリスポーン地点
 
     //宝箱について同じもの
-    private List<Vector3> chestPointsInQuadrant2;
-    private List<Vector3> chestPointsInQuadrant1;
-    private List<Vector3> chestPointsInQuadrant4;
-    private List<Vector3> chestPointsInQuadrant3;
-    private List<Vector3> allChestPoints; //全象限の宝箱出現地点
+    private List<Vector3> chestPointsOrigin; //全象限の宝箱出現地点
+    private List<Vector3> chestPointsDeck; //↑の全ての要素をランダムな順で並べ替えたリスト。文字通り山札
 
     public void InitObservation(GameServerManager gameServerManager, GameClientManager gameClientManager)
     {
@@ -93,11 +90,8 @@ public class MapGenerator : MonoBehaviour
         respawnPointsInQuadrant4 = new List<Vector3>();
         respawnPointsInQuadrant3 = new List<Vector3>();
         allRespawnPoints = new List<Vector3>();
-        chestPointsInQuadrant2 = new List<Vector3>();
-        chestPointsInQuadrant1 = new List<Vector3>();
-        chestPointsInQuadrant4 = new List<Vector3>();
-        chestPointsInQuadrant3 = new List<Vector3>();
-        allChestPoints = new List<Vector3>();
+        chestPointsOrigin = new List<Vector3>();
+        chestPointsDeck = new List<Vector3>();
     }
 
     private void GenerateMap()
@@ -202,26 +196,22 @@ public class MapGenerator : MonoBehaviour
                     {
                         if (j < MAP_PART_SIZE) //第2象限なら
                         {
-                            chestPointsInQuadrant2.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                            allChestPoints.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
                         }
                         else //第1象限なら
                         {
-                            respawnPointsInQuadrant1.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                            allChestPoints.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
                         }
                     }
                     else //第3または第4象限なら
                     {
                         if (j < MAP_PART_SIZE) //第3象限なら
                         {
-                            respawnPointsInQuadrant3.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                            allChestPoints.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
                         }
                         else //第4象限なら
                         {
-                            respawnPointsInQuadrant4.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                            allChestPoints.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
                         }
                     }
                 }
@@ -534,9 +524,30 @@ public class MapGenerator : MonoBehaviour
         return ret;
     }
 
-    public Vector3 GetChestPointRandomly()
+    public Vector3 GetUniqueChestPointRandomly()
     {
-        return allChestPoints[new System.Random().Next(0, allRespawnPoints.Count)]; //これはサブスレッドで実行される可能性があるのでSystemの乱数を使用
+        //抽選用デッキが空になったなら補充する
+        if (chestPointsDeck.Count == 0)
+        {
+            //宝箱の出現地点候補を一つずつコピーする
+            for (int i = 0; i < chestPointsOrigin.Count; i++)
+            {
+                chestPointsDeck.Add(chestPointsOrigin[i]);
+            }
+            //このままだとマップ生成時の順番に従っているので、フィッシャー・イェーツ法でシャッフルする
+            System.Random rand = new System.Random(); //これはサブスレッドで実行される可能性があるのでSystemの乱数を使用
+            for (int i = chestPointsDeck.Count - 1; i > 0; i--)
+            {
+                int swapIndex = rand.Next(0, i + 1);
+                Vector3 tmp = chestPointsDeck[i];
+                chestPointsDeck[i] = chestPointsDeck[swapIndex];
+                chestPointsDeck[swapIndex] = tmp;
+            }
+        }
+
+        Vector3 ret = chestPointsDeck[0]; //リストの0番目要素を返却用変数に格納する
+        chestPointsDeck.RemoveAt(0); //0番目要素をリストから消す。1番目以降のすべての要素はインデックスが繰り下がる
+        return ret; //返却
     }
 
     public Vector3 GetRespawnPointRandomly()
