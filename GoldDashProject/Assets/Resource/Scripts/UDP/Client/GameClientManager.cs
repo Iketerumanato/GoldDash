@@ -279,10 +279,18 @@ public class GameClientManager : MonoBehaviour
                                         break;
                                     case (byte)Definer.EDID.SPAWN_GOLDPILE:
                                         //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
-                                        entity = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
-                                        entityDictionary.Add(receivedActionPacket.targetID, entity); //管理用のIDと共に辞書へ
-                                        entity.EntityID = receivedActionPacket.targetID; //ID割り当て
-                                        entity.Value = receivedActionPacket.value; //金額設定
+                                        //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
+                                        {
+                                            GoldPile goldPile = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
+                                            entityDictionary.Add(receivedActionPacket.targetID, goldPile); //管理用のIDと共に辞書へ
+                                            goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
+                                            goldPile.Value = receivedActionPacket.value; //金額設定
+                                        }
+                                        break;
+                                    case (byte)Definer.EDID.DESTROY_ENTITY:
+                                        //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
+                                        entityDictionary[receivedActionPacket.targetID].Destroy();
+                                        entityDictionary.Remove(receivedActionPacket.targetID);
                                         break;
                                 }
                                 break;

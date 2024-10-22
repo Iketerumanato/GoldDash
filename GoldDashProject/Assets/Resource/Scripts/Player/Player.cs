@@ -193,6 +193,7 @@ public class Player : MonoBehaviour
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_GOLDPILE, other.GetComponent<Entity>().EntityID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
+                Debug.Log("金貨Getリクエスト。");
                 break;
             default:
                 break;

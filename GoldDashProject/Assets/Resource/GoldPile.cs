@@ -4,11 +4,10 @@ using UnityEngine;
 
 public class GoldPile : Entity
 {
-    public ushort test;
+    public int Value { set; get; } //山の金額
 
     public override void Init()
     {
-
     }
 
     public override void Activate()

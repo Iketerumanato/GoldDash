@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using System.Xml.Linq;
 using JetBrains.Annotations;
+using Unity.VisualScripting;
 
 public class GameServerManager : MonoBehaviour
 {
@@ -156,15 +157,15 @@ public class GameServerManager : MonoBehaviour
                         InitPacketClient receivedInitPacket = new InitPacketClient(receivedHeader.data);
 
                         //送られてきたプレイヤーネームが使用済ならエラーコード1番を返す。sessionIDは登録しない。
-                        if (usedName.Contains(receivedInitPacket.playerName))
-                        {
-                            myInitPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID, 1);
-                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, myInitPacket.ToByte());
-                            udpGameServer.Send(myHeader.ToByte());
+                        //if (usedName.Contains(receivedInitPacket.playerName))
+                        //{
+                        //    myInitPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID, 1);
+                        //    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, myInitPacket.ToByte());
+                        //    udpGameServer.Send(myHeader.ToByte());
 
-                            Debug.Log($"プレイヤーネーム:{receivedInitPacket.playerName} は既に使われていたぜ。出直してもらうぜ。");
-                            break;
-                        }
+                        //    Debug.Log($"プレイヤーネーム:{receivedInitPacket.playerName} は既に使われていたぜ。出直してもらうぜ。");
+                        //    break;
+                        //}
                         //TODO プレイヤーが規定人数集まっていたらエラーコード2番
 
                         //ActorControllerインスタンスを作りDictionaryに加える
@@ -329,40 +330,42 @@ public class GameServerManager : MonoBehaviour
                                         udpGameServer.Send(myHeader.ToByte());
 
                                         //重複しないentityIDを作り、オブジェクトを生成しつつ、エンティティのコンポーネントを取得
-                                        Debug.Log("ユニークID取得");
-                                        entityID = GetUniqueEntityID();
-                                        Debug.Log("インスタンス作成");
-                                        entity = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
-                                        Debug.Log("先にID書き込み");
-                                        entity.EntityID = entityID; //値を書き込み
-                                        Debug.Log("先に金額書き込み");
-                                        entity.Value = lostGold;
+                                        //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
+                                        {
+                                            entityID = GetUniqueEntityID();
+                                            Vector3 goldPos = new Vector3(actorDictionary[receivedActionPacket.targetID].transform.position.x, 0, actorDictionary[receivedActionPacket.targetID].transform.position.z);
+                                            GoldPile goldPile = Instantiate(GoldPileObject, goldPos, Quaternion.identity).GetComponent<GoldPile>();
+                                            goldPile.EntityID = entityID; //値を書き込み
+                                            goldPile.Value = lostGold;
+                                            entityDictionary.Add(entityID, goldPile); //管理用のIDと共に辞書へ
 
-
-                                        Debug.Log("辞書書き込み");
-                                        entityDictionary.Add(entityID, entity); //管理用のIDと共に辞書へ
-
-                                        Debug.Log("ID書き込み");
-                                        entityDictionary[entityID].EntityID = entityID; //値を書き込み
-                                        Debug.Log("金額書き込み");
-                                        entityDictionary[entityID].Value = lostGold;
-
-                                        //金額を指定して、殴られた人の足元に金貨の山を生成する命令
-                                        myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, lostGold, actorDictionary[receivedActionPacket.targetID].transform.position);
-                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                        udpGameServer.Send(myHeader.ToByte());
-
-                                        Debug.Log("完");
+                                            //金額を指定して、殴られた人の足元に金貨の山を生成する命令
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, lostGold, goldPos);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
+                                        }
                                         break;
                                     case (byte)Definer.REID.GET_GOLDPILE:
                                         //エンティティが存在するか確かめる。存在しないなら何もしない。エラーコードも返さない。エラーコードを返すとチーターは喜ぶ
                                         if (entityDictionary.TryGetValue(receivedActionPacket.targetID, out entity))
                                         {
+                                            //エンティティをGoldPileにキャスト
+                                            GoldPile goldPile = (GoldPile)entity;
+
                                             //存在するなら入手したプレイヤーにゴールドを振り込む
-                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, entity.Value);
+                                            //まずサーバー側で
+                                            actorDictionary[receivedHeader.sessionID].Gold += goldPile.Value;
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, goldPile.Value);
                                             myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameServer.Send(myHeader.ToByte());
                                             //その金貨の山を消す
+                                            //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
+                                            entityDictionary[receivedActionPacket.targetID].Destroy();
+                                            entityDictionary.Remove(receivedActionPacket.targetID);
+                                            //パケット送信
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.DESTROY_ENTITY, receivedActionPacket.targetID);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
                                         }
                                         break;
                                 }
