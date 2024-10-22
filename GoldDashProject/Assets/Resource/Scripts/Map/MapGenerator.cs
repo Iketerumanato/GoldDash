@@ -31,12 +31,19 @@ public class MapGenerator : MonoBehaviour
     //どこからでも情報を読み取れるように静的にする
     public static CellInfo[,] map;
 
-    //X軸とZ軸で仕切られた4つの象限に存在しているリスポーン地点のリスト。宣言順が気持ち悪いが、マップ生成処理等では第2,第1,第4,第3象限の順に処理しているので統一した。
+    //正方形の中心を通り、もとの正方形を4つの正方形に区分するような2本の直線を引き、それらを2次元の座標軸とみなしたときの4つの象限に存在しているリスポーン地点のリスト。宣言順が気持ち悪いが、マップ生成処理等では第2,第1,第4,第3象限の順に処理しているので統一した。
     private List<Vector3> respawnPointsInQuadrant2;
     private List<Vector3> respawnPointsInQuadrant1;
     private List<Vector3> respawnPointsInQuadrant4;
     private List<Vector3> respawnPointsInQuadrant3;
     private List<Vector3> allRespawnPoints; //全象限のリスポーン地点
+
+    //宝箱について同じもの
+    private List<Vector3> chestPointsInQuadrant2;
+    private List<Vector3> chestPointsInQuadrant1;
+    private List<Vector3> chestPointsInQuadrant4;
+    private List<Vector3> chestPointsInQuadrant3;
+    private List<Vector3> allChestPoints; //全象限の宝箱出現地点
 
     public void InitObservation(GameServerManager gameServerManager, GameClientManager gameClientManager)
     {
@@ -86,6 +93,11 @@ public class MapGenerator : MonoBehaviour
         respawnPointsInQuadrant4 = new List<Vector3>();
         respawnPointsInQuadrant3 = new List<Vector3>();
         allRespawnPoints = new List<Vector3>();
+        chestPointsInQuadrant2 = new List<Vector3>();
+        chestPointsInQuadrant1 = new List<Vector3>();
+        chestPointsInQuadrant4 = new List<Vector3>();
+        chestPointsInQuadrant3 = new List<Vector3>();
+        allChestPoints = new List<Vector3>();
     }
 
     private void GenerateMap()
@@ -185,11 +197,34 @@ public class MapGenerator : MonoBehaviour
                 // 宝箱のスポーン位置
                 if (map[i, j].spawnChest)
                 {
-                    GameObject chest = Instantiate(chestObj, new Vector3(i + 0.5f, 0.2f, j + 0.5f), Quaternion.identity);
-                    chest.transform.parent = Parenttransform;
+                    //第2または第1象限なら
+                    if (i < MAP_PART_SIZE)
+                    {
+                        if (j < MAP_PART_SIZE) //第2象限なら
+                        {
+                            chestPointsInQuadrant2.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                            allChestPoints.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                        }
+                        else //第1象限なら
+                        {
+                            respawnPointsInQuadrant1.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                            allChestPoints.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                        }
+                    }
+                    else //第3または第4象限なら
+                    {
+                        if (j < MAP_PART_SIZE) //第3象限なら
+                        {
+                            respawnPointsInQuadrant3.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                            allChestPoints.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                        }
+                        else //第4象限なら
+                        {
+                            respawnPointsInQuadrant4.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                            allChestPoints.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                        }
+                    }
                 }
-
-                // スポーン位置は別メソッドでサーバーに伝えられるためリスポーン地点を指定するオブジェクトの実装は要らなくなりました
 
                 // プレイヤーのスポーン位置をリストに追加
                 if (map[i, j].spawnPlayer)
@@ -497,6 +532,11 @@ public class MapGenerator : MonoBehaviour
         ret[3] = respawnPointsInQuadrant3[random.Next(0, respawnPointsInQuadrant3.Count)];
 
         return ret;
+    }
+
+    public Vector3 GetChestPointRandomly()
+    {
+        return allChestPoints[new System.Random().Next(0, allRespawnPoints.Count)]; //これはサブスレッドで実行される可能性があるのでSystemの乱数を使用
     }
 
     public Vector3 GetRespawnPointRandomly()

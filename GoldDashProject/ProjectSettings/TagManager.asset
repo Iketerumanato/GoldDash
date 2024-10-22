@@ -9,6 +9,7 @@ TagManager:
   - MoveJoystick
   - MagicList
   - Enemy
+  - GoldPile
   layers:
   - Default
   - TransparentFX
