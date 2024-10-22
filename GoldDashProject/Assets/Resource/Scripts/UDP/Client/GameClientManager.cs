@@ -27,9 +27,10 @@ public class GameClientManager : MonoBehaviour
     private int numOfActors; //アクターの人数
     private int preparedActors; //生成し終わったアクターの数
 
-    [SerializeField] private GameObject ActorObject; //アクターのプレハブ
-    [SerializeField] private GameObject PlayerObject; //プレイヤーのプレハブ
-    [SerializeField] private GameObject GoldPileObject; //金貨の山のプレハブ
+    [SerializeField] private GameObject ActorPrefab; //アクターのプレハブ
+    [SerializeField] private GameObject PlayerPrefab; //プレイヤーのプレハブ
+    [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
+    [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
 
     private bool inGame; //ゲームは始まっているか
 
@@ -204,7 +205,7 @@ public class GameClientManager : MonoBehaviour
                                         if (receivedActionPacket.targetID == this.sessionID) //targetIDが自分のsessionIDと同じなら
                                         {
                                             //プレイヤーをインスタンス化しながらActorControllerを取得
-                                            actorController = Instantiate(PlayerObject).GetComponent<ActorController>();
+                                            actorController = Instantiate(PlayerPrefab).GetComponent<ActorController>();
                                             actorController.gameObject.GetComponent<Player>().SessionID = this.sessionID; //PlayerクラスにはActorControllerとは別にSessionIDを渡しておく。パケット送信を楽にするため。
                                             playerActor = actorController; //プレイヤーのActorControllerはアクセスしやすいように取得しておく
                                             playerActor.gameObject.GetComponent<Player>().GetUdpGameClient(this.udpGameClient, this.sessionID);
@@ -212,7 +213,7 @@ public class GameClientManager : MonoBehaviour
                                         else //他人のIDなら
                                         {
                                             //アクターををインスタンス化しながらActorControllerを取得
-                                            actorController = Instantiate(ActorObject).GetComponent<ActorController>();
+                                            actorController = Instantiate(ActorPrefab).GetComponent<ActorController>();
                                         }
                                         //アクターを指定地点へ移動させる
                                         actorController.Move(receivedActionPacket.pos, Vector3.forward);
@@ -281,7 +282,7 @@ public class GameClientManager : MonoBehaviour
                                         //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
                                         //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
                                         {
-                                            GoldPile goldPile = Instantiate(GoldPileObject, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
+                                            GoldPile goldPile = Instantiate(GoldPilePrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
                                             entityDictionary.Add(receivedActionPacket.targetID, goldPile); //管理用のIDと共に辞書へ
                                             goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
                                             goldPile.Value = receivedActionPacket.value; //金額設定

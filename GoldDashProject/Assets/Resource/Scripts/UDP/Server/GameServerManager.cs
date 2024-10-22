@@ -28,8 +28,9 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private int numOfPlayers; //何人のプレイヤーを募集するか
     private int preparedPlayers; //準備が完了したプレイヤーの数
 
-    [SerializeField] private GameObject ActorObject; //アクターのプレハブ
-    [SerializeField] private GameObject GoldPileObject; //金貨の山のプレハブ
+    [SerializeField] private GameObject ActorPrefab; //アクターのプレハブ
+    [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
+    [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
 
     private bool inGame; //ゲームは始まっているか
 
@@ -170,7 +171,7 @@ public class GameServerManager : MonoBehaviour
 
                         //ActorControllerインスタンスを作りDictionaryに加える
                         //Actorをインスタンス化しながらActorControllerを取得
-                        ActorController actorController = Instantiate(ActorObject).GetComponent<ActorController>();
+                        ActorController actorController = Instantiate(ActorPrefab).GetComponent<ActorController>();
 
                         //アクターの名前を書き込み
                         actorController.PlayerName = receivedInitPacket.playerName;
@@ -334,7 +335,7 @@ public class GameServerManager : MonoBehaviour
                                         {
                                             entityID = GetUniqueEntityID();
                                             Vector3 goldPos = new Vector3(actorDictionary[receivedActionPacket.targetID].transform.position.x, 0, actorDictionary[receivedActionPacket.targetID].transform.position.z);
-                                            GoldPile goldPile = Instantiate(GoldPileObject, goldPos, Quaternion.identity).GetComponent<GoldPile>();
+                                            GoldPile goldPile = Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
                                             goldPile.EntityID = entityID; //値を書き込み
                                             goldPile.Value = lostGold;
                                             entityDictionary.Add(entityID, goldPile); //管理用のIDと共に辞書へ
