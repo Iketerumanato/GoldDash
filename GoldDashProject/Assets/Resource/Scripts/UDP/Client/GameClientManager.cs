@@ -288,6 +288,11 @@ public class GameClientManager : MonoBehaviour
                                             goldPile.Value = receivedActionPacket.value; //金額設定
                                         }
                                         break;
+                                    case (byte)Definer.EDID.DESTROY_ENTITY:
+                                        //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
+                                        entityDictionary[receivedActionPacket.targetID].Destroy();
+                                        entityDictionary.Remove(receivedActionPacket.targetID);
+                                        break;
                                 }
                                 break;
                         }

@@ -355,6 +355,13 @@ public class GameServerManager : MonoBehaviour
                                             myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameServer.Send(myHeader.ToByte());
                                             //その金貨の山を消す
+                                            //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
+                                            entityDictionary[receivedActionPacket.targetID].Destroy();
+                                            entityDictionary.Remove(receivedActionPacket.targetID);
+                                            //パケット送信
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.DESTROY_ENTITY, receivedActionPacket.targetID);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
                                         }
                                         break;
                                 }
