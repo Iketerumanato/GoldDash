@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using System.Xml.Linq;
 using JetBrains.Annotations;
+using Unity.VisualScripting;
 
 public class GameServerManager : MonoBehaviour
 {
@@ -351,6 +352,8 @@ public class GameServerManager : MonoBehaviour
                                             GoldPile goldPile = (GoldPile)entity;
 
                                             //存在するなら入手したプレイヤーにゴールドを振り込む
+                                            //まずサーバー側で
+                                            actorDictionary[receivedHeader.sessionID].Gold += goldPile.Value;
                                             myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, goldPile.Value);
                                             myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameServer.Send(myHeader.ToByte());
