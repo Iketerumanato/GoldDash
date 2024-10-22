@@ -26,6 +26,8 @@ public class ActorController : MonoBehaviour
     private void Update()
     {
         Debug.Log(Gold);
+
+        if (UnityEngine.Input.GetKeyDown(KeyCode.P)) PunchAnimation();
     }
 
     private void Awake()
