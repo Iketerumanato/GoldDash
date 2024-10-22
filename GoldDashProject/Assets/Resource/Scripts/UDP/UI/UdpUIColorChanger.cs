@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class UdpUIColorChanger : MonoBehaviour
 {
     [SerializeField] private Gradient idle;
+    [SerializeField] private Color idleColor;
 
     [SerializeField] private Gradient select;
 
@@ -23,6 +24,12 @@ public class UdpUIColorChanger : MonoBehaviour
 
     [SerializeField] private RawImage image;
 
+    [SerializeField] private RawImage originSign;
+    [SerializeField] private RawImage serverSign;
+    [SerializeField] private RawImage clientSign;
+
+    RawImage currentProcessImage; //その時色変更の対称としている画像
+
     private float timeOffsetSize;
 
     public void InitObservation(UdpButtonManager udpUIManager)
@@ -36,7 +43,10 @@ public class UdpUIColorChanger : MonoBehaviour
         {
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE:
                 currentGradiant = idle;
+                originSign.color = idleColor;
                 timeOffsetSize = 0f;
+                serverSign.gameObject.SetActive(true);
+                currentProcessImage = serverSign;
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
@@ -47,6 +57,9 @@ public class UdpUIColorChanger : MonoBehaviour
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
                 currentGradiant = idle;
                 timeOffsetSize = 0f;
+                originSign.color = idleColor;
+                clientSign.gameObject.SetActive(true);
+                currentProcessImage = clientSign;
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
@@ -57,6 +70,9 @@ public class UdpUIColorChanger : MonoBehaviour
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
                 currentGradiant = select;
                 timeOffsetSize = 0f;
+                serverSign.gameObject.SetActive(false);
+                clientSign.gameObject.SetActive(false);
+                currentProcessImage = originSign;
                 break;
 
             default:
@@ -70,6 +86,13 @@ public class UdpUIColorChanger : MonoBehaviour
     {
         timeOffsetSize = 0f;
         currentGradiant = select;
+
+        currentProcessImage = originSign;
+
+        //ロゴの表示非表示
+        originSign.gameObject.SetActive(true);
+        serverSign.gameObject.SetActive(false);
+        clientSign.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -85,7 +108,10 @@ public class UdpUIColorChanger : MonoBehaviour
     private void ColorAnimation()
     {
         //lineの色変更
-        image.color = currentGradiant.Evaluate(Mathf.PingPong(Time.time / 2, 1.0f));
+        Color currentColor = currentGradiant.Evaluate(Mathf.PingPong(Time.time / 2, 1.0f));
+
+        image.color = currentColor;
+        currentProcessImage.color = currentColor;
 
         //genaralMessageの色変更
         // ① メッシュを再生成する（リセット）
