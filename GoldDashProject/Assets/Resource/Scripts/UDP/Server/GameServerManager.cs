@@ -247,9 +247,9 @@ public class GameServerManager : MonoBehaviour
                                 entityDictionary.Add(entityID, chest); //辞書に登録
 
                                 //ティア（１）と座標を指定して、宝箱を生成する命令
-                                //myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
-                                //myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                //udpGameServer.Send(myHeader.ToByte());
+                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
+                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                udpGameServer.Send(myHeader.ToByte());
                             }
                         }
                         break;

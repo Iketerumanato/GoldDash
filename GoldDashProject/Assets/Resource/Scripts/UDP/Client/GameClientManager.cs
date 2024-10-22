@@ -278,6 +278,16 @@ public class GameClientManager : MonoBehaviour
                                         //指定されたアクターの所持金を編集
                                         actorDictionary[receivedActionPacket.targetID].Gold += receivedActionPacket.value;
                                         break;
+                                    case (byte)Definer.EDID.SPAWN_CHEST:
+                                        //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                        //chestという変数名をここでだけ使いたいのでブロック文でスコープ分け
+                                        {
+                                            Chest chest = Instantiate(ChestPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
+                                            entityDictionary.Add(receivedActionPacket.targetID, chest); //管理用のIDと共に辞書へ
+                                            chest.EntityID = receivedActionPacket.targetID; //ID割り当て
+                                            chest.Tier = receivedActionPacket.value; //金額設定
+                                        }
+                                        break;
                                     case (byte)Definer.EDID.SPAWN_GOLDPILE:
                                         //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
                                         //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
