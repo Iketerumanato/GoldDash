@@ -2414,7 +2414,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sessionPass: 9999
-  numOfPlayers: 2
+  numOfPlayers: 1
   ActorObject: {fileID: 5703939729677495424, guid: 8145896d58e7e6b49a27f9ce769cdd62, type: 3}
   GoldPileObject: {fileID: 4623404360768636731, guid: 9f40ff61e3be277469e7143e2a6666d1, type: 3}
 --- !u!4 &1385810819
@@ -2446,7 +2446,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sessionPass: 9999
   initSessionPass: 1234
-  myName: Kirito
+  myName: Main
   ActorObject: {fileID: 5703939729677495424, guid: 8145896d58e7e6b49a27f9ce769cdd62, type: 3}
   PlayerObject: {fileID: 5261510850691686513, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
   GoldPileObject: {fileID: 4623404360768636731, guid: 9f40ff61e3be277469e7143e2a6666d1, type: 3}

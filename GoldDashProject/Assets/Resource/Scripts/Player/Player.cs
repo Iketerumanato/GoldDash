@@ -89,6 +89,8 @@ public class Player : MonoBehaviour
 
     private IPlayerState _playerCurrentState;
     [SerializeField] Animator playerAnimator;
+    readonly string strPlayerAnimSpeed = "ArmAnimationSpeed";
+    readonly string strPunchTrigger = "ArmPunchTrigger";
     [SerializeField] float smoothSpeed = 10f;
 
     #region ゲーム起動時必ず呼ばれる
@@ -114,31 +116,21 @@ public class Player : MonoBehaviour
     #region プレイヤーの操作と落下
     public void MovePlayerJoystick(Vector3 input)
     {
-        // 移動方向をジョイスティックの入力に基づいて計算
         input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
 
-        // 移動処理
         if (input.magnitude > 0)
         {
-            // プレイヤーの向きを移動方向にスムーズに回転させる
             Quaternion targetRotation = Quaternion.LookRotation(input);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * smoothSpeed); // 回転速度調整
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * smoothSpeed);
 
             // プレイヤーの移動
-            transform.position -= input * moveSpeed * Time.deltaTime;
+            transform.position -= moveSpeed * Time.deltaTime * input;
 
             // アニメーションの遷移 (BlendSpeedの補間)
-            float inputMagnitude = input.magnitude;
-            float currentBlendSpeed = playerAnimator.GetFloat("BlendSpeed");
-            float newBlendSpeed = Mathf.Lerp(currentBlendSpeed, inputMagnitude, Time.deltaTime * smoothSpeed); // 補間速度調整
-            playerAnimator.SetFloat("BlendSpeed", newBlendSpeed);
+            float inputMagnitude = Mathf.Sqrt(input.sqrMagnitude); ;
+            playerAnimator.SetFloat(strPlayerAnimSpeed, inputMagnitude);
         }
-        else
-        {
-            // プレイヤーが停止した場合、アニメーションのBlendSpeedをゆっくり0に戻す
-            float currentBlendSpeed = playerAnimator.GetFloat("BlendSpeed");
-            playerAnimator.SetFloat("BlendSpeed", Mathf.Lerp(currentBlendSpeed, 0f, Time.deltaTime * smoothSpeed));
-        }
+        else playerAnimator.SetFloat(strPlayerAnimSpeed, 0f);//動きが止まった時はアニメーションの停止
     }
 
     public void MoveKey()
@@ -153,7 +145,6 @@ public class Player : MonoBehaviour
             moveDirection = 1;
         }
 
-        // 前進後退の移動
         transform.Translate(Vector3.forward * moveDirection * moveSpeed * Time.deltaTime);
     }
     #endregion
@@ -265,8 +256,8 @@ public class Player : MonoBehaviour
         //distanceを調べてしきい値を調べる
         if (distance > punchReachableDistance)
         {
-            //射程外なら一人称のスカモーション再生
-
+            //射程外なら一人称のスカモーション再生(現在通常のパンチのモーションを再生)
+            playerAnimator.SetTrigger(strPunchTrigger);
             //スカしたことをパケット送信
             myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
             myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
@@ -277,6 +268,7 @@ public class Player : MonoBehaviour
         else
         {
             //射程内なら一人称のパンチモーション再生
+            playerAnimator.SetTrigger(strPunchTrigger);
             //カメラを非同期で敵に向ける処理開始 UniTask
 
             //パンチが正面に当たったのか背面に当たったのか調べる

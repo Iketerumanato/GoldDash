@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: dbf1ee660ddbd0d47b1ed1b7c9eb4fee
+guid: cfc3b3c745310a947b3add25ef492886
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -33,11 +33,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Punch FPS
-      takeName: Punch FPS
-      internalID: 6513285221750627773
+      name: Arm Run
+      takeName: Arm Run
+      internalID: -949575020042893171
       firstFrame: 1
-      lastFrame: 33
+      lastFrame: 25
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

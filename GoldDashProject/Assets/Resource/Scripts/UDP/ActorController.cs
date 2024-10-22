@@ -20,7 +20,8 @@ public class ActorController : MonoBehaviour
     [SerializeField] float smoothSpeed = 0.1f;
     [SerializeField] float animationLerpSpeed = 70f;
     [SerializeField] float rotationSmooth = 10f;
-    readonly string MoveAnimationStr = "BlendSpeed";
+    readonly string strMoveAnimation = "BlendSpeed";
+    readonly string strPunchTrigger = "PunchTrigger";
 
     private void Update()
     {
@@ -44,14 +45,14 @@ public class ActorController : MonoBehaviour
         var sqrRunThreshold = runThreshold * runThreshold;
         float speed = Mathf.Clamp01(distance / sqrRunThreshold);
 
-        float currentSpeed = PlayerAnimator.GetFloat(MoveAnimationStr);
+        float currentSpeed = PlayerAnimator.GetFloat(strMoveAnimation);
 
         // 上昇時と下降時で別々にLerpの速度を調整する
         float blendSpeed = (speed > currentSpeed)
                             ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed)
                             : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
 
-        PlayerAnimator.SetFloat(MoveAnimationStr, blendSpeed);
+        PlayMoveAnimation(blendSpeed);
 
         // 現在の向きとターゲットの向きの角度を-180~180で計算
         float angle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
@@ -79,9 +80,14 @@ public class ActorController : MonoBehaviour
     }
     
     //モーション関連
+    public void PlayMoveAnimation(float blendSpeed)
+    {
+        PlayerAnimator.SetFloat(strMoveAnimation, blendSpeed);
+    }
+
     public void PunchAnimation()
-    { 
-        //パンチモーション再生
+    {
+        PlayerAnimator.SetTrigger(strPunchTrigger);
     }
 
     public void RecoiledAnimation()
