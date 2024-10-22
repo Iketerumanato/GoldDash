@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Chest : Entity
 {
-    int Tier; //レア度
+    int Tier { set; get; } //レア度
 
     public override void Init()
     {
