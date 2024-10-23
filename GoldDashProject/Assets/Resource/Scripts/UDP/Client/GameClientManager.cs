@@ -289,6 +289,7 @@ public class GameClientManager : MonoBehaviour
                                             entityDictionary.Add(receivedActionPacket.targetID, chest); //管理用のIDと共に辞書へ
                                             chest.EntityID = receivedActionPacket.targetID; //ID割り当て
                                             chest.Tier = receivedActionPacket.value; //金額設定
+                                            chest.name = $"Chest ({receivedActionPacket.targetID})";
                                         }
                                         break;
                                     case (byte)Definer.EDID.SPAWN_GOLDPILE:
@@ -299,6 +300,7 @@ public class GameClientManager : MonoBehaviour
                                             entityDictionary.Add(receivedActionPacket.targetID, goldPile); //管理用のIDと共に辞書へ
                                             goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
                                             goldPile.Value = receivedActionPacket.value; //金額設定
+                                            goldPile.name = $"GoldPile ({receivedActionPacket.targetID})";
                                         }
                                         break;
                                     case (byte)Definer.EDID.DESTROY_ENTITY:

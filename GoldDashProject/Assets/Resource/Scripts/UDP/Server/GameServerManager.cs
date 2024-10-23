@@ -180,7 +180,7 @@ public class GameServerManager : MonoBehaviour
                         //アクターの名前を書き込み
                         actorController.PlayerName = receivedInitPacket.playerName;
                         //アクターのゲームオブジェクト
-                        actorController.name = "Actor: " + receivedInitPacket.playerName; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
+                        actorController.name = $"Actor: ({receivedInitPacket.playerName} ({receivedHeader.sessionID})"; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
                         actorController.gameObject.SetActive(false); //初期設定が済んだら無効化して処理を止める。ゲーム開始時に有効化して座標などをセットする
 
                         //アクター辞書に登録
@@ -246,6 +246,7 @@ public class GameServerManager : MonoBehaviour
                                 Chest chest = Instantiate(ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>();
                                 chest.EntityID = entityID; //ID書き込み
                                 chest.Tier = 1; //レア度はまだ適当に1
+                                chest.gameObject.name = $"Chest ({entityID})";
                                 entityDictionary.Add(entityID, chest); //辞書に登録
 
                                 //ティア（１）と座標を指定して、宝箱を生成する命令
@@ -354,6 +355,7 @@ public class GameServerManager : MonoBehaviour
                                             GoldPile goldPile = Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
                                             goldPile.EntityID = entityID; //値を書き込み
                                             goldPile.Value = lostGold;
+                                            goldPile.name = $"GoldPile ({entityID})";
                                             entityDictionary.Add(entityID, goldPile); //管理用のIDと共に辞書へ
 
                                             //金額を指定して、殴られた人の足元に金貨の山を生成する命令
