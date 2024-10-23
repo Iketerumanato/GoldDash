@@ -38,6 +38,7 @@ public class GameClientManager : MonoBehaviour
     public enum CLIENT_INTERNAL_EVENT
     {
         GENERATE_MAP = 0, //マップを生成せよ
+        EDIT_GUI_FOR_GAME, //インゲーム用のUIレイアウトに変更せよ
     }
 
     public Subject<CLIENT_INTERNAL_EVENT> ClientInternalSubject;
