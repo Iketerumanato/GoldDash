@@ -156,6 +156,14 @@ public class GameServerManager : MonoBehaviour
                     #region case (byte)Definer.PT.IPC: InitPacketの場合
                     case (byte)Definer.PT.IPC:
 
+                        //受理済のInitPacketは無視
+                        ActorController tmp;
+                        if (actorDictionary.TryGetValue(receivedHeader.sessionID, out tmp))
+                        {
+                            Debug.Log($"SessionID: {receivedHeader.sessionID}のIPCは処理済だぜ。パケットを破棄するぜ。");
+                            break;
+                        }
+
                         //InitPacketを受け取ったときの処理
                         Debug.Log($"Initパケットを処理するぜ！ActorDictionaryに追加するぜ！");
 
