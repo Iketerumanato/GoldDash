@@ -180,7 +180,9 @@ public class GameClientManager : MonoBehaviour
                                         break;
                                     case (byte)Definer.NDID.STG:
                                         //ここでプレイヤーを有効化してゲーム開始
+                                        //内部通知
                                         ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
+                                        ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME); //UIレイアウトを変更せよ
                                         //全アクターの有効化
                                         foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
                                         { 
