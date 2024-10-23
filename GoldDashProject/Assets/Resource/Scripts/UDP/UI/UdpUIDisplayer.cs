@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using R3;
 
@@ -20,9 +18,6 @@ public class UdpUIDisplayer : MonoBehaviour
 
     //テキストオブジェクト
     [SerializeField] private GameObject stateMessage;
-    [SerializeField] private GameObject GeneralMessage;
-    [SerializeField] private GameObject ImportantMessage;
-    [SerializeField] private GameObject informations;
 
     //装飾
     [SerializeField] private GameObject line;
@@ -46,7 +41,6 @@ public class UdpUIDisplayer : MonoBehaviour
                 buttonActivate.SetActive(true);
                 buttonDeactivate.SetActive(true);
                 buttonBack.SetActive(true);
-                informations.SetActive(true);
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
@@ -59,7 +53,6 @@ public class UdpUIDisplayer : MonoBehaviour
                 buttonConnect.gameObject.SetActive(true);
                 buttonDisconnect.gameObject.SetActive(true);
                 buttonBack.gameObject.SetActive(true);
-                informations.SetActive(true);
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
@@ -69,7 +62,6 @@ public class UdpUIDisplayer : MonoBehaviour
                 buttonConnect.gameObject.SetActive(false);
                 buttonDisconnect.gameObject.SetActive(false);
                 buttonBack.gameObject.SetActive(false);
-                informations.SetActive(false);
 
                 //表示
                 buttonServerMode.gameObject.SetActive(true);
