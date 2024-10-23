@@ -98,6 +98,7 @@ public class UdpUIDisplayer : MonoBehaviour
                 serverSign.gameObject.SetActive(false);
                 clientSign.gameObject.SetActive(false);
                 stateMessage.gameObject.SetActive(false);
+                line.gameObject.SetActive(false);
 
                 //表示
                 originSignMini.gameObject.SetActive(true);
@@ -123,6 +124,7 @@ public class UdpUIDisplayer : MonoBehaviour
                 serverSign.gameObject.SetActive(false);
                 clientSign.gameObject.SetActive(false);
                 stateMessage.gameObject.SetActive(false);
+                line.gameObject.SetActive(false);
 
                 //表示
                 originSignMini.gameObject.SetActive(true);
