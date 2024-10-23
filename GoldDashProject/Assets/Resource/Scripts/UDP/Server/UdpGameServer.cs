@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Net;
 using System;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 public class UdpGameServer : UdpCommnicator
 {
@@ -107,7 +108,6 @@ public class UdpGameServer : UdpCommnicator
 
                 if (RegisterClient(receivedHeader, remoteEndPoint.Address))
                 {
-                    UnityEngine.Debug.Log("当該リモートコンピュータをクライアントと確認し、登録しました。エンキューします。");
                     output.Enqueue(receivedHeader);
                 }
                 else
@@ -126,6 +126,19 @@ public class UdpGameServer : UdpCommnicator
                 case (byte)Definer.PT.IPC: //initパケットなら開封する
                     //基本的にこのクラスでHeader.dataは参照しないのだが、InitパケットはsessionPassを見る必要がある
                     InitPacketClient receivedData = new InitPacketClient(receivedHeader.data);
+
+                    //既にこのInitPacketは処理済かもしれないので辞書を精査
+                    foreach (KeyValuePair<ushort, IPEndPoint> k in clientDictionary)
+                    {
+                        //このInitPacketの送り主のアドレスにバインドされたIPEndPointがclientDictionaryに既にないか確かめる
+                        //4人プレイゲームなので、最大値登録数は4のはず、なのでこれでも良いはずだ。数万人のプレイヤーがいるとまずい。
+                        if (k.Value.Address.ToString().Equals(addr.ToString()))
+                        {
+                            UnityEngine.Debug.Log("当該リモートコンピュータは、精査したところ既知のクライアントでした。ヘッダを編集し、エンキューします。");
+                            receivedHeader.sessionID = k.Key;
+                            return true;
+                        }
+                    }
 
                     if (receivedData.sessionPass == this.sessionPass) //パスワードが正しければ
                     {
@@ -149,6 +162,8 @@ public class UdpGameServer : UdpCommnicator
 
                         //最後に、作ってあげたsessionIDをHeaderに書き込んであげる
                         receivedHeader.sessionID = sessionID;
+
+                        UnityEngine.Debug.Log("当該リモートコンピュータをクライアントと確認し、登録しました。エンキューします。");
                         return true;
                     }
                     break;
