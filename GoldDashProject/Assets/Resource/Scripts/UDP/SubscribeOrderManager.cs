@@ -20,17 +20,20 @@ public class SubscribeOrderManager : MonoBehaviour
         //ここがエントリーポイントなのでFPSも指定しておく
         Application.targetFrameRate = 60;
 
-        //UI関連
-        udpButtonManager.InitObservation();
+        //ボタン関連
+        udpButtonManager.InitObservation(); //InitObservationに引数がないということは、何にも依存していないいうことなので、最初に初期化できる
 
-        udpUIDisplayer.InitObservation(udpButtonManager);
-        udpTextWriter.InitObservation(udpButtonManager);
-        udpUIColorChanger.InitObservation(udpButtonManager);
-
-        soundManager.InitObservation(udpButtonManager);
-
+        //マネージャー
         gameServerManager.InitObservation(udpButtonManager);
         gameClientManager.InitObservation(udpButtonManager);
+
+        //UI関連
+
+        udpUIDisplayer.InitObservation(udpButtonManager, gameServerManager, gameClientManager);
+        udpTextWriter.InitObservation(udpButtonManager, gameServerManager, gameClientManager);
+        udpUIColorChanger.InitObservation(udpButtonManager, gameServerManager, gameClientManager);
+
+        soundManager.InitObservation(udpButtonManager);
 
         //サーバー関連
         mapGenerator.InitObservation(gameServerManager, gameClientManager);

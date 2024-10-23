@@ -42,6 +42,7 @@ public class GameServerManager : MonoBehaviour
     public enum SERVER_INTERNAL_EVENT
     { 
         GENERATE_MAP = 0, //マップを生成せよ
+        EDIT_GUI_FOR_GAME, //インゲーム用のUIレイアウトに変更せよ
     }
 
     public Subject<SERVER_INTERNAL_EVENT> ServerInternalSubject;
@@ -209,6 +210,7 @@ public class GameServerManager : MonoBehaviour
                             //ゲーム開始処理
                             //内部通知
                             ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
+                            ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.EDIT_GUI_FOR_GAME); //UIレイアウトを変更せよ
 
                             //全クライアントにアクターの生成命令を送る
 
