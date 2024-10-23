@@ -234,7 +234,7 @@ public class Player : MonoBehaviour
                     Punch(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ActorController>());
                     break;
                 case "Chest": //宝箱なら開錠を試みる
-                    //TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
+                    TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
                     break;
                 
                 //ドアをタッチで開けるならココ
@@ -302,6 +302,16 @@ public class Player : MonoBehaviour
     //宝箱なら開錠を試みる。パンチと同様RaycastHit構造体から引数をもらう。消えゆく宝箱だったり、他プレイヤーが使用中の宝箱は開錠できない。
     private void TryOpenChest(Vector3 hitPoint, float distance, Chest chestController)
     {
+        //送信用クラスを宣言しておく
+        ActionPacket myActionPacket;
+        Header myHeader;
+
+        //仮！！！！！！
+        //背面に命中させたことをパケット送信
+        myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, chestController.EntityID);
+        myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+        udpGameClient.Send(myHeader.ToByte());
+
         //既に空いていないたらなにもしない
 
         //距離が遠すぎる場合、宝箱の付近までオートラン開始。スティック入力があれば即時解除

@@ -98,6 +98,10 @@ public static class Definer
         /// 背面からパンチしました
         /// </summary>
         HIT_BACK,
+        /// <summary>
+        /// 宝箱の開錠に成功しました
+        /// </summary>
+        OPEN_CHEST_SUCCEED,
     }
 
     /// <summary>
