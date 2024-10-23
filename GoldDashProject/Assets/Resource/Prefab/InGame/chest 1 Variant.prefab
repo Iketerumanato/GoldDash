@@ -184,7 +184,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: e453df24ad02dcb4db5d41996e4ef11b, type: 3}
       propertyPath: m_TagString
-      value: Tresure
+      value: Chest
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -243,4 +243,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78f40453556dbcc47a10fa7581259496, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EntityID: 0
