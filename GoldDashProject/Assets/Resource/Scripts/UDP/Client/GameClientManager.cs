@@ -278,7 +278,7 @@ public class GameClientManager : MonoBehaviour
                                         }
                                         //指定されたアクターの所持金を編集
                                         actorDictionary[receivedActionPacket.targetID].Gold += receivedActionPacket.value;
-                                        Debug.Log($"{actorDictionary[receivedActionPacket.targetID].PlayerName}が({receivedActionPacket.value})ゴールドを入手。現在の所持金は({actorDictionary[receivedActionPacket.targetID].Gold})ゴールド。")
+                                        Debug.Log($"{actorDictionary[receivedActionPacket.targetID].PlayerName}が({receivedActionPacket.value})ゴールドを入手。現在の所持金は({actorDictionary[receivedActionPacket.targetID].Gold})ゴールド。");
                                         break;
                                     case (byte)Definer.EDID.SPAWN_CHEST:
                                         //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
