@@ -29,7 +29,8 @@ public class GameServerManager : MonoBehaviour
     private int preparedPlayers; //準備が完了したプレイヤーの数
 
     [SerializeField] private int maxNumOfChests; //現在の（ゲーム開始時もそう）宝箱の同時出現数の上限。この値より少なければ生成される。
-                                              //動的に減らしたり増やしたりしても問題ないが、宝箱の出現候補地点の数より多くならないように注意が必要。宝箱が同じ位置に重なって生成されてしまう。
+    //動的に減らしたり増やしたりしても問題ないが、宝箱の出現候補地点の数より多くならないように注意が必要。宝箱が同じ位置に重なって生成されてしまう。
+    private int currentNumOfChests; //現在生成されている宝箱の数
 
     [SerializeField] private GameObject ActorPrefab; //アクターのプレハブ
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
@@ -132,7 +133,7 @@ public class GameServerManager : MonoBehaviour
         Header myHeader;
         //オブジェクト生成用の変数を外側のスコープで宣言しておく
         ushort entityID;
-        Entity entity;
+        Entity entity; //TryGetValueの第二引数でoutで使う
 
         while (true)
         {
@@ -253,6 +254,9 @@ public class GameServerManager : MonoBehaviour
                                 myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                 udpGameServer.Send(myHeader.ToByte());
+
+                                //宝箱の数を記録
+                                currentNumOfChests++;
                             }
                         }
                         break;
@@ -307,6 +311,7 @@ public class GameServerManager : MonoBehaviour
 
                                 switch (receivedActionPacket.detailID)
                                 {
+                                    #region case パンチ系:
                                     case (byte)Definer.REID.MISS: //空振り
                                         myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.PUNCH, receivedHeader.sessionID);
                                         myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
@@ -364,6 +369,8 @@ public class GameServerManager : MonoBehaviour
                                             udpGameServer.Send(myHeader.ToByte());
                                         }
                                         break;
+                                    #endregion
+                                    #region case 金貨の山系:
                                     case (byte)Definer.REID.GET_GOLDPILE:
                                         //エンティティが存在するか確かめる。存在しないなら何もしない。エラーコードも返さない。エラーコードを返すとチーターは喜ぶ
                                         if (entityDictionary.TryGetValue(receivedActionPacket.targetID, out entity))
@@ -381,12 +388,62 @@ public class GameServerManager : MonoBehaviour
                                             //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
                                             entityDictionary[receivedActionPacket.targetID].Destroy();
                                             entityDictionary.Remove(receivedActionPacket.targetID);
+                                            usedEntityID.Remove(receivedActionPacket.targetID); //IDも解放
                                             //パケット送信
                                             myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.DESTROY_ENTITY, receivedActionPacket.targetID);
                                             myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameServer.Send(myHeader.ToByte());
                                         }
                                         break;
+                                    #endregion
+                                    #region case 宝箱系:
+                                    case (byte)Definer.REID.OPEN_CHEST_SUCCEED:
+                                        //エンティティが存在するか確かめる。存在しないなら何もしない。エラーコードも返さない。エラーコードを返すとチーターは喜ぶ
+                                        if (entityDictionary.TryGetValue(receivedActionPacket.targetID, out entity))
+                                        {
+                                            //エンティティをChestにキャスト
+                                            Chest chest = (Chest)entity;
+
+                                            //存在するなら入手したプレイヤーにランダムなゴールドを振り込む 適当に80~200ゴールド
+                                            System.Random random = new System.Random();
+                                            int chestGold = random.Next(80, 201);
+                                            //まずサーバー側で
+                                            actorDictionary[receivedHeader.sessionID].Gold += chestGold;
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, chestGold);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
+                                            //その宝箱を消す
+                                            //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
+                                            entityDictionary[receivedActionPacket.targetID].Destroy();
+                                            entityDictionary.Remove(receivedActionPacket.targetID);
+                                            usedEntityID.Remove(receivedActionPacket.targetID); //IDも解放
+                                            currentNumOfChests--; //宝箱の数デクリメント
+                                            //パケット送信
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.DESTROY_ENTITY, receivedActionPacket.targetID);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
+                                            //宝箱の数が足りなければ新たに宝箱を作り出す
+                                            if (currentNumOfChests < maxNumOfChests)
+                                            {
+                                                //まずサーバー側のシーンで
+                                                entityID = GetUniqueEntityID(); //エンティティID生成
+                                                Vector3 chestPos = MapGenerator.instance.GetUniqueChestPointRandomly(); //座標決め
+                                                chest = Instantiate(ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>(); //ここ1つ外のスコープの変数chestを使ってるけど様子見なので問題ないかと
+                                                chest.EntityID = entityID; //ID書き込み
+                                                chest.Tier = 1; //レア度はまだ適当に1
+                                                chest.gameObject.name = $"Chest ({entityID})";
+                                                entityDictionary.Add(entityID, chest); //辞書に登録
+
+                                                //ティア（１）と座標を指定して、宝箱を生成する命令
+                                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
+                                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                udpGameServer.Send(myHeader.ToByte());
+
+                                                currentNumOfChests++; //宝箱の数インクリメント
+                                            }
+                                        }
+                                        break;
+                                    #endregion
                                 }
                                 break;
                             #endregion

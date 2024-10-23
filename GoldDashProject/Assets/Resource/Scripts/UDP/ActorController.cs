@@ -23,18 +23,6 @@ public class ActorController : MonoBehaviour
     readonly string strMoveAnimation = "BlendSpeed";
     readonly string strPunchTrigger = "PunchTrigger";
 
-    int DebugCoolDown = 120;
-    int cd;
-    private void Update()
-    {
-        if (cd >= DebugCoolDown)
-        {
-            Debug.Log(Gold);
-            cd = 0;
-        } 
-        else cd++;
-    }
-
     private void Awake()
     {
         oldPos = transform.position;
