@@ -6,15 +6,15 @@ public class GoldPile : Entity
 {
     public int Value { set; get; } //山の金額
 
-    public override void Init()
+    public override void InitEntity()
     {
     }
 
-    public override void Activate()
+    public override void ActivateEntity()
     {
     }
 
-    public override void Destroy()
+    public override void DestroyEntity()
     {
         Destroy(this.gameObject);
     }

@@ -394,7 +394,7 @@ public class GameServerManager : MonoBehaviour
                                             udpGameServer.Send(myHeader.ToByte());
                                             //その金貨の山を消す
                                             //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
-                                            entityDictionary[receivedActionPacket.targetID].Destroy();
+                                            entityDictionary[receivedActionPacket.targetID].DestroyEntity();
                                             entityDictionary.Remove(receivedActionPacket.targetID);
                                             usedEntityID.Remove(receivedActionPacket.targetID); //IDも解放
                                             //パケット送信
@@ -422,7 +422,7 @@ public class GameServerManager : MonoBehaviour
                                             udpGameServer.Send(myHeader.ToByte());
                                             //その宝箱を消す
                                             //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
-                                            entityDictionary[receivedActionPacket.targetID].Destroy();
+                                            entityDictionary[receivedActionPacket.targetID].DestroyEntity();
                                             entityDictionary.Remove(receivedActionPacket.targetID);
                                             usedEntityID.Remove(receivedActionPacket.targetID); //IDも解放
                                             currentNumOfChests--; //宝箱の数デクリメント

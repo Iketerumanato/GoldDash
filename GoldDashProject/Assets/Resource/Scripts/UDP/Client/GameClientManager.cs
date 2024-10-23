@@ -304,7 +304,7 @@ public class GameClientManager : MonoBehaviour
                                         break;
                                     case (byte)Definer.EDID.DESTROY_ENTITY:
                                         //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
-                                        entityDictionary[receivedActionPacket.targetID].Destroy();
+                                        entityDictionary[receivedActionPacket.targetID].DestroyEntity();
                                         entityDictionary.Remove(receivedActionPacket.targetID);
                                         break;
                                 }
