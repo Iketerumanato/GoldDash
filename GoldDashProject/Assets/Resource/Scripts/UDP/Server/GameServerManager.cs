@@ -511,7 +511,7 @@ public class GameServerManager : MonoBehaviour
                                         //thunderという変数名をここでだけ使いたいのでブロック文でスコープ分け
                                         {
                                             //雷は自動消滅するのでDictionaryで管理しない
-                                            ThunderEntity thunder = Instantiate(ThunderPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<ThunderEntity>();
+                                            ThunderEntity thunder = Instantiate(ThunderPrefab, receivedActionPacket.pos, Quaternion.Euler(0, 0, 90)).GetComponent<ThunderEntity>();
                                             thunder.InitEntity(); //生成時のメソッドを呼ぶ
                                             //雷を生成する命令
                                             myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_THUNDER, default, default, receivedActionPacket.pos);
