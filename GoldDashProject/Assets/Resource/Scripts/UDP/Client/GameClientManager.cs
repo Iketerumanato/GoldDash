@@ -31,6 +31,7 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private GameObject PlayerPrefab; //プレイヤーのプレハブ
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
+    [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
 
     private bool inGame; //ゲームは始まっているか
 
@@ -307,7 +308,7 @@ public class GameClientManager : MonoBehaviour
                                         //thunderという変数名をここでだけ使いたいのでブロック文でスコープ分け
                                         {
                                             //雷は自動消滅するのでDictionaryで管理しない
-                                            ThunderEntity thunder = Instantiate(GoldPilePrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<ThunderEntity>();
+                                            ThunderEntity thunder = Instantiate(ThunderPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<ThunderEntity>();
                                             thunder.InitEntity(); //生成時のメソッドを呼ぶ
                                         }
                                         break;
