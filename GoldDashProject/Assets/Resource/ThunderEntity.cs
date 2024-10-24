@@ -7,7 +7,7 @@ public class ThunderEntity : Entity
 {
     public override async void InitEntity() //これが呼ばれてから1000ミリ秒で消える
     {
-        await UniTask.Delay(1000);
+        await UniTask.Delay(400);
         DestroyEntity();
     }
 

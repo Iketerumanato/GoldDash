@@ -131,7 +131,9 @@ public class GameServerManager : MonoBehaviour
                         Header header; //パケットの送信はメインスレッドでやらないことにしてるよね！？大丈夫！？
 
                         //INTERNAL_THUNDER?? サーバーが一体なぜリクエストパケットを？
-                        myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.INTERNAL_THUNDER, default, default, hit.collider.gameObject.transform.position);
+                        Vector3 thunderPos = new Vector3(hit.collider.gameObject.transform.position.x, 0.5f, hit.collider.gameObject.transform.position.z);
+
+                        myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.INTERNAL_THUNDER, default, default, thunderPos);
                         header = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
 
                         //そうか！サーバー内部から別スレッドで使われているConcurrentQueueにパケットを直接エンキューすることで、
