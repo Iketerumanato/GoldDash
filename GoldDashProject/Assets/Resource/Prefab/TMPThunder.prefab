@@ -5120,7 +5120,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 773664044782194518}
-  - component: {fileID: 5716909123091413691}
   - component: {fileID: 4144883204457229193}
   - component: {fileID: 2800702789284312667}
   - component: {fileID: 686393813599475347}
@@ -5151,21 +5150,6 @@ Transform:
   - {fileID: 298863277891015557}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
---- !u!114 &5716909123091413691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8666734358453998117}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7300d94ce90a40f4c9dfb20ab0caff6c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fadeDuration: 1
-  FlashLightPrefab: {fileID: 2800702789284312667}
-  FlashImagePrefab: {fileID: 570231806803788846}
 --- !u!198 &4144883204457229193
 ParticleSystem:
   m_ObjectHideFlags: 0
