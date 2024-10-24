@@ -102,6 +102,10 @@ public static class Definer
         /// 宝箱の開錠に成功しました
         /// </summary>
         OPEN_CHEST_SUCCEED,
+        /// <summary>
+        /// サーバー内部専用。雷を生成してください。
+        /// </summary>
+        INTERNAL_THUNDER,
     }
 
     /// <summary>
