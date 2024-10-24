@@ -126,6 +126,10 @@ public static class Definer
         /// </summary>
         SPAWN_GOLDPILE,
         /// <summary>
+        /// 雷をスポーンさせろ。
+        /// </summary>
+        SPAWN_THUNDER,
+        /// <summary>
         /// このエンティティを削除しろ
         /// </summary>
         DESTROY_ENTITY,

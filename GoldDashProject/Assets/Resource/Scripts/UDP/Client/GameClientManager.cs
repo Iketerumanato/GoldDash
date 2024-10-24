@@ -302,6 +302,15 @@ public class GameClientManager : MonoBehaviour
                                             goldPile.name = $"GoldPile ({receivedActionPacket.targetID})";
                                         }
                                         break;
+                                    case (byte)Definer.EDID.SPAWN_THUNDER:
+                                        //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                        //thunderという変数名をここでだけ使いたいのでブロック文でスコープ分け
+                                        {
+                                            //雷は自動消滅するのでDictionaryで管理しない
+                                            ThunderEntity thunder = Instantiate(GoldPilePrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<ThunderEntity>();
+                                            thunder.InitEntity(); //生成時のメソッドを呼ぶ
+                                        }
+                                        break;
                                     case (byte)Definer.EDID.DESTROY_ENTITY:
                                         //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
                                         entityDictionary[receivedActionPacket.targetID].DestroyEntity();
