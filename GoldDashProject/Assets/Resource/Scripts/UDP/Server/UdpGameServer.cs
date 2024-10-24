@@ -5,6 +5,7 @@ using System.Net;
 using System;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections.Concurrent;
 
 public class UdpGameServer : UdpCommnicator
 {
@@ -22,7 +23,10 @@ public class UdpGameServer : UdpCommnicator
 
     private ushort rcvPort; //受信用ポート番号
 
-    public UdpGameServer(ref Queue<Header> output, ushort sessionPass)
+    //サーバー内部からのインターナルリクエストパケットがマルチスレッドでエンキューされるのでスレッドセーフなConcurrentQueueを使用
+    private ConcurrentQueue<Header> output; //パケットをHeaderクラスとして開封し整合性チェックをしてからこのキューに出力する。
+
+    public UdpGameServer(ref ConcurrentQueue<Header> output, ushort sessionPass)
     { 
         this.output = output; //パケット排出用キューをセット
         this.sessionPass = sessionPass;

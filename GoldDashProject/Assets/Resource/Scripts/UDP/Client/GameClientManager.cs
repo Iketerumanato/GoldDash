@@ -31,6 +31,7 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private GameObject PlayerPrefab; //プレイヤーのプレハブ
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
+    [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
 
     private bool inGame; //ゲームは始まっているか
 
@@ -300,6 +301,15 @@ public class GameClientManager : MonoBehaviour
                                             goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
                                             goldPile.Value = receivedActionPacket.value; //金額設定
                                             goldPile.name = $"GoldPile ({receivedActionPacket.targetID})";
+                                        }
+                                        break;
+                                    case (byte)Definer.EDID.SPAWN_THUNDER:
+                                        //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                        //thunderという変数名をここでだけ使いたいのでブロック文でスコープ分け
+                                        {
+                                            //雷は自動消滅するのでDictionaryで管理しない
+                                            ThunderEntity thunder = Instantiate(ThunderPrefab, receivedActionPacket.pos, Quaternion.Euler(0, 0, 90)).GetComponent<ThunderEntity>();
+                                            thunder.InitEntity(); //生成時のメソッドを呼ぶ
                                         }
                                         break;
                                     case (byte)Definer.EDID.DESTROY_ENTITY:

@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3386553121241536846, guid: fec3a343303e51a4f91f6037c1fc7f92, type: 3}
+      propertyPath: m_TagString
+      value: Floor
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: fec3a343303e51a4f91f6037c1fc7f92, type: 3}
       propertyPath: m_Name
       value: floor Variant

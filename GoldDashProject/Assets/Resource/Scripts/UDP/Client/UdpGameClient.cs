@@ -19,6 +19,8 @@ public class UdpGameClient : UdpCommnicator
 
     public ushort rcvPort; //自分の受信用ポート番号。GameClientManagerから読み取るためpublic
 
+    private Queue<Header> output; //パケットをHeaderクラスとして開封し整合性チェックをしてからこのキューに出力する
+
     public UdpGameClient(ref Queue<Header> output, ushort initSessionPass)
     {
         serverEndpoint = null; //サーバーを見つけていないときはnullになっていることを前提としているので明示的に代入
