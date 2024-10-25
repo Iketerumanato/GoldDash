@@ -104,7 +104,7 @@ public class ActorController : MonoBehaviour
     //吹っ飛び処理
     public void Blown(Vector3 vector)
     {
-        transform.position += this.transform.forward * -0.5f;
+        transform.position += this.transform.forward * -0.8f;
         //引数の方向にAddForceで吹っ飛ぶ
         //仮
         //float blowDistance = 3.0f;
