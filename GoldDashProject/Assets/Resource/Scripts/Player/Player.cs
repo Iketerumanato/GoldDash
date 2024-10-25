@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public interface IPlayerState
@@ -93,7 +94,10 @@ public class Player : MonoBehaviour
     readonly string strPunchTrigger = "ArmPunchTrigger";
     [SerializeField] float smoothSpeed = 10f;
 
-    #region ゲーム起動時必ず呼ばれる
+    [SerializeField] TMP_Text currentGoldText;
+    [SerializeField] ActorController myActor;
+    int oldGold;
+
     void Start()
     {
         ChangePlayerState(new NormalState());
@@ -103,8 +107,22 @@ public class Player : MonoBehaviour
 
         //カメラ取得
         fpsCamera = GetComponentInChildren<Camera>();
+
+        //currentGoldText.text = $"Gold: { myActor.Gold}";
+        oldGold = myActor.Gold;
     }
-    #endregion
+
+    private void Update()
+    {
+        //if (myActor.Gold != oldGold)
+        //{
+        //    currentGoldText.text = $"Gold: { myActor.Gold}";
+        //    oldGold = myActor.Gold;
+        //}
+
+        currentGoldText.text = $"Gold: { myActor.Gold}";
+        oldGold = myActor.Gold;
+    }
 
     private void FixedUpdate()
     {
@@ -204,7 +222,7 @@ public class Player : MonoBehaviour
 
     //GameClientManagerからプレイヤーの生成タイミングで呼び出してudpGameClientへのアクセスを得る。
     public void GetUdpGameClient(UdpGameClient udpGameClient, ushort sessionID)
-    { 
+    {
         this.udpGameClient = udpGameClient;
         this.SessionID = sessionID;
     }
@@ -236,7 +254,7 @@ public class Player : MonoBehaviour
                 case "Chest": //宝箱なら開錠を試みる
                     TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
                     break;
-                
+
                 //ドアをタッチで開けるならココ
 
                 default: //そうでないものはインタラクト不可能なオブジェクトなので無視

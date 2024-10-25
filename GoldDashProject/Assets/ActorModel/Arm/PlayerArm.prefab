@@ -798,6 +798,8 @@ MonoBehaviour:
   variableJoystick: {fileID: 631653289062796951}
   playerAnimator: {fileID: 5558077121738061834}
   smoothSpeed: 10
+  currentGoldText: {fileID: 6502335468772119213}
+  myActor: {fileID: 2243988343626576125}
 --- !u!114 &3421997971350921957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1195,6 +1197,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2827560105566096703, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
   m_PrefabInstance: {fileID: 8151606776870859852}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6502335468772119213 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3106565121835017953, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
+  m_PrefabInstance: {fileID: 8151606776870859852}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8099573758598905820 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 92082205371730832, guid: 47484e9975ed53246b199f2f135e61bf, type: 3}
