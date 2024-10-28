@@ -36,8 +36,8 @@ public class ActorController : MonoBehaviour
     {
         if (isPlayer) return;
 
-        // 現在の位置とターゲット位置の移動量を計算
-        Vector3 movement = transform.position - targetPosition;
+        // ターゲット位置をもとに移動量を計算
+        Vector3 movement = targetPosition - transform.position;
 
         // 移動量の大きさを計算
         float speed = movement.magnitude;
@@ -45,10 +45,12 @@ public class ActorController : MonoBehaviour
         // アニメーションの速度を滑らかに変化させる
         float currentSpeed = PlayerAnimator.GetFloat(strMoveAnimation);
         float blendSpeed = Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
+
+        Debug.Log("Speed is : " + speed);
         PlayMoveAnimation(blendSpeed);
 
-        // ターゲット位置の更新（この部分は変更しないでください）
-        transform.position = targetPosition; // 実際の位置更新を行う場合
+        // 実際の位置更新
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
     }
 
     public void Move(Vector3 pos, Vector3 forward)
