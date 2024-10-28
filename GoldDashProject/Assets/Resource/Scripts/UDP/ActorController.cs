@@ -28,25 +28,32 @@ public class ActorController : MonoBehaviour
 
     private void Awake()
     {
+        isPlayer = GetComponent<Player>() != null;
+    }
+
+    private void Start()
+    {
         oldPos = transform.position;
         targetPosition = oldPos;
-        isPlayer = GetComponent<Player>() != null;
     }
 
     private void Update()
     {
         if (isPlayer) return;
 
+        // 位置を滑らかに補間
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
         // 移動速度を計算してアニメーションに反映
         float distance = (targetPosition - transform.position).sqrMagnitude;
-        float speed = Mathf.Clamp01(distance / (runThreshold * runThreshold));
+        float speed = Mathf.Clamp01(distance / (runThreshold * runThreshold)); // 速度を0〜1で正規化
 
-        Debug.Log("Speed: " + speed);
+        // デバッグログ: targetPositionとtransform.positionの差分を確認
+        Debug.Log("Target Position: " + targetPosition + ", Current Position: " + transform.position + ", Speed: " + speed);
 
-        PlayerAnimator.SetFloat(strMoveAnimation, speed);
+        PlayerAnimator.SetFloat(strMoveAnimation, speed); // 直接速度を設定
 
+        // 回転補間
         float angle = Vector3.SignedAngle(transform.forward, targetForward, Vector3.up);
         if (Mathf.Abs(angle) > 0.01f)
         {
@@ -61,9 +68,8 @@ public class ActorController : MonoBehaviour
         targetPosition = pos;
         targetForward = forward;
 
-        // 直接transformを変更せず、targetPositionとtargetForwardのみ更新
-        this.gameObject.transform.position = pos;
-        this.gameObject.transform.forward = forward;
+        // Moveメソッドの呼び出し確認
+        Debug.Log("Move method called with Position: " + pos + " and Forward: " + forward);
     }
 
     //メソッドの例。正式実装ではない
