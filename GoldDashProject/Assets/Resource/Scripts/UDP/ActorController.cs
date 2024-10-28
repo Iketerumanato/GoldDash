@@ -18,7 +18,7 @@ public class ActorController : MonoBehaviour
     [SerializeField] Animator PlayerAnimator;
     [SerializeField] float runThreshold = 0.01f;
     [SerializeField] float smoothSpeed = 0.1f;
-    [SerializeField] float animationLerpSpeed = 10f;
+    //[SerializeField] float animationLerpSpeed = 10f;
     [SerializeField] float rotationSmooth = 5f;
 
     readonly string strMoveAnimation = "BlendSpeed";
@@ -44,6 +44,7 @@ public class ActorController : MonoBehaviour
         if (distance > 0.001f)
         {
             float speed = Mathf.Clamp01(distance / (runThreshold * runThreshold));
+            Debug.Log("Speed is :" + speed);
             PlayMoveAnimation(speed);
         }
 
