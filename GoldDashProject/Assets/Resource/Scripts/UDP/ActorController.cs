@@ -11,9 +11,8 @@ public class ActorController : MonoBehaviour
     public int Gold { set; get; } = 100;
 
     private Vector3 targetPosition;
+    private Vector3 previousPosition;
     private Vector3 targetForward;
-    private Vector3 oldPos;
-    private Vector3 currentVelocity;
 
     [SerializeField] Animator PlayerAnimator;
     [SerializeField] float runThreshold = 0.01f;
@@ -28,8 +27,8 @@ public class ActorController : MonoBehaviour
 
     private void Awake()
     {
-        oldPos = transform.position;
-        targetPosition = oldPos;
+        targetPosition = transform.position;
+        previousPosition = transform.position;
         isPlayer = GetComponent<Player>() != null;
     }
 
@@ -37,22 +36,22 @@ public class ActorController : MonoBehaviour
     {
         if (isPlayer) return;
 
-        // SmoothDampで位置を更新
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
+        // 現在の位置と前の位置の差分を使って移動量を計算
+        Vector3 currentPosition = transform.position;
+        float distanceMoved = (currentPosition - previousPosition).magnitude;
 
-        // currentVelocityの大きさを基にspeedを計算
-        float speed = Mathf.Clamp01(currentVelocity.magnitude / runThreshold);
-        PlayMoveAnimation(speed);  // speedをアニメーションに反映
-
-        // 回転補間
-        float angle = Vector3.SignedAngle(transform.forward, targetForward, Vector3.up);
-        if (Mathf.Abs(angle) > 0.01f)
+        // 移動があった場合のみアニメーションを更新
+        if (distanceMoved > runThreshold)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetForward), Time.deltaTime * rotationSmooth);
+            PlayMoveAnimation(1.0f); // 移動時はアニメーションを最大に
+        }
+        else
+        {
+            PlayMoveAnimation(0.0f); // 移動がなければアニメーションを停止
         }
 
-        // 更新した位置を保持
-        oldPos = transform.position;
+        // 前の位置を更新
+        previousPosition = currentPosition;
     }
 
     public void Move(Vector3 pos, Vector3 forward)
