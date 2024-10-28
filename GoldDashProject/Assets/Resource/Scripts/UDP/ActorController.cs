@@ -40,19 +40,15 @@ public class ActorController : MonoBehaviour
         // プレイヤーの位置を補間
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
+        // 移動量を計算
         float distance = (targetPosition - oldPos).sqrMagnitude;
         var sqrRunThreshold = runThreshold * runThreshold;
         float speed = Mathf.Clamp01(distance / sqrRunThreshold);
 
-        float currentSpeed = PlayerAnimator.GetFloat(strMoveAnimation);
+        // speed をそのままアニメーションの速度として使用
+        PlayMoveAnimation(speed);
 
-        // 上昇時と下降時で別々にLerpの速度を調整する
-        float blendSpeed = (speed > currentSpeed)
-                            ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed)
-                            : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
-
-        PlayMoveAnimation(blendSpeed);
-
+        // oldPos を更新
         oldPos = targetPosition;
     }
 
