@@ -17,7 +17,7 @@ public class ActorController : MonoBehaviour
     [SerializeField] Animator PlayerAnimator;
     [SerializeField] float runThreshold = 0.01f;
     [SerializeField] float smoothSpeed = 0.1f;
-    //[SerializeField] float animationLerpSpeed = 10f;
+    [SerializeField] float animationLerpSpeed = 10f;
     [SerializeField] float rotationSmooth = 5f;
 
     readonly string strMoveAnimation = "BlendSpeed";
@@ -36,22 +36,19 @@ public class ActorController : MonoBehaviour
     {
         if (isPlayer) return;
 
-        // 現在の位置と前の位置の差分を使って移動量を計算
-        Vector3 currentPosition = transform.position;
-        float distanceMoved = (currentPosition - previousPosition).magnitude;
+        // 現在の位置とターゲット位置の移動量を計算
+        Vector3 movement = transform.position - targetPosition;
 
-        // 移動があった場合のみアニメーションを更新
-        if (distanceMoved > runThreshold)
-        {
-            PlayMoveAnimation(1.0f); // 移動時はアニメーションを最大に
-        }
-        else
-        {
-            PlayMoveAnimation(0.0f); // 移動がなければアニメーションを停止
-        }
+        // 移動量の大きさを計算
+        float speed = movement.magnitude;
 
-        // 前の位置を更新
-        previousPosition = currentPosition;
+        // アニメーションの速度を滑らかに変化させる
+        float currentSpeed = PlayerAnimator.GetFloat(strMoveAnimation);
+        float blendSpeed = Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
+        PlayMoveAnimation(blendSpeed);
+
+        // ターゲット位置の更新（この部分は変更しないでください）
+        transform.position = targetPosition; // 実際の位置更新を行う場合
     }
 
     public void Move(Vector3 pos, Vector3 forward)
