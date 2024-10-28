@@ -23,13 +23,19 @@ public class ActorController : MonoBehaviour
     readonly string strMoveAnimation = "BlendSpeed";
     readonly string strPunchTrigger = "PunchTrigger";
 
+    Vector3 pos;
+    Vector3 forward;
+
     private void Awake()
     {
         oldPos = transform.position;
         targetPosition = oldPos;
+
+        pos = this.gameObject.transform.position;
+        forward = this.gameObject.transform.forward;
     }
 
-    public void Move(Vector3 pos, Vector3 forward)
+    private void Update()
     {
         targetPosition = pos;
 
@@ -37,7 +43,7 @@ public class ActorController : MonoBehaviour
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
         float distance = (targetPosition - oldPos).sqrMagnitude;
-        var sqrRunThreshold = runThreshold * runThreshold;
+        float sqrRunThreshold = runThreshold * runThreshold;
         float speed = Mathf.Clamp01(distance / sqrRunThreshold);
 
         float currentSpeed = PlayerAnimator.GetFloat(strMoveAnimation);
@@ -59,6 +65,13 @@ public class ActorController : MonoBehaviour
         }
 
         oldPos = targetPosition;
+    }
+
+    public void Move(Vector3 pos, Vector3 forward)
+    {
+        // 座標と向きを更新
+        this.gameObject.transform.position = pos;
+        this.gameObject.transform.forward = forward;
     }
 
     //メソッドの例。正式実装ではない
