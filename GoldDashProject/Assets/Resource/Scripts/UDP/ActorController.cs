@@ -15,6 +15,7 @@ public class ActorController : MonoBehaviour
 
     private Vector3 targetPosition;
     private Vector3 targetForward;
+    private Vector3 oldPos;
     private Vector3 currentVelocity;
 
     [SerializeField] Animator PlayerAnimator;
@@ -30,7 +31,8 @@ public class ActorController : MonoBehaviour
 
     private void Awake()
     {
-        targetPosition = transform.position;
+        oldPos = transform.position;
+        targetPosition = oldPos;
         isPlayer = GetComponent<Player>() != null;
     }
 
@@ -52,12 +54,16 @@ public class ActorController : MonoBehaviour
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetForward), Time.deltaTime * rotationSmooth);
         }
+
+        oldPos = targetPosition;
     }
 
     public void Move(Vector3 pos, Vector3 forward)
     {
-        targetPosition = pos;
-        targetForward = forward;
+        //targetPosition = pos;
+
+        this.gameObject.transform.position = pos;
+        this.gameObject.transform.forward = forward;
     }
 
     //メソッドの例。正式実装ではない
@@ -72,7 +78,7 @@ public class ActorController : MonoBehaviour
     public void GiveStatus()
     {
     }
-    
+
     //モーション関連
     public void PlayMoveAnimation(float blendSpeed)
     {
@@ -85,18 +91,18 @@ public class ActorController : MonoBehaviour
     }
 
     public void RecoiledAnimation()
-    { 
+    {
         //怯みアニメーション再生
     }
 
     public void BlownAnimation()
-    { 
+    {
         //吹っ飛ぶアニメーション再生
     }
 
     //所持金関連
     public void DropGold()
-    { 
+    {
         //金貨の山を落とす
     }
 
