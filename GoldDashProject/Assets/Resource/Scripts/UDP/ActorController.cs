@@ -1,7 +1,4 @@
 using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEngine.Windows;
-using static UnityEditor.PlayerSettings;
 
 /// <summary>
 /// プレイヤー達を管理するクラス。GameServerManagerでSessionIDをKeyとしてDictionaryで管理される
@@ -40,13 +37,13 @@ public class ActorController : MonoBehaviour
     {
         if (isPlayer) return;
 
+        // 位置を滑らかに補間
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
+        // 移動速度を計算してアニメーションに反映
         float distance = (targetPosition - transform.position).sqrMagnitude;
         float speed = Mathf.Clamp01(distance / (runThreshold * runThreshold));
-        float currentSpeed = PlayerAnimator.GetFloat(strMoveAnimation);
-        float blendSpeed = Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
-        PlayMoveAnimation(blendSpeed);
+        PlayMoveAnimation(speed);
 
         // 回転補間
         float angle = Vector3.SignedAngle(transform.forward, targetForward, Vector3.up);
