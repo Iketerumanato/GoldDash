@@ -14,7 +14,6 @@ public class ActorController : MonoBehaviour
     public int Gold { set; get; } = 100; //所持金
 
     private Vector3 targetPosition;
-    private Vector3 targetForward;
     private Vector3 oldPos;
     private Vector3 currentVelocity;
     [SerializeField] Animator PlayerAnimator;
@@ -25,14 +24,20 @@ public class ActorController : MonoBehaviour
     readonly string strMoveAnimation = "BlendSpeed";
     readonly string strPunchTrigger = "PunchTrigger";
 
+    public bool isPlayer;
+
     private void Awake()
     {
         oldPos = transform.position;
         targetPosition = oldPos;
+
+        isPlayer = GetComponent<Player>() != null;
     }
 
     private void Update()
     {
+        if (isPlayer) return;
+
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
         float distance = (targetPosition - oldPos).sqrMagnitude;
