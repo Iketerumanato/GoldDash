@@ -28,7 +28,7 @@ public class ActorController : MonoBehaviour
 
     private void Awake()
     {
-        oldPos = transform.position;
+        oldPos = this.gameObject.transform.position;
         targetPosition = oldPos;
 
         //pos = this.gameObject.transform.position;
