@@ -11,15 +11,15 @@ public class ActorController : MonoBehaviour
     public int Gold { set; get; } = 100;
 
     private Vector3 targetPosition;
-    private Vector3 targetForward;
     private Vector3 oldPos;
-    private Vector3 oldForward;
     private Vector3 currentVelocity;
+
     [SerializeField] Animator PlayerAnimator;
     [SerializeField] float runThreshold = 0.01f;
     [SerializeField] float smoothSpeed = 0.1f;
-    [SerializeField] float animationLerpSpeed = 70f;
-    [SerializeField] float rotationSmooth = 10f;
+    [SerializeField] float animationLerpSpeed = 10f;
+    [SerializeField] float rotationSmooth = 0.001f;
+
     readonly string strMoveAnimation = "BlendSpeed";
     readonly string strPunchTrigger = "PunchTrigger";
 
@@ -29,9 +29,6 @@ public class ActorController : MonoBehaviour
     {
         oldPos = transform.position;
         targetPosition = oldPos;
-
-        oldForward = transform.forward;
-        targetForward = oldForward;
 
         isPlayer = GetComponent<Player>() != null;
     }
@@ -56,21 +53,21 @@ public class ActorController : MonoBehaviour
 
         PlayMoveAnimation(blendSpeed);
 
-        // 現在の向きとターゲットの向きの角度を-180~180で計算
-        float angle = Vector3.SignedAngle(transform.forward, targetForward, Vector3.up);
-
-        // 回転を補間
-        if (Mathf.Abs(angle) > 0.01f)
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetForward), Time.deltaTime * rotationSmooth);
-        }
-
         oldPos = targetPosition;
     }
 
     public void Move(Vector3 pos, Vector3 forward)
     {
         targetPosition = pos;
+
+        // 現在の向きとターゲットの向きの角度を-180~180で計算
+        float angle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
+
+        // 回転を補間
+        if (Mathf.Abs(angle) > 0.01f)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), Time.deltaTime * rotationSmooth);
+        }
 
         this.gameObject.transform.position = pos;
         this.gameObject.transform.forward = forward;
