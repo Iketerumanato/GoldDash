@@ -37,16 +37,15 @@ public class ActorController : MonoBehaviour
     {
         if (isPlayer) return;
 
+        // SmoothDampで位置を更新
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
-        // 移動速度を計算してアニメーションに反映
         float distance = (targetPosition - transform.position).sqrMagnitude;
-        float speed = Mathf.Clamp01(distance / (runThreshold * runThreshold));
-
-        // デバッグログ
-        Debug.Log("Speed: " + speed);
-
-        PlayerAnimator.SetFloat(strMoveAnimation, speed);
+        if (distance > 0.001f)
+        {
+            float speed = Mathf.Clamp01(distance / (runThreshold * runThreshold));
+            PlayMoveAnimation(speed);
+        }
 
         // 回転補間
         float angle = Vector3.SignedAngle(transform.forward, targetForward, Vector3.up);
@@ -55,7 +54,8 @@ public class ActorController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetForward), Time.deltaTime * rotationSmooth);
         }
 
-        oldPos = targetPosition;
+        // 更新した位置を保持
+        oldPos = transform.position;
     }
 
     public void Move(Vector3 pos, Vector3 forward)
