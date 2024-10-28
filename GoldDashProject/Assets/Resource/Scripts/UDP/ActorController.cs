@@ -10,8 +10,8 @@ public class ActorController : MonoBehaviour
 {
     //プロパティ
     public string PlayerName { set; get; }
-    public ushort SessionID { set; get; } //MonoBehaviourからすると、いちいちDictionaryからIDを取るより目の前のアクターのIDを取得した方が速そうなので
-    public int Gold { set; get; } = 100; //所持金
+    public ushort SessionID { set; get; }
+    public int Gold { set; get; } = 100;
 
     private Vector3 targetPosition;
     private Vector3 targetForward;
@@ -60,10 +60,9 @@ public class ActorController : MonoBehaviour
 
     public void Move(Vector3 pos, Vector3 forward)
     {
+        // 直接transformを変更せず、targetPositionとtargetForwardのみ更新
         targetPosition = pos;
-
-        this.gameObject.transform.position = pos;
-        this.gameObject.transform.forward = forward;
+        targetForward = forward;
     }
 
     //メソッドの例。正式実装ではない
