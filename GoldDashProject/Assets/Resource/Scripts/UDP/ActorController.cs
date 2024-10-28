@@ -37,15 +37,16 @@ public class ActorController : MonoBehaviour
     {
         if (isPlayer) return;
 
-        // 位置を滑らかに補間
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
         // 移動速度を計算してアニメーションに反映
         float distance = (targetPosition - transform.position).sqrMagnitude;
         float speed = Mathf.Clamp01(distance / (runThreshold * runThreshold));
-        PlayMoveAnimation(speed);
 
-        // 回転補間
+        Debug.Log("Speed: " + speed);
+
+        PlayerAnimator.SetFloat(strMoveAnimation, speed);
+
         float angle = Vector3.SignedAngle(transform.forward, targetForward, Vector3.up);
         if (Mathf.Abs(angle) > 0.01f)
         {
@@ -58,6 +59,7 @@ public class ActorController : MonoBehaviour
     public void Move(Vector3 pos, Vector3 forward)
     {
         targetPosition = pos;
+        targetForward = forward;
 
         // 直接transformを変更せず、targetPositionとtargetForwardのみ更新
         this.gameObject.transform.position = pos;
