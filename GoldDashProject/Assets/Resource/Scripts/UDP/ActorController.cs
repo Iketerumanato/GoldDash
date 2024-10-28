@@ -60,6 +60,8 @@ public class ActorController : MonoBehaviour
 
     public void Move(Vector3 pos, Vector3 forward)
     {
+        targetPosition = pos;
+
         // 直接transformを変更せず、targetPositionとtargetForwardのみ更新
         this.gameObject.transform.position = pos;
         this.gameObject.transform.forward = forward;
