@@ -40,13 +40,9 @@ public class ActorController : MonoBehaviour
         // SmoothDampで位置を更新
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
-        float distance = (targetPosition - transform.position).sqrMagnitude;
-        if (distance > 0.001f)
-        {
-            float speed = Mathf.Clamp01(distance / (runThreshold * runThreshold));
-            Debug.Log("Speed is :" + speed);
-            PlayMoveAnimation(speed);
-        }
+        // currentVelocityの大きさを基にspeedを計算
+        float speed = Mathf.Clamp01(currentVelocity.magnitude / runThreshold);
+        PlayMoveAnimation(speed);  // speedをアニメーションに反映
 
         // 回転補間
         float angle = Vector3.SignedAngle(transform.forward, targetForward, Vector3.up);
