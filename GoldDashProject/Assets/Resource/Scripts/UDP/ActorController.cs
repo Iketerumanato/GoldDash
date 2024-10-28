@@ -37,7 +37,7 @@ public class ActorController : MonoBehaviour
 
     private void Update()
     {
-        //targetPosition = pos;
+        targetPosition = pos;
 
         //// プレイヤーの位置を補間
         //transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
