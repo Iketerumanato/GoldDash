@@ -31,40 +31,40 @@ public class ActorController : MonoBehaviour
         oldPos = transform.position;
         targetPosition = oldPos;
 
-        pos = this.gameObject.transform.position;
-        forward = this.gameObject.transform.forward;
+        //pos = this.gameObject.transform.position;
+        //forward = this.gameObject.transform.forward;
     }
 
     private void Update()
     {
-        targetPosition = pos;
+        //targetPosition = pos;
 
-        // プレイヤーの位置を補間
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
+        //// プレイヤーの位置を補間
+        //transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
 
-        float distance = (targetPosition - oldPos).sqrMagnitude;
-        float sqrRunThreshold = runThreshold * runThreshold;
-        float speed = Mathf.Clamp01(distance / sqrRunThreshold);
+        //float distance = (targetPosition - oldPos).sqrMagnitude;
+        //float sqrRunThreshold = runThreshold * runThreshold;
+        //float speed = Mathf.Clamp01(distance / sqrRunThreshold);
 
-        float currentSpeed = PlayerAnimator.GetFloat(strMoveAnimation);
+        //float currentSpeed = PlayerAnimator.GetFloat(strMoveAnimation);
 
-        // 上昇時と下降時で別々にLerpの速度を調整する
-        float blendSpeed = (speed > currentSpeed)
-                            ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed)
-                            : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
+        //// 上昇時と下降時で別々にLerpの速度を調整する
+        //float blendSpeed = (speed > currentSpeed)
+        //                    ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed)
+        //                    : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
 
-        PlayMoveAnimation(blendSpeed);
+        //PlayMoveAnimation(blendSpeed);
 
-        // 現在の向きとターゲットの向きの角度を-180~180で計算
-        float angle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
+        //// 現在の向きとターゲットの向きの角度を-180~180で計算
+        //float angle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
 
-        // 回転を補間
-        if (Mathf.Abs(angle) > 0.01f)
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), Time.deltaTime * rotationSmooth);
-        }
+        //// 回転を補間
+        //if (Mathf.Abs(angle) > 0.01f)
+        //{
+        //    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), Time.deltaTime * rotationSmooth);
+        //}
 
-        oldPos = targetPosition;
+        //oldPos = targetPosition;
     }
 
     public void Move(Vector3 pos, Vector3 forward)
