@@ -12,53 +12,67 @@ public class ActorController : MonoBehaviour
     public ushort SessionID { set; get; } //MonoBehaviourからすると、いちいちDictionaryからIDを取るより目の前のアクターのIDを取得した方が速そうなので
     public int Gold { set; get; } = 100; //所持金
 
+    //このアクターはこの場所、この向きを目指してなめらかに移動
     private Vector3 targetPosition;
-    private Vector3 oldPos;
-    private Vector3 currentVelocity;
+    private Vector3 targetForward;
+
+    //このアクターがプレイヤーか。プレイヤーならUpdateの内容は実行されない
+    private bool isPlayer;
+
+    //SmoothDamp計算用
+    private Vector3 currentVelocity_P; //pos
+    private Vector3 currentVelocity_F; //forward
+
+    //アニメーションのフラグに使用
+    Vector3 oldPos; //前フレームの座標を見て、その大きさから走りモーションのブレンドスピードを決定する
+
     [SerializeField] Animator PlayerAnimator;
-    [SerializeField] float runThreshold = 0.01f;
-    [SerializeField] float smoothSpeed = 0.1f;
+    [SerializeField] float runThreshold = 1f;
+    float sqrRunThreshold;
     [SerializeField] float animationLerpSpeed = 70f;
-    [SerializeField] float rotationSmooth = 10f;
+
+    //歩行アニメーションのメソッドに渡す
+    float blendSpeed;
+
     readonly string strMoveAnimation = "BlendSpeed";
     readonly string strPunchTrigger = "PunchTrigger";
 
     private void Awake()
     {
-        oldPos = transform.position;
-        targetPosition = oldPos;
+        isPlayer = (GetComponent<Player>() != null);
+        sqrRunThreshold = runThreshold * runThreshold;
+    }
+
+    private void Update()
+    {
+        if (isPlayer) return;
+        this.transform.position = Vector3.SmoothDamp(this.transform.position, targetPosition, ref currentVelocity_P, 0.1f);
+        this.transform.forward = Vector3.SmoothDamp(this.transform.forward, targetForward, ref currentVelocity_F, 0.1f);
+
+        //モーション関連。そのまま＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+        float distance = (targetPosition - oldPos).sqrMagnitude;
+        float speed = Mathf.Clamp01(distance / sqrRunThreshold);
+        float currentSpeed = PlayerAnimator.GetFloat(strMoveAnimation);
+        // 上昇時と下降時で別々にLerpの速度を調整する
+        float blendSpeed = (speed > currentSpeed)
+                            ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed)
+                            : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
+        PlayMoveAnimation(blendSpeed);
+        //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+
+        oldPos = transform.position; //最後にoldPos更新
     }
 
     public void Move(Vector3 pos, Vector3 forward)
     {
         targetPosition = pos;
+        targetForward = forward;
+    }
 
-        // プレイヤーの位置を補間
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothSpeed);
-
-        float distance = (targetPosition - oldPos).sqrMagnitude;
-        var sqrRunThreshold = runThreshold * runThreshold;
-        float speed = Mathf.Clamp01(distance / sqrRunThreshold);
-
-        float currentSpeed = PlayerAnimator.GetFloat(strMoveAnimation);
-
-        // 上昇時と下降時で別々にLerpの速度を調整する
-        float blendSpeed = (speed > currentSpeed)
-                            ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed)
-                            : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
-
-        PlayMoveAnimation(blendSpeed);
-
-        // 現在の向きとターゲットの向きの角度を-180~180で計算
-        float angle = Vector3.SignedAngle(transform.forward, forward, Vector3.up);
-
-        // 回転を補間
-        if (Mathf.Abs(angle) > 0.01f)
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), Time.deltaTime * rotationSmooth);
-        }
-
-        oldPos = targetPosition;
+    public void Warp(Vector3 pos, Vector3 forward)
+    { 
+        this.transform.position = pos;
+        this.transform.forward = forward;
     }
 
     //メソッドの例。正式実装ではない

@@ -218,7 +218,7 @@ public class GameClientManager : MonoBehaviour
                                             actorController = Instantiate(ActorPrefab).GetComponent<ActorController>();
                                         }
                                         //アクターを指定地点へ移動させる
-                                        actorController.Move(receivedActionPacket.pos, Vector3.forward);
+                                        actorController.Warp(receivedActionPacket.pos, Vector3.forward);
                                         //アクターの名前を書き込み
                                         actorController.PlayerName = receivedActionPacket.msg;
                                         //アクターのSessionIDを書き込み
