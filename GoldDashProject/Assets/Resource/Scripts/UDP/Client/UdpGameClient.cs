@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 public class UdpGameClient : UdpCommnicator
@@ -20,6 +21,9 @@ public class UdpGameClient : UdpCommnicator
     public ushort rcvPort; //自分の受信用ポート番号。GameClientManagerから読み取るためpublic
 
     private Queue<Header> output; //パケットをHeaderクラスとして開封し整合性チェックをしてからこのキューに出力する
+
+    private CancellationTokenSource receiveCts; //パケット受信タスクのキャンセル用
+    private CancellationToken token;
 
     public UdpGameClient(ref Queue<Header> output, ushort initSessionPass)
     {
@@ -40,8 +44,12 @@ public class UdpGameClient : UdpCommnicator
         UnityEngine.Debug.Log("受信用UDPクライアントを生成しました。");
         this.rcvPort = (ushort)localEndPointForReceive.Port;
 
+        //タスクとキャンセルトークン
+        receiveCts = new CancellationTokenSource();
+        token = receiveCts.Token;
+
         //パケットの受信を非同期で行う
-        Task.Run(() => Receive());
+        Task.Run(() => Receive(), token);
     }
 
     public override void Send(byte[] sendData)
@@ -168,5 +176,8 @@ public class UdpGameClient : UdpCommnicator
     public override void Dispose()
     {
         //Taskのキャンセル処理など
+        receiveCts.Cancel();
+        sender.Dispose();
+        receiver.Dispose();
     }
 }

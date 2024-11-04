@@ -56,7 +56,7 @@ public class GameClientManager : MonoBehaviour
         switch (e)
         {
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
-                udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
+                if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
                 if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
@@ -68,10 +68,12 @@ public class GameClientManager : MonoBehaviour
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
                 udpGameClient.Dispose();
+                udpGameClient = null;
                 isRunning = false;
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
                 if (udpGameClient != null) udpGameClient.Dispose();
+                udpGameClient = null;
                 isRunning = false;
                 break;
             default:
