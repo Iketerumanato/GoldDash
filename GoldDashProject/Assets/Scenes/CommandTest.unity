@@ -852,6 +852,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2790657463491512000, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.b
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2790657463491512000, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.g
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2790657463491512000, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.r
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4402492639727931420, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4655632947239519485, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7524702430156319257, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: buttonRectTransform
+      value: 
+      objectReference: {fileID: 2002772315}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3017,6 +3041,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!224 &2002772315 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 79274958427279901, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+  m_PrefabInstance: {fileID: 480766043}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
