@@ -4,9 +4,6 @@ using UnityEngine;
 using R3;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using System.Xml.Linq;
-using JetBrains.Annotations;
-using Unity.VisualScripting;
 using System.Collections.Concurrent;
 
 public class GameServerManager : MonoBehaviour
@@ -76,10 +73,12 @@ public class GameServerManager : MonoBehaviour
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
                 udpGameServer.Dispose();
+                udpGameServer = null;
                 isRunning = false;
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
                 if (udpGameServer != null) udpGameServer.Dispose();
+                udpGameServer = null;
                 isRunning = false;
                 break;
             default:

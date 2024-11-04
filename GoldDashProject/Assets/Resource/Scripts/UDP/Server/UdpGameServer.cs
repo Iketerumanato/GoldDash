@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Collections.Concurrent;
+using System.Threading;
 
 public class UdpGameServer : UdpCommnicator
 {
@@ -25,6 +26,9 @@ public class UdpGameServer : UdpCommnicator
 
     //サーバー内部からのインターナルリクエストパケットがマルチスレッドでエンキューされるのでスレッドセーフなConcurrentQueueを使用
     private ConcurrentQueue<Header> output; //パケットをHeaderクラスとして開封し整合性チェックをしてからこのキューに出力する。
+
+    private CancellationTokenSource receiveCts; //パケット受信タスクのキャンセル用
+    private CancellationToken token;
 
     public UdpGameServer(ref ConcurrentQueue<Header> output, ushort sessionPass)
     { 
@@ -56,8 +60,12 @@ public class UdpGameServer : UdpCommnicator
         UnityEngine.Debug.Log("受信用UDPクライアントを生成しました。");
         this.rcvPort = (ushort)localEndPointForReceive.Port;
 
+        //タスクとキャンセルトークン
+        receiveCts = new CancellationTokenSource();
+        token = receiveCts.Token;
+
         //パケットの受信を非同期で行う
-        Task.Run(() => Receive());
+        Task.Run(() => Receive(), token);
     }
 
     public override void Send(byte[] sendData)
@@ -188,5 +196,8 @@ public class UdpGameServer : UdpCommnicator
     public override void Dispose()
     {
         //Taskのキャンセル処理など
+        receiveCts.Cancel();
+        sender.Dispose();
+        receiver.Dispose();
     }
 }
