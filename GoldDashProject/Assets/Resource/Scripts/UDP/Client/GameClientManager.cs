@@ -74,6 +74,7 @@ public class GameClientManager : MonoBehaviour
                 }
                 udpGameClient.Dispose();
                 udpGameClient = null;
+                this.sessionID = 0; //変数リセットなど
                 isRunning = false;
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:

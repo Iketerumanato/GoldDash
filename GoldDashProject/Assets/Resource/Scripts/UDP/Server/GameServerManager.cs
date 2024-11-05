@@ -78,6 +78,8 @@ public class GameServerManager : MonoBehaviour
                 }
                 udpGameServer.Dispose();
                 udpGameServer = null;
+                actorDictionary.Clear(); //変数リセットなど
+                preparedPlayers = 0;
                 isRunning = false;
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
