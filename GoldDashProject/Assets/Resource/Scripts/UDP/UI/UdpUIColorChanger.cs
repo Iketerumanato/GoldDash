@@ -66,10 +66,6 @@ public class UdpUIColorChanger : MonoBehaviour
                 currentTextComponent = stateMsgMini;
                 currentProcessImage = clientSignMini;
                 break;
-            case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED:
-                currentGradiant = client;
-                timeOffsetSize = 0.1f;
-                break;
             case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL:
                 currentGradiant = error;
                 break;
@@ -101,6 +97,11 @@ public class UdpUIColorChanger : MonoBehaviour
                 originSign.color = idleColor;
                 clientSign.gameObject.SetActive(true);
                 currentProcessImage = clientSign;
+                break;
+
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
+                currentGradiant = client;
+                timeOffsetSize = 0.1f;
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:

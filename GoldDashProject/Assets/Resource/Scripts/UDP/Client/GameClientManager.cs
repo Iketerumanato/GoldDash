@@ -4,7 +4,6 @@ using UnityEngine;
 using R3;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
-using System.Threading;
 
 public class GameClientManager : MonoBehaviour
 {
@@ -36,16 +35,11 @@ public class GameClientManager : MonoBehaviour
 
     private bool inGame; //ゲームは始まっているか
 
-    private CancellationTokenSource sendCts; //パケット送信タスクのキャンセル用。ブロードキャストは時間がかかるので
-    private CancellationToken token;
-
     //クライアントが内部をコントロールするための通知　マップ生成など
     public enum CLIENT_INTERNAL_EVENT
     {
         GENERATE_MAP = 0, //マップを生成せよ
         EDIT_GUI_FOR_GAME, //インゲーム用のUIレイアウトに変更せよ
-        COMM_ESTABLISHED, //通信が確立された
-        COMM_ERROR, //通信エラー
         COMM_ERROR_FATAL, //致命的な通信エラー
     }
 
@@ -69,19 +63,16 @@ public class GameClientManager : MonoBehaviour
                 if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
 
                 //Initパケット送信
-                //再送処理など時間がかかるので非同期に行う
-                sendCts = new CancellationTokenSource();
-                token = sendCts.Token;
-                Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte()), token);
+                udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte());
 
+                isRunning = true;
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
-                sendCts.Cancel(); //送信を非同期で行っているなら止める
                 if (isRunning) //稼働中なら切断パケット
                 {
                     udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
                 }
-                if (udpGameClient != null) udpGameClient.Dispose();
+                udpGameClient.Dispose();
                 udpGameClient = null;
                 this.sessionID = 0; //変数リセットなど
                 isRunning = false;
@@ -169,8 +160,6 @@ public class GameClientManager : MonoBehaviour
 
                         sessionID = receivedInitPacket.sessionID; //自分のsessionIDを受け取る
                         Debug.Log($"sessionID:{sessionID}を受け取ったぜ。");
-                        //通信が確立されたことを内部通知
-                        ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED);
 
                         //エラーコードがあればここで処理
                         break;
