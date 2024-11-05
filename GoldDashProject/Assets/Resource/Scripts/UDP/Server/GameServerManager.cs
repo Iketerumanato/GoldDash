@@ -76,7 +76,7 @@ public class GameServerManager : MonoBehaviour
                 {
                     udpGameServer.Send(new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
                 }
-                udpGameServer.Dispose();
+                if (udpGameServer != null) udpGameServer.Dispose();
                 udpGameServer = null;
                 actorDictionary.Clear(); //変数リセットなど
                 preparedPlayers = 0;
