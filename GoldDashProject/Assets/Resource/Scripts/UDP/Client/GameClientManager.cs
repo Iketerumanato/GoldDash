@@ -40,6 +40,7 @@ public class GameClientManager : MonoBehaviour
     {
         GENERATE_MAP = 0, //マップを生成せよ
         EDIT_GUI_FOR_GAME, //インゲーム用のUIレイアウトに変更せよ
+        COMM_ERROR_FATAL, //致命的な通信エラー
     }
 
     public Subject<CLIENT_INTERNAL_EVENT> ClientInternalSubject;
@@ -182,6 +183,9 @@ public class GameClientManager : MonoBehaviour
                                     case (byte)Definer.NDID.PSG:
                                         //生成すべきアクターの数を受け取る
                                         numOfActors = receivedActionPacket.targetID;
+                                        break;
+                                    case (byte)Definer.NDID.DISCONNECT:
+                                        ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL); //予期せずサーバーから切断された場合エラーを出す
                                         break;
                                     case (byte)Definer.NDID.STG:
                                         //ここでプレイヤーを有効化してゲーム開始

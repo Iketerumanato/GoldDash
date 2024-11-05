@@ -72,6 +72,10 @@ public class GameServerManager : MonoBehaviour
                 isRunning = true;
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
+                if (isRunning) //稼働中なら切断パケット
+                {
+                    udpGameServer.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
+                }
                 udpGameServer.Dispose();
                 udpGameServer = null;
                 isRunning = false;

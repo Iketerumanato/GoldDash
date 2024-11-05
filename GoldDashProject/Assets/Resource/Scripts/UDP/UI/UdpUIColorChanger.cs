@@ -66,6 +66,9 @@ public class UdpUIColorChanger : MonoBehaviour
                 currentTextComponent = stateMsgMini;
                 currentProcessImage = clientSignMini;
                 break;
+            case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL:
+                currentGradiant = error;
+                break;
             default:
                 break;
         }
