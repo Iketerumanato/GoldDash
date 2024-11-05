@@ -4,7 +4,6 @@ using System.Net.Sockets;
 using System.Net;
 using System;
 using System.Threading.Tasks;
-using System.Diagnostics;
 using System.Collections.Concurrent;
 using System.Threading;
 
@@ -187,6 +186,12 @@ public class UdpGameServer : UdpCommnicator
 
             return false;
         }
+    }
+
+    public void RemoveClientFromDictionary(ushort sessionID)
+    { 
+        clientDictionary.Remove(sessionID);
+        usedID.Remove(sessionID);
     }
 
     public ushort GetReceivePort() { return rcvPort; }

@@ -323,7 +323,7 @@ public class GameServerManager : MonoBehaviour
                         }
                         break;
                     #endregion
-                    #region (byte)Definer.PT.AP: ActionPacketの場合
+                    #region case (byte)Definer.PT.AP: ActionPacketの場合
                     case (byte)Definer.PT.AP:
 
                         //ActionPacketを受け取ったときの処理
@@ -361,6 +361,24 @@ public class GameServerManager : MonoBehaviour
                                             }
                                             //ゲーム開始
                                             inGame = true;
+                                        }
+                                        break;
+                                    case (byte)Definer.NDID.DISCONNECT:
+                                        if (inGame)
+                                        {
+                                            //ゲーム中の切断処理
+                                        }
+                                        else
+                                        {
+                                            Debug.Log($"{receivedActionPacket.targetID}からのセッション切断通知がありました。クライアント登録・アクター登録を抹消します。");
+                                            //サーバー側で登録の抹消
+                                            udpGameServer.RemoveClientFromDictionary(receivedActionPacket.targetID);
+                                            usedName.Remove(actorDictionary[receivedActionPacket.targetID].PlayerName);
+                                            actorDictionary.Remove(receivedActionPacket.targetID);
+                                            //各クライアントにも通知
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.DELETE_ACTOR, receivedActionPacket.targetID);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
                                         }
                                         break;
                                 }

@@ -67,6 +67,10 @@ public class GameClientManager : MonoBehaviour
                 isRunning = true;
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
+                if (isRunning) //稼働中なら切断パケット
+                {
+                    udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
+                }
                 udpGameClient.Dispose();
                 udpGameClient = null;
                 isRunning = false;
@@ -313,6 +317,12 @@ public class GameClientManager : MonoBehaviour
                                             ThunderEntity thunder = Instantiate(ThunderPrefab, receivedActionPacket.pos, Quaternion.Euler(0, 0, 90)).GetComponent<ThunderEntity>();
                                             thunder.InitEntity(); //生成時のメソッドを呼ぶ
                                         }
+                                        break;
+                                    case (byte)Definer.EDID.DELETE_ACTOR:
+                                        //アクターのオブジェクトを削除
+                                        Destroy(actorDictionary[receivedActionPacket.targetID].gameObject);
+                                        //アクター登録の削除
+                                        actorDictionary.Remove(receivedActionPacket.targetID);
                                         break;
                                     case (byte)Definer.EDID.DESTROY_ENTITY:
                                         //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行

@@ -14,6 +14,8 @@ public class UdpUIColorChanger : MonoBehaviour
 
     [SerializeField] private Gradient client;
 
+    [SerializeField] private Gradient error;
+
     private Gradient currentGradiant;
 
     //色を変えたいUI

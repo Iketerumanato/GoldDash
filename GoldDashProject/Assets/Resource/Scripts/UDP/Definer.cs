@@ -68,6 +68,10 @@ public static class Definer
         /// </summary>
         PSG,
         /// <summary>
+        /// 通信を切断します。
+        /// </summary>
+        DISCONNECT,
+        /// <summary>
         /// Start Game, ゲームを開始します
         /// </summary>
         STG,
@@ -129,6 +133,10 @@ public static class Definer
         /// 雷をスポーンさせろ。
         /// </summary>
         SPAWN_THUNDER,
+        /// <summary>
+        /// このActorを削除しろ
+        /// </summary>
+        DELETE_ACTOR,
         /// <summary>
         /// このエンティティを削除しろ
         /// </summary>
