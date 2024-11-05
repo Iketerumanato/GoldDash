@@ -74,7 +74,7 @@ public class GameServerManager : MonoBehaviour
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
                 if (isRunning) //稼働中なら切断パケット
                 {
-                    udpGameServer.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
+                    udpGameServer.Send(new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
                 }
                 udpGameServer.Dispose();
                 udpGameServer = null;
@@ -376,8 +376,9 @@ public class GameServerManager : MonoBehaviour
                                         {
                                             Debug.Log($"{receivedActionPacket.targetID}からのセッション切断通知がありました。クライアント登録・アクター登録を抹消します。");
                                             //サーバー側で登録の抹消
-                                            udpGameServer.RemoveClientFromDictionary(receivedActionPacket.targetID);
                                             usedName.Remove(actorDictionary[receivedActionPacket.targetID].PlayerName);
+                                            Destroy(actorDictionary[receivedActionPacket.targetID].gameObject);
+                                            udpGameServer.RemoveClientFromDictionary(receivedActionPacket.targetID);
                                             actorDictionary.Remove(receivedActionPacket.targetID);
                                             //各クライアントにも通知
                                             myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.DELETE_ACTOR, receivedActionPacket.targetID);

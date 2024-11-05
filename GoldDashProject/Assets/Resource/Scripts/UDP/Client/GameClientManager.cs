@@ -70,7 +70,7 @@ public class GameClientManager : MonoBehaviour
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
                 if (isRunning) //稼働中なら切断パケット
                 {
-                    udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
+                    udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
                 }
                 udpGameClient.Dispose();
                 udpGameClient = null;
