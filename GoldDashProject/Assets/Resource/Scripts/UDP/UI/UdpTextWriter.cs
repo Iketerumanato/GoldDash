@@ -35,7 +35,7 @@ public class UdpTextWriter : MonoBehaviour
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
-                stateMessage.text = "CLIENT MODE : RUNNING";
+                stateMessage.text = "CLIENT MODE : PREPARING";
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
@@ -69,6 +69,9 @@ public class UdpTextWriter : MonoBehaviour
         {
             case GameClientManager.CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME:
                 stateMessageMini.text = "STABLE";
+                break;
+            case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED:
+                stateMessage.text = "CLIENT MODE : RUNNING";
                 break;
             default:
                 break;
