@@ -67,7 +67,7 @@ public class GameClientManager : MonoBehaviour
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
                 if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
-
+                if (this.sessionID != 0) break; //既に接続中なら何もしない
                 isRunning = true;
                 //Initパケット送信
                 //再送処理など時間がかかるので非同期に行う

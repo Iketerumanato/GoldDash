@@ -95,7 +95,7 @@ public class UdpUIColorChanger : MonoBehaviour
                 timeOffsetSize = 0.1f;
                 break;
 
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
                 currentGradiant = idle;
                 timeOffsetSize = 0f;
                 originSign.color = idleColor;
@@ -112,8 +112,6 @@ public class UdpUIColorChanger : MonoBehaviour
                 break;
 
             default:
-                currentGradiant = idle;
-                timeOffsetSize = 0f;
                 break;
         }
     }

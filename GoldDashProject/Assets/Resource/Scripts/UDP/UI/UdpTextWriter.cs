@@ -34,10 +34,6 @@ public class UdpTextWriter : MonoBehaviour
                 stateMessage.text = "CLIENT MODE : IDLING";
                 break;
 
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
-                stateMessage.text = "CLIENT MODE : PREPARING";
-                break;
-
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
                 stateMessage.text = "CLIENT MODE : IDLING";
                 break;
