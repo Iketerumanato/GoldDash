@@ -70,6 +70,8 @@ public class GameClientManager : MonoBehaviour
 
                 //Initパケット送信
                 //再送処理など時間がかかるので非同期に行う
+                isRunning = true;
+
                 sendCts = new CancellationTokenSource();
                 token = sendCts.Token;
                 Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte()), token);
