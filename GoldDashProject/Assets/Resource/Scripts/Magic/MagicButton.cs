@@ -14,7 +14,7 @@ public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [SerializeField] float buttonMoveSpeed = 20f;
     [SerializeField] float buttonAnimDuration = 0.2f;
 
-    [SerializeField] float ButtonFlickLenge = 500f;
+    [SerializeField] float ButtonFlickLength = 500f;
 
     private bool isDragging = false;
     private float flickThreshold = 50f;
@@ -48,6 +48,11 @@ public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 TriggerFlickAnimation();
                 isFlicked = true; // フリックしたことを記録
             }
+            else
+            {
+                // 元の位置に戻す
+                buttonRectTransform.DOLocalMove(originalPosition, buttonAnimDuration).SetEase(Ease.OutQuad);
+            }
 
             isDragging = false;
         }
@@ -55,9 +60,19 @@ public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void TriggerFlickAnimation()
     {
-        buttonRectTransform.DOLocalMoveY(buttonRectTransform.localPosition.y + 500f, 0.5f)
+        buttonRectTransform.DOLocalMoveY(buttonRectTransform.localPosition.y + ButtonFlickLength, 0.5f)
             .SetEase(Ease.OutCubic)
             .OnComplete(() => Debug.Log("Button finished flying up."));
+    }
+
+    private void Update()
+    {
+        if (isDragging && !isFlicked)
+        {
+            // カーソルのY位置のみ追従
+            Vector2 mousePosition = Input.mousePosition;
+            buttonRectTransform.localPosition = new Vector2(buttonRectTransform.localPosition.x, mousePosition.y - originalPosition.y);
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)

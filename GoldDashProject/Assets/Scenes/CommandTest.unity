@@ -852,6 +852,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2082208405265216036, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2790657463491512000, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: m_Colors.m_HighlightedColor.b
       value: 0.8
@@ -864,6 +868,18 @@ PrefabInstance:
       propertyPath: m_Colors.m_HighlightedColor.r
       value: 0.8
       objectReference: {fileID: 0}
+    - target: {fileID: 3932664616122842022, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: buttonMoveSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932664616122842022, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: ButtonFlickLength
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932664616122842022, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: buttonAnimDuration
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 4402492639727931420, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -873,9 +889,33 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7524702430156319257, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: buttonMoveSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7524702430156319257, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: ButtonFlickLength
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 7524702430156319257, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: buttonAnimDuration
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7524702430156319257, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: buttonRectTransform
       value: 
       objectReference: {fileID: 2002772315}
+    - target: {fileID: 7807050173618537044, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: buttonMoveSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7807050173618537044, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: ButtonFlickLength
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 7807050173618537044, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: buttonAnimDuration
+      value: 0.1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
