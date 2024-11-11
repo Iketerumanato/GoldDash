@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.EventSystems;
 //using Mirror;
 
@@ -73,7 +73,13 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         input = (eventData.position - position) / (radius * canvas.scaleFactor);
         FormatInput();
         HandleInput(input.magnitude, input.normalized, radius, cam);
-        handle.anchoredPosition = input * radius * handleRange;
+
+        // 追加: Lerpで滑らかにハンドルの位置を更新
+        Vector2 targetPosition = input * radius * handleRange;
+        handle.anchoredPosition = new Vector2(
+            Mathf.Lerp(handle.anchoredPosition.x, targetPosition.x, 0.1f),  // X軸のスムージング
+            Mathf.Lerp(handle.anchoredPosition.y, targetPosition.y, 0.1f)   // Y軸のスムージング
+        );
     }
 
     protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam)

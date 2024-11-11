@@ -75,6 +75,8 @@ public class Player : MonoBehaviour
     [Header("移動速度")]
     [SerializeField] float moveSpeed = 0.1f;
 
+    [SerializeField] Rigidbody PlayerRig;
+
     [Header("プレイヤーの最大HP")]
     [SerializeField] int maxPlayerHP = 10;
     int PlayerCurrentHP;
@@ -142,7 +144,8 @@ public class Player : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * smoothSpeed);
 
             // プレイヤーの移動
-            transform.position -= moveSpeed * Time.deltaTime * input;
+            //transform.position -= moveSpeed * Time.deltaTime * input;
+            PlayerRig.AddForce(input * -moveSpeed, ForceMode.Force);
 
             // アニメーションの遷移 (BlendSpeedの補間)
             float inputMagnitude = Mathf.Sqrt(input.sqrMagnitude); ;

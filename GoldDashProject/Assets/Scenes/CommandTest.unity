@@ -892,6 +892,14 @@ PrefabInstance:
       propertyPath: m_Color.a
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2145081487705626574, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2377288703928472327, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: moveSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 2655593044101009515, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.7
@@ -1011,6 +1019,22 @@ PrefabInstance:
     - target: {fileID: 7807050173618537044, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: buttonAnimDuration
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8764142507045295701, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: m_Mass
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8764142507045295701, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: m_Constraints
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8764142507045295701, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: m_ImplicitTensor
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8786443541520265689, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: deadZone
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
