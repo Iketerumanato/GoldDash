@@ -2543,7 +2543,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sessionPass: 9999
-  numOfPlayers: 1
+  numOfPlayers: 2
   maxNumOfChests: 10
   ActorPrefab: {fileID: 5703939729677495424, guid: 8145896d58e7e6b49a27f9ce769cdd62, type: 3}
   GoldPilePrefab: {fileID: 3135798385285437698, guid: 6fb001d414ae3684f9597b7c17828efd, type: 3}
