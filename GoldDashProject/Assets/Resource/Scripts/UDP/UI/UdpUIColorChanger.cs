@@ -95,12 +95,22 @@ public class UdpUIColorChanger : MonoBehaviour
                 timeOffsetSize = 0.1f;
                 break;
 
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
+                currentGradiant = idle;
+                timeOffsetSize = 0f;
+                break;
+
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
+                currentGradiant = idle;
+                originSign.color = idleColor;
+                timeOffsetSize = 0f;
+                clientSign.gameObject.SetActive(true);
+                currentProcessImage = clientSign;
+                break;
+
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
                 currentGradiant = idle;
                 timeOffsetSize = 0f;
-                originSign.color = idleColor;
-                clientSign.gameObject.SetActive(true);
-                currentProcessImage = clientSign;
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
