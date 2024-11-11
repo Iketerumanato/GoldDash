@@ -4,6 +4,7 @@ using UnityEngine;
 using R3;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
+using System.Threading;
 
 public class GameClientManager : MonoBehaviour
 {
@@ -35,11 +36,17 @@ public class GameClientManager : MonoBehaviour
 
     private bool inGame; //ゲームは始まっているか
 
+    private CancellationTokenSource sendCts; //パケット送信タスクのキャンセル用。ブロードキャストは時間がかかるので
+    private CancellationToken token;
+
     //クライアントが内部をコントロールするための通知　マップ生成など
     public enum CLIENT_INTERNAL_EVENT
     {
         GENERATE_MAP = 0, //マップを生成せよ
         EDIT_GUI_FOR_GAME, //インゲーム用のUIレイアウトに変更せよ
+        COMM_ESTABLISHED, //通信が確立された
+        COMM_ERROR, //通信エラー
+        COMM_ERROR_FATAL, //致命的な通信エラー
     }
 
     public Subject<CLIENT_INTERNAL_EVENT> ClientInternalSubject;
@@ -56,22 +63,33 @@ public class GameClientManager : MonoBehaviour
         switch (e)
         {
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
-                udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
+                if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
                 if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
-
-                //Initパケット送信
-                udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte());
-
+                if (this.sessionID != 0) break; //既に接続中なら何もしない
                 isRunning = true;
+                //Initパケット送信
+                //再送処理など時間がかかるので非同期に行う
+                sendCts = new CancellationTokenSource();
+                token = sendCts.Token;
+                Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte()), token);
+
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
-                udpGameClient.Dispose();
                 isRunning = false;
+                sendCts.Cancel(); //送信を非同期で行っているなら止める
+                if (this.sessionID != 0) //サーバーに接続中なら切断パケット
+                {
+                    udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
+                }
+                if (udpGameClient != null) udpGameClient.Dispose();
+                udpGameClient = null;
+                this.sessionID = 0; //変数リセットなど
                 break;
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
                 if (udpGameClient != null) udpGameClient.Dispose();
+                udpGameClient = null;
                 isRunning = false;
                 break;
             default:
@@ -152,6 +170,8 @@ public class GameClientManager : MonoBehaviour
 
                         sessionID = receivedInitPacket.sessionID; //自分のsessionIDを受け取る
                         Debug.Log($"sessionID:{sessionID}を受け取ったぜ。");
+                        //通信が確立されたことを内部通知
+                        ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED);
 
                         //エラーコードがあればここで処理
                         break;
@@ -176,6 +196,9 @@ public class GameClientManager : MonoBehaviour
                                     case (byte)Definer.NDID.PSG:
                                         //生成すべきアクターの数を受け取る
                                         numOfActors = receivedActionPacket.targetID;
+                                        break;
+                                    case (byte)Definer.NDID.DISCONNECT:
+                                        ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL); //予期せずサーバーから切断された場合エラーを出す
                                         break;
                                     case (byte)Definer.NDID.STG:
                                         //ここでプレイヤーを有効化してゲーム開始
@@ -311,6 +334,12 @@ public class GameClientManager : MonoBehaviour
                                             ThunderEntity thunder = Instantiate(ThunderPrefab, receivedActionPacket.pos, Quaternion.Euler(0, 0, 90)).GetComponent<ThunderEntity>();
                                             thunder.InitEntity(); //生成時のメソッドを呼ぶ
                                         }
+                                        break;
+                                    case (byte)Definer.EDID.DELETE_ACTOR:
+                                        //アクターのオブジェクトを削除
+                                        Destroy(actorDictionary[receivedActionPacket.targetID].gameObject);
+                                        //アクター登録の削除
+                                        actorDictionary.Remove(receivedActionPacket.targetID);
                                         break;
                                     case (byte)Definer.EDID.DESTROY_ENTITY:
                                         //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行

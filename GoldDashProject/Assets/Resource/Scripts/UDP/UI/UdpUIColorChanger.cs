@@ -14,6 +14,8 @@ public class UdpUIColorChanger : MonoBehaviour
 
     [SerializeField] private Gradient client;
 
+    [SerializeField] private Gradient error;
+
     private Gradient currentGradiant;
 
     //色を変えたいUI
@@ -64,6 +66,13 @@ public class UdpUIColorChanger : MonoBehaviour
                 currentTextComponent = stateMsgMini;
                 currentProcessImage = clientSignMini;
                 break;
+            case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED:
+                currentGradiant = client;
+                timeOffsetSize = 0.1f;
+                break;
+            case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL:
+                currentGradiant = error;
+                break;
             default:
                 break;
         }
@@ -86,17 +95,22 @@ public class UdpUIColorChanger : MonoBehaviour
                 timeOffsetSize = 0.1f;
                 break;
 
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
                 currentGradiant = idle;
                 timeOffsetSize = 0f;
+                break;
+
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
+                currentGradiant = idle;
                 originSign.color = idleColor;
+                timeOffsetSize = 0f;
                 clientSign.gameObject.SetActive(true);
                 currentProcessImage = clientSign;
                 break;
 
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
-                currentGradiant = client;
-                timeOffsetSize = 0.1f;
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
+                currentGradiant = idle;
+                timeOffsetSize = 0f;
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
@@ -108,8 +122,6 @@ public class UdpUIColorChanger : MonoBehaviour
                 break;
 
             default:
-                currentGradiant = idle;
-                timeOffsetSize = 0f;
                 break;
         }
     }

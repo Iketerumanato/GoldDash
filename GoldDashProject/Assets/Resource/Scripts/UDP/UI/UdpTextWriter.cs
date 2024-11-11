@@ -34,10 +34,6 @@ public class UdpTextWriter : MonoBehaviour
                 stateMessage.text = "CLIENT MODE : IDLING";
                 break;
 
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
-                stateMessage.text = "CLIENT MODE : RUNNING";
-                break;
-
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
                 stateMessage.text = "CLIENT MODE : IDLING";
                 break;
@@ -69,6 +65,9 @@ public class UdpTextWriter : MonoBehaviour
         {
             case GameClientManager.CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME:
                 stateMessageMini.text = "STABLE";
+                break;
+            case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED:
+                stateMessage.text = "CLIENT MODE : RUNNING";
                 break;
             default:
                 break;
