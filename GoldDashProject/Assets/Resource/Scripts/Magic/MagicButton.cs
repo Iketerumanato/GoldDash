@@ -10,19 +10,21 @@ public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [SerializeField] Button magicbutton;
 
     [SerializeField] RectTransform buttonRectTransform;
+    [SerializeField] Transform endPos;  // EndPosオブジェクトの参照
     private Vector2 originalPosition;
     [SerializeField] float buttonMoveSpeed = 20f;
     [SerializeField] float buttonAnimDuration = 0.2f;
 
-    [SerializeField] float ButtonFlickLength = 500f;
-
+    [SerializeField] float flickThreshold = 50f;
     private bool isDragging = false;
-    private float flickThreshold = 50f;
     private bool isFlicked = false;
+
+    private CanvasGroup canvasGroup;
 
     private void Awake()
     {
         originalPosition = buttonRectTransform.localPosition;
+        canvasGroup = buttonRectTransform.GetComponent<CanvasGroup>();
     }
 
     void Start()
@@ -32,7 +34,10 @@ public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        originalPosition = eventData.position;
+        buttonRectTransform.DOKill();
+        buttonRectTransform.localPosition = originalPosition;
+        canvasGroup.alpha = 1f;  // 透明度をリセット
+
         isDragging = true;
     }
 
@@ -46,11 +51,10 @@ public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             if (dragVector.y > flickThreshold)
             {
                 TriggerFlickAnimation();
-                isFlicked = true; // フリックしたことを記録
+                isFlicked = true;
             }
             else
             {
-                // 元の位置に戻す
                 buttonRectTransform.DOLocalMove(originalPosition, buttonAnimDuration).SetEase(Ease.OutQuad);
             }
 
@@ -60,19 +64,13 @@ public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void TriggerFlickAnimation()
     {
-        buttonRectTransform.DOLocalMoveY(buttonRectTransform.localPosition.y + ButtonFlickLength, 0.5f)
+        // EndPos位置まで移動し、透明度を徐々に0にする
+        buttonRectTransform.DOMove(endPos.position, 0.5f)
             .SetEase(Ease.OutCubic)
-            .OnComplete(() => Debug.Log("Button finished flying up."));
-    }
+            .OnComplete(() => Debug.Log("Button reached end position."));
 
-    private void Update()
-    {
-        if (isDragging && !isFlicked)
-        {
-            // カーソルのY位置のみ追従
-            Vector2 mousePosition = Input.mousePosition;
-            buttonRectTransform.localPosition = new Vector2(buttonRectTransform.localPosition.x, mousePosition.y - originalPosition.y);
-        }
+        // 透明度を徐々に0にするアニメーション
+        canvasGroup.DOFade(0f, 0.5f);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

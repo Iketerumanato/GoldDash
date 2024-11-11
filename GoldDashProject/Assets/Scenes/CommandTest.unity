@@ -870,15 +870,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3932664616122842022, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: buttonMoveSpeed
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3932664616122842022, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: ButtonFlickLength
-      value: 500
+      value: 600
       objectReference: {fileID: 0}
     - target: {fileID: 3932664616122842022, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: buttonAnimDuration
-      value: 0.1
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 4402492639727931420, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: m_IsActive
@@ -890,15 +890,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7524702430156319257, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: buttonMoveSpeed
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7524702430156319257, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: ButtonFlickLength
-      value: 500
+      value: 600
       objectReference: {fileID: 0}
     - target: {fileID: 7524702430156319257, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: buttonAnimDuration
-      value: 0.1
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 7524702430156319257, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: buttonRectTransform
@@ -906,15 +906,15 @@ PrefabInstance:
       objectReference: {fileID: 2002772315}
     - target: {fileID: 7807050173618537044, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: buttonMoveSpeed
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7807050173618537044, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: ButtonFlickLength
-      value: 500
+      value: 600
       objectReference: {fileID: 0}
     - target: {fileID: 7807050173618537044, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: buttonAnimDuration
-      value: 0.1
+      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
