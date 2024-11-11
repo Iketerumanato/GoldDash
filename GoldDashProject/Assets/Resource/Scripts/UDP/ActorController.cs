@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.Windows;
-using static UnityEditor.PlayerSettings;
 
 /// <summary>
 /// プレイヤー達を管理するクラス。GameServerManagerでSessionIDをKeyとしてDictionaryで管理される
