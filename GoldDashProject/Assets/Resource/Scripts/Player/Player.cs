@@ -11,8 +11,6 @@ public interface IPlayerState
 //通常の状態
 public class NormalState : IPlayerState
 {
-    private Vector3 inputVector;
-
     public void EnterState(Player player)
     {
         Debug.Log("Player操作中");
@@ -20,7 +18,7 @@ public class NormalState : IPlayerState
 
     public void UpdateProcess(Player player)
     {
-        player.MovePlayerJoystick(inputVector);
+        player.MovePlayerJoystick();
         player.MoveKey();
         if (Input.GetMouseButtonDown(0))
         {
@@ -88,7 +86,7 @@ public class Player : MonoBehaviour
     [SerializeField] DrawCircle drawCircle;
     [SerializeField] CameraControll cameraControll;
 
-    [SerializeField] VariableJoystick variableJoystick;
+    [SerializeField] VariableJoystick moveJoystick;
 
     private IPlayerState _playerCurrentState;
     [SerializeField] Animator playerAnimator;
@@ -129,26 +127,25 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         _playerCurrentState.UpdateProcess(this);
+
         // 落下時のリスポーン
         if (transform.position.y < fallThreshold) PlayerRespawn();
     }
 
     #region プレイヤーの操作と落下
-    public void MovePlayerJoystick(Vector3 input)
+    public void MovePlayerJoystick()
     {
-        input = transform.forward * variableJoystick.Vertical + transform.right * variableJoystick.Horizontal;
+        Vector3 direction = Vector3.forward * moveJoystick.Vertical + Vector3.right * moveJoystick.Horizontal;
 
-        if (input.magnitude > 0)
+        if (direction.magnitude > 0)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(input);
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * smoothSpeed);
 
-            // プレイヤーの移動
-            //transform.position -= moveSpeed * Time.deltaTime * input;
-            PlayerRig.AddForce(input * -moveSpeed, ForceMode.Force);
+            PlayerRig.AddForce(direction * -moveSpeed, ForceMode.Force);
 
             // アニメーションの遷移 (BlendSpeedの補間)
-            float inputMagnitude = Mathf.Sqrt(input.sqrMagnitude); ;
+            float inputMagnitude = Mathf.Sqrt(direction.sqrMagnitude); ;
             playerAnimator.SetFloat(strPlayerAnimSpeed, inputMagnitude);
         }
         else playerAnimator.SetFloat(strPlayerAnimSpeed, 0f);//動きが止まった時はアニメーションの停止

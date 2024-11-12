@@ -34,6 +34,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     [SerializeField] protected RectTransform background = null;
     [SerializeField] private RectTransform handle = null;
     private RectTransform baseRect = null;
+    private float handleSmoothValue = 15f;
 
     private Canvas canvas;
     private Camera cam;
@@ -49,7 +50,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         if (canvas == null)
             Debug.LogError("The Joystick is not placed inside a canvas");
 
-        Vector2 center = new Vector2(0.5f, 0.5f);
+        Vector2 center = new (0.5f, 0.5f);
         background.pivot = center;
         handle.anchorMin = center;
         handle.anchorMax = center;
@@ -74,23 +75,20 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         FormatInput();
         HandleInput(input.magnitude, input.normalized, radius, cam);
 
-        // 追加: Lerpで滑らかにハンドルの位置を更新
+        // スムージングとdeltaTimeを使用した位置設定
         Vector2 targetPosition = input * radius * handleRange;
-        handle.anchoredPosition = new Vector2(
-            Mathf.Lerp(handle.anchoredPosition.x, targetPosition.x, 0.1f),  // X軸のスムージング
-            Mathf.Lerp(handle.anchoredPosition.y, targetPosition.y, 0.1f)   // Y軸のスムージング
-        );
+        handle.anchoredPosition = Vector2.Lerp(handle.anchoredPosition, targetPosition, handleSmoothValue * Time.deltaTime);
     }
 
     protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam)
     {
+        float threshold = 0.1f;
         if (magnitude > deadZone)
         {
-            if (magnitude > 1)
-                input = normalised;
+            if (magnitude > 1) input = normalised;
+            else if (magnitude < threshold) input = Vector2.zero; 
         }
-        else
-            input = Vector2.zero;
+        else input = Vector2.zero;
     }
 
     private void FormatInput()
