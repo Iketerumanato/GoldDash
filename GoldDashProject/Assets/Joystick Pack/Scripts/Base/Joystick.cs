@@ -34,7 +34,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     [SerializeField] protected RectTransform background = null;
     [SerializeField] private RectTransform handle = null;
     private RectTransform baseRect = null;
-    private float handleSmoothValue = 15f;
+    private float handleSmoothValue = 3f;
 
     private Canvas canvas;
     private Camera cam;

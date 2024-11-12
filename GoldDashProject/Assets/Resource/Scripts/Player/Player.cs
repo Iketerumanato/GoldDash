@@ -101,7 +101,6 @@ public class Player : MonoBehaviour
     void Start()
     {
         ChangePlayerState(new NormalState());
-        //variableJoystick = FindAnyObjectByType<VariableJoystick>();
         initialSpawnPosition = transform.position;
         PlayerCurrentHP = maxPlayerHP;
 
@@ -135,7 +134,7 @@ public class Player : MonoBehaviour
     #region プレイヤーの操作と落下
     public void MovePlayerJoystick()
     {
-        Vector3 direction = Vector3.forward * moveJoystick.Vertical + Vector3.right * moveJoystick.Horizontal;
+        Vector3 direction = transform.forward * moveJoystick.Vertical + transform.right * moveJoystick.Horizontal;
 
         if (direction.magnitude > 0)
         {
@@ -148,7 +147,11 @@ public class Player : MonoBehaviour
             float inputMagnitude = Mathf.Sqrt(direction.sqrMagnitude); ;
             playerAnimator.SetFloat(strPlayerAnimSpeed, inputMagnitude);
         }
-        else playerAnimator.SetFloat(strPlayerAnimSpeed, 0f);//動きが止まった時はアニメーションの停止
+        else
+        {
+            PlayerRig.velocity = Vector3.zero;
+            playerAnimator.SetFloat(strPlayerAnimSpeed, 0f);//動きが止まった時はアニメーションの停止
+        }
     }
 
     public void MoveKey()

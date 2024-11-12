@@ -2310,7 +2310,7 @@ MonoBehaviour:
   interactableDistance: 4
   punchReachableDistance: 1
   flontRange: 120
-  moveSpeed: 0.1
+  moveSpeed: 10
   PlayerRig: {fileID: 8764142507045295701}
   maxPlayerHP: 10
   fallThreshold: -10
@@ -2389,7 +2389,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1191692250164345034}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 824bdd4efb69ace4387f24ec62752ba4, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
