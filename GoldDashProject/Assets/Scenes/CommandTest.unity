@@ -848,6 +848,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerArm
       objectReference: {fileID: 0}
+    - target: {fileID: 1191692250164345034, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2000281466106405488, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
