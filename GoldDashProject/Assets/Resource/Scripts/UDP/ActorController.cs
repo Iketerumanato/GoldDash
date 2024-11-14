@@ -34,6 +34,8 @@ public class ActorController : MonoBehaviour
 
     readonly string strMoveAnimation = "BlendSpeed";
     readonly string strPunchTrigger = "PunchTrigger";
+    readonly string strHitedFrontTrigger = "HitFrontActorTrigger";
+    readonly string strHitedBackTrigger = "HitBackActorTrigger";
 
     private void Awake()
     {
@@ -98,13 +100,15 @@ public class ActorController : MonoBehaviour
     }
 
     public void RecoiledAnimation()
-    { 
-        //怯みアニメーション再生
+    {
+        //正面殴られモーション再生(Actor)
+        PlayerAnimator.SetTrigger(strHitedFrontTrigger);
     }
 
     public void BlownAnimation()
-    { 
-        //吹っ飛ぶアニメーション再生
+    {
+        //背面殴られモーション再生(Actor)
+        PlayerAnimator.SetTrigger(strHitedBackTrigger);
     }
 
     //所持金関連

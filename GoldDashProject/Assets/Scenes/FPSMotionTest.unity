@@ -1709,6 +1709,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Actor
       objectReference: {fileID: 0}
+    - target: {fileID: 5703939729677495424, guid: 8145896d58e7e6b49a27f9ce769cdd62, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2910,6 +2914,10 @@ PrefabInstance:
     - target: {fileID: 5703939729677495424, guid: 8145896d58e7e6b49a27f9ce769cdd62, type: 3}
       propertyPath: m_Name
       value: Actor (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5703939729677495424, guid: 8145896d58e7e6b49a27f9ce769cdd62, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
