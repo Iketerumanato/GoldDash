@@ -4047,7 +4047,7 @@ MonoBehaviour:
   smoothSpeed: 10
   currentGoldText: {fileID: 1944260099277541391}
   myActor: {fileID: 2243988343626576125}
-  shakeEffect: {fileID: 0}
+  shakeEffect: {fileID: 8017749298216204248}
 --- !u!114 &3421997971350921957
 MonoBehaviour:
   m_ObjectHideFlags: 0
