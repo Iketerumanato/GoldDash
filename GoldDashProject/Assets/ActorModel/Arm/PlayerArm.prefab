@@ -815,9 +815,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shakeCameraTransform: {fileID: 189977119046504732}
-  cameraPositionStrength: {x: 0.15, y: 0.15, z: 0.15}
-  cameraRotationStrength: {x: 0.1, y: 0.1, z: 0.1}
-  shakeCameraDuration: 0.2
+  smallPositionStrength: {x: 0.03, y: 0.03, z: 0.03}
+  smallRotationStrength: {x: 0.02, y: 0.02, z: 0.02}
+  smallShakeDuration: 0.2
+  mediumPositionStrength: {x: 0.06, y: 0.06, z: 0.06}
+  mediumRotationStrength: {x: 0.05, y: 0.05, z: 0.05}
+  mediumShakeDuration: 0.4
+  largePositionStrength: {x: 0.1, y: 0.1, z: 0.1}
+  largeRotationStrength: {x: 0.1, y: 0.1, z: 0.1}
+  largeShakeDuration: 0.6
 --- !u!1 &4238137697240569449
 GameObject:
   m_ObjectHideFlags: 0

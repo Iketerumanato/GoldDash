@@ -282,6 +282,7 @@ public class Player : MonoBehaviour
             myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
             myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             udpGameClient.Send(myHeader.ToByte());
+            shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Small);
 
             Debug.Log("スカ送信");
         }
@@ -301,7 +302,7 @@ public class Player : MonoBehaviour
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
-                shakeEffect.ShakeCameraEffect();
+                shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium);
                 Debug.Log("正面送信");
             }
             else
@@ -310,7 +311,7 @@ public class Player : MonoBehaviour
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_BACK, actorController.SessionID, default, punchVec);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
-                shakeEffect.ShakeCameraEffect();
+                shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large);
                 Debug.Log("背面送信");
             }
         }
