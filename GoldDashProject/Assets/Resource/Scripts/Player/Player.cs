@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public interface IPlayerState
 {
@@ -265,7 +266,7 @@ public class Player : MonoBehaviour
     }
 
     //パンチ。パンチを成立させたRaycastHit構造体のPointとDistanceを引数にもらおう
-    private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
+    async UniTaskVoid Punch(Vector3 hitPoint, float distance, ActorController actorController)
     {
         Debug.Log("Punch入った");
 
@@ -282,6 +283,7 @@ public class Player : MonoBehaviour
             myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
             myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             udpGameClient.Send(myHeader.ToByte());
+            await UniTask.Delay(200);
             shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Small);
 
             Debug.Log("スカ送信");
@@ -302,6 +304,7 @@ public class Player : MonoBehaviour
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
+                await UniTask.Delay(200);
                 shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium);
                 Debug.Log("正面送信");
             }
@@ -311,6 +314,7 @@ public class Player : MonoBehaviour
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_BACK, actorController.SessionID, default, punchVec);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
+                await UniTask.Delay(200);
                 shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large);
                 Debug.Log("背面送信");
             }
