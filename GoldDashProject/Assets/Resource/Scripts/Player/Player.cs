@@ -283,7 +283,7 @@ public class Player : MonoBehaviour
             myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
             myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             udpGameClient.Send(myHeader.ToByte());
-            await UniTask.Delay(200);
+            await UniTask.Delay(400);
             shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Small);
 
             Debug.Log("スカ送信");
