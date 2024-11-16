@@ -96,6 +96,7 @@ public class Player : MonoBehaviour
 
     [SerializeField] TMP_Text currentGoldText;
     [SerializeField] ActorController myActor;
+    [SerializeField] ShakeEffect shakeEffect;
     int oldGold;
 
     void Start()
@@ -300,8 +301,7 @@ public class Player : MonoBehaviour
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
-
-
+                shakeEffect.ShakeCameraEffect();
                 Debug.Log("正面送信");
             }
             else
@@ -310,8 +310,7 @@ public class Player : MonoBehaviour
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_BACK, actorController.SessionID, default, punchVec);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
-
-
+                shakeEffect.ShakeCameraEffect();
                 Debug.Log("背面送信");
             }
         }
