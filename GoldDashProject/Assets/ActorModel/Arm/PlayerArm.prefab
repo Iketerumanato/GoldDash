@@ -814,7 +814,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91656bd5c1ba1324b9f9beb9003a1ab7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isCameraShake: 0
   shakeCameraTransform: {fileID: 189977119046504732}
   cameraPositionStrength: {x: 0.5, y: 0.5, z: 0.5}
   cameraRotationStrength: {x: 0.2, y: 0.2, z: 0.2}
@@ -2338,6 +2337,7 @@ MonoBehaviour:
   smoothSpeed: 10
   currentGoldText: {fileID: 1944260099277541391}
   myActor: {fileID: 2243988343626576125}
+  shakeEffect: {fileID: 1593976633976117632}
 --- !u!114 &3421997971350921957
 MonoBehaviour:
   m_ObjectHideFlags: 0
