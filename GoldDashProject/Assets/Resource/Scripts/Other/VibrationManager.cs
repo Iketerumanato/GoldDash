@@ -4,7 +4,7 @@ public class VibrationManager : MonoBehaviour
 {
     public static void VibrateTablet()
     {
-#if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID
         using (AndroidJavaObject vibrationService = new AndroidJavaObject("android.os.Vibrator"))
         {
             using (AndroidJavaObject unityActivity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity"))
