@@ -93,6 +93,12 @@ public class Player : MonoBehaviour
     [SerializeField] Animator playerAnimator;
     readonly string strPlayerAnimSpeed = "ArmAnimationSpeed";
     readonly string strPunchTrigger = "ArmPunchTrigger";
+
+    #region 殴られた判定で使うstring型のTrigger
+    readonly string strHitedFrontTrigger = "HitedFrontArmTrigger";
+    readonly string strHitedBackTrigger = "HitedBackArmTrigger";
+    #endregion
+
     [SerializeField] float smoothSpeed = 10f;
 
     [SerializeField] TMP_Text currentGoldText;

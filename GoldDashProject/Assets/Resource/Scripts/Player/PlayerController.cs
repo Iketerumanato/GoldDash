@@ -85,6 +85,7 @@ public class PlayerController : MonoBehaviour
         playerMoveVec = new Vector3(leftJoystick.Horizontal, 0f, leftJoystick.Vertical); //上書き
 
         this.transform.Translate(playerMoveVec * playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
+        playerAnimator.SetFloat(strPlayerAnimSpeed, playerMoveVec.magnitude); //走りモーション（仮）
         #endregion
 
         #region 右スティックでカメラを操作しつつ、プレイヤーを左右に回転させる
