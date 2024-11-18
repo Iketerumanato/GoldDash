@@ -28,6 +28,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float fallThreshold = -10f;
     private Vector3 initialSpawnPosition; //リスポーン地点
 
+    [Header("魔法を最大何個持てるか")]
+    [SerializeField] private int magicSlot = 3;
+
     //UI関連
     //プレイヤーを移動させる左ジョイスティック
     private VariableJoystick leftJoystick;
@@ -52,6 +55,10 @@ public class PlayerController : MonoBehaviour
     private readonly string strPunchTrigger = "ArmPunchTrigger";
     [SerializeField] float smoothSpeed = 10f;
 
+    //魔法関連
+    //所持している魔法。可変長である必要がないため配列で
+    private MagicData[] magicDataArray;
+
     private void Start()
     {
         //リスポーン地点の記録
@@ -62,6 +69,9 @@ public class PlayerController : MonoBehaviour
         rightJoystick = GetComponentInChildren<DynamicJoystick>(); //同上
         playerCam = Camera.main; //プレイヤーカメラにはMainCameraのタグがついている
         playerAnimator = GetComponent<Animator>();
+
+        //コレクションのインスタンス作成
+        magicDataArray = new MagicData[magicSlot];
     }
 
     private void LateUpdate()
