@@ -17,6 +17,12 @@ public class PlayerController : MonoBehaviour
     [Header("移動速度（マス／毎秒）")]
     [SerializeField] private float playerMoveSpeed = 1f;
 
+    [Tooltip("プレイヤーの移動速度制限")]
+    [SerializeField] float playerLimitSoeed = 5f;
+
+    [Tooltip("減速する方向の力")]
+    [Range(1f, 5f),SerializeField] float playerFrictionPower = 5f;
+
     [Header("カメラ回転速度（度／毎秒）")]
     [SerializeField] private float cameraMoveSpeed = 1f;
 
@@ -55,6 +61,8 @@ public class PlayerController : MonoBehaviour
     private readonly string strPunchTrigger = "ArmPunchTrigger";
     [SerializeField] float smoothSpeed = 10f;
 
+    [SerializeField] Rigidbody playerRig;
+
     //魔法関連
     //所持している魔法。可変長である必要がないため配列で
     private MagicData[] magicDataArray;
@@ -82,9 +90,26 @@ public class PlayerController : MonoBehaviour
 
         //ジョイスティックの入力があればそれで上書きする
         if (!Mathf.Approximately(leftJoystick.Horizontal, 0) || !Mathf.Approximately(leftJoystick.Vertical, 0)) //左スティックの水平垂直どちらの入力も"ほぼ0"でないなら
-        playerMoveVec = new Vector3(leftJoystick.Horizontal, 0f, leftJoystick.Vertical); //上書き
+            playerMoveVec = new Vector3(leftJoystick.Horizontal, 0f, leftJoystick.Vertical); //上書き
 
-        this.transform.Translate(playerMoveVec * playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
+        //プレイヤーの移動(Translate版)
+        //this.transform.Translate(playerMoveVec * playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
+        //プレイヤーの移動(Addforce版)
+
+        // 正規化して移動速度を計算
+        playerMoveVec = playerMoveVec.normalized * playerMoveSpeed;
+
+        // プレイヤーの移動 (AddForce版)
+        if (playerRig.velocity.magnitude > playerLimitSoeed)
+        {
+            playerRig.velocity = playerRig.velocity.normalized * playerLimitSoeed;
+        }
+        else
+        {
+            //入力がなくなったときには入力移動速度は0になるので、減速する方向に力が加わる
+            playerRig.AddForce(playerMoveSpeed * (playerMoveVec - playerRig.velocity * playerFrictionPower));
+        }
+
         #endregion
 
         #region 右スティックでカメラを操作しつつ、プレイヤーを左右に回転させる
