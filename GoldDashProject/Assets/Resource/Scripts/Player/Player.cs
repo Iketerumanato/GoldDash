@@ -106,6 +106,8 @@ public class Player : MonoBehaviour
     [SerializeField] ShakeEffect shakeEffect;
     int oldGold;
 
+    private VibrationManager vibrationManager;
+
     void Start()
     {
         ChangePlayerState(new NormalState());
@@ -118,6 +120,8 @@ public class Player : MonoBehaviour
 
         //currentGoldText.text = $"Gold: { myActor.Gold}";
         oldGold = myActor.Gold;
+
+        vibrationManager = new();
     }
 
     private void Update()
@@ -312,7 +316,7 @@ public class Player : MonoBehaviour
                 udpGameClient.Send(myHeader.ToByte());
                 await UniTask.Delay(200);
                 shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium);
-                VibrationManager.VibrateTablet();
+                vibrationManager.Vibrate(500);
                 Debug.Log("正面送信");
             }
             else
@@ -323,7 +327,7 @@ public class Player : MonoBehaviour
                 udpGameClient.Send(myHeader.ToByte());
                 await UniTask.Delay(200);
                 shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large);
-                VibrationManager.VibrateTablet();
+                vibrationManager.Vibrate(500);
                 Debug.Log("背面送信");
             }
         }

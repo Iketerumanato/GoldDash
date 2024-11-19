@@ -2,16 +2,40 @@ using UnityEngine;
 
 public class VibrationManager : MonoBehaviour
 {
-    public static void VibrateTablet()
+    public void Vibrate(long milliseconds)
     {
 #if UNITY_ANDROID
-        using (AndroidJavaObject vibrationService = new AndroidJavaObject("android.os.Vibrator"))
-        {
-            using (AndroidJavaObject unityActivity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity"))
-            {
-                vibrationService.Call("vibrate", 500); // 500msバイブレーション
-            }
-        }
+        // AndroidのVibratorサービスを取得
+        AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        AndroidJavaObject vibrator = currentActivity.Call<AndroidJavaObject>("getSystemService", "vibrator");
+
+        // 振動を発生させる
+        vibrator.Call("vibrate", milliseconds);
+#endif
+    }
+
+    public void VibratePattern(long[] pattern, int repeat)
+    {
+#if UNITY_ANDROID
+        AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        AndroidJavaObject vibrator = currentActivity.Call<AndroidJavaObject>("getSystemService", "vibrator");
+
+        // 振動パターンを設定
+        vibrator.Call("vibrate", pattern, repeat);
+#endif
+    }
+
+    public void CancelVibration()
+    {
+#if UNITY_ANDROID
+        AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        AndroidJavaObject vibrator = currentActivity.Call<AndroidJavaObject>("getSystemService", "vibrator");
+
+        // 振動を停止
+        vibrator.Call("cancel");
 #endif
     }
 }
