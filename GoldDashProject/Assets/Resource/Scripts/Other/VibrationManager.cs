@@ -1,16 +1,11 @@
 using UnityEngine;
 
-public class VibrationManager : MonoBehaviour
+public class VibrationManager
 {
     readonly string VibrationMethod = "vibrate";
 
-    [Tooltip("to 30000")]
-    [SerializeField] long vibrationTime = 250;
-
-    [Tooltip("1 to 255")]
-    [SerializeField,Range(1,255)] int vibratePower = 75;
-
-    public void VibrateWithAmplitude(long milliseconds, int amplitude)
+    //millisecondsに関しては30000ミリ秒,amplitudeに関しては1から255まで強さを設定できる
+    public void VibrateWithAmplitude(long vibrationTime, int vibratePower)
     {
 #if UNITY_ANDROID
         // UnityPlayer クラスの取得
@@ -26,8 +21,8 @@ public class VibrationManager : MonoBehaviour
             AndroidJavaClass vibrationEffectClass = new AndroidJavaClass("android.os.VibrationEffect");
             AndroidJavaObject vibrationEffect = vibrationEffectClass.CallStatic<AndroidJavaObject>(
                 "createOneShot",
-                milliseconds,
-                amplitude);
+                vibrationTime,
+                vibratePower);
             // 振動処理を呼び出す
             vibrator.Call(VibrationMethod, vibrationEffect);
         }
