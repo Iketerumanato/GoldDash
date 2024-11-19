@@ -295,7 +295,7 @@ public class Player : MonoBehaviour
             udpGameClient.Send(myHeader.ToByte());
             await UniTask.Delay(400);
             shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Small);
-
+            vibrationManager.VibrateWithAmplitude(125, 35);
             Debug.Log("スカ送信");
         }
         else
