@@ -1,41 +1,44 @@
 using UnityEngine;
 
-public class VibrationManager : MonoBehaviour
+public class VibrationManager
 {
-    public void Vibrate(long milliseconds)
+    public void VibrateWithAmplitude(long milliseconds, int amplitude)
     {
 #if UNITY_ANDROID
-        // AndroidのVibratorサービスを取得
+        // UnityPlayer クラスの取得
         AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        // Vibratorサービスを取得
         AndroidJavaObject vibrator = currentActivity.Call<AndroidJavaObject>("getSystemService", "vibrator");
 
-        // 振動を発生させる
-        vibrator.Call("vibrate", milliseconds);
+        //AndroidVersionIsOreoOrHigherでtrue判定を受けた時のみVibrationEffectを利用
+        if (vibrator != null && AndroidVersionIsOreoOrHigher())
+        {
+            // VibrationEffectクラスの生成
+            AndroidJavaClass vibrationEffectClass = new AndroidJavaClass("android.os.VibrationEffect");
+            AndroidJavaObject vibrationEffect = vibrationEffectClass.CallStatic<AndroidJavaObject>(
+                "createOneShot",
+                milliseconds,
+                amplitude
+            );
+            // 振動処理を呼び出す
+            vibrator.Call("vibrate", vibrationEffect);
+        }
 #endif
     }
 
-    public void VibratePattern(long[] pattern, int repeat)
+    /// <summary>
+    /// 現在のAndroidバージョンが8.0（API 26）以上かどうかを確認します。
+    /// </summary>
+    /// <returns>API 26以上ならtrue、それ以外はfalse</returns>
+    private bool AndroidVersionIsOreoOrHigher()
     {
 #if UNITY_ANDROID
-        AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-        AndroidJavaObject vibrator = currentActivity.Call<AndroidJavaObject>("getSystemService", "vibrator");
-
-        // 振動パターンを設定
-        vibrator.Call("vibrate", pattern, repeat);
-#endif
-    }
-
-    public void CancelVibration()
-    {
-#if UNITY_ANDROID
-        AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-        AndroidJavaObject vibrator = currentActivity.Call<AndroidJavaObject>("getSystemService", "vibrator");
-
-        // 振動を停止
-        vibrator.Call("cancel");
+        AndroidJavaClass versionClass = new AndroidJavaClass("android.os.Build$VERSION");
+        int sdkInt = versionClass.GetStatic<int>("SDK_INT");
+        return sdkInt >= 26; // API 26 = Android 8.0
+#else
+        return false;
 #endif
     }
 }

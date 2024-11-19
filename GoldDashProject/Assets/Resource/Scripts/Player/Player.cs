@@ -316,7 +316,7 @@ public class Player : MonoBehaviour
                 udpGameClient.Send(myHeader.ToByte());
                 await UniTask.Delay(200);
                 shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium);
-                vibrationManager.Vibrate(500);
+                vibrationManager.VibrateWithAmplitude(250,75);
                 Debug.Log("正面送信");
             }
             else
@@ -327,7 +327,7 @@ public class Player : MonoBehaviour
                 udpGameClient.Send(myHeader.ToByte());
                 await UniTask.Delay(200);
                 shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large);
-                vibrationManager.Vibrate(500);
+                vibrationManager.VibrateWithAmplitude(500,150);
                 Debug.Log("背面送信");
             }
         }
