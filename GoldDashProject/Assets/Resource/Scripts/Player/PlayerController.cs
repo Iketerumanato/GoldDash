@@ -45,14 +45,20 @@ public class PlayerController : MonoBehaviour
     //カメラがY軸中心に何度回転しているか
     private float rotationY;
 
+    //カメラを振動させるためのコンポーネント
+    private ShakeEffect shakeEffect;
+
     //パケット関連
     UdpGameClient udpGameClient = null; //パケット送信用。
     public ushort sessionID; //パケットに差出人情報を書くため必要
 
     //アニメーション関連
     private Animator playerAnimator;
+    //Animatorの変数名
     private readonly string strPlayerAnimSpeed = "ArmAnimationSpeed";
     private readonly string strPunchTrigger = "ArmPunchTrigger";
+    private readonly string strGetPunchFrontTrigger = "HitedFrontArmTrigger";
+    private readonly string strGetPunchBackTrigger = "HitedBackArmTrigger";
     [SerializeField] float smoothSpeed = 10f;
 
     //魔法関連
@@ -69,9 +75,13 @@ public class PlayerController : MonoBehaviour
         rightJoystick = GetComponentInChildren<DynamicJoystick>(); //同上
         playerCam = Camera.main; //プレイヤーカメラにはMainCameraのタグがついている
         playerAnimator = GetComponent<Animator>();
+        shakeEffect = GetComponent<ShakeEffect>();
 
         //コレクションのインスタンス作成
         magicDataArray = new MagicData[magicSlot];
+
+        //振動させたいカメラを指定してtransformをshakeEffectに渡す
+        shakeEffect.shakeCameraTransform = playerCam.transform;
     }
 
     private void LateUpdate()
@@ -267,5 +277,27 @@ public class PlayerController : MonoBehaviour
 
         //    //パケット送信
         //}
+    }
+
+    //正面から殴られたときの処理。GameClientManagerから呼ばれる
+    public void GetPunchFront()
+    {
+        //一人称モーションの再生
+        playerAnimator.SetTrigger(strGetPunchFrontTrigger);
+
+        //カメラ演出
+        shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Small); //振動小
+    }
+    
+    //背面から殴られたときの処理。GameClientManagerから呼ばれる
+    public void GetPunchBack()
+    {
+        //一人称モーションの再生
+        playerAnimator.SetTrigger(strGetPunchBackTrigger);
+
+        //カメラ演出
+        shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large); //振動大
+
+        //前に吹っ飛ぶ
     }
 }

@@ -274,6 +274,7 @@ public class GameClientManager : MonoBehaviour
                                         if (receivedActionPacket.targetID == this.sessionID)
                                         {
                                             //プレイヤー側で演出
+                                            playerController.GetPunchFront();
                                         }
                                         else
                                         {
@@ -287,6 +288,7 @@ public class GameClientManager : MonoBehaviour
                                         {
                                             //プレイヤー側で演出
                                             //playerController.Blown(receivedActionPacket.pos); //パンチの方向に吹っ飛ぶ
+                                            playerController.GetPunchBack();
                                         }
                                         else
                                         {
