@@ -2020,6 +2020,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactableDistance: 10
   punchReachableDistance: 1
+  punchCooldownTime: 1200
   flontRange: 120
   playerMoveSpeed: 1
   cameraMoveSpeed: 150

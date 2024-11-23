@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -8,6 +9,9 @@ public class PlayerController : MonoBehaviour
 
     [Header("パンチの射程")]
     [SerializeField] float punchReachableDistance = 1f;
+
+    [Header("パンチのクールダウン時間（ミリ秒）")]
+    [SerializeField] int punchCooldownTime = 1000;
 
     [Header("正面から左右に何度までをキャラクターの正面と見做すか")]
     [Range(0f, 360f)]
@@ -60,6 +64,9 @@ public class PlayerController : MonoBehaviour
     private readonly string strGetPunchFrontTrigger = "HitedFrontArmTrigger";
     private readonly string strGetPunchBackTrigger = "HitedBackArmTrigger";
     [SerializeField] float smoothSpeed = 10f;
+
+    //パンチのクールダウン管理用
+    private bool isPunchable = true; //punch + ableなので単に「パンチ可能」という意味だけど、英語圏のスラングでは「殴りたくなる」みたいな意味になるそうですよ。（例：punchable face）
 
     //魔法関連
     //所持している魔法。可変長である必要がないため配列で
@@ -189,6 +196,8 @@ public class PlayerController : MonoBehaviour
     //パンチ。パンチを成立させたRaycastHit構造体のPointとDistanceを引数にもらおう
     private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
     {
+        //パンチのクールダウンが上がってなければreturn
+        if (!isPunchable) return;
         Debug.Log("Punch入った");
 
         //送信用クラスを外側のスコープで宣言しておく
@@ -200,6 +209,7 @@ public class PlayerController : MonoBehaviour
         {
             //射程外なら一人称のスカモーション再生(現在通常のパンチのモーションを再生)
             playerAnimator.SetTrigger(strPunchTrigger);
+            UniTask.RunOnThreadPool(() => PunchCoolDown()); //クールダウン開始
             //スカしたことをパケット送信
             myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
             myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
@@ -211,6 +221,7 @@ public class PlayerController : MonoBehaviour
         {
             //射程内なら一人称のパンチモーション再生
             playerAnimator.SetTrigger(strPunchTrigger);
+            UniTask.RunOnThreadPool(() => PunchCoolDown()); //クールダウン開始
             //カメラを非同期で敵に向ける処理開始 UniTask
 
             //パンチが正面に当たったのか背面に当たったのか調べる
@@ -237,6 +248,13 @@ public class PlayerController : MonoBehaviour
 
                 Debug.Log("背面送信");
             }
+        }
+
+        async void PunchCoolDown()
+        {
+            isPunchable = false; //クールダウン開始
+            await UniTask.Delay(punchCooldownTime); //指定された秒数待ったら
+            isPunchable = true; //クールダウン終了
         }
     }
 
