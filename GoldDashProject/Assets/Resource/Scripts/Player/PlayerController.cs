@@ -212,7 +212,7 @@ public class PlayerController : MonoBehaviour
     }
 
     //パンチ。パンチを成立させたRaycastHit構造体のPointとDistanceを引数にもらおう
-    private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
+    async private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
     {
         //パンチのクールダウンが上がってなければreturn
         if (!isPunchable) return;
@@ -227,7 +227,10 @@ public class PlayerController : MonoBehaviour
         {
             //射程外なら一人称のスカモーション再生(現在通常のパンチのモーションを再生)
             playerAnimator.SetTrigger(strPunchTrigger);
-            UniTask.RunOnThreadPool(() => PunchCoolDown()); //クールダウン開始
+            UniTask u = UniTask.RunOnThreadPool(() => PunchCoolDown()); //クールダウン開始
+            //画面揺れ小
+            await UniTask.Delay(400);
+            shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Small);
             //スカしたことをパケット送信
             myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
             myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
@@ -239,8 +242,7 @@ public class PlayerController : MonoBehaviour
         {
             //射程内なら一人称のパンチモーション再生
             playerAnimator.SetTrigger(strPunchTrigger);
-            UniTask.RunOnThreadPool(() => PunchCoolDown()); //クールダウン開始
-            //カメラを非同期で敵に向ける処理開始 UniTask
+            UniTask u = UniTask.RunOnThreadPool(() => PunchCoolDown()); //クールダウン開始
 
             //パンチが正面に当たったのか背面に当たったのか調べる
             Vector3 punchVec = hitPoint - this.transform.position;
@@ -248,6 +250,10 @@ public class PlayerController : MonoBehaviour
 
             if (angle < flontRange)
             {
+                //画面揺れ小
+                await UniTask.Delay(400);
+                shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Small);
+
                 //正面に命中させたことをパケット送信
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
@@ -258,6 +264,10 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
+                //画面揺れ中
+                await UniTask.Delay(400);
+                shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium);
+
                 //背面に命中させたことをパケット送信
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_BACK, actorController.SessionID, default, punchVec);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
