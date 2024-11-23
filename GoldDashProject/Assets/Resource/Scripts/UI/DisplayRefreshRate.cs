@@ -10,16 +10,22 @@ public class DisplayRefreshRate : MonoBehaviour
 
     private float deltaTime = 0.0f;
 
-    private void Awake()
-    {
-        tabletRefreshRate = Screen.currentResolution.refreshRate;
-    }
-
     void Update()
     {
-        refreshRateText.text = $"Refresh Rate: {tabletRefreshRate} Hz";
+        tabletRefreshRate = Screen.currentResolution.refreshRate; // または Screen.refreshRate (Unity 2021.2以降)
+        if (refreshRateText != null)
+        {
+            refreshRateText.text = $"Refresh Rate: {tabletRefreshRate} Hz";
+        }
+
+        // FPSを計算
         deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
         float fps = 1.0f / deltaTime;
-        fpsText.text = $"FPS: {fps:0.0}";  
+
+        // UIにFPSを表示
+        if (fpsText != null)
+        {
+            fpsText.text = $"FPS: {fps:0.0}";
+        }
     }
 }
