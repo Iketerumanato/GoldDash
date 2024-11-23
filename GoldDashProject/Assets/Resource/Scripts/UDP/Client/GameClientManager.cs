@@ -122,6 +122,7 @@ public class GameClientManager : MonoBehaviour
         while (true) 
         {
             //プレイヤーアクターの座標をMOVで送信
+            //プレイヤーの正面とアクターの正面は真逆なのでforwardにはマイナスをかけてから送信
             myActionPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, default, playerController.transform.position, -playerController.transform.forward);
             myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             udpGameClient.Send(myHeader.ToByte());
