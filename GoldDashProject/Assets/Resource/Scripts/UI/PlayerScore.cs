@@ -9,7 +9,7 @@ public class PlayerScore : MonoBehaviour
     [SerializeField] private float animationTime = 0.5f;
     [SerializeField] private float digitHeight = 32f;
     [SerializeField] private float delayBetweenDigits = 0.1f;
-    [SerializeField] private int Score;
+    [SerializeField] ActorController actorScore;
     private int previousScore;
     private Sequence CountUpAnimation;
     private Vector2[] digitsInitialPositions;
@@ -20,17 +20,17 @@ public class PlayerScore : MonoBehaviour
     {
         SetupDigitImages();
         StoreInitialPositions();
-        previousScore = Score;
+        previousScore = actorScore.Gold;
         UpdateScoreDisplay();
     }
 
     private void Update()
     {
         // Inspectorでscoreを変更した時のみアニメーションを更新
-        if (Score != previousScore)
+        if (actorScore.Gold != previousScore)
         {
             UpdateScoreDisplay();
-            previousScore = Score;
+            previousScore = actorScore.Gold;
         }
     }
 
@@ -58,10 +58,10 @@ public class PlayerScore : MonoBehaviour
             CountUpAnimation.Kill();
         }
 
-        int scoreDifference = Score - previousScore;
+        int scoreDifference = actorScore.Gold - previousScore;
         if (scoreDifference != 0 && displayScoreHistory != null) displayScoreHistory.AddScoreHistory(scoreDifference);
 
-        int[] digits = GetAllDigits(Score);
+        int[] digits = GetAllDigits(actorScore.Gold);
         CountUpAnimation = DOTween.Sequence();
 
         for (int digitsCnt = 0; digitsCnt < digitImages.Length; digitsCnt++)

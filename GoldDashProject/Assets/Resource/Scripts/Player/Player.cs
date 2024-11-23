@@ -101,10 +101,8 @@ public class Player : MonoBehaviour
 
     [SerializeField] float smoothSpeed = 10f;
 
-    [SerializeField] TMP_Text currentGoldText;
     [SerializeField] ActorController myActor;
     [SerializeField] ShakeEffect shakeEffect;
-    int oldGold;
 
     private VibrationManager vibrationManager;
 
@@ -118,9 +116,6 @@ public class Player : MonoBehaviour
         //カメラ取得
         fpsCamera = GetComponentInChildren<Camera>();
 
-        //currentGoldText.text = $"Gold: { myActor.Gold}";
-        oldGold = myActor.Gold;
-
         vibrationManager = new();
     }
 
@@ -131,9 +126,6 @@ public class Player : MonoBehaviour
         //    currentGoldText.text = $"Gold: { myActor.Gold}";
         //    oldGold = myActor.Gold;
         //}
-
-        currentGoldText.text = $"Gold: { myActor.Gold}";
-        oldGold = myActor.Gold;
     }
 
     private void FixedUpdate()
