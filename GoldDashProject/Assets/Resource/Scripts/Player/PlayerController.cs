@@ -18,6 +18,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float flontRange = 120f;
     //例えばこの値が一時的に0になれば、敵をどの角度からパンチしても金を奪える状態になる
 
+    [Header("殴られたときの吹っ飛び倍率")]
+    [SerializeField] float blownPower= 1f;
+
     [Header("移動速度（マス／毎秒）")]
     [SerializeField] private float playerMoveSpeed = 1f;
 
@@ -68,6 +71,9 @@ public class PlayerController : MonoBehaviour
     //パンチのクールダウン管理用
     private bool isPunchable = true; //punch + ableなので単に「パンチ可能」という意味だけど、英語圏のスラングでは「殴りたくなる」みたいな意味になるそうですよ。（例：punchable face）
 
+    //吹っ飛ぶためのrigidbody
+    private Rigidbody rigidbody;
+
     //魔法関連
     //所持している魔法。可変長である必要がないため配列で
     private MagicData[] magicDataArray;
@@ -83,6 +89,7 @@ public class PlayerController : MonoBehaviour
         playerCam = Camera.main; //プレイヤーカメラにはMainCameraのタグがついている
         playerAnimator = GetComponent<Animator>();
         shakeEffect = GetComponent<ShakeEffect>();
+        rigidbody = GetComponent<Rigidbody>();
 
         //コレクションのインスタンス作成
         magicDataArray = new MagicData[magicSlot];
@@ -304,7 +311,7 @@ public class PlayerController : MonoBehaviour
         playerAnimator.SetTrigger(strGetPunchFrontTrigger);
 
         //カメラ演出
-        shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Small); //振動小
+        shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium); //振動中
     }
     
     //背面から殴られたときの処理。GameClientManagerから呼ばれる
@@ -317,5 +324,6 @@ public class PlayerController : MonoBehaviour
         shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large); //振動大
 
         //前に吹っ飛ぶ
+        rigidbody.AddForce(this.transform.forward * blownPower, ForceMode.Impulse);
     }
 }
