@@ -23,9 +23,6 @@ public class DisplayRefreshRate : MonoBehaviour
         float fps = 1.0f / deltaTime;
 
         // UIにFPSを表示
-        if (fpsText != null)
-        {
-            fpsText.text = $"FPS: {fps:0.0}";
-        }
+        fpsText.text = $"FPS: {fps:0.0}";
     }
 }
