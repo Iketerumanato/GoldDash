@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -18,8 +19,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float flontRange = 120f;
     //例えばこの値が一時的に0になれば、敵をどの角度からパンチしても金を奪える状態になる
 
-    [Header("殴られたときの吹っ飛び倍率")]
+    [Header("背面を殴られたときの吹っ飛び倍率")]
     [SerializeField] float blownPower= 1f;
+
+    [Header("背面を殴られてから金貨を拾えるようになるまでの時間（ミリ秒）")]
+    [SerializeField] int forbidPickTime = 1000;
 
     [Header("移動速度（マス／毎秒）")]
     [SerializeField] private float playerMoveSpeed = 1f;
@@ -71,8 +75,10 @@ public class PlayerController : MonoBehaviour
     //パンチのクールダウン管理用
     private bool isPunchable = true; //punch + ableなので単に「パンチ可能」という意味だけど、英語圏のスラングでは「殴りたくなる」みたいな意味になるそうですよ。（例：punchable face）
 
-    //吹っ飛ぶためのrigidbody
-    private Rigidbody rigidbody;
+    //吹っ飛び関連
+    private Rigidbody _rigidbody; //吹っ飛ぶためのrigidbody
+    private bool isPickable = true; //吹っ飛んでいる間金貨を拾えないようにする
+    CancellationTokenSource forbidPickCts; //短時間で何度も吹っ飛ばしを受けた時に、発生中の金貨獲得禁止時間を延長するためにunitaskを停止させる必要がある
 
     //魔法関連
     //所持している魔法。可変長である必要がないため配列で
@@ -89,9 +95,10 @@ public class PlayerController : MonoBehaviour
         playerCam = Camera.main; //プレイヤーカメラにはMainCameraのタグがついている
         playerAnimator = GetComponent<Animator>();
         shakeEffect = GetComponent<ShakeEffect>();
-        rigidbody = GetComponent<Rigidbody>();
+        _rigidbody = GetComponent<Rigidbody>();
 
-        //コレクションのインスタンス作成
+        //インスタンス作成
+        forbidPickCts = new CancellationTokenSource();
         magicDataArray = new MagicData[magicSlot];
 
         //振動させたいカメラを指定してtransformをshakeEffectに渡す
@@ -149,6 +156,7 @@ public class PlayerController : MonoBehaviour
         switch (other.tag)
         {
             case "GoldPile":
+                if (!isPickable) break; //金貨を拾えない状態にされているならbreakする。
                 //金貨の山に触れたというリクエスト送信。他のプレイヤーが先に触れていた場合、お金は入手できない。早い者勝ち。
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_GOLDPILE, other.GetComponent<Entity>().EntityID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
@@ -324,6 +332,16 @@ public class PlayerController : MonoBehaviour
         shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large); //振動大
 
         //前に吹っ飛ぶ
-        rigidbody.AddForce(this.transform.forward * blownPower, ForceMode.Impulse);
+        //金貨を拾えない状態にする
+        if(!isPickable) forbidPickCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
+        UniTask.RunOnThreadPool(() => ForbidPick(), default, forbidPickCts.Token);
+        _rigidbody.AddForce(this.transform.forward * blownPower, ForceMode.Impulse);
+
+        async void ForbidPick()
+        {
+            isPickable = false; //金貨を拾えない状態にする
+            await UniTask.Delay(forbidPickTime); //指定された時間待つ
+            isPickable = true; //金貨を拾えるようにする
+        }
     }
 }
