@@ -128,7 +128,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8aa6c38712dc0d54ba8ccab35c579c94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  digitImages: []
+  digitImages:
+  - {fileID: 7524910425305684597}
+  - {fileID: 2071652483392342973}
+  - {fileID: 5873914001339996061}
+  - {fileID: 6396088460714077031}
+  - {fileID: 624702799596231581}
+  - {fileID: 8380991633759605354}
   numberTexture: {fileID: 2800000, guid: 44f77c9a8dbe85f43b37f2a0cd0481c6, type: 3}
   animationTime: 0.5
   digitHeight: 32
