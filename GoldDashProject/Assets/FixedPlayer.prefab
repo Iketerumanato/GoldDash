@@ -2022,6 +2022,9 @@ MonoBehaviour:
   punchReachableDistance: 1
   punchCooldownTime: 1200
   flontRange: 120
+  blownPowerHorizontal: 4
+  blownPowerVertical: 2
+  forbidPickTime: 1000
   playerMoveSpeed: 1
   cameraMoveSpeed: 150
   camRotateLimitX: 90

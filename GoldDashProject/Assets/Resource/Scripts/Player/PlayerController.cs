@@ -19,8 +19,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float flontRange = 120f;
     //例えばこの値が一時的に0になれば、敵をどの角度からパンチしても金を奪える状態になる
 
-    [Header("背面を殴られたときの吹っ飛び倍率")]
-    [SerializeField] float blownPower= 1f;
+    [Header("背面を殴られたときの水平方向への吹っ飛び倍率")]
+    [SerializeField] float blownPowerHorizontal = 1f;
+
+    [Header("背面を殴られたときの垂直方向への吹っ飛び倍率")]
+    [SerializeField] float blownPowerVertical = 1f;
 
     [Header("背面を殴られてから金貨を拾えるようになるまでの時間（ミリ秒）")]
     [SerializeField] int forbidPickTime = 1000;
@@ -335,7 +338,7 @@ public class PlayerController : MonoBehaviour
         //金貨を拾えない状態にする
         if(!isPickable) forbidPickCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
         UniTask.RunOnThreadPool(() => ForbidPick(), default, forbidPickCts.Token);
-        _rigidbody.AddForce(this.transform.forward * blownPower, ForceMode.Impulse);
+        _rigidbody.AddForce(this.transform.forward * blownPowerHorizontal + Vector3.up * blownPowerVertical, ForceMode.Impulse);
 
         async void ForbidPick()
         {
