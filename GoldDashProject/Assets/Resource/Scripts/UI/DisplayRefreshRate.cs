@@ -4,26 +4,28 @@ using TMPro;
 public class DisplayRefreshRate : MonoBehaviour
 {
     [SerializeField] TMP_Text refreshRateText;
+    [SerializeField] TMP_Text fpsText;
 
     private int tabletRefreshRate;
 
-    // Start is called before the first frame update
-    void Awake()
-    {
-        tabletRefreshRate = Screen.currentResolution.refreshRate;
-    }
+    private float deltaTime = 0.0f;
 
-    // Update is called once per frame
     void Update()
     {
-        // UIにリフレッシュレートを表示
+        tabletRefreshRate = Screen.currentResolution.refreshRate; // または Screen.refreshRate (Unity 2021.2以降)
         if (refreshRateText != null)
         {
             refreshRateText.text = $"Refresh Rate: {tabletRefreshRate} Hz";
         }
-        else
+
+        // FPSを計算
+        deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
+        float fps = 1.0f / deltaTime;
+
+        // UIにFPSを表示
+        if (fpsText != null)
         {
-            Debug.Log($"Refresh Rate: {tabletRefreshRate} Hz");
+            fpsText.text = $"FPS: {fps:0.0}";
         }
     }
 }
