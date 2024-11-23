@@ -2056,12 +2056,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1470805afa7a823429d606edc73e0dec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerAnimator: {fileID: 0}
+  PlayerAnimator: {fileID: 5678647048182640870}
   runThreshold: 1
   animationLerpSpeed: 70
 --- !u!4 &1742532088667761308 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cfc3b3c745310a947b3add25ef492886, type: 3}
+  m_PrefabInstance: {fileID: 2279963592310623607}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &5678647048182640870 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: cfc3b3c745310a947b3add25ef492886, type: 3}
   m_PrefabInstance: {fileID: 2279963592310623607}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6749737937941288979

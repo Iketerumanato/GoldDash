@@ -231,9 +231,9 @@ public class GameClientManager : MonoBehaviour
                                         {
                                             //プレイヤーをインスタンス化しながらActorControllerを取得
                                             actorController = Instantiate(PlayerPrefab).GetComponent<ActorController>();
-                                            actorController.gameObject.GetComponent<Player>().SessionID = this.sessionID; //PlayerクラスにはActorControllerとは別にSessionIDを渡しておく。パケット送信を楽にするため。
+                                            actorController.gameObject.GetComponent<PlayerController>().SessionID = this.sessionID; //PlayerクラスにはActorControllerとは別にSessionIDを渡しておく。パケット送信を楽にするため。
                                             playerController = actorController.gameObject.GetComponent<PlayerController>(); //playerControllerはアクセスしやすいように取得しておく
-                                            playerController.gameObject.GetComponent<Player>().GetUdpGameClient(this.udpGameClient, this.sessionID);
+                                            playerController.gameObject.GetComponent<PlayerController>().GetUdpGameClient(this.udpGameClient, this.sessionID);
                                         }
                                         else //他人のIDなら
                                         {

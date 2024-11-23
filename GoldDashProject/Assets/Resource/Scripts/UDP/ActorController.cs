@@ -39,7 +39,7 @@ public class ActorController : MonoBehaviour
 
     private void Awake()
     {
-        isPlayer = (GetComponent<Player>() != null);
+        isPlayer = (GetComponent<PlayerController>() != null);
         sqrRunThreshold = runThreshold * runThreshold;
     }
 
