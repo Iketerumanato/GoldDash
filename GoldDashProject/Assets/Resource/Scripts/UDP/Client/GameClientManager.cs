@@ -22,7 +22,7 @@ public class GameClientManager : MonoBehaviour
     private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを保管。自分以外のプレイヤー（アクター）のセッションIDも記録していく
     private Dictionary<ushort, Entity> entityDictionary; //entityIDを鍵としてentityインスタンスを管理
 
-    private ActorController playerActor; //プレイヤーが操作するキャラクターのActorController
+    private PlayerController playerController; //プレイヤーが操作するキャラクターのplayerController
 
 
     private int numOfActors; //アクターの人数
@@ -122,11 +122,12 @@ public class GameClientManager : MonoBehaviour
         while (true) 
         {
             //プレイヤーアクターの座標をMOVで送信
-            myActionPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, default, playerActor.transform.position, playerActor.transform.forward);
+            //プレイヤーの視点的な正面(カメラの向き)とオブジェクトの正面ベクトルは逆になっているので、forwardにはマイナスをかける必要がある
+            myActionPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, default, playerController.transform.position, -playerController.transform.forward);
             myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             udpGameClient.Send(myHeader.ToByte());
 
-            await UniTask.Delay(100);
+            await UniTask.Delay(170);
         }
     }
 
@@ -231,9 +232,9 @@ public class GameClientManager : MonoBehaviour
                                         {
                                             //プレイヤーをインスタンス化しながらActorControllerを取得
                                             actorController = Instantiate(PlayerPrefab).GetComponent<ActorController>();
-                                            actorController.gameObject.GetComponent<Player>().SessionID = this.sessionID; //PlayerクラスにはActorControllerとは別にSessionIDを渡しておく。パケット送信を楽にするため。
-                                            playerActor = actorController; //プレイヤーのActorControllerはアクセスしやすいように取得しておく
-                                            playerActor.gameObject.GetComponent<Player>().GetUdpGameClient(this.udpGameClient, this.sessionID);
+                                            actorController.gameObject.GetComponent<PlayerController>().SessionID = this.sessionID; //PlayerクラスにはActorControllerとは別にSessionIDを渡しておく。パケット送信を楽にするため。
+                                            playerController = actorController.gameObject.GetComponent<PlayerController>(); //playerControllerはアクセスしやすいように取得しておく
+                                            playerController.gameObject.GetComponent<PlayerController>().GetUdpGameClient(this.udpGameClient, this.sessionID);
                                         }
                                         else //他人のIDなら
                                         {
@@ -274,6 +275,7 @@ public class GameClientManager : MonoBehaviour
                                         if (receivedActionPacket.targetID == this.sessionID)
                                         {
                                             //プレイヤー側で演出
+                                            playerController.GetPunchFront();
                                         }
                                         else
                                         {
@@ -286,7 +288,8 @@ public class GameClientManager : MonoBehaviour
                                         if (receivedActionPacket.targetID == this.sessionID)
                                         {
                                             //プレイヤー側で演出
-                                            playerActor.Blown(receivedActionPacket.pos); //パンチの方向に吹っ飛ぶ
+                                            //playerController.Blown(receivedActionPacket.pos); //パンチの方向に吹っ飛ぶ
+                                            playerController.GetPunchBack();
                                         }
                                         else
                                         {

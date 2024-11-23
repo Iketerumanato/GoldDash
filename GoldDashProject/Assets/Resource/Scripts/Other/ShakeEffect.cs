@@ -10,8 +10,8 @@ public class ShakeEffect : MonoBehaviour
         Large
     }
 
-    [Header("CameraShakeSetting")]
-    [SerializeField] Transform shakeCameraTransform;
+    //振動させたいカメラのtransform
+    public Transform shakeCameraTransform;
 
     [Header("Small Camera Shake Settings")]
     [SerializeField] Vector3 smallPositionStrength;

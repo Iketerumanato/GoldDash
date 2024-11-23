@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -9,10 +11,22 @@ public class PlayerController : MonoBehaviour
     [Header("パンチの射程")]
     [SerializeField] float punchReachableDistance = 1f;
 
+    [Header("パンチのクールダウン時間（ミリ秒）")]
+    [SerializeField] int punchCooldownTime = 1000;
+
     [Header("正面から左右に何度までをキャラクターの正面と見做すか")]
     [Range(0f, 360f)]
     [SerializeField] float flontRange = 120f;
     //例えばこの値が一時的に0になれば、敵をどの角度からパンチしても金を奪える状態になる
+
+    [Header("背面を殴られたときの水平方向への吹っ飛び倍率")]
+    [SerializeField] float blownPowerHorizontal = 1f;
+
+    [Header("背面を殴られたときの垂直方向への吹っ飛び倍率")]
+    [SerializeField] float blownPowerVertical = 1f;
+
+    [Header("背面を殴られてから金貨を拾えるようになるまでの時間（ミリ秒）")]
+    [SerializeField] int forbidPickTime = 1000;
 
     [Header("移動速度（マス／毎秒）")]
     [SerializeField] private float playerMoveSpeed = 1f;
@@ -45,15 +59,29 @@ public class PlayerController : MonoBehaviour
     //カメラがY軸中心に何度回転しているか
     private float rotationY;
 
+    //カメラを振動させるためのコンポーネント
+    private ShakeEffect shakeEffect;
+
     //パケット関連
     UdpGameClient udpGameClient = null; //パケット送信用。
-    public ushort sessionID; //パケットに差出人情報を書くため必要
+    public ushort SessionID { set; get; } //パケットに差出人情報を書くため必要
 
     //アニメーション関連
     private Animator playerAnimator;
+    //Animatorの変数名
     private readonly string strPlayerAnimSpeed = "ArmAnimationSpeed";
     private readonly string strPunchTrigger = "ArmPunchTrigger";
+    private readonly string strGetPunchFrontTrigger = "HitedFrontArmTrigger";
+    private readonly string strGetPunchBackTrigger = "HitedBackArmTrigger";
     [SerializeField] float smoothSpeed = 10f;
+
+    //パンチのクールダウン管理用
+    private bool isPunchable = true; //punch + ableなので単に「パンチ可能」という意味だけど、英語圏のスラングでは「殴りたくなる」みたいな意味になるそうですよ。（例：punchable face）
+
+    //吹っ飛び関連
+    private Rigidbody _rigidbody; //吹っ飛ぶためのrigidbody
+    private bool isPickable = true; //吹っ飛んでいる間金貨を拾えないようにする
+    CancellationTokenSource forbidPickCts; //短時間で何度も吹っ飛ばしを受けた時に、発生中の金貨獲得禁止時間を延長するためにunitaskを停止させる必要がある
 
     //魔法関連
     //所持している魔法。可変長である必要がないため配列で
@@ -69,9 +97,15 @@ public class PlayerController : MonoBehaviour
         rightJoystick = GetComponentInChildren<DynamicJoystick>(); //同上
         playerCam = Camera.main; //プレイヤーカメラにはMainCameraのタグがついている
         playerAnimator = GetComponent<Animator>();
+        shakeEffect = GetComponent<ShakeEffect>();
+        _rigidbody = GetComponent<Rigidbody>();
 
-        //コレクションのインスタンス作成
+        //インスタンス作成
+        forbidPickCts = new CancellationTokenSource();
         magicDataArray = new MagicData[magicSlot];
+
+        //振動させたいカメラを指定してtransformをshakeEffectに渡す
+        shakeEffect.shakeCameraTransform = playerCam.transform;
     }
 
     private void LateUpdate()
@@ -125,9 +159,10 @@ public class PlayerController : MonoBehaviour
         switch (other.tag)
         {
             case "GoldPile":
+                if (!isPickable) break; //金貨を拾えない状態にされているならbreakする。
                 //金貨の山に触れたというリクエスト送信。他のプレイヤーが先に触れていた場合、お金は入手できない。早い者勝ち。
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_GOLDPILE, other.GetComponent<Entity>().EntityID);
-                myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
                 break;
             default:
@@ -139,7 +174,7 @@ public class PlayerController : MonoBehaviour
     public void GetUdpGameClient(UdpGameClient udpGameClient, ushort sessionID)
     {
         this.udpGameClient = udpGameClient;
-        this.sessionID = sessionID;
+        this.SessionID = sessionID;
     }
 
     //画面を「タッチしたとき」呼ばれる。オブジェクトに触ったかどうか判定 UpdateProcess -> if (Input.GetMouseButtonDown(0))
@@ -177,8 +212,10 @@ public class PlayerController : MonoBehaviour
     }
 
     //パンチ。パンチを成立させたRaycastHit構造体のPointとDistanceを引数にもらおう
-    private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
+    async private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
     {
+        //パンチのクールダウンが上がってなければreturn
+        if (!isPunchable) return;
         Debug.Log("Punch入った");
 
         //送信用クラスを外側のスコープで宣言しておく
@@ -190,9 +227,13 @@ public class PlayerController : MonoBehaviour
         {
             //射程外なら一人称のスカモーション再生(現在通常のパンチのモーションを再生)
             playerAnimator.SetTrigger(strPunchTrigger);
+            UniTask u = UniTask.RunOnThreadPool(() => PunchCoolDown()); //クールダウン開始
+            //画面揺れ小
+            await UniTask.Delay(400);
+            shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Small);
             //スカしたことをパケット送信
             myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
-            myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             udpGameClient.Send(myHeader.ToByte());
 
             Debug.Log("スカ送信");
@@ -201,7 +242,7 @@ public class PlayerController : MonoBehaviour
         {
             //射程内なら一人称のパンチモーション再生
             playerAnimator.SetTrigger(strPunchTrigger);
-            //カメラを非同期で敵に向ける処理開始 UniTask
+            UniTask u = UniTask.RunOnThreadPool(() => PunchCoolDown()); //クールダウン開始
 
             //パンチが正面に当たったのか背面に当たったのか調べる
             Vector3 punchVec = hitPoint - this.transform.position;
@@ -209,9 +250,13 @@ public class PlayerController : MonoBehaviour
 
             if (angle < flontRange)
             {
+                //画面揺れ小
+                await UniTask.Delay(400);
+                shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Small);
+
                 //正面に命中させたことをパケット送信
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
-                myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
 
 
@@ -219,14 +264,25 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
+                //画面揺れ中
+                await UniTask.Delay(400);
+                shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium);
+
                 //背面に命中させたことをパケット送信
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_BACK, actorController.SessionID, default, punchVec);
-                myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 udpGameClient.Send(myHeader.ToByte());
 
 
                 Debug.Log("背面送信");
             }
+        }
+
+        async void PunchCoolDown()
+        {
+            isPunchable = false; //クールダウン開始
+            await UniTask.Delay(punchCooldownTime); //指定された秒数待ったら
+            isPunchable = true; //クールダウン終了
         }
     }
 
@@ -240,7 +296,7 @@ public class PlayerController : MonoBehaviour
         //仮！！！！！！
         //背面に命中させたことをパケット送信
         myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, chestController.EntityID);
-        myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+        myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
         udpGameClient.Send(myHeader.ToByte());
 
         //既に空いていないたらなにもしない
@@ -267,5 +323,38 @@ public class PlayerController : MonoBehaviour
 
         //    //パケット送信
         //}
+    }
+
+    //正面から殴られたときの処理。GameClientManagerから呼ばれる
+    public void GetPunchFront()
+    {
+        //一人称モーションの再生
+        playerAnimator.SetTrigger(strGetPunchFrontTrigger);
+
+        //カメラ演出
+        shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium); //振動中
+    }
+    
+    //背面から殴られたときの処理。GameClientManagerから呼ばれる
+    public void GetPunchBack()
+    {
+        //一人称モーションの再生
+        playerAnimator.SetTrigger(strGetPunchBackTrigger);
+
+        //カメラ演出
+        shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large); //振動大
+
+        //前に吹っ飛ぶ
+        //金貨を拾えない状態にする
+        if(!isPickable) forbidPickCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
+        UniTask.RunOnThreadPool(() => ForbidPick(), default, forbidPickCts.Token);
+        _rigidbody.AddForce(this.transform.forward * blownPowerHorizontal + Vector3.up * blownPowerVertical, ForceMode.Impulse);
+
+        async void ForbidPick()
+        {
+            isPickable = false; //金貨を拾えない状態にする
+            await UniTask.Delay(forbidPickTime); //指定された時間待つ
+            isPickable = true; //金貨を拾えるようにする
+        }
     }
 }
