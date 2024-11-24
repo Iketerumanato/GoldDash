@@ -850,7 +850,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1191692250164345034, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1593976633976117632, guid: 4b0fd1ac6cac5a34db30b86019584bfd, type: 3}
       propertyPath: shakeCameraDuration
@@ -2744,7 +2744,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!20 &1513128943
 Camera:
   m_ObjectHideFlags: 0
