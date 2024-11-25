@@ -1,6 +1,8 @@
+using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[Obsolete("Camera制御機能は新PlayerControllerクラスに統合されました")]
 public class CameraControll : MonoBehaviour
 {
     [Header("プレイヤーのオブジェクト")]
