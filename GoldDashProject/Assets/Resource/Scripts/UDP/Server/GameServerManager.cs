@@ -508,7 +508,7 @@ public class GameServerManager : MonoBehaviour
                                             udpGameServer.Send(myHeader.ToByte());
 
                                             //魔法（の巻物）を抽選して付与
-                                                                
+                                            int magicID = magicLottely.Lottely();                  
 
                                             //その宝箱を消す
                                             //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行

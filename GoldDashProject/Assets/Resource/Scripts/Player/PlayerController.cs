@@ -42,9 +42,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float fallThreshold = -10f;
     private Vector3 initialSpawnPosition; //リスポーン地点
 
-    [Header("魔法を最大何個持てるか")]
-    [SerializeField] private int magicSlot = 3;
-
     //UI関連
     //プレイヤーを移動させる左ジョイスティック
     private VariableJoystick leftJoystick;
@@ -83,10 +80,6 @@ public class PlayerController : MonoBehaviour
     private bool isPickable = true; //吹っ飛んでいる間金貨を拾えないようにする
     CancellationTokenSource forbidPickCts; //短時間で何度も吹っ飛ばしを受けた時に、発生中の金貨獲得禁止時間を延長するためにunitaskを停止させる必要がある
 
-    //魔法関連
-    //所持している魔法。可変長である必要がないため配列で
-    private MagicData[] magicDataArray;
-
     private void Start()
     {
         //リスポーン地点の記録
@@ -102,7 +95,6 @@ public class PlayerController : MonoBehaviour
 
         //インスタンス作成
         forbidPickCts = new CancellationTokenSource();
-        magicDataArray = new MagicData[magicSlot];
 
         //振動させたいカメラを指定してtransformをshakeEffectに渡す
         shakeEffect.shakeCameraTransform = playerCam.transform;

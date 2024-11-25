@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -36,16 +37,35 @@ public class ActorController : MonoBehaviour
     readonly string strPunchTrigger = "PunchTrigger";
     readonly string strHitedFrontTrigger = "HitFrontActorTrigger";
     readonly string strHitedBackTrigger = "HitBackActorTrigger";
+    
+    //魔法関連
+    //所持している魔法のキュー
+    private Queue<MagicData> magicDataQueue;
 
-    private void Awake()
+    private void Start()
     {
+        //プレイヤーか否か確認する
         isPlayer = (GetComponent<PlayerController>() != null);
+        //2乗した定数の計算
         sqrRunThreshold = runThreshold * runThreshold;
+
+        //コレクションのインスタンス作成
+        magicDataQueue = new Queue<MagicData>();
     }
 
     private void Update()
     {
-        if (isPlayer) return;
+        if (isPlayer) UpdateForPlayer();
+        else UpdateForEnemy();
+    }
+
+    private void UpdateForPlayer()
+    { 
+
+    }
+
+    private void UpdateForEnemy()
+    {
         this.transform.position = Vector3.SmoothDamp(this.transform.position, targetPosition, ref currentVelocity_P, 0.1f);
         this.transform.forward = Vector3.SmoothDamp(this.transform.forward, targetForward, ref currentVelocity_F, 0.1f);
 
