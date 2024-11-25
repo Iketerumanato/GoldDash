@@ -1,7 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
+[Obsolete("Camera制御機能は新PlayerControllerクラスに統合されました", true)]
 //アイテムのソースデータ
 [CreateAssetMenu(menuName = "ScriptableObject/MagicData")]
 public class MagicData : ScriptableObject
