@@ -170,7 +170,7 @@ public static class Definer
     /// <summary>
     /// Magic ID, 魔法の種類を表すID
     /// </summary>
-    public enum MID : byte
+    public enum MID : int //ActionPacketのValueに載せるのでint型
     { 
         Thunder,
         Golddash,
