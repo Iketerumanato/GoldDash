@@ -58,6 +58,8 @@ public class MagicLottely : MonoBehaviour
             }
         }
 
-        return 0; //ここには絶対到達しないはず。テスト済
+        throw new Exception(); //ここには絶対到達しないはず。テスト済。到達したらエラー
+
+        return 0; 
     }
 }
