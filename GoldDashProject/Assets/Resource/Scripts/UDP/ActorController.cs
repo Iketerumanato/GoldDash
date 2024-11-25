@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 /// <summary>
@@ -46,6 +47,10 @@ public class ActorController : MonoBehaviour
     //所持している魔法のキュー
     public int[] magicIDArray;
 
+    //仮
+    //所持金テキスト
+    [SerializeField] private TextMeshProUGUI goldText;
+
     //魔法をスロットに入れる
     public void SetMagicToSlot(int magicID)
     {
@@ -87,8 +92,8 @@ public class ActorController : MonoBehaviour
     }
 
     private void UpdateForPlayer()
-    { 
-
+    {
+        goldText.text = $"Gold:{Gold}";
     }
 
     private void UpdateForEnemy()
