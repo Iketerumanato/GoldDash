@@ -73,7 +73,6 @@ public class PlayerController : MonoBehaviour
     private readonly string strPunchTrigger = "ArmPunchTrigger";
     private readonly string strGetPunchFrontTrigger = "HitedFrontArmTrigger";
     private readonly string strGetPunchBackTrigger = "HitedBackArmTrigger";
-    [SerializeField] float smoothSpeed = 10f;
 
     //パンチのクールダウン管理用
     private bool isPunchable = true; //punch + ableなので単に「パンチ可能」という意味だけど、英語圏のスラングでは「殴りたくなる」みたいな意味になるそうですよ。（例：punchable face）

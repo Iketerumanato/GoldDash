@@ -21,7 +21,7 @@ public class CameraControll : MonoBehaviour
     [SerializeField] float CamXMinClanpRot = -90f;
     float yRotation = 0f;
 
-    [SerializeField] float rotateSpeed = 100f;
+    //[SerializeField] float rotateSpeed = 100f;
 
     [SerializeField] Camera PlayerCamera;
     readonly float CamNeer = 0.1f;

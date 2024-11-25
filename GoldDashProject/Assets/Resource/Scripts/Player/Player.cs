@@ -1,61 +1,65 @@
 using TMPro;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using System;
 
-public interface IPlayerState
+[Obsolete("PlayerControllerクラスを使ってください", true)]
+public class Player : MonoBehaviour
 {
-    void EnterState(Player player);
-    void UpdateProcess(Player player);
-    void ExitState(Player player);
-}
-
-//通常の状態
-public class NormalState : IPlayerState
-{
-    private Vector3 inputVector;
-
-    public void EnterState(Player player)
+    #region Stateインターフェース
+    public interface IPlayerState
     {
-        Debug.Log("Player操作中");
+        void EnterState(Player player);
+        void UpdateProcess(Player player);
+        void ExitState(Player player);
     }
 
-    public void UpdateProcess(Player player)
+    //通常の状態
+    public class NormalState : IPlayerState
     {
-        player.MovePlayerJoystick(inputVector);
-        player.MoveKey();
-        if (Input.GetMouseButtonDown(0))
+        private Vector3 inputVector;
+
+        public void EnterState(Player player)
         {
-            player.Interact();
+            Debug.Log("Player操作中");
+        }
+
+        public void UpdateProcess(Player player)
+        {
+            player.MovePlayerJoystick(inputVector);
+            player.MoveKey();
+            if (Input.GetMouseButtonDown(0))
+            {
+                player.Interact();
+            }
+        }
+
+        public void ExitState(Player player)
+        {
+            Debug.Log("Playerの状態変更");
         }
     }
 
-    public void ExitState(Player player)
+    //プレイヤーが動けなくなった時
+    public class IncapacitatedState : IPlayerState
     {
-        Debug.Log("Playerの状態変更");
-    }
-}
+        public void EnterState(Player player)
+        {
+            Debug.Log("Playerに対して何かしらのアクション");
+        }
 
-//プレイヤーが動けなくなった時
-public class IncapacitatedState : IPlayerState
-{
-    public void EnterState(Player player)
-    {
-        Debug.Log("Playerに対して何かしらのアクション");
-    }
+        public void UpdateProcess(Player player)
+        {
+            Debug.Log("Player行動不能中");
+        }
 
-    public void UpdateProcess(Player player)
-    {
-        Debug.Log("Player行動不能中");
+        public void ExitState(Player player)
+        {
+            Debug.Log("Playerの気絶解除");
+        }
     }
+    #endregion
 
-    public void ExitState(Player player)
-    {
-        Debug.Log("Playerの気絶解除");
-    }
-}
-
-public class Player : MonoBehaviour
-{
     //パケット関連
     UdpGameClient udpGameClient = null; //パケット送信用。
     public ushort SessionID { set; get; } //パケットに差出人情報を書くため必要
@@ -95,8 +99,8 @@ public class Player : MonoBehaviour
     readonly string strPunchTrigger = "ArmPunchTrigger";
 
     #region 殴られた判定で使うstring型のTrigger
-    readonly string strHitedFrontTrigger = "HitedFrontArmTrigger";
-    readonly string strHitedBackTrigger = "HitedBackArmTrigger";
+    //readonly string strHitedFrontTrigger = "HitedFrontArmTrigger";
+    //readonly string strHitedBackTrigger = "HitedBackArmTrigger";
     #endregion
 
     [SerializeField] float smoothSpeed = 10f;
@@ -261,7 +265,7 @@ public class Player : MonoBehaviour
             {
                 case "Enemy": //プレイヤーならパンチ
                     Debug.Log("Punch入りたい");
-                    Punch(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ActorController>());
+                    UniTaskVoid u = Punch(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ActorController>());
                     break;
                 case "Chest": //宝箱なら開錠を試みる
                     TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
