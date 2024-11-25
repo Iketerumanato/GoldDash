@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class VibrationManager : MonoBehaviour
+public class VibrationManager
 {
     readonly string VibrationMethod = "vibrate";
 
