@@ -33,10 +33,11 @@ public class MagicLottely : MonoBehaviour
         //重みの合計値計算
         weightSum = magicWeightsDictionary.Values.Sum();
 
-        for (int i = 0; i < 1000; i++)
-        {
-            Debug.Log(Lottely());
-        }
+        //確立シミュレーションしたい場合はこちら
+        //for (int i = 0; i < 1000; i++)
+        //{
+        //    Debug.Log(Lottely());
+        //}
     }
 
     public Definer.MID Lottely()
@@ -51,12 +52,12 @@ public class MagicLottely : MonoBehaviour
         foreach (KeyValuePair<Definer.MID, int> k in magicWeightsDictionary)
         {
             //Dictionaryの端から範囲を狭めながら、randの値がどのKeyの指す範囲にあるか調べていく
-            if ((tmpWeightSum -= k.Value) < rand)
+            if ((tmpWeightSum -= k.Value) <= rand)
             {
                 return k.Key;
             }
         }
 
-        return 0; //ここには絶対到達しないはず
+        return 0; //ここには絶対到達しないはず。テスト済
     }
 }

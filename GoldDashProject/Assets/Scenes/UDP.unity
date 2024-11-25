@@ -2599,9 +2599,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   magicWeightsList:
   - magicName: 0
-    weight: 1
+    weight: 7
   - magicName: 1
-    weight: 1
+    weight: 3
 --- !u!1 &1469145183
 GameObject:
   m_ObjectHideFlags: 0
