@@ -271,6 +271,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        //一定時間パンチができなくなるローカル関数
         async void PunchCoolDown()
         {
             isPunchable = false; //クールダウン開始
@@ -287,7 +288,7 @@ public class PlayerController : MonoBehaviour
         Header myHeader;
 
         //仮！！！！！！
-        //背面に命中させたことをパケット送信
+        //宝箱を開錠したことをパケット送信
         myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, chestController.EntityID);
         myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
         UdpGameClient.Send(myHeader.ToByte());
@@ -337,12 +338,14 @@ public class PlayerController : MonoBehaviour
         //カメラ演出
         shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large); //振動大
 
-        //前に吹っ飛ぶ
         //金貨を拾えない状態にする
         if(!isPickable) forbidPickCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
         UniTask.RunOnThreadPool(() => ForbidPick(), default, forbidPickCts.Token);
+
+        //前に吹っ飛ぶ
         _rigidbody.AddForce(this.transform.forward * blownPowerHorizontal + Vector3.up * blownPowerVertical, ForceMode.Impulse);
 
+        //金貨を一定時間拾えないようにするローカル関数
         async void ForbidPick()
         {
             isPickable = false; //金貨を拾えない状態にする
