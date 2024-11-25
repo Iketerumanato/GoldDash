@@ -172,7 +172,8 @@ public static class Definer
     /// </summary>
     public enum MID : int //ActionPacketのValueに載せるのでint型
     {
-        Thunder,
-        Golddash,
+        NONE = -1,
+        THUNDER,
+        GOLDDASH,
     }
 }

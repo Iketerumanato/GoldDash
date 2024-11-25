@@ -351,6 +351,10 @@ public class GameClientManager : MonoBehaviour
                                         entityDictionary[receivedActionPacket.targetID].DestroyEntity();
                                         entityDictionary.Remove(receivedActionPacket.targetID);
                                         break;
+                                    case (byte)Definer.EDID.GIVE_MAGIC:
+                                        //魔法の巻物をアクターに与える
+                                        actorDictionary[receivedActionPacket.targetID].SetMagicToSlot(receivedActionPacket.value);
+                                        break;
                                 }
                                 break;
                         }

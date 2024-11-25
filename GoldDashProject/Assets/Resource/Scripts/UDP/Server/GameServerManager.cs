@@ -508,7 +508,13 @@ public class GameServerManager : MonoBehaviour
                                             udpGameServer.Send(myHeader.ToByte());
 
                                             //魔法（の巻物）を抽選して付与
-                                            int magicID = magicLottely.Lottely();                  
+                                            int magicID = magicLottely.Lottely();
+                                            //まずサーバー側で魔法所持状況を更新
+                                            actorDictionary[receivedHeader.sessionID].SetMagicToSlot(magicID);
+                                            //パケット送信
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.GIVE_MAGIC, receivedHeader.sessionID, magicID);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
 
                                             //その宝箱を消す
                                             //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
