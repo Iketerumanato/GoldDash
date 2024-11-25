@@ -107,13 +107,9 @@ public static class Definer
         /// </summary>
         OPEN_CHEST_SUCCEED,
         /// <summary>
-        /// 魔法「サンダー」を使用しました。
+        /// 魔法を使用しました。
         /// </summary>
-        USE_THUNDER,
-        /// <summary>
-        /// 魔法「ゴールドダッシュ」を使用しました。
-        /// </summary>
-        USE_GOLDDASH,
+        USE_MAGIC,
         /// <summary>
         /// サーバー内部専用。雷を生成してください。
         /// </summary>
@@ -165,5 +161,18 @@ public static class Definer
         /// このActorにパンチを背面からヒットさせろ
         /// </summary>
         HIT_BACK,
+        /// <summary>
+        /// このActorにこの魔法（の巻物）を与えろ
+        /// </summary>
+        GIVE_MAGIC,
+    }
+
+    /// <summary>
+    /// Magic ID, 魔法の種類を表すID
+    /// </summary>
+    public enum MID : byte
+    { 
+        Thunder,
+        Golddash,
     }
 }

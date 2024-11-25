@@ -30,9 +30,9 @@ public class MagicData : ScriptableObject
     }
 
     //使用した際にサーバーに送るパケットのREID
-    [SerializeField] private Definer.REID requestID;
-    public Definer.REID RequestID
+    [SerializeField] private Definer.MID magicID;
+    public Definer.MID MagicID
     {
-        get { return requestID; }
+        get { return MagicID; }
     }
 }
