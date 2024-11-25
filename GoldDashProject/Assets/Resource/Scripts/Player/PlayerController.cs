@@ -130,8 +130,9 @@ public class PlayerController : MonoBehaviour
             //オイラー角をtransform.rotationに代入するため、クォータニオンに変換する
             playerCam.transform.rotation = Quaternion.Euler(cameraMoveEulers);
 
-            //プレイヤーの正面方向を、カメラの正面方向（注視点の方向）と（XZ平面について）合わせる。カメラのX軸回転によって注視点のY座標（高さ）が変化するが、これは無視して0fを代入。
-            this.transform.forward = new Vector3(playerCam.transform.forward.x, 0f, playerCam.transform.forward.z);
+            //プレイヤーのY軸を中心とした回転を、カメラのそれと合わせる。
+            Vector3 PlayerMoveEulers = new Vector3(0, rotationY, 0f);
+            this.transform.rotation = Quaternion.Euler(PlayerMoveEulers);
         }
         #endregion
 
