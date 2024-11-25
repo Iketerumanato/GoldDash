@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ddc739486419e7e4d8446824555c6990, type: 3}
-  m_Name: Thunder
+  m_Name: GoldDash
   m_EditorClassIdentifier: 
-  magicName: "\u30B5\u30F3\u30C0\u30FC"
+  magicName: "\u30B4\u30FC\u30EB\u30C9\u30C0\u30C3\u30B7\u30E5"
   icon: {fileID: 0}
   explanation: {fileID: 0}
-  requestID: 0
+  requestID: 6

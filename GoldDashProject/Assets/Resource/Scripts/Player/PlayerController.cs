@@ -63,7 +63,8 @@ public class PlayerController : MonoBehaviour
     private ShakeEffect shakeEffect;
 
     //パケット関連
-    UdpGameClient udpGameClient = null; //パケット送信用。
+    //GameClientManagerからプレイヤーの生成タイミングでsetterを呼び出し
+    public UdpGameClient UdpGameClient { set; get; } //パケット送信用。
     public ushort SessionID { set; get; } //パケットに差出人情報を書くため必要
 
     //アニメーション関連
@@ -162,18 +163,11 @@ public class PlayerController : MonoBehaviour
                 //金貨の山に触れたというリクエスト送信。他のプレイヤーが先に触れていた場合、お金は入手できない。早い者勝ち。
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_GOLDPILE, other.GetComponent<Entity>().EntityID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                udpGameClient.Send(myHeader.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
                 break;
             default:
                 break;
         }
-    }
-
-    //GameClientManagerからプレイヤーの生成タイミングで呼び出してudpGameClientへのアクセスを得る。
-    public void GetUdpGameClient(UdpGameClient udpGameClient, ushort sessionID)
-    {
-        this.udpGameClient = udpGameClient;
-        this.SessionID = sessionID;
     }
 
     //画面を「タッチしたとき」呼ばれる。オブジェクトに触ったかどうか判定 UpdateProcess -> if (Input.GetMouseButtonDown(0))
@@ -233,7 +227,7 @@ public class PlayerController : MonoBehaviour
             //スカしたことをパケット送信
             myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
             myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-            udpGameClient.Send(myHeader.ToByte());
+            UdpGameClient.Send(myHeader.ToByte());
 
             Debug.Log("スカ送信");
         }
@@ -256,7 +250,7 @@ public class PlayerController : MonoBehaviour
                 //正面に命中させたことをパケット送信
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, actorController.SessionID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                udpGameClient.Send(myHeader.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
 
 
                 Debug.Log("正面送信");
@@ -270,7 +264,7 @@ public class PlayerController : MonoBehaviour
                 //背面に命中させたことをパケット送信
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_BACK, actorController.SessionID, default, punchVec);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                udpGameClient.Send(myHeader.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
 
 
                 Debug.Log("背面送信");
@@ -296,7 +290,7 @@ public class PlayerController : MonoBehaviour
         //背面に命中させたことをパケット送信
         myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, chestController.EntityID);
         myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-        udpGameClient.Send(myHeader.ToByte());
+        UdpGameClient.Send(myHeader.ToByte());
 
         //既に空いていないたらなにもしない
 

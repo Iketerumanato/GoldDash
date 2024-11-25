@@ -107,6 +107,14 @@ public static class Definer
         /// </summary>
         OPEN_CHEST_SUCCEED,
         /// <summary>
+        /// 魔法「サンダー」を使用しました。
+        /// </summary>
+        USE_THUNDER,
+        /// <summary>
+        /// 魔法「ゴールドダッシュ」を使用しました。
+        /// </summary>
+        USE_GOLDDASH,
+        /// <summary>
         /// サーバー内部専用。雷を生成してください。
         /// </summary>
         INTERNAL_THUNDER,
