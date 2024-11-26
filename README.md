@@ -6,7 +6,7 @@ Unity 2022.3.30f1
 
 **<使用中のライブラリ>**
 
-System.Threading, System.Runtime, UniTask.Linq, Unity.TextMeshPro,
+System.Net.Sockets,System.Threading, System.Runtime, UniTask.Linq, Unity.TextMeshPro,
 VisualScripting, RenderPipelines.ShaderGraph, R3.Unity, Unity.Recorder,
 
 **魔法取得までの流れ09/20(エフェクトあり)**
