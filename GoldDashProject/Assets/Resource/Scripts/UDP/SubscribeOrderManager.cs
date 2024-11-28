@@ -18,7 +18,7 @@ public class SubscribeOrderManager : MonoBehaviour
     private void Awake()
     {
         //ここがエントリーポイントなのでFPSも指定しておく
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = 45;
 
         //ボタン関連
         udpButtonManager.InitObservation(); //InitObservationに引数がないということは、何にも依存していないいうことなので、最初に初期化できる
