@@ -2544,7 +2544,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sessionPass: 9999
-  numOfPlayers: 2
+  numOfPlayers: 1
   maxNumOfChests: 10
   ActorPrefab: {fileID: 5703939729677495424, guid: 8145896d58e7e6b49a27f9ce769cdd62, type: 3}
   GoldPilePrefab: {fileID: 3135798385285437698, guid: 6fb001d414ae3684f9597b7c17828efd, type: 3}
@@ -2598,9 +2598,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   magicWeightsList:
-  - magicName: 0
+  - magicID: 0
     weight: 7
-  - magicName: 1
+  - magicID: 0
     weight: 3
 --- !u!1 &1469145183
 GameObject:
@@ -3209,7 +3209,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1

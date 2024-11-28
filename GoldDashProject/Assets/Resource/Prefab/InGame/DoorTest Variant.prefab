@@ -52,6 +52,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: DoorTest2 Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 5322534366645787118, guid: 59e2dd93afc8c7e49b9c4140d7659f68, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 8058687815170874680, guid: 59e2dd93afc8c7e49b9c4140d7659f68, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3730309723901927228, guid: 59e2dd93afc8c7e49b9c4140d7659f68, type: 3}
     m_RemovedGameObjects: []
@@ -114,6 +122,14 @@ PrefabInstance:
     - target: {fileID: 2163574600245000057, guid: 256a056455de708409956906d4cafcfc, type: 3}
       propertyPath: m_Name
       value: DoorTest1 Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 2163574600245000057, guid: 256a056455de708409956906d4cafcfc, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 2949998561647846512, guid: 256a056455de708409956906d4cafcfc, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 4526445954784282184, guid: 256a056455de708409956906d4cafcfc, type: 3}
@@ -181,6 +197,14 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: c813d6938ef0abc4c8846566084fd840, type: 3}
       propertyPath: m_Name
       value: DoorTest Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: c813d6938ef0abc4c8846566084fd840, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 8717006814415585051, guid: c813d6938ef0abc4c8846566084fd840, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: -5811766253009493418, guid: c813d6938ef0abc4c8846566084fd840, type: 3}
