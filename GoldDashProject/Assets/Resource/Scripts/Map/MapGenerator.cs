@@ -18,6 +18,7 @@ public class MapGenerator : MonoBehaviour
 
     //生成に使用するパーツ類
     [SerializeField] GameObject floorObj;
+    [SerializeField] GameObject ceilingObj;
     [SerializeField] GameObject wallObj;
     [SerializeField] GameObject doorObj;
     [SerializeField] GameObject chestObj;
@@ -140,13 +141,13 @@ public class MapGenerator : MonoBehaviour
                 // 天井
                 if (map[i, j].cellType != CellInfo.CELL_TYPE.NONE)
                 {
-                    GameObject ceiling = Instantiate(floorObj, new Vector3(i + 0.5f, 1f, j + 0.5f), Quaternion.Euler(180f, 0f, 0f));
+                    GameObject ceiling = Instantiate(ceilingObj, new Vector3(i + 0.5f, 1f, j + 0.5f), Quaternion.identity);
                     ceiling.transform.parent = Parenttransform;
                 }
                 // 左の壁
                 if (map[i, j].wallLeft == CellInfo.WALL_TYPE.WALL)
                 {
-                    GameObject leftWall = Instantiate(wallObj, new Vector3(i + 0.5f, 0.5f, j), Quaternion.Euler(0f, 90f, 0f));
+                    GameObject leftWall = Instantiate(wallObj, new Vector3(i + 0.5f, 0f, j), Quaternion.identity);
                     leftWall.transform.parent = Parenttransform;
                 }
                 else if (map[i, j].wallLeft == CellInfo.WALL_TYPE.DOOR)
@@ -157,7 +158,7 @@ public class MapGenerator : MonoBehaviour
                 // 右の壁
                 if (map[i, j].wallRight == CellInfo.WALL_TYPE.WALL)
                 {
-                    GameObject rightWall = Instantiate(wallObj, new Vector3(i + 0.5f, 0.5f, j + 1f), Quaternion.Euler(0f, 90f, 0f));
+                    GameObject rightWall = Instantiate(wallObj, new Vector3(i + 0.5f, 0f, j + 1f), Quaternion.identity);
                     rightWall.transform.parent = Parenttransform;
                 }
                 else if (map[i, j].wallRight == CellInfo.WALL_TYPE.DOOR)
@@ -168,23 +169,23 @@ public class MapGenerator : MonoBehaviour
                 // 上の壁
                 if (map[i, j].wallUpper == CellInfo.WALL_TYPE.WALL)
                 {
-                    GameObject upperWall = Instantiate(wallObj, new Vector3(i, 0.5f, j + 0.5f), Quaternion.Euler(0f, 0f, 0f));
+                    GameObject upperWall = Instantiate(wallObj, new Vector3(i, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
                     upperWall.transform.parent = Parenttransform;
                 }
                 else if (map[i, j].wallUpper == CellInfo.WALL_TYPE.DOOR)
                 {
-                    GameObject upperDoor = Instantiate(doorObj, new Vector3(i, 0.5f, j + 0.5f), Quaternion.Euler(0f, 0f, 0f));
+                    GameObject upperDoor = Instantiate(doorObj, new Vector3(i, 0.5f, j + 0.5f), Quaternion.identity);
                     upperDoor.transform.parent = Parenttransform;
                 }
                 // 下の壁
                 if (map[i, j].wallLower == CellInfo.WALL_TYPE.WALL)
                 {
-                    GameObject lowerWall = Instantiate(wallObj, new Vector3(i + 1f, 0.5f, j + 0.5f), Quaternion.Euler(0f, 0f, 0f));
+                    GameObject lowerWall = Instantiate(wallObj, new Vector3(i + 1f, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
                     lowerWall.transform.parent = Parenttransform;
                 }
                 else if (map[i, j].wallLower == CellInfo.WALL_TYPE.DOOR)
                 {
-                    GameObject lowerDoor = Instantiate(doorObj, new Vector3(i + 1f, 0.5f, j + 0.5f), Quaternion.Euler(0f, 0f, 0f));
+                    GameObject lowerDoor = Instantiate(doorObj, new Vector3(i + 1f, 0.5f, j + 0.5f), Quaternion.identity);
                     lowerDoor.transform.parent = Parenttransform;
                 }
 

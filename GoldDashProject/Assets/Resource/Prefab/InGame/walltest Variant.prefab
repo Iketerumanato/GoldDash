@@ -56,9 +56,17 @@ PrefabInstance:
       propertyPath: m_Convex
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -6900383789687202522, guid: 75a0d17d5e4f9c44ebc3ff07bdcc4dd0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 75a0d17d5e4f9c44ebc3ff07bdcc4dd0, type: 3}
       propertyPath: m_Name
       value: walltest Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 75a0d17d5e4f9c44ebc3ff07bdcc4dd0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: -7503245412704961684, guid: 75a0d17d5e4f9c44ebc3ff07bdcc4dd0, type: 3}

@@ -1,6 +1,8 @@
+using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[Obsolete("Camera制御機能は新PlayerControllerクラスに統合されました")]
 public class CameraControll : MonoBehaviour
 {
     [Header("プレイヤーのオブジェクト")]
@@ -21,7 +23,7 @@ public class CameraControll : MonoBehaviour
     [SerializeField] float CamXMinClanpRot = -90f;
     float yRotation = 0f;
 
-    [SerializeField] float rotateSpeed = 100f;
+    //[SerializeField] float rotateSpeed = 100f;
 
     [SerializeField] Camera PlayerCamera;
     readonly float CamNeer = 0.1f;

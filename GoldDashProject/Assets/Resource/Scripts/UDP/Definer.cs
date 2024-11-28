@@ -107,6 +107,10 @@ public static class Definer
         /// </summary>
         OPEN_CHEST_SUCCEED,
         /// <summary>
+        /// 魔法を使用しました。
+        /// </summary>
+        USE_MAGIC,
+        /// <summary>
         /// サーバー内部専用。雷を生成してください。
         /// </summary>
         INTERNAL_THUNDER,
@@ -157,5 +161,19 @@ public static class Definer
         /// このActorにパンチを背面からヒットさせろ
         /// </summary>
         HIT_BACK,
+        /// <summary>
+        /// このActorにこの魔法（の巻物）を与えろ
+        /// </summary>
+        GIVE_MAGIC,
+    }
+
+    /// <summary>
+    /// Magic ID, 魔法の種類を表すID
+    /// </summary>
+    public enum MID : int //ActionPacketのValueに載せるのでint型
+    {
+        NONE = -1,
+        THUNDER,
+        GOLDDASH,
     }
 }

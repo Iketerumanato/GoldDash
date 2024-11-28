@@ -47,6 +47,9 @@ public class GameServerManager : MonoBehaviour
 
     public Subject<SERVER_INTERNAL_EVENT> ServerInternalSubject;
 
+    //魔法抽選用コンポーネント
+    private MagicLottely magicLottely;
+
     //仮
     //レイを飛ばすためのカメラ
     private Camera mapCamera;
@@ -108,6 +111,9 @@ public class GameServerManager : MonoBehaviour
         //スレッドが何個いるのかは試してみないと分からない
         Task.Run(() => ProcessPacket());
         Task.Run(() => SendAllActorsPosition());
+
+        //MagicLottely取得
+        magicLottely = GetComponent<MagicLottely>();
 
         //仮
         //カメラ取得
@@ -496,9 +502,20 @@ public class GameServerManager : MonoBehaviour
                                             int chestGold = random.Next(80, 201);
                                             //まずサーバー側で
                                             actorDictionary[receivedHeader.sessionID].Gold += chestGold;
+                                            //ゴールド振込パケット送信
                                             myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, chestGold);
                                             myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameServer.Send(myHeader.ToByte());
+
+                                            //魔法（の巻物）を抽選して付与
+                                            int magicID = magicLottely.Lottely();
+                                            //まずサーバー側で魔法所持状況を更新
+                                            actorDictionary[receivedHeader.sessionID].SetMagicToSlot(magicID);
+                                            //パケット送信
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.GIVE_MAGIC, receivedHeader.sessionID, magicID);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
+
                                             //その宝箱を消す
                                             //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
                                             entityDictionary[receivedActionPacket.targetID].DestroyEntity();

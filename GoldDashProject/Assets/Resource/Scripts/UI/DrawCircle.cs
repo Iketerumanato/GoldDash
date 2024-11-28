@@ -25,7 +25,7 @@ public class DrawCircle : MonoBehaviour
 
     void Update()
     {
-        #region ‰~‚ğ•`‚­
+        #region å††ã‚’æã
         if (Input.GetMouseButtonDown(0))
         {
             drawpoints.Clear();
@@ -38,14 +38,14 @@ public class DrawCircle : MonoBehaviour
             RectTransformUtility.ScreenPointToLocalPointInRectangle(drawPanel, Input.mousePosition, null, out Vector2 localPoint);
             drawpoints.Add(localPoint);
 
-            // ƒ|ƒCƒ“ƒg‚ª2‚ÂˆÈã‚ ‚éê‡‚Ì‚İˆ—‚ğs‚¤
+            // ãƒã‚¤ãƒ³ãƒˆãŒ2ã¤ä»¥ä¸Šã‚ã‚‹å ´åˆã®ã¿å‡¦ç†ã‚’è¡Œã†
             if (drawpoints.Count > 1)
             {
                 if (drawpoints.Count > 1) center = GetCenter(drawpoints);
 
                 float angle = CalculateAngle(drawpoints, center);
 
-                //’†S“_‚ÆƒNƒŠƒbƒN‚µ‚½‚Æ‚«‚Ì“_‚Æ‚Ì‚È‚·Šp‚ğ‹‚ß‚ÄŠp“x‚Ì•Ï‰»•ûŒü‚ğƒ`ƒFƒbƒN
+                //ä¸­å¿ƒç‚¹ã¨ã‚¯ãƒªãƒƒã‚¯ã—ãŸã¨ãã®ç‚¹ã¨ã®ãªã™è§’ã‚’æ±‚ã‚ã¦è§’åº¦ã®å¤‰åŒ–æ–¹å‘ã‚’ãƒã‚§ãƒƒã‚¯
                 float sign = Mathf.Sign(Vector2.SignedAngle(drawpoints[drawpoints.Count - 2] - center, drawpoints[drawpoints.Count - 1] - center));
                 if (previousSign == NoneNum)
                 {
@@ -53,7 +53,7 @@ public class DrawCircle : MonoBehaviour
                 }
                 else if (sign != previousSign)
                 {
-                    Debug.Log("Šp“x‚Ì•ûŒü‚ª‹t“]‚µ‚Ü‚µ‚½BƒJƒEƒ“ƒg‚ğƒŠƒZƒbƒg‚µ‚Ü‚·");
+                    Debug.Log("è§’åº¦ã®æ–¹å‘ãŒé€†è»¢ã—ã¾ã—ãŸã€‚ã‚«ã‚¦ãƒ³ãƒˆã‚’ãƒªã‚»ãƒƒãƒˆã—ã¾ã™");
                     circleCount = NoneNum;
                     angleSum = NoneNum;
                     previousSign = sign;
@@ -65,10 +65,10 @@ public class DrawCircle : MonoBehaviour
                 {
                     circleCount++;
                     angleSum -= 360f;
-                    Debug.Log("‰~‚ğˆêü‚µ‚Ü‚µ‚½I Œ»İ‚ÌƒJƒEƒ“ƒg: " + circleCount);
+                    Debug.Log("å††ã‚’ä¸€å‘¨ã—ã¾ã—ãŸï¼ ç¾åœ¨ã®ã‚«ã‚¦ãƒ³ãƒˆ: " + circleCount);
                     if (circleCount == MaxDrawCount)
                     {
-                        Debug.Log("•ó” ƒI[ƒvƒ“");
+                        Debug.Log("å®ç®±ã‚ªãƒ¼ãƒ—ãƒ³");
                         uiFade.FadeOutImage();
                         cameraControll.ActiveCameraControll();
                         magicList.GrantRandomMagics(_magicmanagement);
@@ -80,13 +80,13 @@ public class DrawCircle : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
-            Debug.Log("ƒ}ƒEƒX‚ğ—£‚µ‚Ü‚µ‚½B‰~‚ÌƒJƒEƒ“ƒg‚ğƒŠƒZƒbƒg‚µ‚Ü‚·B");
+            Debug.Log("ãƒã‚¦ã‚¹ã‚’é›¢ã—ã¾ã—ãŸã€‚å††ã®ã‚«ã‚¦ãƒ³ãƒˆã‚’ãƒªã‚»ãƒƒãƒˆã—ã¾ã™ã€‚");
             circleCount = 0;
         }
         #endregion
     }
 
-    #region ’†S“_‚Ìæ“¾
+    #region ä¸­å¿ƒç‚¹ã®å–å¾—
     Vector2 GetCenter(List<Vector2> points)
     {
         if (points.Count < 2)
@@ -101,10 +101,10 @@ public class DrawCircle : MonoBehaviour
     }
     #endregion
 
-    #region •`‚©‚ê‚½‰~‚ÌŠp“xŒvZ
+    #region æã‹ã‚ŒãŸå††ã®è§’åº¦è¨ˆç®—
     float CalculateAngle(List<Vector2> points, Vector2 center)
     {
-        // ƒ|ƒCƒ“ƒg‚ª2‚Â–¢–‚Ìê‡AŠp“x‚ğŒvZ‚µ‚È‚¢
+        // ãƒã‚¤ãƒ³ãƒˆãŒ2ã¤æœªæº€ã®å ´åˆã€è§’åº¦ã‚’è¨ˆç®—ã—ãªã„
         if (points.Count < 2)
             return 0;
 

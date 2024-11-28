@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
 
 /// <summary>
@@ -5,6 +8,9 @@ using UnityEngine;
 /// </summary>
 public class ActorController : MonoBehaviour
 {
+    //定数
+    private const int magicSlot = 3; //魔法の所持数
+
     //プロパティ
     public string PlayerName { set; get; }
     public ushort SessionID { set; get; } //MonoBehaviourからすると、いちいちDictionaryからIDを取るより目の前のアクターのIDを取得した方が速そうなので
@@ -37,15 +43,61 @@ public class ActorController : MonoBehaviour
     readonly string strHitedFrontTrigger = "HitFrontActorTrigger";
     readonly string strHitedBackTrigger = "HitBackActorTrigger";
 
-    private void Awake()
+    //魔法関連
+    //所持している魔法のキュー
+    public int[] magicIDArray;
+
+    //仮
+    //所持金テキスト
+    [SerializeField] private TextMeshProUGUI goldText;
+
+    //魔法をスロットに入れる
+    public void SetMagicToSlot(int magicID)
     {
+        for (int i = 0; i < magicIDArray.Count(); i++)
+        {
+            //未所持ならそのスロットに入れる
+            if(magicIDArray[i] == -1) //Definer.MID.NONEは-1
+            {
+                magicIDArray[i] = magicID;
+            }
+        }
+
+        if (isPlayer)
+        { 
+            //魔法を検索
+            //その魔法を発動するボタンを生成する
+        }
+    }
+
+    private void Start()
+    {
+        //プレイヤーか否か確認する
         isPlayer = (GetComponent<PlayerController>() != null);
+        //2乗した定数の計算
         sqrRunThreshold = runThreshold * runThreshold;
+
+        //コレクションのインスタンス作成
+        magicIDArray = new int[magicSlot];
+        for (int i = 0; i < magicIDArray.Count(); i++)
+        {
+            magicIDArray[i] = (int)Definer.MID.NONE; //すべて未所持にする
+        }
     }
 
     private void Update()
     {
-        if (isPlayer) return;
+        if (isPlayer) UpdateForPlayer();
+        else UpdateForEnemy();
+    }
+
+    private void UpdateForPlayer()
+    {
+        goldText.text = $"Gold:{Gold}";
+    }
+
+    private void UpdateForEnemy()
+    {
         this.transform.position = Vector3.SmoothDamp(this.transform.position, targetPosition, ref currentVelocity_P, 0.1f);
         this.transform.forward = Vector3.SmoothDamp(this.transform.forward, targetForward, ref currentVelocity_F, 0.1f);
 

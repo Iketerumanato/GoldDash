@@ -232,9 +232,11 @@ public class GameClientManager : MonoBehaviour
                                         {
                                             //プレイヤーをインスタンス化しながらActorControllerを取得
                                             actorController = Instantiate(PlayerPrefab).GetComponent<ActorController>();
-                                            actorController.gameObject.GetComponent<PlayerController>().SessionID = this.sessionID; //PlayerクラスにはActorControllerとは別にSessionIDを渡しておく。パケット送信を楽にするため。
-                                            playerController = actorController.gameObject.GetComponent<PlayerController>(); //playerControllerはアクセスしやすいように取得しておく
-                                            playerController.gameObject.GetComponent<PlayerController>().GetUdpGameClient(this.udpGameClient, this.sessionID);
+                                            //playerControllerはアクセスしやすいように取得しておく
+                                            playerController = actorController.gameObject.GetComponent<PlayerController>();
+                                            //Playerクラスには別にSessionIDとUdpGameClientを渡し、パケット送信を自分でやらせる。
+                                            playerController.SessionID = this.sessionID;
+                                            playerController.UdpGameClient = this.udpGameClient;
                                         }
                                         else //他人のIDなら
                                         {
@@ -348,6 +350,10 @@ public class GameClientManager : MonoBehaviour
                                         //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
                                         entityDictionary[receivedActionPacket.targetID].DestroyEntity();
                                         entityDictionary.Remove(receivedActionPacket.targetID);
+                                        break;
+                                    case (byte)Definer.EDID.GIVE_MAGIC:
+                                        //魔法の巻物をアクターに与える
+                                        actorDictionary[receivedActionPacket.targetID].SetMagicToSlot(receivedActionPacket.value);
                                         break;
                                 }
                                 break;
