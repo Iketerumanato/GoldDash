@@ -58,7 +58,15 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 541a75329865a1b40bb77b7162404c99, type: 2}
     - target: {fileID: 919132149155446097, guid: ea8d4535a3e828c44a878a50c084ba72, type: 3}
       propertyPath: m_Name
-      value: Ceiling
+      value: Ceiling Prefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ea8d4535a3e828c44a878a50c084ba72, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 6068965413939263502, guid: ea8d4535a3e828c44a878a50c084ba72, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

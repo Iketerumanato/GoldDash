@@ -3080,8 +3080,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Parenttransform: {fileID: 1585246435}
-  floorObj: {fileID: 6506074169082892065, guid: 654ef1ba9ef1cc141b22e805380d48d9, type: 3}
-  wallObj: {fileID: 3201486429960166728, guid: b794f629a45a4254b961bba1d1d9b8c5, type: 3}
+  floorObj: {fileID: 3618892825052563774, guid: 6a7dcb8ccd70c9b418e96bde42355201, type: 3}
+  ceilingObj: {fileID: 2245593692840514771, guid: 4a00a3f5854a82d4f81dc4ce35912571, type: 3}
+  wallObj: {fileID: 3049529086512440611, guid: d69d3fa195f8cfe4f95540f955dc80b7, type: 3}
   doorObj: {fileID: 6386287164377620441, guid: 52aff7cf64cbca04b8caaa2a5c88e2c0, type: 3}
   chestObj: {fileID: 5283063881264726642, guid: f99816d4e2a842047bc8f89cd40346a8, type: 3}
   respawnObj: {fileID: 4160669350675892000, guid: ce5eafa118884ff4797ae07d23444af0, type: 3}
