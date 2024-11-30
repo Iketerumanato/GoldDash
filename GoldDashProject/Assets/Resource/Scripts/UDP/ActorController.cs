@@ -9,7 +9,8 @@ using UnityEngine;
 public class ActorController : MonoBehaviour
 {
     //定数
-    private const int magicSlot = 3; //魔法の所持数
+    private const int MAGIC_INVENTRY_MAX = 3; //魔法の最大所持数
+    private int magicInventry = 0; //現在の魔法の所持数
 
     //プロパティ
     public string PlayerName { set; get; }
@@ -44,7 +45,7 @@ public class ActorController : MonoBehaviour
     readonly string strHitedBackTrigger = "HitBackActorTrigger";
 
     //魔法関連
-    //所持している魔法のキュー
+    //所持している魔法を管理する固定長の配列
     public int[] magicIDArray;
 
     //仮
@@ -54,6 +55,11 @@ public class ActorController : MonoBehaviour
     //魔法をスロットに入れる
     public void SetMagicToSlot(int magicID)
     {
+        if (magicInventry == MAGIC_INVENTRY_MAX)
+        { 
+            //魔法をこれ以上持てないときの処理
+        }
+
         for (int i = 0; i < magicIDArray.Count(); i++)
         {
             //未所持ならそのスロットに入れる
@@ -61,12 +67,6 @@ public class ActorController : MonoBehaviour
             {
                 magicIDArray[i] = magicID;
             }
-        }
-
-        if (isPlayer)
-        { 
-            //魔法を検索
-            //その魔法を発動するボタンを生成する
         }
     }
 
@@ -78,7 +78,7 @@ public class ActorController : MonoBehaviour
         sqrRunThreshold = runThreshold * runThreshold;
 
         //コレクションのインスタンス作成
-        magicIDArray = new int[magicSlot];
+        magicIDArray = new int[MAGIC_INVENTRY_MAX];
         for (int i = 0; i < magicIDArray.Count(); i++)
         {
             magicIDArray[i] = (int)Definer.MID.NONE; //すべて未所持にする

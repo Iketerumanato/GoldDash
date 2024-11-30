@@ -2600,7 +2600,7 @@ MonoBehaviour:
   magicWeightsList:
   - magicID: 0
     weight: 7
-  - magicID: 0
+  - magicID: 1
     weight: 3
 --- !u!1 &1469145183
 GameObject:

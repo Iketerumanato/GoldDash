@@ -354,6 +354,11 @@ public class GameClientManager : MonoBehaviour
                                     case (byte)Definer.EDID.GIVE_MAGIC:
                                         //魔法の巻物をアクターに与える
                                         actorDictionary[receivedActionPacket.targetID].SetMagicToSlot(receivedActionPacket.value);
+                                        //もしプレイヤーに魔法が与えられたならPlayerController側も処理する
+                                        if (receivedActionPacket.targetID == this.sessionID)
+                                        { 
+                                            //UI更新など
+                                        }
                                         break;
                                 }
                                 break;
