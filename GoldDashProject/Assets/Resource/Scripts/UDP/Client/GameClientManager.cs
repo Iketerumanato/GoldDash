@@ -353,11 +353,12 @@ public class GameClientManager : MonoBehaviour
                                         break;
                                     case (byte)Definer.EDID.GIVE_MAGIC:
                                         //魔法の巻物をアクターに与える
-                                        actorDictionary[receivedActionPacket.targetID].SetMagicToSlot(receivedActionPacket.value);
+                                        int slot = actorDictionary[receivedActionPacket.targetID].SetMagicToSlot(receivedActionPacket.value);
                                         //もしプレイヤーに魔法が与えられたならPlayerController側も処理する
-                                        if (receivedActionPacket.targetID == this.sessionID)
-                                        { 
-                                            //UI更新など
+                                        if (receivedActionPacket.targetID == this.sessionID && slot != -1) //魔法が持てなかった場合（slotに-1が返ってきた場合）は処理しない
+                                        {
+                                            //UIの生成
+                                            playerController.SetMagicIcon((Definer.MID)receivedActionPacket.value, slot);
                                         }
                                         break;
                                 }

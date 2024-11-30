@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using System.Threading;
 using TMPro;
 using UnityEngine;
@@ -81,6 +82,17 @@ public class PlayerController : MonoBehaviour
     private bool isPickable = true; //吹っ飛んでいる間金貨を拾えないようにする
     CancellationTokenSource forbidPickCts; //短時間で何度も吹っ飛ばしを受けた時に、発生中の金貨獲得禁止時間を延長するためにunitaskを停止させる必要がある
 
+    //UI関連
+    [Header("魔法のアイコンのゲームオブジェクト")]
+    [SerializeField] GameObject thunderIcon;
+    [SerializeField] GameObject goldDashIcon;
+
+    [Header("魔法のアイコンを生成する座標")]
+    [SerializeField] List<Vector3> iconPositions;
+
+    //生成したアイコンを管理しておく配列
+    GameObject[] magicIconSlot;
+
     private void Start()
     {
         //リスポーン地点の記録
@@ -99,6 +111,15 @@ public class PlayerController : MonoBehaviour
 
         //振動させたいカメラを指定してtransformをshakeEffectに渡す
         shakeEffect.shakeCameraTransform = playerCam.transform;
+
+        //UI用配列は最大所持数ぶんのサイズを確保しておく
+        magicIconSlot = new GameObject[ActorController.MAGIC_INVENTRY_MAX];
+
+        //定数と座標の設定が一致していなければ警告する
+        if (iconPositions.Count != ActorController.MAGIC_INVENTRY_MAX)
+        {
+            Debug.LogError("魔法の最大所持数と、UIの生成位置指定の数が一致していません。");
+        }
     }
 
     private void LateUpdate()
@@ -198,6 +219,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    #region パンチ関連 
     //パンチ。パンチを成立させたRaycastHit構造体のPointとDistanceを引数にもらおう
     async private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
     {
@@ -274,6 +296,43 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    //正面から殴られたときの処理。GameClientManagerから呼ばれる
+    public void GetPunchFront()
+    {
+        //一人称モーションの再生
+        playerAnimator.SetTrigger(strGetPunchFrontTrigger);
+
+        //カメラ演出
+        shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium); //振動中
+    }
+    
+    //背面から殴られたときの処理。GameClientManagerから呼ばれる
+    public void GetPunchBack()
+    {
+        //一人称モーションの再生
+        playerAnimator.SetTrigger(strGetPunchBackTrigger);
+
+        //カメラ演出
+        shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large); //振動大
+
+        //金貨を拾えない状態にする
+        if(!isPickable) forbidPickCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
+        UniTask.RunOnThreadPool(() => ForbidPick(), default, forbidPickCts.Token);
+
+        //前に吹っ飛ぶ
+        _rigidbody.AddForce(this.transform.forward * blownPowerHorizontal + Vector3.up * blownPowerVertical, ForceMode.Impulse);
+
+        //金貨を一定時間拾えないようにするローカル関数
+        async void ForbidPick()
+        {
+            isPickable = false; //金貨を拾えない状態にする
+            await UniTask.Delay(forbidPickTime); //指定された時間待つ
+            isPickable = true; //金貨を拾えるようにする
+        }
+    }
+    #endregion
+
+    #region 宝箱と魔法の獲得関連
     //宝箱なら開錠を試みる。パンチと同様RaycastHit構造体から引数をもらう。消えゆく宝箱だったり、他プレイヤーが使用中の宝箱は開錠できない。
     private void TryOpenChest(Vector3 hitPoint, float distance, Chest chestController)
     {
@@ -313,38 +372,34 @@ public class PlayerController : MonoBehaviour
         //}
     }
 
-    //正面から殴られたときの処理。GameClientManagerから呼ばれる
-    public void GetPunchFront()
+    //魔法の巻物を獲得し、演出しつつ使うためのUIを生成する。GameClientManagerから呼ばれる
+    public void SetMagicIcon(Definer.MID magicID, int slot)
     {
-        //一人称モーションの再生
-        playerAnimator.SetTrigger(strGetPunchFrontTrigger);
-
-        //カメラ演出
-        shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium); //振動中
-    }
-    
-    //背面から殴られたときの処理。GameClientManagerから呼ばれる
-    public void GetPunchBack()
-    {
-        //一人称モーションの再生
-        playerAnimator.SetTrigger(strGetPunchBackTrigger);
-
-        //カメラ演出
-        shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large); //振動大
-
-        //金貨を拾えない状態にする
-        if(!isPickable) forbidPickCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
-        UniTask.RunOnThreadPool(() => ForbidPick(), default, forbidPickCts.Token);
-
-        //前に吹っ飛ぶ
-        _rigidbody.AddForce(this.transform.forward * blownPowerHorizontal + Vector3.up * blownPowerVertical, ForceMode.Impulse);
-
-        //金貨を一定時間拾えないようにするローカル関数
-        async void ForbidPick()
+        //NONEが渡されたら指定されたスロットのアイコンを削除
+        if (magicID == Definer.MID.NONE)
         {
-            isPickable = false; //金貨を拾えない状態にする
-            await UniTask.Delay(forbidPickTime); //指定された時間待つ
-            isPickable = true; //金貨を拾えるようにする
+            Destroy(magicIconSlot[slot]); //オブジェクトを削除
+            magicIconSlot[slot] = null; //参照を参照
+            return;
         }
+
+        GameObject obj;//生成したいUI用オブジェクトを決める 
+        switch (magicID)
+        {
+            case Definer.MID.THUNDER:
+                obj = thunderIcon;
+                break;
+
+            case Definer.MID.GOLDDASH:
+                obj = goldDashIcon;
+                break;
+
+            default:
+                obj = null;
+                break;
+        }
+        magicIconSlot[slot] = Instantiate(obj); //オブジェクトを生成して参照を得る
+        magicIconSlot[slot].transform.position = iconPositions[slot]; //座標を指定
     }
+    #endregion
 }

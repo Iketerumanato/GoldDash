@@ -9,7 +9,7 @@ using UnityEngine;
 public class ActorController : MonoBehaviour
 {
     //定数
-    private const int MAGIC_INVENTRY_MAX = 3; //魔法の最大所持数
+    public const int MAGIC_INVENTRY_MAX = 3; //魔法の最大所持数
     private int magicInventry = 0; //現在の魔法の所持数
 
     //プロパティ
@@ -53,11 +53,12 @@ public class ActorController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI goldText;
 
     //魔法をスロットに入れる
-    public void SetMagicToSlot(int magicID)
+    public int SetMagicToSlot(int magicID)
     {
         if (magicInventry == MAGIC_INVENTRY_MAX)
-        { 
+        {
             //魔法をこれ以上持てないときの処理
+            return -1; //持てなかったら-1を返す
         }
 
         for (int i = 0; i < magicIDArray.Count(); i++)
@@ -67,7 +68,10 @@ public class ActorController : MonoBehaviour
             {
                 magicIDArray[i] = magicID;
             }
+            return i; //獲得に成功したらスロット番号を返す
         }
+
+        return -1; //ここに到達することはないはずだが持てなかったら-1を返す
     }
 
     private void Start()
