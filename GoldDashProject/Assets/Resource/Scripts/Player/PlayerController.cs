@@ -231,7 +231,7 @@ public class PlayerController : MonoBehaviour
             foreach (Touch t in Input.touches)
             {
                 //タッチし始めたフレームでないなら処理しない
-                if (t.phase != TouchPhase.Began) return;
+                if (t.phase != TouchPhase.Began) continue;
 
                 //カメラの位置からタッチした位置に向けrayを飛ばす
                 RaycastHit hit;
