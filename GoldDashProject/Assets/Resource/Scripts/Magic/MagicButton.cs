@@ -1,17 +1,13 @@
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using DG.Tweening;
 
-public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
+public class MagicButton : MonoBehaviour
 {
-    [SerializeField] MagicManagement magicManagement;
+    //[SerializeField] MagicManagement magicManagement;
     [SerializeField] int magicIndex;
-    [SerializeField] Button magicbutton;
 
-    [SerializeField] RectTransform buttonRectTransform;
     [SerializeField] Transform endPos;  // EndPosオブジェクトの参照
-    private Vector2 originalPosition;
+    private Vector3 originalPosition;
     [SerializeField] float buttonMoveSpeed = 20f;
     [SerializeField] float buttonAnimDuration = 0.2f;
 
@@ -19,43 +15,43 @@ public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private bool isDragging = false;
     private bool isFlicked = false;
 
-    private CanvasGroup canvasGroup;
+    [SerializeField] Camera MagicButtonCam;
 
     private void Awake()
     {
-        originalPosition = buttonRectTransform.localPosition;
-        canvasGroup = buttonRectTransform.GetComponent<CanvasGroup>();
+        originalPosition = transform.position;
     }
 
-    void Start()
+    private void OnMouseDown()
     {
-        magicbutton.onClick.AddListener(() => magicManagement.ActivateMagic(magicIndex));
-    }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        buttonRectTransform.DOKill();
-        buttonRectTransform.localPosition = originalPosition;
-        canvasGroup.alpha = 1f;  // 透明度をリセット
-
+        // タッチ/クリック開始
+        transform.DOKill();
+        transform.position = originalPosition;
         isDragging = true;
+        Debug.Log("ボタンのクリックを検知");
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    private void OnMouseUp()
     {
+        // タッチ/クリック終了
         if (isDragging)
         {
-            Vector2 releasePointerPosition = eventData.position;
-            Vector2 dragVector = releasePointerPosition - originalPosition;
+            Vector3 screenPoint = Input.mousePosition;
+            Ray ray = MagicButtonCam.ScreenPointToRay(screenPoint);
 
-            if (dragVector.y > flickThreshold)
+            if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                TriggerFlickAnimation();
-                isFlicked = true;
-            }
-            else
-            {
-                buttonRectTransform.DOLocalMove(originalPosition, buttonAnimDuration).SetEase(Ease.OutQuad);
+                Vector3 dragVector = hit.point - originalPosition;
+
+                if (dragVector.y > flickThreshold)
+                {
+                    TriggerFlickAnimation();
+                    isFlicked = true;
+                }
+                else
+                {
+                    transform.DOMove(originalPosition, buttonAnimDuration).SetEase(Ease.OutQuad);
+                }
             }
 
             isDragging = false;
@@ -64,24 +60,23 @@ public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void TriggerFlickAnimation()
     {
-        // EndPos位置まで移動し、透明度を徐々に0にする
-        buttonRectTransform.DOMove(endPos.position, 0.5f)
+        // EndPos位置まで移動
+        transform.DOMove(endPos.position, 0.5f)
             .SetEase(Ease.OutCubic)
             .OnComplete(() => Debug.Log("Button reached end position."));
-
-        // 透明度を徐々に0にするアニメーション
-        canvasGroup.DOFade(0f, 0.5f);
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    private void OnMouseEnter()
     {
+        // ホバー効果
         if (isFlicked) return;
-        buttonRectTransform.DOLocalMoveY(originalPosition.y + buttonMoveSpeed, buttonAnimDuration).SetEase(Ease.OutQuad);
+        transform.DOMoveY(originalPosition.y + buttonMoveSpeed, buttonAnimDuration).SetEase(Ease.OutQuad);
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    private void OnMouseExit()
     {
+        // ホバー終了効果
         if (isFlicked) return;
-        buttonRectTransform.DOLocalMoveY(originalPosition.y, buttonAnimDuration).SetEase(Ease.OutQuad);
+        transform.DOMoveY(originalPosition.y, buttonAnimDuration).SetEase(Ease.OutQuad);
     }
 }
