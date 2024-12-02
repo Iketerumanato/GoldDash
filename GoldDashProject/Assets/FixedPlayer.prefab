@@ -2387,11 +2387,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65c630bffdd03834da5e4dbab7119f9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FPSPlayerParticles:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  FPSPlayerParticles: []
 --- !u!4 &1742532088667761308 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cfc3b3c745310a947b3add25ef492886, type: 3}
