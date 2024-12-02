@@ -30,6 +30,7 @@ public class NormalState : IPlayerState
         playerController.ControllPlayerLeftJoystick();
         playerController.ControllPlayerRightJoystick();
 
+        //1点以上のタッチが確認されたらインタラクト
         if (Input.touchCount > 0) playerController.Interact();
         playerController.PlayerRespawn();
     }
@@ -225,6 +226,7 @@ public class PlayerController : MonoBehaviour
 
         foreach (Touch t in Input.touches)
         {
+            //タッチし始めたフレームでないなら処理しない
             if (t.phase != TouchPhase.Began) return;
 
             //カメラの位置からタッチした位置に向けrayを飛ばす
