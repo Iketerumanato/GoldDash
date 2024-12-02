@@ -141,16 +141,6 @@ public class PlayerController : MonoBehaviour
 
         //落下していたらリスポーン
         if (transform.position.y < fallThreshold) transform.position = initialSpawnPosition;
-
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            ActionPacket myActionPacket;
-            Header myHeader;
-
-            myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.USE_MAGIC, default, (int)Definer.MID.THUNDER);
-            myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-            UdpGameClient.Send(myHeader.ToByte());
-        }
     }
 
     //エンティティに接触したとき
