@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using TMPro;
 using UnityEngine;
+using static Unity.Burst.Intrinsics.X86.Avx;
 
 #region プレイヤーのState(通常,状態異常)
 public interface IPlayerState
@@ -222,31 +223,34 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log("レイ飛ばします");
 
-        //カメラの位置からタッチした位置に向けrayを飛ばす
-        RaycastHit hit;
-        Ray ray = playerCam.ScreenPointToRay(Input.mousePosition);
-
-        //rayがなにかに当たったら調べる
-        //定数INTERACTABLE_DISTANCEでrayの長さを調整することでインタラクト可能な距離を制限できる
-        if (Physics.Raycast(ray, out hit, interactableDistance))
+        foreach (Touch t in Input.touches)
         {
+            //カメラの位置からタッチした位置に向けrayを飛ばす
+            RaycastHit hit;
+            Ray ray = playerCam.ScreenPointToRay(t.position);
 
-            Debug.Log(hit.collider.gameObject.name);
-
-            switch (hit.collider.gameObject.tag)
+            //rayがなにかに当たったら調べる
+            //定数INTERACTABLE_DISTANCEでrayの長さを調整することでインタラクト可能な距離を制限できる
+            if (Physics.Raycast(ray, out hit, interactableDistance))
             {
-                case "Enemy": //プレイヤーならパンチ
-                    Debug.Log("Punch入りたい");
-                    Punch(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ActorController>());
-                    break;
-                case "Chest": //宝箱なら開錠を試みる
-                    TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
-                    break;
 
-                //ドアをタッチで開けるならココ
+                Debug.Log(hit.collider.gameObject.name);
 
-                default: //そうでないものはインタラクト不可能なオブジェクトなので無視
-                    break;
+                switch (hit.collider.gameObject.tag)
+                {
+                    case "Enemy": //プレイヤーならパンチ
+                        Debug.Log("Punch入りたい");
+                        Punch(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ActorController>());
+                        break;
+                    case "Chest": //宝箱なら開錠を試みる
+                        TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
+                        break;
+
+                    //ドアをタッチで開けるならココ
+
+                    default: //そうでないものはインタラクト不可能なオブジェクトなので無視
+                        break;
+                }
             }
         }
     }
