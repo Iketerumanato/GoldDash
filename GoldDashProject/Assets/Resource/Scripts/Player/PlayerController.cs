@@ -30,7 +30,7 @@ public class NormalState : IPlayerState
         playerController.ControllPlayerLeftJoystick();
         playerController.ControllPlayerRightJoystick();
 
-        if (Input.GetMouseButtonDown(0)) playerController.Interact();
+        if (Input.touchCount > 0) playerController.Interact();
         playerController.PlayerRespawn();
     }
 
