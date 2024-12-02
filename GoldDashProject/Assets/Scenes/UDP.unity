@@ -1297,7 +1297,7 @@ GameObject:
   - component: {fileID: 801294302}
   - component: {fileID: 801294305}
   m_Layer: 0
-  m_Name: Main Camera
+  m_Name: Map Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2550,6 +2550,7 @@ MonoBehaviour:
   GoldPilePrefab: {fileID: 3135798385285437698, guid: 6fb001d414ae3684f9597b7c17828efd, type: 3}
   ChestPrefab: {fileID: 5283063881264726642, guid: f99816d4e2a842047bc8f89cd40346a8, type: 3}
   ThunderPrefab: {fileID: 8666734358453998117, guid: 2dff9d1b170394642984e801a4cdf773, type: 3}
+  mapCamera: {fileID: 801294303}
 --- !u!4 &1385810819
 Transform:
   m_ObjectHideFlags: 0
@@ -2599,8 +2600,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   magicWeightsList:
   - magicID: 0
-    weight: 7
-  - magicID: 0
+    weight: 2
+  - magicID: 1
     weight: 3
 --- !u!1 &1469145183
 GameObject:

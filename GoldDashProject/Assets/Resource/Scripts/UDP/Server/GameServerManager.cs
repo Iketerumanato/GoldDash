@@ -50,9 +50,114 @@ public class GameServerManager : MonoBehaviour
     //魔法抽選用コンポーネント
     private MagicLottely magicLottely;
 
-    //仮
     //レイを飛ばすためのカメラ
-    private Camera mapCamera;
+    [SerializeField] private Camera mapCamera;
+
+    #region Stateインターフェース
+    public interface ISetverState
+    {
+        void EnterState(GameServerManager gameServerManager, Definer.MID magicID);
+        void UpdateProcess(GameServerManager gameServerManager);
+        void ExitState(GameServerManager gameServerManager);
+    }
+
+    //現在のstate
+    private ISetverState currentSetverState;
+    //魔法の実行待機ならtrue
+    private bool isAwaitingMagic;
+
+    //魔法IDを渡しつつStateの切り替え
+    public void ChangeServerState(ISetverState newState, Definer.MID magicID = Definer.MID.NONE)
+    {
+        if (currentSetverState != null) currentSetverState.ExitState(this);
+        currentSetverState = newState;
+        currentSetverState.EnterState(this, magicID);
+    }
+
+    //通常の状態
+    public class NormalState : ISetverState
+    {
+        public void EnterState(GameServerManager gameServerManager, Definer.MID magicID)
+        {
+        }
+
+        public void UpdateProcess(GameServerManager gameServerManager)
+        {
+        }
+
+        public void ExitState(GameServerManager gameServerManager)
+        {
+        }
+    }
+
+    //魔法のための画面タッチを待機している状態
+    public class AwaitTouchState : ISetverState
+    {
+        Definer.MID awaitMagicID;
+
+        public void EnterState(GameServerManager gameServerManager, Definer.MID magicID)
+        {
+            gameServerManager.isAwaitingMagic = true;
+            awaitMagicID = magicID;
+        }
+
+        public void UpdateProcess(GameServerManager gameServerManager)
+        {
+            switch (awaitMagicID)
+            {
+                case Definer.MID.THUNDER:
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        //カメラの位置からタッチした位置に向けrayを飛ばす
+                        RaycastHit hit;
+                        Ray ray = gameServerManager.mapCamera.ScreenPointToRay(Input.mousePosition);
+
+                        //rayがなにかに当たったら調べる
+                        if (Physics.Raycast(ray, out hit))
+                        {
+                            Debug.Log(hit.collider.gameObject.name);
+
+                            switch (hit.collider.gameObject.tag)
+                            {
+                                case "Floor": //床にタッチしたら雷落とす
+                                              //！あぶない！　ここで雷を生成すると最悪entityDictionaryが別スレッドの処理とぶつかってデッドロックして世界が終わるよ
+                                    ActionPacket myActionPacket; //いったい何をするの！？
+                                    Header header; //パケットの送信はメインスレッドでやらないことにしてるよね！？大丈夫！？
+
+                                    //INTERNAL_THUNDER?? サーバーが一体なぜリクエストパケットを？
+                                    Vector3 thunderPos = new Vector3(hit.collider.gameObject.transform.position.x, 0.5f, hit.collider.gameObject.transform.position.z);
+
+                                    myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.INTERNAL_THUNDER, default, default, thunderPos);
+                                    header = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+
+                                    //そうか！サーバー内部から別スレッドで使われているConcurrentQueueにパケットを直接エンキューすることで、
+                                    //ネットワークを介さずとも他の処理と同様のフローでオブジェクト生成を実行できるだけでなく、
+                                    //プレイヤー達のパケット処理の順番を待ってから処理されることでゲームルールの公平性も確保されるんだね！すごいや！
+                                    gameServerManager.packetQueue.Enqueue(header);
+                                    //Monobehaviorの処理をパケット処理スレッドに一任している（これは俺が決めました）以上、
+                                    //entityDictionaryをスレッドセーフなコレクションにしてUpdate()内でオブジェクト生成を行うことは禁忌だし、この実装が一番よさそうだね！
+                                    //参考:https://learn.microsoft.com/ja-jp/dotnet/standard/collections/thread-safe/when-to-use-a-thread-safe-collection
+                                    //スレッドセーフにしてくれてマジ、感謝。
+                                    
+                                    gameServerManager.ChangeServerState(new NormalState()); //雷を落としたらノーマルステートに戻る
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public void ExitState(GameServerManager gameServerManager)
+        {
+            gameServerManager.isAwaitingMagic = false;
+        }
+    }
+    #endregion
 
     #region ボタンが押されたらサーバーを有効化したり無効化したり
     public void InitObservation(UdpButtonManager udpUIManager)
@@ -115,53 +220,13 @@ public class GameServerManager : MonoBehaviour
         //MagicLottely取得
         magicLottely = GetComponent<MagicLottely>();
 
-        //仮
-        //カメラ取得
-        mapCamera = Camera.main;
+        //State初期化
+        ChangeServerState(new NormalState());
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            //カメラの位置からタッチした位置に向けrayを飛ばす
-            RaycastHit hit;
-            Ray ray = mapCamera.ScreenPointToRay(Input.mousePosition);
-
-            //rayがなにかに当たったら調べる
-            //定数INTERACTABLE_DISTANCEでrayの長さを調整することでインタラクト可能な距離を制限できる
-            if (Physics.Raycast(ray, out hit))
-            {
-                Debug.Log(hit.collider.gameObject.name);
-
-                switch (hit.collider.gameObject.tag)
-                {
-                    case "Floor": //床にタッチしたら雷落とす
-                        //！あぶない！　ここで雷を生成すると最悪entityDictionaryが別スレッドの処理とぶつかってデッドロックして世界が終わるよ
-                        ActionPacket myActionPacket; //いったい何をするの！？
-                        Header header; //パケットの送信はメインスレッドでやらないことにしてるよね！？大丈夫！？
-
-                        //INTERNAL_THUNDER?? サーバーが一体なぜリクエストパケットを？
-                        Vector3 thunderPos = new Vector3(hit.collider.gameObject.transform.position.x, 0.5f, hit.collider.gameObject.transform.position.z);
-
-                        myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.INTERNAL_THUNDER, default, default, thunderPos);
-                        header = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-
-                        //そうか！サーバー内部から別スレッドで使われているConcurrentQueueにパケットを直接エンキューすることで、
-                        //ネットワークを介さずとも他の処理と同様のフローでオブジェクト生成を実行できるだけでなく、
-                        //プレイヤー達のパケット処理の順番を待ってから処理されることでゲームルールの公平性も確保されるんだね！すごいや！
-                        packetQueue.Enqueue(header);
-                        //Monobehaviorの処理をパケット処理スレッドに一任している（これは俺が決めました）以上、
-                        //entityDictionaryをスレッドセーフなコレクションにしてUpdate()内でオブジェクト生成を行うことは禁忌だし、この実装が一番よさそうだね！
-                        //参考:https://learn.microsoft.com/ja-jp/dotnet/standard/collections/thread-safe/when-to-use-a-thread-safe-collection
-                        //スレッドセーフにしてくれてマジ、感謝。
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }
+        currentSetverState.UpdateProcess(this);
     }
 
     private async void SendAllActorsPosition()
@@ -509,8 +574,8 @@ public class GameServerManager : MonoBehaviour
 
                                             //魔法（の巻物）を抽選して付与
                                             int magicID = magicLottely.Lottely();
-                                            //まずサーバー側で魔法所持状況を更新
-                                            actorDictionary[receivedHeader.sessionID].SetMagicToSlot(magicID);
+                                            //まずサーバー側で魔法所持数を1個増やす
+                                            actorDictionary[receivedHeader.sessionID].MagicInventry++;
                                             //パケット送信
                                             myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.GIVE_MAGIC, receivedHeader.sessionID, magicID);
                                             myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
@@ -545,6 +610,24 @@ public class GameServerManager : MonoBehaviour
 
                                                 currentNumOfChests++; //宝箱の数インクリメント
                                             }
+                                        }
+                                        break;
+                                    #endregion
+                                    #region case 魔法系
+                                    case (byte)Definer.REID.USE_MAGIC:
+                                        //魔法の種類がvalueに書かれているので確認して分岐
+                                        switch ((Definer.MID)receivedActionPacket.value)
+                                        {
+                                            //雷
+                                            case Definer.MID.THUNDER:
+                                                //もし違う魔法の実行待機をしているならエラー返す
+                                                if (isAwaitingMagic)
+                                                {
+                                                    //エラーパケット
+                                                    break;
+                                                }
+                                                ChangeServerState(new AwaitTouchState(), Definer.MID.THUNDER); //雷を待機する状態にする
+                                                break;
                                         }
                                         break;
                                     #endregion

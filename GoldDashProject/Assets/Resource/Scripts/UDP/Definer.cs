@@ -165,6 +165,18 @@ public static class Definer
         /// このActorにこの魔法（の巻物）を与えろ
         /// </summary>
         GIVE_MAGIC,
+        /// <summary>
+        /// このActorの魔法をひとつ消費させろ
+        /// </summary>
+        CONSUME_MAGIC,
+        /// <summary>
+        /// このアクターをスタンさせろ
+        /// </summary>
+        GIVE_STATUS_STUN,
+        /// <summary>
+        /// このアクターをゴールドダッシュ状態にしろ
+        /// </summary>
+        GIVE_STATUS_GOLDDASH,
     }
 
     /// <summary>

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3230181656755420769}
   m_Layer: 0
   m_Name: floor
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -117,7 +117,7 @@ GameObject:
   - component: {fileID: 4139709061694722948}
   m_Layer: 0
   m_Name: floor Prefab
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
