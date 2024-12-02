@@ -79,7 +79,6 @@ public class GameServerManager : MonoBehaviour
     {
         public void EnterState(GameServerManager gameServerManager, Definer.MID magicID)
         {
-            gameServerManager.isAwaitingMagic = false;
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
@@ -121,6 +120,9 @@ public class GameServerManager : MonoBehaviour
                             switch (hit.collider.gameObject.tag)
                             {
                                 case "Floor": //床にタッチしたら雷落とす
+
+                                    Debug.Log("雷を落としたい");
+
                                               //！あぶない！　ここで雷を生成すると最悪entityDictionaryが別スレッドの処理とぶつかってデッドロックして世界が終わるよ
                                     ActionPacket myActionPacket; //いったい何をするの！？
                                     Header header; //パケットの送信はメインスレッドでやらないことにしてるよね！？大丈夫！？
@@ -155,6 +157,7 @@ public class GameServerManager : MonoBehaviour
 
         public void ExitState(GameServerManager gameServerManager)
         {
+            gameServerManager.isAwaitingMagic = false;
         }
     }
     #endregion
