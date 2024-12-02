@@ -192,6 +192,7 @@ public class PlayerController : MonoBehaviour
         //ジョイスティックの入力があればそれで上書きする
         if (!Mathf.Approximately(leftJoystick.Horizontal, 0) || !Mathf.Approximately(leftJoystick.Vertical, 0)) //左スティックの水平垂直どちらの入力も"ほぼ0"でないなら
             playerMoveVec = new Vector3(leftJoystick.Horizontal, 0f, leftJoystick.Vertical); //上書き
+        playerAnimator.PlayFPSRunAnimation(playerMoveVec);
 
         this.transform.Translate(playerMoveVec * playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
     }
