@@ -65,13 +65,8 @@ public class PlayerController : MonoBehaviour
     public UdpGameClient UdpGameClient { set; get; } //パケット送信用。
     public ushort SessionID { set; get; } //パケットに差出人情報を書くため必要
 
-    //アニメーション関連
-    private Animator playerAnimator;
-    //Animatorの変数名
-    private readonly string strPlayerAnimSpeed = "ArmAnimationSpeed";
-    private readonly string strPunchTrigger = "ArmPunchTrigger";
-    private readonly string strGetPunchFrontTrigger = "HitedFrontArmTrigger";
-    private readonly string strGetPunchBackTrigger = "HitedBackArmTrigger";
+    [Header("以下演出関連")]
+    [SerializeField] PlayerAnimator playerAnimator;
 
     //パンチのクールダウン管理用
     private bool isPunchable = true; //punch + ableなので単に「パンチ可能」という意味だけど、英語圏のスラングでは「殴りたくなる」みたいな意味になるそうですよ。（例：punchable face）
@@ -90,7 +85,6 @@ public class PlayerController : MonoBehaviour
         leftJoystick = GetComponentInChildren<VariableJoystick>(); //プレイヤープレハブの子のキャンバスにある
         rightJoystick = GetComponentInChildren<DynamicJoystick>(); //同上
         playerCam = Camera.main; //プレイヤーカメラにはMainCameraのタグがついている
-        playerAnimator = GetComponent<Animator>();
         shakeEffect = GetComponent<ShakeEffect>();
         _rigidbody = GetComponent<Rigidbody>();
 
@@ -112,7 +106,7 @@ public class PlayerController : MonoBehaviour
         playerMoveVec = new Vector3(leftJoystick.Horizontal, 0f, leftJoystick.Vertical); //上書き
 
         this.transform.Translate(playerMoveVec * playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
-        playerAnimator.SetFloat(strPlayerAnimSpeed, playerMoveVec.magnitude); //走りモーション（仮）
+        playerAnimator.PlayFPSRunAnimation(playerMoveVec); //走りモーション（仮）
         #endregion
 
         #region 右スティックでカメラを操作しつつ、プレイヤーを左右に回転させる
@@ -128,7 +122,7 @@ public class PlayerController : MonoBehaviour
             Vector3 cameraMoveEulers = new Vector3(rotationX, rotationY, 0f); //X軸だけマイナスをかけています
 
             //オイラー角をtransform.rotationに代入するため、クォータニオンに変換する
-            playerCam.transform.rotation = Quaternion.Euler(cameraMoveEulers);
+            //playerCam.transform.rotation = Quaternion.Euler(cameraMoveEulers);
 
             //プレイヤーのY軸を中心とした回転を、カメラのそれと合わせる。
             Vector3 PlayerMoveEulers = new Vector3(0, rotationY, 0f);
@@ -213,7 +207,7 @@ public class PlayerController : MonoBehaviour
         if (distance > punchReachableDistance)
         {
             //射程外なら一人称のスカモーション再生(現在通常のパンチのモーションを再生)
-            playerAnimator.SetTrigger(strPunchTrigger);
+            playerAnimator.PlayFPSPunchAnimation();
             UniTask u = UniTask.RunOnThreadPool(() => PunchCoolDown()); //クールダウン開始
             //画面揺れ小
             await UniTask.Delay(400);
@@ -228,7 +222,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             //射程内なら一人称のパンチモーション再生
-            playerAnimator.SetTrigger(strPunchTrigger);
+            playerAnimator.PlayFPSPunchAnimation();
             UniTask u = UniTask.RunOnThreadPool(() => PunchCoolDown()); //クールダウン開始
 
             //パンチが正面に当たったのか背面に当たったのか調べる
@@ -317,7 +311,7 @@ public class PlayerController : MonoBehaviour
     public void GetPunchFront()
     {
         //一人称モーションの再生
-        playerAnimator.SetTrigger(strGetPunchFrontTrigger);
+        playerAnimator.PlayFPSHitedFrontAnimation();
 
         //カメラ演出
         shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium); //振動中
@@ -327,7 +321,7 @@ public class PlayerController : MonoBehaviour
     public void GetPunchBack()
     {
         //一人称モーションの再生
-        playerAnimator.SetTrigger(strGetPunchBackTrigger);
+        playerAnimator.PlayFPSHitedBackAnimation();
 
         //カメラ演出
         shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large); //振動大
