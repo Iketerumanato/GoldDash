@@ -31,7 +31,7 @@ public class NormalState : IPlayerState
         playerController.ControllPlayerRightJoystick();
 
         //1点以上のタッチが確認されたらインタラクト
-        if (Input.touchCount > 0) playerController.Interact();
+        if (Input.touchCount > 0　|| Input.GetMouseButtonDown(0)) playerController.Interact();
         playerController.PlayerRespawn();
     }
 
@@ -224,14 +224,48 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log("レイ飛ばします");
 
-        foreach (Touch t in Input.touches)
+        //どこかしらタッチされているなら（＝タッチ対応デバイスを使っているなら）
+        if (Input.touchCount > 0)
         {
-            //タッチし始めたフレームでないなら処理しない
-            if (t.phase != TouchPhase.Began) return;
+            foreach (Touch t in Input.touches)
+            {
+                //タッチし始めたフレームでないなら処理しない
+                if (t.phase != TouchPhase.Began) return;
 
+                //カメラの位置からタッチした位置に向けrayを飛ばす
+                RaycastHit hit;
+                Ray ray = playerCam.ScreenPointToRay(t.position);
+
+                //rayがなにかに当たったら調べる
+                //定数INTERACTABLE_DISTANCEでrayの長さを調整することでインタラクト可能な距離を制限できる
+                if (Physics.Raycast(ray, out hit, interactableDistance))
+                {
+
+                    Debug.Log(hit.collider.gameObject.name);
+
+                    switch (hit.collider.gameObject.tag)
+                    {
+                        case "Enemy": //プレイヤーならパンチ
+                            Debug.Log("Punch入りたい");
+                            Punch(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ActorController>());
+                            break;
+                        case "Chest": //宝箱なら開錠を試みる
+                            TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
+                            break;
+
+                        //ドアをタッチで開けるならココ
+
+                        default: //そうでないものはインタラクト不可能なオブジェクトなので無視
+                            break;
+                    }
+                }
+            }
+        }
+        else
+        {
             //カメラの位置からタッチした位置に向けrayを飛ばす
             RaycastHit hit;
-            Ray ray = playerCam.ScreenPointToRay(t.position);
+            Ray ray = playerCam.ScreenPointToRay(Input.mousePosition);
 
             //rayがなにかに当たったら調べる
             //定数INTERACTABLE_DISTANCEでrayの長さを調整することでインタラクト可能な距離を制限できる
@@ -257,6 +291,8 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+
+        
     }
 
     //パンチ。パンチを成立させたRaycastHit構造体のPointとDistanceを引数にもらおう
