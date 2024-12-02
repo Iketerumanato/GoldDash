@@ -509,8 +509,8 @@ public class GameServerManager : MonoBehaviour
 
                                             //魔法（の巻物）を抽選して付与
                                             int magicID = magicLottely.Lottely();
-                                            //まずサーバー側で魔法所持状況を更新
-                                            actorDictionary[receivedHeader.sessionID].SetMagicToSlot(magicID);
+                                            //まずサーバー側で魔法所持数を1個増やす
+                                            actorDictionary[receivedHeader.sessionID].MagicInventry++;
                                             //パケット送信
                                             myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.GIVE_MAGIC, receivedHeader.sessionID, magicID);
                                             myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());

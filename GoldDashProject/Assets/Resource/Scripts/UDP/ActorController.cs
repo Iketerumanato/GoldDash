@@ -9,18 +9,24 @@ using UnityEngine;
 public class ActorController : MonoBehaviour
 {
     //定数
-    private const int magicSlot = 3; //魔法の所持数
+    private const int MAGIC_INVENTRY_MAX = 3; //魔法の最大所持数
 
     //プロパティ
     public string PlayerName { set; get; }
     public ushort SessionID { set; get; } //MonoBehaviourからすると、いちいちDictionaryからIDを取るより目の前のアクターのIDを取得した方が速そうなので
     public int Gold { set; get; } = 100; //所持金
 
+    public int MagicInventry //魔法の所持数。0より小さくならない。MAGIC_INVENTRY_MAXを越えて増えない。
+    {
+        set { if (0 <= value && value <= MAGIC_INVENTRY_MAX) MagicInventry = value; }
+        get { return MagicInventry; }
+    }
+
     //このアクターはこの場所、この向きを目指してなめらかに移動
     private Vector3 targetPosition;
     private Vector3 targetForward;
 
-    //このアクターがプレイヤーか。プレイヤーならUpdateの内容は実行されない
+    //このアクターがプレイヤーか。Updateの内容をこれで分岐させる
     private bool isPlayer;
 
     //SmoothDamp計算用
@@ -43,32 +49,9 @@ public class ActorController : MonoBehaviour
     readonly string strHitedFrontTrigger = "HitFrontActorTrigger";
     readonly string strHitedBackTrigger = "HitBackActorTrigger";
 
-    //魔法関連
-    //所持している魔法のキュー
-    public int[] magicIDArray;
-
     //仮
     //所持金テキスト
     [SerializeField] private TextMeshProUGUI goldText;
-
-    //魔法をスロットに入れる
-    public void SetMagicToSlot(int magicID)
-    {
-        for (int i = 0; i < magicIDArray.Count(); i++)
-        {
-            //未所持ならそのスロットに入れる
-            if(magicIDArray[i] == -1) //Definer.MID.NONEは-1
-            {
-                magicIDArray[i] = magicID;
-            }
-        }
-
-        if (isPlayer)
-        { 
-            //魔法を検索
-            //その魔法を発動するボタンを生成する
-        }
-    }
 
     private void Start()
     {
@@ -76,13 +59,6 @@ public class ActorController : MonoBehaviour
         isPlayer = (GetComponent<PlayerController>() != null);
         //2乗した定数の計算
         sqrRunThreshold = runThreshold * runThreshold;
-
-        //コレクションのインスタンス作成
-        magicIDArray = new int[magicSlot];
-        for (int i = 0; i < magicIDArray.Count(); i++)
-        {
-            magicIDArray[i] = (int)Definer.MID.NONE; //すべて未所持にする
-        }
     }
 
     private void Update()
@@ -127,19 +103,6 @@ public class ActorController : MonoBehaviour
         this.transform.forward = forward;
     }
 
-    //メソッドの例。正式実装ではない
-    public void Kill()
-    {
-    }
-
-    public void GiveItem()
-    {
-    }
-
-    public void GiveStatus()
-    {
-    }
-    
     //モーション関連
     public void PlayMoveAnimation(float blendSpeed)
     {
@@ -161,21 +124,5 @@ public class ActorController : MonoBehaviour
     {
         //背面殴られモーション再生(Actor)
         PlayerAnimator.SetTrigger(strHitedBackTrigger);
-    }
-
-    //所持金関連
-    public void DropGold()
-    { 
-        //金貨の山を落とす
-    }
-
-    //吹っ飛び処理
-    public void Blown(Vector3 vector)
-    {
-        transform.position += this.transform.forward * -0.8f;
-        //引数の方向にAddForceで吹っ飛ぶ
-        //仮
-        //float blowDistance = 3.0f;
-        //transform.position += Vector3.Normalize(vector) * blowDistance;
     }
 }
