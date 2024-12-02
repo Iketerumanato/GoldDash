@@ -225,6 +225,8 @@ public class PlayerController : MonoBehaviour
 
         foreach (Touch t in Input.touches)
         {
+            if (t.phase != TouchPhase.Began) return;
+
             //カメラの位置からタッチした位置に向けrayを飛ばす
             RaycastHit hit;
             Ray ray = playerCam.ScreenPointToRay(t.position);
