@@ -4238,6 +4238,10 @@ PrefabInstance:
       propertyPath: m_Constraints
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8844285673036646204, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: FPSPlayerParticles.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

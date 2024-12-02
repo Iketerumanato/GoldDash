@@ -3,8 +3,66 @@ using System.Threading;
 using TMPro;
 using UnityEngine;
 
+#region プレイヤーのState(通常,状態異常)
+public interface IPlayerState
+{
+    //そのステートに入る
+    void EnterState(PlayerController playerController);
+
+    //そのステートで毎フレーム呼び出される処理群
+    void UpdateProcess(PlayerController playerController);
+
+    //そのステートから出る
+    void ExitState(PlayerController playerController);
+}
+
+//通常の状態
+public class NormalState : IPlayerState
+{
+    public void EnterState(PlayerController playerController)
+    {
+        Debug.Log("Player通常状態に移行");
+    }
+
+    public void UpdateProcess(PlayerController playerController)
+    {
+        playerController.ControllPlayerLeftJoystick();
+        playerController.ControllPlayerRightJoystick();
+
+        if (Input.GetMouseButtonDown(0)) playerController.Interact();
+        playerController.PlayerRespawn();
+    }
+
+    public void ExitState(PlayerController playerController)
+    {
+        Debug.Log("Playerの状態変更");
+    }
+}
+
+//プレイヤーが動けなくなった時(雷や罠などで)
+public class IncapacitatedState : IPlayerState
+{
+    public void EnterState(PlayerController playerController)
+    {
+        Debug.Log("Playerに対して何かしらのアクション");
+    }
+
+    public void UpdateProcess(PlayerController playerController)
+    {
+        Debug.Log("Player行動不能中");
+    }
+
+    public void ExitState(PlayerController playerController)
+    {
+        Debug.Log("Playerの気絶解除");
+    }
+}
+#endregion
+
 public class PlayerController : MonoBehaviour
 {
+    private IPlayerState _playerControllState;
+
     //パラメータ
     [Header("インタラクト可能な距離")]
     [SerializeField] float interactableDistance = 10.0f;
@@ -65,13 +123,8 @@ public class PlayerController : MonoBehaviour
     public UdpGameClient UdpGameClient { set; get; } //パケット送信用。
     public ushort SessionID { set; get; } //パケットに差出人情報を書くため必要
 
-    //アニメーション関連
-    private Animator playerAnimator;
-    //Animatorの変数名
-    private readonly string strPlayerAnimSpeed = "ArmAnimationSpeed";
-    private readonly string strPunchTrigger = "ArmPunchTrigger";
-    private readonly string strGetPunchFrontTrigger = "HitedFrontArmTrigger";
-    private readonly string strGetPunchBackTrigger = "HitedBackArmTrigger";
+    [Header("以下演出関連")]
+    [SerializeField] PlayerAnimator playerAnimator;
 
     //パンチのクールダウン管理用
     private bool isPunchable = true; //punch + ableなので単に「パンチ可能」という意味だけど、英語圏のスラングでは「殴りたくなる」みたいな意味になるそうですよ。（例：punchable face）
@@ -83,6 +136,8 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        ChangePlayerState(new NormalState());
+
         //リスポーン地点の記録
         initialSpawnPosition = transform.position;
 
@@ -90,7 +145,6 @@ public class PlayerController : MonoBehaviour
         leftJoystick = GetComponentInChildren<VariableJoystick>(); //プレイヤープレハブの子のキャンバスにある
         rightJoystick = GetComponentInChildren<DynamicJoystick>(); //同上
         playerCam = Camera.main; //プレイヤーカメラにはMainCameraのタグがついている
-        playerAnimator = GetComponent<Animator>();
         shakeEffect = GetComponent<ShakeEffect>();
         _rigidbody = GetComponent<Rigidbody>();
 
@@ -103,44 +157,7 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        #region 左スティックでプレイヤーを移動させる
-        //WASDの入力をベクトルにする
-        Vector3 playerMoveVec = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
-
-        //ジョイスティックの入力があればそれで上書きする
-        if (!Mathf.Approximately(leftJoystick.Horizontal, 0) || !Mathf.Approximately(leftJoystick.Vertical, 0)) //左スティックの水平垂直どちらの入力も"ほぼ0"でないなら
-        playerMoveVec = new Vector3(leftJoystick.Horizontal, 0f, leftJoystick.Vertical); //上書き
-
-        this.transform.Translate(playerMoveVec * playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
-        playerAnimator.SetFloat(strPlayerAnimSpeed, playerMoveVec.magnitude); //走りモーション（仮）
-        #endregion
-
-        #region 右スティックでカメラを操作しつつ、プレイヤーを左右に回転させる
-        //カメラ操作の入力がないなら回転しない
-        if (!Mathf.Approximately(rightJoystick.Horizontal, 0) || !Mathf.Approximately(rightJoystick.Vertical, 0)) //右スティックの水平垂直どちらの入力も"ほぼ0"でないなら
-        {
-            //ジョイスティックの入力をオイラー角（〇軸を中心に△度回転、という書き方）にする
-            //前提：カメラはZ軸の正の方向を向いている
-            //水平の入力はY軸中心、垂直の入力はX軸中心になる。Z軸中心の回転はペテルギウス・ロマネコンティになってしまうため行わない。
-            rotationX -= rightJoystick.Vertical * cameraMoveSpeed * Time.deltaTime; //Unityは左手座標系なので、上下の回転角度（X軸中心）にはマイナスをかけなければならない
-            rotationX = Mathf.Clamp(rotationX, -camRotateLimitX, camRotateLimitX); //縦方向(X軸中心)回転には角度制限をつけないと宙返りしてしまう
-            rotationY += rightJoystick.Horizontal * cameraMoveSpeed * Time.deltaTime; //Unityは左手座標系なので、左右の回転角度（Y軸中心）は加算でいい
-            Vector3 cameraMoveEulers = new Vector3(rotationX, rotationY, 0f); //X軸だけマイナスをかけています
-
-            //オイラー角をtransform.rotationに代入するため、クォータニオンに変換する
-            playerCam.transform.rotation = Quaternion.Euler(cameraMoveEulers);
-
-            //プレイヤーのY軸を中心とした回転を、カメラのそれと合わせる。
-            Vector3 PlayerMoveEulers = new Vector3(0, rotationY, 0f);
-            this.transform.rotation = Quaternion.Euler(PlayerMoveEulers);
-        }
-        #endregion
-
-        //タッチ（クリック）したものにインタラクト
-        if (Input.GetMouseButtonDown(0)) Interact();
-
-        //落下していたらリスポーン
-        if (transform.position.y < fallThreshold) transform.position = initialSpawnPosition;
+        _playerControllState.UpdateProcess(this);
     }
 
     //エンティティに接触したとき
@@ -163,6 +180,42 @@ public class PlayerController : MonoBehaviour
                 break;
         }
     }
+
+    #region ジョイスティック操作
+    public void ControllPlayerLeftJoystick()
+    {
+        //WASDの入力をベクトルにする
+        Vector3 playerMoveVec = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+
+        //ジョイスティックの入力があればそれで上書きする
+        if (!Mathf.Approximately(leftJoystick.Horizontal, 0) || !Mathf.Approximately(leftJoystick.Vertical, 0)) //左スティックの水平垂直どちらの入力も"ほぼ0"でないなら
+            playerMoveVec = new Vector3(leftJoystick.Horizontal, 0f, leftJoystick.Vertical); //上書き
+
+        this.transform.Translate(playerMoveVec * playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
+    }
+
+    public void ControllPlayerRightJoystick()
+    {
+        //カメラ操作の入力がないなら回転しない
+        if (!Mathf.Approximately(rightJoystick.Horizontal, 0) || !Mathf.Approximately(rightJoystick.Vertical, 0)) //右スティックの水平垂直どちらの入力も"ほぼ0"でないなら
+        {
+            //ジョイスティックの入力をオイラー角（〇軸を中心に△度回転、という書き方）にする
+            //前提：カメラはZ軸の正の方向を向いている
+            //水平の入力はY軸中心、垂直の入力はX軸中心になる。Z軸中心の回転はペテルギウス・ロマネコンティになってしまうため行わない。
+            rotationX -= rightJoystick.Vertical * cameraMoveSpeed * Time.deltaTime; //Unityは左手座標系なので、上下の回転角度（X軸中心）にはマイナスをかけなければならない
+            rotationX = Mathf.Clamp(rotationX, -camRotateLimitX, camRotateLimitX); //縦方向(X軸中心)回転には角度制限をつけないと宙返りしてしまう
+            rotationY += rightJoystick.Horizontal * cameraMoveSpeed * Time.deltaTime; //Unityは左手座標系なので、左右の回転角度（Y軸中心）は加算でいい
+            Vector3 cameraMoveEulers = new Vector3(rotationX, rotationY, 0f); //X軸だけマイナスをかけています
+
+            //オイラー角をtransform.rotationに代入するため、クォータニオンに変換する
+            playerCam.transform.rotation = Quaternion.Euler(cameraMoveEulers);
+
+            //プレイヤーのY軸を中心とした回転を、カメラのそれと合わせる。
+            Vector3 PlayerMoveEulers = new Vector3(0, rotationY, 0f);
+            this.transform.rotation = Quaternion.Euler(PlayerMoveEulers);
+        }
+    }
+    #endregion
 
     //画面を「タッチしたとき」呼ばれる。オブジェクトに触ったかどうか判定 UpdateProcess -> if (Input.GetMouseButtonDown(0))
     public void Interact()
@@ -213,7 +266,7 @@ public class PlayerController : MonoBehaviour
         if (distance > punchReachableDistance)
         {
             //射程外なら一人称のスカモーション再生(現在通常のパンチのモーションを再生)
-            playerAnimator.SetTrigger(strPunchTrigger);
+            playerAnimator.PlayFPSPunchAnimation();
             UniTask u = UniTask.RunOnThreadPool(() => PunchCoolDown()); //クールダウン開始
             //画面揺れ小
             await UniTask.Delay(400);
@@ -228,7 +281,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             //射程内なら一人称のパンチモーション再生
-            playerAnimator.SetTrigger(strPunchTrigger);
+            playerAnimator.PlayFPSPunchAnimation();
             UniTask u = UniTask.RunOnThreadPool(() => PunchCoolDown()); //クールダウン開始
 
             //パンチが正面に当たったのか背面に当たったのか調べる
@@ -317,23 +370,23 @@ public class PlayerController : MonoBehaviour
     public void GetPunchFront()
     {
         //一人称モーションの再生
-        playerAnimator.SetTrigger(strGetPunchFrontTrigger);
+        playerAnimator.PlayFPSHitedFrontAnimation();
 
         //カメラ演出
         shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium); //振動中
     }
-    
+
     //背面から殴られたときの処理。GameClientManagerから呼ばれる
     public void GetPunchBack()
     {
         //一人称モーションの再生
-        playerAnimator.SetTrigger(strGetPunchBackTrigger);
+        playerAnimator.PlayFPSHitedBackAnimation();
 
         //カメラ演出
         shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large); //振動大
 
         //金貨を拾えない状態にする
-        if(!isPickable) forbidPickCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
+        if (!isPickable) forbidPickCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
         UniTask.RunOnThreadPool(() => ForbidPick(), default, forbidPickCts.Token);
 
         //前に吹っ飛ぶ
@@ -346,5 +399,19 @@ public class PlayerController : MonoBehaviour
             await UniTask.Delay(forbidPickTime); //指定された時間待つ
             isPickable = true; //金貨を拾えるようにする
         }
+    }
+
+    //落下していたらリスポーン
+    public void PlayerRespawn()
+    {
+        if (transform.position.y < fallThreshold) transform.position = initialSpawnPosition;
+    }
+
+    //Stateの切り替え(雷に打たれた時や罠にかかった時に呼び出される)
+    public void ChangePlayerState(IPlayerState newState)
+    {
+        if (_playerControllState != null) _playerControllState.ExitState(this);
+        _playerControllState = newState;
+        _playerControllState.EnterState(this);
     }
 }
