@@ -61,7 +61,10 @@ public class GameServerManager : MonoBehaviour
         void ExitState(GameServerManager gameServerManager);
     }
 
-    ISetverState currentSetverState;
+    //現在のstate
+    private ISetverState currentSetverState;
+    //魔法の実行待機ならtrue
+    private bool isAwaitingMagic;
 
     //魔法IDを渡しつつStateの切り替え
     public void ChangeServerState(ISetverState newState, Definer.MID magicID = Definer.MID.NONE)
@@ -76,6 +79,7 @@ public class GameServerManager : MonoBehaviour
     {
         public void EnterState(GameServerManager gameServerManager, Definer.MID magicID)
         {
+            gameServerManager.isAwaitingMagic = false;
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
@@ -94,6 +98,7 @@ public class GameServerManager : MonoBehaviour
 
         public void EnterState(GameServerManager gameServerManager, Definer.MID magicID)
         {
+            gameServerManager.isAwaitingMagic = true;
             awaitMagicID = magicID;
         }
 
@@ -605,6 +610,24 @@ public class GameServerManager : MonoBehaviour
 
                                                 currentNumOfChests++; //宝箱の数インクリメント
                                             }
+                                        }
+                                        break;
+                                    #endregion
+                                    #region case 魔法系
+                                    case (byte)Definer.REID.USE_MAGIC:
+                                        //魔法の種類がvalueに書かれているので確認して分岐
+                                        switch ((Definer.MID)receivedActionPacket.value)
+                                        {
+                                            //雷
+                                            case Definer.MID.THUNDER:
+                                                //もし違う魔法の実行待機をしているならエラー返す
+                                                if (isAwaitingMagic)
+                                                {
+                                                    //エラーパケット
+                                                    break;
+                                                }
+                                                ChangeServerState(new AwaitTouchState(), Definer.MID.THUNDER); //雷を待機する状態にする
+                                                break;
                                         }
                                         break;
                                     #endregion
