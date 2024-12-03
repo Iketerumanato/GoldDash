@@ -16,10 +16,11 @@ public class ActorController : MonoBehaviour
     public ushort SessionID { set; get; } //MonoBehaviourからすると、いちいちDictionaryからIDを取るより目の前のアクターのIDを取得した方が速そうなので
     public int Gold { set; get; } = 100; //所持金
 
-    public int MagicInventry //魔法の所持数。0より小さくならない。MAGIC_INVENTRY_MAXを越えて増えない。
+    private int magicInventry; //魔法の所持数。0より小さくならない。MAGIC_INVENTRY_MAXを越えて増えない。
+    public int MagicInventry
     {
-        set { if (0 <= value && value <= MAGIC_INVENTRY_MAX) MagicInventry = value; }
-        get { return MagicInventry; }
+        set { if (0 <= value && value <= MAGIC_INVENTRY_MAX) magicInventry = value; }
+        get { return magicInventry; }
     }
 
     //このアクターはこの場所、この向きを目指してなめらかに移動
