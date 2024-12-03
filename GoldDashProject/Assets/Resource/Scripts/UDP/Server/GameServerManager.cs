@@ -37,6 +37,8 @@ public class GameServerManager : MonoBehaviour
 
     private bool inGame; //ゲームは始まっているか
 
+    [SerializeField] private BGGradientController gradientController;
+
     //サーバーが内部をコントロールするための通知　マップ生成など
     //クライアントサーバーのクライアント部分の処理をここでやると機能過多になるため、通知を飛ばすだけにする。脳が体内の器官に命令を送るようなイメージ。実行するのはあくまで器官側。
     public enum SERVER_INTERNAL_EVENT
@@ -83,6 +85,27 @@ public class GameServerManager : MonoBehaviour
 
         public void UpdateProcess(GameServerManager gameServerManager)
         {
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.NORMAL;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_1;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_2;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_3;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha5))
+            {
+                gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_4;
+            }
+
         }
 
         public void ExitState(GameServerManager gameServerManager)
