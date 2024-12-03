@@ -12,6 +12,7 @@ TagManager:
   - GoldPile
   - Chest
   - Floor
+  - MagicButton
   layers:
   - Default
   - TransparentFX
