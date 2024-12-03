@@ -30,8 +30,8 @@ public class NormalState : IPlayerState
         playerController.ControllPlayerRightJoystick();
 
         //1点以上のタッチが確認されたらインタラクト
-        if (Input.touchCount > 0) playerController.Interact();
-        playerController.PlayerRespawn();
+        if (Input.touchCount > 0 || Input.GetMouseButtonDown(0))
+            playerController.PlayerRespawn();
     }
 
     public void ExitState(PlayerController playerController)
@@ -136,7 +136,8 @@ public class PlayerController : MonoBehaviour
     CancellationTokenSource forbidPickCts; //短時間で何度も吹っ飛ばしを受けた時に、発生中の金貨獲得禁止時間を延長するためにunitaskを停止させる必要がある
 
     //rayからのtag取得の際に読むもの
-    const string GoldTag = "GoldPile";
+    const string EnemyTag = "Enemy";
+    const string ChestTag = "Chest";
     const string MagicButtonTag = "MagicButton";
 
     private void Start()
@@ -174,16 +175,13 @@ public class PlayerController : MonoBehaviour
 
         switch (other.tag)
         {
-            case GoldTag:
+            case "GoldPile":
                 if (!isPickable) break; //金貨を拾えない状態にされているならbreakする。
                 //金貨の山に触れたというリクエスト送信。他のプレイヤーが先に触れていた場合、お金は入手できない。早い者勝ち。
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_GOLDPILE, other.GetComponent<Entity>().EntityID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 UdpGameClient.Send(myHeader.ToByte());
                 break;
-            case MagicButtonTag:
-                Debug.Log("魔法ボタンを検知");
-                    return;
             default:
                 break;
         }
@@ -228,13 +226,10 @@ public class PlayerController : MonoBehaviour
     //画面を「タッチしたとき」呼ばれる。オブジェクトに触ったかどうか判定 UpdateProcess -> if (Input.GetMouseButtonDown(0))
     public void Interact()
     {
-        Debug.Log("レイ飛ばします");
-
         foreach (Touch t in Input.touches)
         {
             //タッチし始めたフレームでないなら処理しない
-            if (t.phase != TouchPhase.Began) return;
-
+            if (t.phase != TouchPhase.Began) continue;
             //カメラの位置からタッチした位置に向けrayを飛ばす
             RaycastHit hit;
             Ray ray = playerCam.ScreenPointToRay(t.position);
@@ -248,14 +243,16 @@ public class PlayerController : MonoBehaviour
 
                 switch (hit.collider.gameObject.tag)
                 {
-                    case "Enemy": //プレイヤーならパンチ
+                    case EnemyTag: //プレイヤーならパンチ
                         Debug.Log("Punch入りたい");
                         Punch(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ActorController>());
                         break;
-                    case "Chest": //宝箱なら開錠を試みる
+                    case ChestTag: //宝箱なら開錠を試みる
                         TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
                         break;
-
+                    case MagicButtonTag:
+                        Debug.Log("魔法ボタンを検知");
+                        return;
                     //ドアをタッチで開けるならココ
 
                     default: //そうでないものはインタラクト不可能なオブジェクトなので無視
