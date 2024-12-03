@@ -2,7 +2,6 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using TMPro;
 using UnityEngine;
-using static Unity.Burst.Intrinsics.X86.Avx;
 
 #region プレイヤーのState(通常,状態異常)
 public interface IPlayerState
@@ -136,6 +135,10 @@ public class PlayerController : MonoBehaviour
     private bool isPickable = true; //吹っ飛んでいる間金貨を拾えないようにする
     CancellationTokenSource forbidPickCts; //短時間で何度も吹っ飛ばしを受けた時に、発生中の金貨獲得禁止時間を延長するためにunitaskを停止させる必要がある
 
+    //rayからのtag取得の際に読むもの
+    const string GoldTag = "GoldPile";
+    const string MagicButtonTag = "MagicButton";
+
     private void Start()
     {
         ChangePlayerState(new NormalState());
@@ -171,13 +174,16 @@ public class PlayerController : MonoBehaviour
 
         switch (other.tag)
         {
-            case "GoldPile":
+            case GoldTag:
                 if (!isPickable) break; //金貨を拾えない状態にされているならbreakする。
                 //金貨の山に触れたというリクエスト送信。他のプレイヤーが先に触れていた場合、お金は入手できない。早い者勝ち。
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_GOLDPILE, other.GetComponent<Entity>().EntityID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 UdpGameClient.Send(myHeader.ToByte());
                 break;
+            case MagicButtonTag:
+                Debug.Log("魔法ボタンを検知");
+                    return;
             default:
                 break;
         }

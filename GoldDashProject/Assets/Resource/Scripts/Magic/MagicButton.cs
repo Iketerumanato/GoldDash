@@ -1,13 +1,14 @@
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using DG.Tweening;
 
-public class MagicButton : MonoBehaviour
+public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    //[SerializeField] MagicManagement magicManagement;
     [SerializeField] int magicIndex;
-
+    [SerializeField] RectTransform buttonRectTransform;
     [SerializeField] Transform endPos;  // EndPosオブジェクトの参照
-    private Vector3 originalPosition;
+    private Vector2 originalPosition;
     [SerializeField] float buttonMoveSpeed = 20f;
     [SerializeField] float buttonAnimDuration = 0.2f;
 
@@ -15,43 +16,38 @@ public class MagicButton : MonoBehaviour
     private bool isDragging = false;
     private bool isFlicked = false;
 
-    [SerializeField] Camera MagicButtonCam;
+    private CanvasGroup canvasGroup;
 
     private void Awake()
     {
-        originalPosition = transform.position;
+        originalPosition = buttonRectTransform.localPosition;
+        canvasGroup = buttonRectTransform.GetComponent<CanvasGroup>();
     }
 
-    private void OnMouseDown()
+    public void OnPointerDown(PointerEventData eventData)
     {
-        // タッチ/クリック開始
-        transform.DOKill();
-        transform.position = originalPosition;
+        buttonRectTransform.DOKill();
+        buttonRectTransform.localPosition = originalPosition;
+        canvasGroup.alpha = 1f;  // 透明度をリセット
+
         isDragging = true;
-        Debug.Log("ボタンのクリックを検知");
     }
 
-    private void OnMouseUp()
+    public void OnPointerUp(PointerEventData eventData)
     {
-        // タッチ/クリック終了
         if (isDragging)
         {
-            Vector3 screenPoint = Input.mousePosition;
-            Ray ray = MagicButtonCam.ScreenPointToRay(screenPoint);
+            Vector2 releasePointerPosition = eventData.position;
+            Vector2 dragVector = releasePointerPosition - originalPosition;
 
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            if (dragVector.y > flickThreshold)
             {
-                Vector3 dragVector = hit.point - originalPosition;
-
-                if (dragVector.y > flickThreshold)
-                {
-                    TriggerFlickAnimation();
-                    isFlicked = true;
-                }
-                else
-                {
-                    transform.DOMove(originalPosition, buttonAnimDuration).SetEase(Ease.OutQuad);
-                }
+                TriggerFlickAnimation();
+                isFlicked = true;
+            }
+            else
+            {
+                buttonRectTransform.DOLocalMove(originalPosition, buttonAnimDuration).SetEase(Ease.OutQuad);
             }
 
             isDragging = false;
@@ -60,23 +56,24 @@ public class MagicButton : MonoBehaviour
 
     private void TriggerFlickAnimation()
     {
-        // EndPos位置まで移動
-        transform.DOMove(endPos.position, 0.5f)
+        // EndPos位置まで移動し、透明度を徐々に0にする
+        buttonRectTransform.DOMove(endPos.position, 0.5f)
             .SetEase(Ease.OutCubic)
             .OnComplete(() => Debug.Log("Button reached end position."));
+
+        // 透明度を徐々に0にするアニメーション
+        canvasGroup.DOFade(0f, 0.5f);
     }
 
-    private void OnMouseEnter()
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        // ホバー効果
         if (isFlicked) return;
-        transform.DOMoveY(originalPosition.y + buttonMoveSpeed, buttonAnimDuration).SetEase(Ease.OutQuad);
+        buttonRectTransform.DOLocalMoveY(originalPosition.y + buttonMoveSpeed, buttonAnimDuration).SetEase(Ease.OutQuad);
     }
 
-    private void OnMouseExit()
+    public void OnPointerExit(PointerEventData eventData)
     {
-        // ホバー終了効果
         if (isFlicked) return;
-        transform.DOMoveY(originalPosition.y, buttonAnimDuration).SetEase(Ease.OutQuad);
+        buttonRectTransform.DOLocalMoveY(originalPosition.y, buttonAnimDuration).SetEase(Ease.OutQuad);
     }
 }
