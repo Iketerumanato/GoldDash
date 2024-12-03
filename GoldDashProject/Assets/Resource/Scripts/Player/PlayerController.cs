@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using System.Threading;
-using TMPro;
 using UnityEngine;
 
 #region プレイヤーのState(通常,状態異常)
@@ -27,11 +26,17 @@ public class NormalState : IPlayerState
     public void UpdateProcess(PlayerController playerController)
     {
         playerController.ControllPlayerLeftJoystick();
-        playerController.ControllPlayerRightJoystick();
+        if (!playerController.isTouchUI) playerController.ControllPlayerRightJoystick();
+
+
+        playerController.UIInteract();
 
         //1点以上のタッチが確認されたらインタラクト
-        if (Input.touchCount > 0 || Input.GetMouseButtonDown(0))
-            playerController.PlayerRespawn();
+        if (Input.touchCount > 0 || Input.GetMouseButton(0))
+        {
+            playerController.Interact();
+        }
+        playerController.PlayerRespawn();
     }
 
     public void ExitState(PlayerController playerController)
@@ -135,10 +140,17 @@ public class PlayerController : MonoBehaviour
     private bool isPickable = true; //吹っ飛んでいる間金貨を拾えないようにする
     CancellationTokenSource forbidPickCts; //短時間で何度も吹っ飛ばしを受けた時に、発生中の金貨獲得禁止時間を延長するためにunitaskを停止させる必要がある
 
-    //rayからのtag取得の際に読むもの
+    [Header("UI関連")]
+    [SerializeField] Camera MagicButtonCam;
+    [SerializeField] LayerMask MagicButtonLayer;
     const string EnemyTag = "Enemy";
     const string ChestTag = "Chest";
     const string MagicButtonTag = "MagicButton";
+    const string MagicButtonBackTag = "MagicButtonBack";
+    public bool isTouchUI = false;
+    public bool isControllUI = false;
+    private Vector3 oldHitRayHeightY;
+    private MagicButton currentMagicButton;
 
     private void Start()
     {
@@ -196,6 +208,7 @@ public class PlayerController : MonoBehaviour
         //ジョイスティックの入力があればそれで上書きする
         if (!Mathf.Approximately(leftJoystick.Horizontal, 0) || !Mathf.Approximately(leftJoystick.Vertical, 0)) //左スティックの水平垂直どちらの入力も"ほぼ0"でないなら
             playerMoveVec = new Vector3(leftJoystick.Horizontal, 0f, leftJoystick.Vertical); //上書き
+        playerAnimator.PlayFPSRunAnimation(playerMoveVec);
 
         this.transform.Translate(playerMoveVec * playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
     }
@@ -226,21 +239,50 @@ public class PlayerController : MonoBehaviour
     //画面を「タッチしたとき」呼ばれる。オブジェクトに触ったかどうか判定 UpdateProcess -> if (Input.GetMouseButtonDown(0))
     public void Interact()
     {
-        foreach (Touch t in Input.touches)
+        //どこかしらタッチされているなら（＝タッチ対応デバイスを使っているなら）
+        if (Input.touchCount > 0)
         {
-            //タッチし始めたフレームでないなら処理しない
-            if (t.phase != TouchPhase.Began) continue;
+            foreach (Touch t in Input.touches)
+            {
+                //カメラの位置からタッチした位置に向けrayを飛ばす
+                RaycastHit hit;
+                Ray ray = playerCam.ScreenPointToRay(t.position);
+
+                //タッチし始めたフレームでないなら処理しない
+                if (t.phase != TouchPhase.Began) continue;
+
+                //rayがなにかに当たったら調べる
+                //定数INTERACTABLE_DISTANCEでrayの長さを調整することでインタラクト可能な距離を制限できる
+                if (Physics.Raycast(ray, out hit, interactableDistance))
+                {
+                    switch (hit.collider.gameObject.tag)
+                    {
+                        case EnemyTag: //プレイヤーならパンチ
+                            Debug.Log("Punch入りたい");
+                            Punch(hit.point, hit.distance, hit.collider.gameObject.GetComponent<ActorController>());
+                            break;
+                        case ChestTag: //宝箱なら開錠を試みる
+                            TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
+                            break;
+
+                        //ドアをタッチで開けるならココ
+
+                        default: //そうでないものはインタラクト不可能なオブジェクトなので無視
+                            break;
+                    }
+                }
+            }
+        }
+        else
+        {
             //カメラの位置からタッチした位置に向けrayを飛ばす
             RaycastHit hit;
-            Ray ray = playerCam.ScreenPointToRay(t.position);
+            Ray ray = playerCam.ScreenPointToRay(Input.mousePosition);
 
             //rayがなにかに当たったら調べる
             //定数INTERACTABLE_DISTANCEでrayの長さを調整することでインタラクト可能な距離を制限できる
             if (Physics.Raycast(ray, out hit, interactableDistance))
             {
-
-                Debug.Log(hit.collider.gameObject.name);
-
                 switch (hit.collider.gameObject.tag)
                 {
                     case EnemyTag: //プレイヤーならパンチ
@@ -250,15 +292,125 @@ public class PlayerController : MonoBehaviour
                     case ChestTag: //宝箱なら開錠を試みる
                         TryOpenChest(hit.point, hit.distance, hit.collider.gameObject.GetComponent<Chest>());
                         break;
-                    case MagicButtonTag:
-                        Debug.Log("魔法ボタンを検知");
-                        return;
+
                     //ドアをタッチで開けるならココ
 
                     default: //そうでないものはインタラクト不可能なオブジェクトなので無視
                         break;
                 }
             }
+        }
+    }
+
+    public void UIInteract()
+    {
+        //カメラの位置からタッチした(クリックした)位置に向けrayを飛ばす
+        RaycastHit UIhit;
+
+        //どこかしらタッチされているなら（＝タッチ対応デバイスを使っているなら）
+        if (Input.touchCount > 0)
+        {
+            foreach (Touch t in Input.touches)
+            {
+                //同時に魔法ボタンを映しているカメラからもRayを飛ばす
+                Ray UIray = MagicButtonCam.ScreenPointToRay(t.position);
+
+                //タッチし始めたフレームでないなら処理しない
+                //if (t.phase != TouchPhase.Began) continue;
+
+                //rayがなにかに当たったら調べる
+                if (Physics.Raycast(UIray, out UIhit, Mathf.Infinity, MagicButtonLayer)
+                    && UIhit.collider.CompareTag(MagicButtonTag))
+                {
+                    MagicButton magicButton = UIhit.collider.gameObject.GetComponent<MagicButton>();
+                    magicButton.FollowFingerPosY(UIhit.point);
+                }
+            }
+        }
+        else if (Input.GetMouseButton(0)) //クリック版のインタラクト
+        {
+            Ray UIray = MagicButtonCam.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(UIray, out UIhit, Mathf.Infinity, MagicButtonLayer))
+            {
+                float diff_y = 0f;
+
+                if (UIhit.collider.CompareTag(MagicButtonTag)) //タグを見て
+                {
+                    if (!isTouchUI) //このフレームに触れ始めたなら
+                    {
+                        currentMagicButton = UIhit.collider.gameObject.GetComponent<MagicButton>(); //コンポーネント取得
+                        isTouchUI = true; //フラグtrue
+                    }
+                    diff_y = currentMagicButton.FollowFingerPosY(UIhit.point); //マウスのy軸の位置とボタンの位置を同じよう
+                }
+                else if (UIhit.collider.CompareTag(MagicButtonBackTag)) //背景にrayが当たっていたら
+                {
+                    if (isTouchUI) diff_y = currentMagicButton.FollowFingerPosY(UIhit.point); //UI操作中なら引き続き追従処理を行う
+                }
+
+                //Debug.Log(diff_y);
+                //if (diff_y > 0.01f) currentMagicButton.OnFlickUpper();
+
+
+                //    isTouchUI = true;
+                //    MagicButton magicButton = UIhit.collider.gameObject.GetComponent<MagicButton>();
+
+                //    if (Input.GetMouseButton(0))
+                //    {
+                //        //UIが触れていることを検知
+                //        isControllUI = true;
+                //        //前フレームに放ったのRayのy座標を保存
+                //        oldHitRayHeightY.y = UIhit.point.y;
+                //        //マウスのy軸の位置とボタンの位置を同じように
+                //        magicButton.TouchingMagic(UIhit.point);
+                //    }
+                //    else isControllUI = false;
+                //}
+                ////MagicButtonTagが当たっていないということでフリックされたとみなす
+                //if (Physics.Raycast(UIray, out UIhit, Mathf.Infinity, MagicButtonLayer)
+                //        && UIhit.collider.CompareTag(MagicButtonBackTag))
+                //{
+                //    isTouchUI = false;
+                //    isControllUI = false;
+                //    //前フレームに放たれたRayのHitした高さよりも新しくHitしたRayの高さが高かった時にフリックの判定となる
+                //    if(UIhit.point.y > oldHitRayHeightY.y) Debug.Log("ボタンをフリック");
+            }
+        }
+        else if (isTouchUI && Input.GetMouseButtonUp(0))
+        {
+            Ray UIray = MagicButtonCam.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(UIray, out UIhit, Mathf.Infinity, MagicButtonLayer))
+            {
+                float diff_y = 0f;
+
+                if (UIhit.collider.CompareTag(MagicButtonTag)) //タグを見て
+                {
+                    if (!isTouchUI) //このフレームに触れ始めたなら
+                    {
+                        currentMagicButton = UIhit.collider.gameObject.GetComponent<MagicButton>(); //コンポーネント取得
+                        isTouchUI = true; //フラグtrue
+                    }
+                    diff_y = currentMagicButton.FollowFingerPosY(UIhit.point); //マウスのy軸の位置とボタンの位置を同じよう
+                }
+                else if (UIhit.collider.CompareTag(MagicButtonBackTag)) //背景にrayが当たっていたら
+                {
+                    if (isTouchUI) diff_y = currentMagicButton.FollowFingerPosY(UIhit.point); //UI操作中なら引き続き追従処理を行う
+                }
+
+                if (diff_y > 0.008f) currentMagicButton.OnFlickUpper();
+                else currentMagicButton.ReturnToOriginPos();
+
+
+                isTouchUI = false;
+                currentMagicButton = null;
+            }
+        }
+        else
+        {
+            isTouchUI = false;
+            currentMagicButton = null;
         }
     }
 

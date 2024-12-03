@@ -1,79 +1,67 @@
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using DG.Tweening;
 
-public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
+public class MagicButton : MonoBehaviour
 {
-    [SerializeField] int magicIndex;
-    [SerializeField] RectTransform buttonRectTransform;
-    [SerializeField] Transform endPos;  // EndPosオブジェクトの参照
-    private Vector2 originalPosition;
-    [SerializeField] float buttonMoveSpeed = 20f;
-    [SerializeField] float buttonAnimDuration = 0.2f;
+    [SerializeField] private Definer.MID magicID;
 
-    [SerializeField] float flickThreshold = 50f;
-    private bool isDragging = false;
-    private bool isFlicked = false;
+    [SerializeField] private float rizeUpTargetPosY; //上にフリックしたとき、この高さまで上昇する
+    [SerializeField] private float rizeUpTime; //上にフリックしたとき、この秒数で目的地まで上昇する
 
-    private CanvasGroup canvasGroup;
+    [SerializeField] Transform MagicButtonPosition;
+    [SerializeField] Transform ButtonEndPoint;
 
-    private void Awake()
+    [SerializeField] private float rotateTime; //左右にフリックしたとき、この秒数で回転アニメーションをする
+
+    [SerializeField] private float returnOriginPosTime; //初期位置に戻るとき、この秒数で目的地まで移動する
+
+    private Vector3 originPos; //初期位置 
+
+    [SerializeField] float ButtonAnimationDuration = 0.2f;
+
+    private void Start()
     {
-        originalPosition = buttonRectTransform.localPosition;
-        canvasGroup = buttonRectTransform.GetComponent<CanvasGroup>();
+        originPos = this.transform.position;
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public float FollowFingerPosY(Vector3 pos) //y座標について追従する
     {
-        buttonRectTransform.DOKill();
-        buttonRectTransform.localPosition = originalPosition;
-        canvasGroup.alpha = 1f;  // 透明度をリセット
+        float Diff_Y = pos.y - this.transform.position.y; //Y座標の差分
+        this.transform.position = new Vector3(this.transform.position.x, pos.y, this.transform.position.z);
 
-        isDragging = true;
+        return Diff_Y;
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    public Definer.MID OnFlickUpper() //上にフリックされたときのアニメーション。発動する魔法のIDを返却する
     {
-        if (isDragging)
-        {
-            Vector2 releasePointerPosition = eventData.position;
-            Vector2 dragVector = releasePointerPosition - originalPosition;
-
-            if (dragVector.y > flickThreshold)
-            {
-                TriggerFlickAnimation();
-                isFlicked = true;
-            }
-            else
-            {
-                buttonRectTransform.DOLocalMove(originalPosition, buttonAnimDuration).SetEase(Ease.OutQuad);
-            }
-
-            isDragging = false;
-        }
-    }
-
-    private void TriggerFlickAnimation()
-    {
-        // EndPos位置まで移動し、透明度を徐々に0にする
-        buttonRectTransform.DOMove(endPos.position, 0.5f)
+        //決まった高さまで上昇するアニメーション
+        MagicButtonPosition.DOMove(ButtonEndPoint.position, ButtonAnimationDuration)
             .SetEase(Ease.OutCubic)
             .OnComplete(() => Debug.Log("Button reached end position."));
 
-        // 透明度を徐々に0にするアニメーション
-        canvasGroup.DOFade(0f, 0.5f);
+        //ディゾルブなど演出
+
+        Debug.Log("上にフリックされたぞ！");
+        return this.magicID;
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    public void OnFlickRight() //右方向にフリックされたときのアニメーション。回る
     {
-        if (isFlicked) return;
-        buttonRectTransform.DOLocalMoveY(originalPosition.y + buttonMoveSpeed, buttonAnimDuration).SetEase(Ease.OutQuad);
+        this.transform.DORotate(Vector3.up * 360f, rotateTime, RotateMode.LocalAxisAdd);
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public void OnFlickLeft() //左方向にフリックされたときのアニメーション。回る
     {
-        if (isFlicked) return;
-        buttonRectTransform.DOLocalMoveY(originalPosition.y, buttonAnimDuration).SetEase(Ease.OutQuad);
+        this.transform.DORotate(Vector3.up * 360f, rotateTime, RotateMode.LocalAxisAdd);
+    }
+
+    public void ReturnToOriginPos()
+    {
+        this.transform.DOMove(originPos, returnOriginPosTime);
+    }
+
+    public void ReturnOriginPosInstant()
+    {
+        this.transform.position = originPos;
     }
 }

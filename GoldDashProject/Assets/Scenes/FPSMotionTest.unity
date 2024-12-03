@@ -4190,6 +4190,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 713362415310924446, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 713362415310924446, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1397636643559747622, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_Name
       value: FixedPlayer
@@ -4237,6 +4245,10 @@ PrefabInstance:
     - target: {fileID: 6897993866421088452, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_Constraints
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8282324137260367603, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.02
       objectReference: {fileID: 0}
     - target: {fileID: 8844285673036646204, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: FPSPlayerParticles.Array.size
