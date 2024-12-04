@@ -171,6 +171,7 @@ public class PlayerController : MonoBehaviour
 
         //振動させたいカメラを指定してtransformをshakeEffectに渡す
         shakeEffect.shakeCameraTransform = playerCam.transform;
+
     }
 
     private void LateUpdate()
@@ -210,7 +211,8 @@ public class PlayerController : MonoBehaviour
             playerMoveVec = new Vector3(leftJoystick.Horizontal, 0f, leftJoystick.Vertical); //上書き
         playerAnimator.PlayFPSRunAnimation(playerMoveVec);
 
-        this.transform.Translate(playerMoveVec * playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
+        //注意！プレイヤーオブジェクトの腕やカメラは、オブジェクトのforwardとは逆を向いているので移動方向にマイナスをかける。Mayaの座標系がすべての元凶
+        this.transform.Translate(-playerMoveVec * playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
     }
 
     public void ControllPlayerRightJoystick()
@@ -219,19 +221,15 @@ public class PlayerController : MonoBehaviour
         if (!Mathf.Approximately(rightJoystick.Horizontal, 0) || !Mathf.Approximately(rightJoystick.Vertical, 0)) //右スティックの水平垂直どちらの入力も"ほぼ0"でないなら
         {
             //ジョイスティックの入力をオイラー角（〇軸を中心に△度回転、という書き方）にする
-            //前提：カメラはZ軸の正の方向を向いている
-            //水平の入力はY軸中心、垂直の入力はX軸中心になる。Z軸中心の回転はペテルギウス・ロマネコンティになってしまうため行わない。
+            //前提：カメラはZ軸の負の方向を向いている
+            //まずプレイヤーを回転させる
+            rotationY += rightJoystick.Horizontal * cameraMoveSpeed * Time.deltaTime; //Unityは左手座標系なので、左右の回転角度（Y軸中心）は加算でいい
+            this.transform.eulerAngles = new Vector3(0f, rotationY, 0f);
+
+            //垂直の入力を使って、カメラのみ、X軸中心回転を行う。
             rotationX -= rightJoystick.Vertical * cameraMoveSpeed * Time.deltaTime; //Unityは左手座標系なので、上下の回転角度（X軸中心）にはマイナスをかけなければならない
             rotationX = Mathf.Clamp(rotationX, -camRotateLimitX, camRotateLimitX); //縦方向(X軸中心)回転には角度制限をつけないと宙返りしてしまう
-            rotationY += rightJoystick.Horizontal * cameraMoveSpeed * Time.deltaTime; //Unityは左手座標系なので、左右の回転角度（Y軸中心）は加算でいい
-            Vector3 cameraMoveEulers = new Vector3(rotationX, rotationY, 0f); //X軸だけマイナスをかけています
-
-            //オイラー角をtransform.rotationに代入するため、クォータニオンに変換する
-            playerCam.transform.rotation = Quaternion.Euler(cameraMoveEulers);
-
-            //プレイヤーのY軸を中心とした回転を、カメラのそれと合わせる。
-            Vector3 PlayerMoveEulers = new Vector3(0, rotationY, 0f);
-            this.transform.rotation = Quaternion.Euler(PlayerMoveEulers);
+            playerCam.transform.eulerAngles = new Vector3(rotationX, playerCam.transform.eulerAngles.y, 0f); //playerCam.transform.eulerAngles.yは親の回転に委ねているので弄らない
         }
     }
     #endregion
