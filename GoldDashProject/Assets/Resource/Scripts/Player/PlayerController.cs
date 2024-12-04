@@ -29,7 +29,7 @@ public class NormalState : IPlayerState
 
         if (!playerController.isTouchUI) playerController.ControllPlayerRightJoystick();
 
-         playerController.UIInteract();
+        playerController.UIInteract();
 
         //1点以上のタッチが確認されたらインタラクト
         if (Input.touchCount > 0 || Input.GetMouseButtonDown(0))
@@ -346,6 +346,7 @@ public class PlayerController : MonoBehaviour
                     if (isTouchUI) currentMagicButton.FollowFingerPosY(UIhit.point); //UI操作中なら引き続き追従処理を行う
                 }
 
+                #region 旧UI操作
                 //Debug.Log(diff_y);
                 //if (diff_y > 0.01f) currentMagicButton.OnFlickUpper();
 
@@ -372,6 +373,7 @@ public class PlayerController : MonoBehaviour
                 //    isControllUI = false;
                 //    //前フレームに放たれたRayのHitした高さよりも新しくHitしたRayの高さが高かった時にフリックの判定となる
                 //    if(UIhit.point.y > oldHitRayHeightY.y) Debug.Log("ボタンをフリック");
+                #endregion
             }
         }
         if (isTouchUI && Input.GetMouseButtonUp(0))
@@ -381,8 +383,9 @@ public class PlayerController : MonoBehaviour
             Vector3 dragVector = dragEndPos - dragStartPos;
             currentMagicButton.FrickUpper(dragVector);
             isTouchUI = false;
-            //currentMagicButton;
+            currentMagicButton = null;
 
+            #region　旧UI操作終了処理
             //Ray UIray = MagicButtonCam.ScreenPointToRay(Input.mousePosition);
 
             //if (Physics.Raycast(UIray, out UIhit, Mathf.Infinity, MagicButtonLayer))
@@ -410,6 +413,7 @@ public class PlayerController : MonoBehaviour
             //    isTouchUI = false;
             //    currentMagicButton = null;
             //}
+            #endregion
         }
     }
 

@@ -45,7 +45,7 @@ public class MagicButton : MonoBehaviour
     {
         Vector3 EndPosVec = transform.parent.InverseTransformPoint(MoveEndPos.position);
 
-        if (dragVector.magnitude > FlickThreshold && IsUpwardFlick(dragVector))
+        if (dragVector.sqrMagnitude > FlickThreshold * FlickThreshold && IsUpwardFlick(dragVector))
         {
             OnFlickAnimation(EndPosVec);
         }
@@ -69,7 +69,7 @@ public class MagicButton : MonoBehaviour
         // ベクトルを正規化して上方向への割合を確認
         Vector3 normalizedDrag = dragVector.normalized;
 
-        // y成分が一定以上（例: 0.8）の場合のみ「上方向」と判定
+        // y成分が一定以上の場合のみ「上方向」と判定
         return normalizedDrag.y > minVerticalRatio;
     }
 
