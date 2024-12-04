@@ -13,6 +13,7 @@ TagManager:
   - Chest
   - Floor
   - MagicButton
+  - MagicButtonBack
   layers:
   - Default
   - TransparentFX

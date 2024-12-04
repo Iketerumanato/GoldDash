@@ -26,16 +26,17 @@ public class NormalState : IPlayerState
     public void UpdateProcess(PlayerController playerController)
     {
         playerController.ControllPlayerLeftJoystick();
+
         if (!playerController.isTouchUI) playerController.ControllPlayerRightJoystick();
 
-
-        playerController.UIInteract();
+         playerController.UIInteract();
 
         //1点以上のタッチが確認されたらインタラクト
-        if (Input.touchCount > 0 || Input.GetMouseButton(0))
+        if (Input.touchCount > 0 || Input.GetMouseButtonDown(0))
         {
             playerController.Interact();
         }
+
         playerController.PlayerRespawn();
     }
 
@@ -148,8 +149,7 @@ public class PlayerController : MonoBehaviour
     const string MagicButtonTag = "MagicButton";
     const string MagicButtonBackTag = "MagicButtonBack";
     public bool isTouchUI = false;
-    public bool isControllUI = false;
-    private Vector3 oldHitRayHeightY;
+    private Vector3 dragStartPos;
     private MagicButton currentMagicButton;
 
     private void Start()
@@ -325,26 +325,25 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        else if (Input.GetMouseButton(0)) //クリック版のインタラクト
+        else if(Input.GetMouseButton(0)) //クリック版のインタラクト
         {
             Ray UIray = MagicButtonCam.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(UIray, out UIhit, Mathf.Infinity, MagicButtonLayer))
-            {
-                float diff_y = 0f;
-
+            { 
                 if (UIhit.collider.CompareTag(MagicButtonTag)) //タグを見て
                 {
                     if (!isTouchUI) //このフレームに触れ始めたなら
                     {
                         currentMagicButton = UIhit.collider.gameObject.GetComponent<MagicButton>(); //コンポーネント取得
                         isTouchUI = true; //フラグtrue
+                        dragStartPos = Input.mousePosition;
                     }
-                    diff_y = currentMagicButton.FollowFingerPosY(UIhit.point); //マウスのy軸の位置とボタンの位置を同じよう
+                    currentMagicButton.FollowFingerPosY(UIhit.point); //マウスのy軸の位置とボタンの位置を同じよう\
                 }
                 else if (UIhit.collider.CompareTag(MagicButtonBackTag)) //背景にrayが当たっていたら
                 {
-                    if (isTouchUI) diff_y = currentMagicButton.FollowFingerPosY(UIhit.point); //UI操作中なら引き続き追従処理を行う
+                    if (isTouchUI) currentMagicButton.FollowFingerPosY(UIhit.point); //UI操作中なら引き続き追従処理を行う
                 }
 
                 //Debug.Log(diff_y);
@@ -375,40 +374,42 @@ public class PlayerController : MonoBehaviour
                 //    if(UIhit.point.y > oldHitRayHeightY.y) Debug.Log("ボタンをフリック");
             }
         }
-        else if (isTouchUI && Input.GetMouseButtonUp(0))
+        if (isTouchUI && Input.GetMouseButtonUp(0))
         {
-            Ray UIray = MagicButtonCam.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(UIray, out UIhit, Mathf.Infinity, MagicButtonLayer))
-            {
-                float diff_y = 0f;
-
-                if (UIhit.collider.CompareTag(MagicButtonTag)) //タグを見て
-                {
-                    if (!isTouchUI) //このフレームに触れ始めたなら
-                    {
-                        currentMagicButton = UIhit.collider.gameObject.GetComponent<MagicButton>(); //コンポーネント取得
-                        isTouchUI = true; //フラグtrue
-                    }
-                    diff_y = currentMagicButton.FollowFingerPosY(UIhit.point); //マウスのy軸の位置とボタンの位置を同じよう
-                }
-                else if (UIhit.collider.CompareTag(MagicButtonBackTag)) //背景にrayが当たっていたら
-                {
-                    if (isTouchUI) diff_y = currentMagicButton.FollowFingerPosY(UIhit.point); //UI操作中なら引き続き追従処理を行う
-                }
-
-                if (diff_y > 0.008f) currentMagicButton.OnFlickUpper();
-                else currentMagicButton.ReturnToOriginPos();
-
-
-                isTouchUI = false;
-                currentMagicButton = null;
-            }
-        }
-        else
-        {
+            Vector3 dragEndPos = Input.mousePosition;
+            Vector3 dragVector = dragEndPos - dragStartPos;
+            currentMagicButton.FrickUpper(dragVector);
             isTouchUI = false;
-            currentMagicButton = null;
+            //currentMagicButton;
+
+            //Ray UIray = MagicButtonCam.ScreenPointToRay(Input.mousePosition);
+
+            //if (Physics.Raycast(UIray, out UIhit, Mathf.Infinity, MagicButtonLayer))
+            //{
+            //    float diff_y = 0f;
+
+            //    if (UIhit.collider.CompareTag(MagicButtonTag)) //タグを見て
+            //    {
+            //        if (!isTouchUI) //このフレームに触れ始めたなら
+            //        {
+            //            currentMagicButton = UIhit.collider.gameObject.GetComponent<MagicButton>(); //コンポーネント取得
+            //            isTouchUI = true; //フラグtrue
+            //        }
+            //        diff_y = currentMagicButton.FollowFingerPosY(UIhit.point); //マウスのy軸の位置とボタンの位置を同じよう
+            //    }
+            //    else if (UIhit.collider.CompareTag(MagicButtonBackTag)) //背景にrayが当たっていたら
+            //    {
+            //        if (isTouchUI) diff_y = currentMagicButton.FollowFingerPosY(UIhit.point); //UI操作中なら引き続き追従処理を行う
+            //    }
+
+            //    if (diff_y > 0.008f) currentMagicButton.OnFlickAnimation();
+            //    else currentMagicButton.ReturnToOriginPos();
+
+
+            //    isTouchUI = false;
+            //    currentMagicButton = null;
+            //}
         }
     }
 

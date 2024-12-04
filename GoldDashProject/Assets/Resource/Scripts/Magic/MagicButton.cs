@@ -8,20 +8,29 @@ public class MagicButton : MonoBehaviour
     [SerializeField] private float rizeUpTargetPosY; //上にフリックしたとき、この高さまで上昇する
     [SerializeField] private float rizeUpTime; //上にフリックしたとき、この秒数で目的地まで上昇する
 
-    [SerializeField] Transform MagicButtonPosition;
-    [SerializeField] Transform ButtonEndPoint;
-
     [SerializeField] private float rotateTime; //左右にフリックしたとき、この秒数で回転アニメーションをする
 
     [SerializeField] private float returnOriginPosTime; //初期位置に戻るとき、この秒数で目的地まで移動する
 
-    private Vector3 originPos; //初期位置 
-
     [SerializeField] float ButtonAnimationDuration = 0.2f;
 
-    private void Start()
+    [SerializeField] float FlickThreshold = 1.0f; // フリック距離の閾値
+
+    [SerializeField] float minVerticalRatio = 0.8f;
+
+    [SerializeField] bool isActive = false;
+
+    [SerializeField] Transform MoveEndPos;
+    [SerializeField] Transform originPos;
+
+    //private void Start()
+    //{
+    //    originPos = this.transform.localPosition;
+    //}
+
+    private void OnEnable()
     {
-        originPos = this.transform.position;
+        if (isActive) ActiveButton();
     }
 
     public float FollowFingerPosY(Vector3 pos) //y座標について追従する
@@ -32,12 +41,22 @@ public class MagicButton : MonoBehaviour
         return Diff_Y;
     }
 
-    public Definer.MID OnFlickUpper() //上にフリックされたときのアニメーション。発動する魔法のIDを返却する
+    public void FrickUpper(Vector3 dragVector)
+    {
+        Vector3 EndPosVec = transform.parent.InverseTransformPoint(MoveEndPos.position);
+
+        if (dragVector.magnitude > FlickThreshold && IsUpwardFlick(dragVector))
+        {
+            OnFlickAnimation(EndPosVec);
+        }
+        else ReturnToOriginPos();
+    }
+
+    public Definer.MID OnFlickAnimation(Vector3 targetLocalPos) //上にフリックされたときのアニメーション。発動する魔法のIDを返却する
     {
         //決まった高さまで上昇するアニメーション
-        MagicButtonPosition.DOMove(ButtonEndPoint.position, ButtonAnimationDuration)
-            .SetEase(Ease.OutCubic)
-            .OnComplete(() => Debug.Log("Button reached end position."));
+        this.transform.DOLocalMove(targetLocalPos, ButtonAnimationDuration)
+            .SetEase(Ease.OutCubic).OnComplete(() => ReturnToOriginPos());
 
         //ディゾルブなど演出
 
@@ -45,23 +64,39 @@ public class MagicButton : MonoBehaviour
         return this.magicID;
     }
 
+    private bool IsUpwardFlick(Vector3 dragVector)
+    {
+        // ベクトルを正規化して上方向への割合を確認
+        Vector3 normalizedDrag = dragVector.normalized;
+
+        // y成分が一定以上（例: 0.8）の場合のみ「上方向」と判定
+        return normalizedDrag.y > minVerticalRatio;
+    }
+
     public void OnFlickRight() //右方向にフリックされたときのアニメーション。回る
     {
-        this.transform.DORotate(Vector3.up * 360f, rotateTime, RotateMode.LocalAxisAdd);
+        this.transform.DOLocalRotate(Vector3.up * 360f, rotateTime, RotateMode.LocalAxisAdd);
     }
 
     public void OnFlickLeft() //左方向にフリックされたときのアニメーション。回る
     {
-        this.transform.DORotate(Vector3.up * 360f, rotateTime, RotateMode.LocalAxisAdd);
+        this.transform.DOLocalRotate(Vector3.up * 360f, rotateTime, RotateMode.LocalAxisAdd);
     }
 
     public void ReturnToOriginPos()
     {
-        this.transform.DOMove(originPos, returnOriginPosTime);
+        var localOriginPos = transform.parent.InverseTransformPoint(originPos.position);
+        this.transform.DOLocalMove(localOriginPos, returnOriginPosTime).SetEase(Ease.OutQuad);
     }
 
-    public void ReturnOriginPosInstant()
+    //public void ReturnOriginPosInstant()
+    //{
+    //    this.transform.position = originPos;
+    //}
+
+    void ActiveButton()
     {
-        this.transform.position = originPos;
+        this.gameObject.SetActive(true);
+        ReturnToOriginPos();
     }
 }
