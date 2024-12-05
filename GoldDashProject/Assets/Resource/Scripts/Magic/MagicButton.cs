@@ -28,7 +28,6 @@ public class MagicButton : MonoBehaviour
 
     [SerializeField] Material buttonDissolveMat;
     const string offsetName = "_DissolveOffest";
-    const string directionName = "_DissolveDirection";
     readonly float maxButtonAlpha = 1f;
 
     private void Start()
@@ -113,15 +112,13 @@ public class MagicButton : MonoBehaviour
             currentduration                      // アニメーション時間
         ).SetEase(Ease.InOutSine)
         .OnComplete(() => isActive = false);//非アクティブ状態へ
-
-        Debug.Log(isActive);
     }
 
     private void ReturnAnimateDissolve(float returnDuration)
     {
         // 初期値と目標値を設定（-1 → 1の範囲で進行）
         float returnStartValue = -1;
-        float returnEndValue = 1f;
+        float returnEndValue = maxButtonAlpha;
 
         DOTween.To(
             () => returnStartValue,
@@ -130,7 +127,6 @@ public class MagicButton : MonoBehaviour
             returnDuration
         ).SetEase(Ease.InOutSine)
         .OnComplete(() => isActive = true);//アクティブ状態へ
-        Debug.Log(isActive);
     }
 
     //ディゾルブマテリアルのオフセットの変化

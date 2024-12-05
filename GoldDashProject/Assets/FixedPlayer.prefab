@@ -542,7 +542,7 @@ Transform:
   m_GameObject: {fileID: 5109216213607677628}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.375, z: -0.035}
+  m_LocalPosition: {x: 0, y: 0.375, z: -0.034999967}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2760,6 +2760,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MoveStartPos03
       objectReference: {fileID: 0}
+    - target: {fileID: 1081291095758924961, guid: 30bf9d03274c1b5469cc6a23df714b41, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e386e06d921be43409f4c3e6554faccd, type: 2}
     - target: {fileID: 2391794162412396645, guid: 30bf9d03274c1b5469cc6a23df714b41, type: 3}
       propertyPath: m_Name
       value: ButtonOriginPos03
@@ -2839,7 +2843,7 @@ PrefabInstance:
     - target: {fileID: 5834417610075322911, guid: 30bf9d03274c1b5469cc6a23df714b41, type: 3}
       propertyPath: buttonDissolveMat
       value: 
-      objectReference: {fileID: 2100000, guid: 01b355b1a7894c743b655598ade709a9, type: 2}
+      objectReference: {fileID: 2100000, guid: e386e06d921be43409f4c3e6554faccd, type: 2}
     - target: {fileID: 5834417610075322911, guid: 30bf9d03274c1b5469cc6a23df714b41, type: 3}
       propertyPath: MagicButtonPosition
       value: 
@@ -2884,6 +2888,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MoveStartPos02
       objectReference: {fileID: 0}
+    - target: {fileID: 1081291095758924961, guid: 30bf9d03274c1b5469cc6a23df714b41, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 87b6aa7f82e1a894dba13a8f330db7b9, type: 2}
     - target: {fileID: 2391794162412396645, guid: 30bf9d03274c1b5469cc6a23df714b41, type: 3}
       propertyPath: m_Name
       value: ButtonOriginPos02
@@ -2963,7 +2971,7 @@ PrefabInstance:
     - target: {fileID: 5834417610075322911, guid: 30bf9d03274c1b5469cc6a23df714b41, type: 3}
       propertyPath: buttonDissolveMat
       value: 
-      objectReference: {fileID: 2100000, guid: 01b355b1a7894c743b655598ade709a9, type: 2}
+      objectReference: {fileID: 2100000, guid: 87b6aa7f82e1a894dba13a8f330db7b9, type: 2}
     - target: {fileID: 5834417610075322911, guid: 30bf9d03274c1b5469cc6a23df714b41, type: 3}
       propertyPath: MagicButtonPosition
       value: 
