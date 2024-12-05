@@ -30,6 +30,8 @@ public class MagicButton : MonoBehaviour
     const string offsetName = "_DissolveOffest";
     readonly float maxButtonAlpha = 1f;
 
+    [SerializeField] GameObject ButtonGuideObj;
+
     private void Start()
     {
         SetDissolveMatOffset(maxButtonAlpha);
@@ -42,12 +44,14 @@ public class MagicButton : MonoBehaviour
         float Diff_Y = pos.y - this.transform.position.y; //Y座標の差分
         this.transform.position = new Vector3(this.transform.position.x, pos.y, this.transform.position.z);
         if (transform.position.y > 0.2f) OnFlickAnimation(localMoveEndPos);
+        ButtonGuideObj.SetActive(true);
         return Diff_Y;
     }
 
     public void FrickUpper(Vector3 dragVector)
     {
         //Vector3 EndPosVec = transform.parent.InverseTransformPoint(MoveEndPos.position);
+        ButtonGuideObj.SetActive(false);
 
         if (dragVector.sqrMagnitude > FlickThreshold * FlickThreshold && IsUpwardFlick(dragVector))
         {
