@@ -1,87 +1,141 @@
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using DG.Tweening;
 
-public class MagicButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
+public class MagicButton : MonoBehaviour
 {
-    [SerializeField] MagicManagement magicManagement;
-    [SerializeField] int magicIndex;
-    [SerializeField] Button magicbutton;
+    [SerializeField] private Definer.MID magicID;
 
-    [SerializeField] RectTransform buttonRectTransform;
-    [SerializeField] Transform endPos;  // EndPosオブジェクトの参照
-    private Vector2 originalPosition;
-    [SerializeField] float buttonMoveSpeed = 20f;
-    [SerializeField] float buttonAnimDuration = 0.2f;
+    [SerializeField] private float rizeUpTargetPosY; //上にフリックしたとき、この高さまで上昇する
+    [SerializeField] private float rizeUpTime; //上にフリックしたとき、この秒数で目的地まで上昇する
 
-    [SerializeField] float flickThreshold = 50f;
-    private bool isDragging = false;
-    private bool isFlicked = false;
+    [SerializeField] private float rotateTime; //左右にフリックしたとき、この秒数で回転アニメーションをする
 
-    private CanvasGroup canvasGroup;
+    [SerializeField] private float returnOriginPosTime; //初期位置に戻るとき、この秒数で目的地まで移動する
 
-    private void Awake()
+    [SerializeField] float ButtonAnimationDuration = 0.2f;
+
+    [SerializeField] float FlickThreshold = 1.0f; // フリック距離の閾値
+
+    [SerializeField] float minVerticalRatio = 0.8f;
+
+    bool isActive = true;
+
+    [SerializeField] Transform MoveEndPos;
+    private Vector3 localMoveEndPos;
+
+    [SerializeField] Transform buttonOriginPos;
+    private Vector3 locabuttonOriginPos;
+
+    [SerializeField] Material buttonDissolveMat;
+    const string offsetName = "_DissolveOffest";
+    const string directionName = "_DissolveDirection";
+    readonly float maxButtonAlpha = 1f;
+
+    private void Start()
     {
-        originalPosition = buttonRectTransform.localPosition;
-        canvasGroup = buttonRectTransform.GetComponent<CanvasGroup>();
+        SetDissolveMatOffset(maxButtonAlpha);
+        localMoveEndPos = transform.parent.InverseTransformPoint(MoveEndPos.position);
+        locabuttonOriginPos = transform.parent.InverseTransformPoint(buttonOriginPos.position);
     }
 
-    void Start()
+    public float FollowFingerPosY(Vector3 pos) //y座標について追従する
     {
-        magicbutton.onClick.AddListener(() => magicManagement.ActivateMagic(magicIndex));
+        float Diff_Y = pos.y - this.transform.position.y; //Y座標の差分
+        this.transform.position = new Vector3(this.transform.position.x, pos.y, this.transform.position.z);
+        if (transform.position.y > 0.2f) OnFlickAnimation(localMoveEndPos);
+        return Diff_Y;
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public void FrickUpper(Vector3 dragVector)
     {
-        buttonRectTransform.DOKill();
-        buttonRectTransform.localPosition = originalPosition;
-        canvasGroup.alpha = 1f;  // 透明度をリセット
+        //Vector3 EndPosVec = transform.parent.InverseTransformPoint(MoveEndPos.position);
 
-        isDragging = true;
-    }
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        if (isDragging)
+        if (dragVector.sqrMagnitude > FlickThreshold * FlickThreshold && IsUpwardFlick(dragVector))
         {
-            Vector2 releasePointerPosition = eventData.position;
-            Vector2 dragVector = releasePointerPosition - originalPosition;
-
-            if (dragVector.y > flickThreshold)
-            {
-                TriggerFlickAnimation();
-                isFlicked = true;
-            }
-            else
-            {
-                buttonRectTransform.DOLocalMove(originalPosition, buttonAnimDuration).SetEase(Ease.OutQuad);
-            }
-
-            isDragging = false;
+            OnFlickAnimation(localMoveEndPos);
+            Debug.Log("上にフリックされたぞ！");
         }
+        else ReturnToOriginPos();
     }
 
-    private void TriggerFlickAnimation()
+    public Definer.MID OnFlickAnimation(Vector3 targetLocalPos) //上にフリックされたときのアニメーション。発動する魔法のIDを返却する
     {
-        // EndPos位置まで移動し、透明度を徐々に0にする
-        buttonRectTransform.DOMove(endPos.position, 0.5f)
-            .SetEase(Ease.OutCubic)
-            .OnComplete(() => Debug.Log("Button reached end position."));
+        //決まった高さまで上昇するアニメーション
+        this.transform.DOLocalMove(targetLocalPos, ButtonAnimationDuration)
+            .SetEase(Ease.Linear).OnComplete(() => ReturnToOriginPos());
 
-        // 透明度を徐々に0にするアニメーション
-        canvasGroup.DOFade(0f, 0.5f);
+        //ディゾルブなど演出
+        AnimateDissolve(ButtonAnimationDuration);
+
+        return this.magicID;
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    private bool IsUpwardFlick(Vector3 dragVector)
     {
-        if (isFlicked) return;
-        buttonRectTransform.DOLocalMoveY(originalPosition.y + buttonMoveSpeed, buttonAnimDuration).SetEase(Ease.OutQuad);
+        // ベクトルを正規化して上方向への割合を確認
+        Vector3 normalizedDrag = dragVector.normalized;
+
+        // y成分が一定以上の場合のみ「上方向」と判定
+        return normalizedDrag.y > minVerticalRatio;
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public void OnFlickRight() //右方向にフリックされたときのアニメーション。回る
     {
-        if (isFlicked) return;
-        buttonRectTransform.DOLocalMoveY(originalPosition.y, buttonAnimDuration).SetEase(Ease.OutQuad);
+        this.transform.DOLocalRotate(Vector3.up * 360f, rotateTime, RotateMode.LocalAxisAdd);
+    }
+
+    public void OnFlickLeft() //左方向にフリックされたときのアニメーション。回る
+    {
+        this.transform.DOLocalRotate(Vector3.up * 360f, rotateTime, RotateMode.LocalAxisAdd);
+    }
+
+    public void ReturnToOriginPos()
+    {
+        this.transform.DOLocalMove(locabuttonOriginPos, returnOriginPosTime).SetEase(Ease.Linear);
+        ReturnAnimateDissolve(returnOriginPosTime);
+    }
+
+    //public void ReturnOriginPosInstant()
+    //{
+    //    this.transform.position = originPos;
+    //}
+
+    private void AnimateDissolve(float currentduration)
+    {
+        // 初期値と目標値を設定（現在のduration → 1の範囲で進行）
+        float startValue = currentduration;
+        float endValue = -1f;
+
+        DOTween.To(
+            () => startValue,             // 開始値の取得
+            value => SetDissolveMatOffset(value), // 値を更新する処理
+            endValue,                     // 目標値
+            currentduration                      // アニメーション時間
+        ).SetEase(Ease.InOutSine)
+        .OnComplete(() => isActive = false);//非アクティブ状態へ
+
+        Debug.Log(isActive);
+    }
+
+    private void ReturnAnimateDissolve(float returnDuration)
+    {
+        // 初期値と目標値を設定（-1 → 1の範囲で進行）
+        float returnStartValue = -1;
+        float returnEndValue = 1f;
+
+        DOTween.To(
+            () => returnStartValue,
+            value => SetDissolveMatOffset(value), 
+            returnEndValue,
+            returnDuration
+        ).SetEase(Ease.InOutSine)
+        .OnComplete(() => isActive = true);//アクティブ状態へ
+        Debug.Log(isActive);
+    }
+
+    //ディゾルブマテリアルのオフセットの変化
+    private void SetDissolveMatOffset(float dissolveValue)
+    {
+        buttonDissolveMat.SetVector(offsetName, new Vector4(0f, dissolveValue, 0f, 0f));
     }
 }

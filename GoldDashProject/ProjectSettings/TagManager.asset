@@ -12,6 +12,8 @@ TagManager:
   - GoldPile
   - Chest
   - Floor
+  - MagicButton
+  - MagicButtonBack
   layers:
   - Default
   - TransparentFX
@@ -20,7 +22,7 @@ TagManager:
   - Water
   - UI
   - PlayerHand
-  - 
+  - MagicButton
   - 
   - 
   - 
