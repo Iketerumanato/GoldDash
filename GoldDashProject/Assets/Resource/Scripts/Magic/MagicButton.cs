@@ -28,8 +28,9 @@ public class MagicButton : MonoBehaviour
 
     [SerializeField] Material buttonDissolveMat;
     const string offsetName = "_DissolveOffest";
-    const string directionName = "_DissolveDirection";
     readonly float maxButtonAlpha = 1f;
+
+    [SerializeField] GameObject ButtonGuideObj;
 
     private void Start()
     {
@@ -43,12 +44,14 @@ public class MagicButton : MonoBehaviour
         float Diff_Y = pos.y - this.transform.position.y; //Y座標の差分
         this.transform.position = new Vector3(this.transform.position.x, pos.y, this.transform.position.z);
         if (transform.position.y > 0.2f) OnFlickAnimation(localMoveEndPos);
+        ButtonGuideObj.SetActive(true);
         return Diff_Y;
     }
 
     public void FrickUpper(Vector3 dragVector)
     {
         //Vector3 EndPosVec = transform.parent.InverseTransformPoint(MoveEndPos.position);
+        ButtonGuideObj.SetActive(false);
 
         if (dragVector.sqrMagnitude > FlickThreshold * FlickThreshold && IsUpwardFlick(dragVector))
         {
@@ -113,15 +116,13 @@ public class MagicButton : MonoBehaviour
             currentduration                      // アニメーション時間
         ).SetEase(Ease.InOutSine)
         .OnComplete(() => isActive = false);//非アクティブ状態へ
-
-        Debug.Log(isActive);
     }
 
     private void ReturnAnimateDissolve(float returnDuration)
     {
         // 初期値と目標値を設定（-1 → 1の範囲で進行）
         float returnStartValue = -1;
-        float returnEndValue = 1f;
+        float returnEndValue = maxButtonAlpha;
 
         DOTween.To(
             () => returnStartValue,
@@ -130,7 +131,6 @@ public class MagicButton : MonoBehaviour
             returnDuration
         ).SetEase(Ease.InOutSine)
         .OnComplete(() => isActive = true);//アクティブ状態へ
-        Debug.Log(isActive);
     }
 
     //ディゾルブマテリアルのオフセットの変化
