@@ -18,36 +18,42 @@ public class MagicButton : MonoBehaviour
 
     [SerializeField] float minVerticalRatio = 0.8f;
 
-    [SerializeField] bool isActive = false;
+    bool isActive = true;
 
     [SerializeField] Transform MoveEndPos;
-    [SerializeField] Transform originPos;
+    private Vector3 localMoveEndPos;
 
-    //private void Start()
-    //{
-    //    originPos = this.transform.localPosition;
-    //}
+    [SerializeField] Transform buttonOriginPos;
+    private Vector3 locabuttonOriginPos;
 
-    private void OnEnable()
+    [SerializeField] Material buttonDissolveMat;
+    const string offsetName = "_DissolveOffest";
+    const string directionName = "_DissolveDirection";
+    readonly float maxButtonAlpha = 1f;
+
+    private void Start()
     {
-        if (isActive) ActiveButton();
+        SetDissolveMatOffset(maxButtonAlpha);
+        localMoveEndPos = transform.parent.InverseTransformPoint(MoveEndPos.position);
+        locabuttonOriginPos = transform.parent.InverseTransformPoint(buttonOriginPos.position);
     }
 
     public float FollowFingerPosY(Vector3 pos) //y座標について追従する
     {
         float Diff_Y = pos.y - this.transform.position.y; //Y座標の差分
         this.transform.position = new Vector3(this.transform.position.x, pos.y, this.transform.position.z);
-
+        if (transform.position.y > 0.2f) OnFlickAnimation(localMoveEndPos);
         return Diff_Y;
     }
 
     public void FrickUpper(Vector3 dragVector)
     {
-        Vector3 EndPosVec = transform.parent.InverseTransformPoint(MoveEndPos.position);
+        //Vector3 EndPosVec = transform.parent.InverseTransformPoint(MoveEndPos.position);
 
         if (dragVector.sqrMagnitude > FlickThreshold * FlickThreshold && IsUpwardFlick(dragVector))
         {
-            OnFlickAnimation(EndPosVec);
+            OnFlickAnimation(localMoveEndPos);
+            Debug.Log("上にフリックされたぞ！");
         }
         else ReturnToOriginPos();
     }
@@ -56,11 +62,11 @@ public class MagicButton : MonoBehaviour
     {
         //決まった高さまで上昇するアニメーション
         this.transform.DOLocalMove(targetLocalPos, ButtonAnimationDuration)
-            .SetEase(Ease.OutCubic).OnComplete(() => ReturnToOriginPos());
+            .SetEase(Ease.Linear).OnComplete(() => ReturnToOriginPos());
 
         //ディゾルブなど演出
+        AnimateDissolve(ButtonAnimationDuration);
 
-        Debug.Log("上にフリックされたぞ！");
         return this.magicID;
     }
 
@@ -85,8 +91,8 @@ public class MagicButton : MonoBehaviour
 
     public void ReturnToOriginPos()
     {
-        var localOriginPos = transform.parent.InverseTransformPoint(originPos.position);
-        this.transform.DOLocalMove(localOriginPos, returnOriginPosTime).SetEase(Ease.OutQuad);
+        this.transform.DOLocalMove(locabuttonOriginPos, returnOriginPosTime).SetEase(Ease.Linear);
+        ReturnAnimateDissolve(returnOriginPosTime);
     }
 
     //public void ReturnOriginPosInstant()
@@ -94,9 +100,42 @@ public class MagicButton : MonoBehaviour
     //    this.transform.position = originPos;
     //}
 
-    void ActiveButton()
+    private void AnimateDissolve(float currentduration)
     {
-        this.gameObject.SetActive(true);
-        ReturnToOriginPos();
+        // 初期値と目標値を設定（現在のduration → 1の範囲で進行）
+        float startValue = currentduration;
+        float endValue = -1f;
+
+        DOTween.To(
+            () => startValue,             // 開始値の取得
+            value => SetDissolveMatOffset(value), // 値を更新する処理
+            endValue,                     // 目標値
+            currentduration                      // アニメーション時間
+        ).SetEase(Ease.InOutSine)
+        .OnComplete(() => isActive = false);//非アクティブ状態へ
+
+        Debug.Log(isActive);
+    }
+
+    private void ReturnAnimateDissolve(float returnDuration)
+    {
+        // 初期値と目標値を設定（-1 → 1の範囲で進行）
+        float returnStartValue = -1;
+        float returnEndValue = 1f;
+
+        DOTween.To(
+            () => returnStartValue,
+            value => SetDissolveMatOffset(value), 
+            returnEndValue,
+            returnDuration
+        ).SetEase(Ease.InOutSine)
+        .OnComplete(() => isActive = true);//アクティブ状態へ
+        Debug.Log(isActive);
+    }
+
+    //ディゾルブマテリアルのオフセットの変化
+    private void SetDissolveMatOffset(float dissolveValue)
+    {
+        buttonDissolveMat.SetVector(offsetName, new Vector4(0f, dissolveValue, 0f, 0f));
     }
 }

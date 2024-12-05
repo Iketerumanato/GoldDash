@@ -8259,6 +8259,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1742532088667761308, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
   m_PrefabInstance: {fileID: 4655737573122132708}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1927976705 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7025055321887494154, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+  m_PrefabInstance: {fileID: 4655737573122132708}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9b356d55ddaa3d40b1b7c931b31a3e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1930212887
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9403,8 +9414,16 @@ PrefabInstance:
       value: 0.682
       objectReference: {fileID: 0}
     - target: {fileID: 131928433933215329, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: _playerController
+      value: 
+      objectReference: {fileID: 1927976705}
+    - target: {fileID: 131928433933215329, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: returnOriginPosTime
-      value: 0.5
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 131928433933215329, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: ButtonAnimationDuration
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 349858837828385637, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_IsActive
@@ -9536,7 +9555,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3085980220130377005, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3497549864228954412, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_Name
@@ -9546,6 +9565,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: MoveStartPos03
       objectReference: {fileID: 0}
+    - target: {fileID: 3796467655970011727, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 87b6aa7f82e1a894dba13a8f330db7b9, type: 2}
+    - target: {fileID: 3827753281513462040, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e386e06d921be43409f4c3e6554faccd, type: 2}
     - target: {fileID: 5124432897554132498, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_IsTrigger
       value: 1
@@ -9591,8 +9618,16 @@ PrefabInstance:
       value: 0.682
       objectReference: {fileID: 0}
     - target: {fileID: 7703246870044233638, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: buttonDissolveMat
+      value: 
+      objectReference: {fileID: 2100000, guid: e386e06d921be43409f4c3e6554faccd, type: 2}
+    - target: {fileID: 7703246870044233638, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: returnOriginPosTime
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7703246870044233638, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: ButtonAnimationDuration
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 7734444543009385713, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: EndPos.y
@@ -9603,8 +9638,16 @@ PrefabInstance:
       value: 0.715
       objectReference: {fileID: 0}
     - target: {fileID: 7734444543009385713, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: buttonDissolveMat
+      value: 
+      objectReference: {fileID: 2100000, guid: 87b6aa7f82e1a894dba13a8f330db7b9, type: 2}
+    - target: {fileID: 7734444543009385713, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: returnOriginPosTime
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7734444543009385713, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: ButtonAnimationDuration
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 7772102012520037853, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_IsActive
