@@ -31,7 +31,7 @@ public class NormalState : IPlayerState
 
         playerController.UIInteract();
 
-        //1点以上のタッチが確認されたらインタラクト
+        //1点以上のタッチまたはクリックが確認されたらインタラクト
         if (Input.touchCount > 0 || Input.GetMouseButtonDown(0))
         {
             playerController.Interact();
@@ -68,8 +68,6 @@ public class IncapacitatedState : IPlayerState
 
 public class PlayerController : MonoBehaviour
 {
-    private IPlayerState _playerControllState;
-
     //パラメータ
     [Header("インタラクト可能な距離")]
     [SerializeField] float interactableDistance = 10.0f;
@@ -107,6 +105,9 @@ public class PlayerController : MonoBehaviour
     [Header("この高さ以下に落下したらリスポーン")]
     [SerializeField] private float fallThreshold = -10f;
     private Vector3 initialSpawnPosition; //リスポーン地点
+
+    //プレイヤーの現在のState
+    private IPlayerState _playerControllState;
 
     //UI関連
     //プレイヤーを移動させる左ジョイスティック
@@ -154,6 +155,7 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        //stateをノーマルにする
         ChangePlayerState(new NormalState());
 
         //リスポーン地点の記録
@@ -174,7 +176,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void LateUpdate()
+    private void Update()
     {
         _playerControllState.UpdateProcess(this);
     }
@@ -200,7 +202,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    #region ジョイスティック操作
+    #region ジョイスティックによるキャラクターとカメラの操作
     public void ControllPlayerLeftJoystick()
     {
         //WASDの入力をベクトルにする
@@ -417,6 +419,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    #region パンチ関連
     //パンチ。パンチを成立させたRaycastHit構造体のPointとDistanceを引数にもらおう
     async private void Punch(Vector3 hitPoint, float distance, ActorController actorController)
     {
@@ -492,7 +495,9 @@ public class PlayerController : MonoBehaviour
             isPunchable = true; //クールダウン終了
         }
     }
+    #endregion
 
+    #region 宝箱関連
     //宝箱なら開錠を試みる。パンチと同様RaycastHit構造体から引数をもらう。消えゆく宝箱だったり、他プレイヤーが使用中の宝箱は開錠できない。
     private void TryOpenChest(Vector3 hitPoint, float distance, Chest chestController)
     {
@@ -505,33 +510,10 @@ public class PlayerController : MonoBehaviour
         myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, chestController.EntityID);
         myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
         UdpGameClient.Send(myHeader.ToByte());
-
-        //既に空いていないたらなにもしない
-
-        //距離が遠すぎる場合、宝箱の付近までオートラン開始。スティック入力があれば即時解除
-        //オートランの目標地点算出
-
-        //宝箱のID取得。サーバー側で開錠中ステータスにする
-        //ACTIONパケット送信
-
-        //キャンバス表示（まわせ）
-
-        //非同期回転処理開始
-        //以下非同期ローカル関数で
-
-        //OpenChest
-
-        //async UniTask OpenChest()
-        //{
-        //    //いつでも中断できるようにする
-
-        //    //成功したらパケット送信準備
-        //    //宝箱のID取得
-
-        //    //パケット送信
-        //}
     }
+    #endregion
 
+    #region 殴られたときのリアクション
     //正面から殴られたときの処理。GameClientManagerから呼ばれる
     public void GetPunchFront()
     {
@@ -541,6 +523,7 @@ public class PlayerController : MonoBehaviour
         //カメラ演出
         shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium); //振動中
     }
+    #endregion
 
     //背面から殴られたときの処理。GameClientManagerから呼ばれる
     public void GetPunchBack()
