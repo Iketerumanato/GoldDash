@@ -307,31 +307,52 @@ public class PlayerController : MonoBehaviour
         //カメラの位置からタッチした(クリックした)位置に向けrayを飛ばす
         RaycastHit UIhit;
 
+        //タブレットでのタッチ操作を行うための宣言
+        Touch UiTouch = Input.GetTouch(0);
+
         //どこかしらタッチされているなら（＝タッチ対応デバイスを使っているなら）
-        if (Input.touchCount > 0)
+        if (Input.touchCount > 0 && UiTouch.phase == TouchPhase.Began)
         {
             foreach (Touch t in Input.touches)
             {
                 //同時に魔法ボタンを映しているカメラからもRayを飛ばす
-                Ray UIray = MagicButtonCam.ScreenPointToRay(t.position);
+                Ray UIrayTouch = MagicButtonCam.ScreenPointToRay(t.position);
 
-                //タッチし始めたフレームでないなら処理しない
-                //if (t.phase != TouchPhase.Began) continue;
-
-                //rayがなにかに当たったら調べる
-                if (Physics.Raycast(UIray, out UIhit, Mathf.Infinity, MagicButtonLayer)
-                    && UIhit.collider.CompareTag(MagicButtonTag))
+                if (Physics.Raycast(UIrayTouch, out UIhit, Mathf.Infinity, MagicButtonLayer))
                 {
-                    MagicButton magicButton = UIhit.collider.gameObject.GetComponent<MagicButton>();
-                    magicButton.FollowFingerPosY(UIhit.point);
+                    if (UIhit.collider.CompareTag(MagicButtonTag)) //タグを見て
+                    {
+                        if (!isTouchUI) //このフレームに触れ始めたなら
+                        {
+                            currentMagicButton = UIhit.collider.gameObject.GetComponent<MagicButton>(); //コンポーネント取得
+                            isTouchUI = true; //フラグtrue
+                            dragStartPos = Input.mousePosition;
+                        }
+                        currentMagicButton.FollowFingerPosY(UIhit.point); //マウスのy軸の位置とボタンの位置を同じよう\
+                    }
+                    else if (UIhit.collider.CompareTag(MagicButtonBackTag)) //背景にrayが当たっていたら
+                    {
+                        if (isTouchUI) currentMagicButton.FollowFingerPosY(UIhit.point); //UI操作中なら引き続き追従処理を行う
+                    }
                 }
             }
         }
-        else if(Input.GetMouseButton(0)) //クリック版のインタラクト
+        //タッチが終了した際のフリック判定
+        else if(isTouchUI && UiTouch.phase == TouchPhase.Ended)
         {
-            Ray UIray = MagicButtonCam.ScreenPointToRay(Input.mousePosition);
+            Vector3 dragEndPos = Input.mousePosition;
+            Vector3 dragVector = dragEndPos - dragStartPos;
+            currentMagicButton.FrickUpper(dragVector);
+            isTouchUI = false;
+            currentMagicButton = null;
+        }
 
-            if (Physics.Raycast(UIray, out UIhit, Mathf.Infinity, MagicButtonLayer))
+        #region クリック版のインタラクト
+        if (Input.GetMouseButton(0)) 
+        {
+            Ray UIrayClick = MagicButtonCam.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(UIrayClick, out UIhit, Mathf.Infinity, MagicButtonLayer))
             { 
                 if (UIhit.collider.CompareTag(MagicButtonTag)) //タグを見て
                 {
@@ -378,7 +399,8 @@ public class PlayerController : MonoBehaviour
                 #endregion
             }
         }
-        if (isTouchUI && Input.GetMouseButtonUp(0))
+        //クリックが終了時のフリック判定
+        else if (isTouchUI && Input.GetMouseButtonUp(0))
         {
 
             Vector3 dragEndPos = Input.mousePosition;
@@ -386,7 +408,6 @@ public class PlayerController : MonoBehaviour
             currentMagicButton.FrickUpper(dragVector);
             isTouchUI = false;
             currentMagicButton = null;
-
             #region　旧UI操作終了処理
             //Ray UIray = MagicButtonCam.ScreenPointToRay(Input.mousePosition);
 
@@ -417,6 +438,7 @@ public class PlayerController : MonoBehaviour
             //}
             #endregion
         }
+        #endregion
     }
 
     #region パンチ関連
@@ -504,6 +526,9 @@ public class PlayerController : MonoBehaviour
         //送信用クラスを宣言しておく
         ActionPacket myActionPacket;
         Header myHeader;
+
+
+
 
         //仮！！！！！！
         //宝箱を開錠したことをパケット送信

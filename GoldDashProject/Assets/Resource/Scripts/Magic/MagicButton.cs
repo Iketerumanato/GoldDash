@@ -43,7 +43,7 @@ public class MagicButton : MonoBehaviour
     {
         float Diff_Y = pos.y - this.transform.position.y; //Y座標の差分
         this.transform.position = new Vector3(this.transform.position.x, pos.y, this.transform.position.z);
-        if (transform.position.y > 0.2f) OnFlickAnimation(localMoveEndPos);
+        //if (transform.position.y > 0.2f) OnFlickAnimation(localMoveEndPos);
         ButtonGuideObj.SetActive(true);
         return Diff_Y;
     }
