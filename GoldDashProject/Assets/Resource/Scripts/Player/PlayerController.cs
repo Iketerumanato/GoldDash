@@ -307,9 +307,9 @@ public class PlayerController : MonoBehaviour
         //カメラの位置からタッチした(クリックした)位置に向けrayを飛ばす
         RaycastHit UIhit;
 
+        #region タブレット版のインタラクト
         //タブレットでのタッチ操作を行うための宣言
         Touch UiTouch = Input.GetTouch(0);
-
         //どこかしらタッチされているなら（＝タッチ対応デバイスを使っているなら）
         if (Input.touchCount > 0 && UiTouch.phase == TouchPhase.Began)
         {
@@ -346,6 +346,7 @@ public class PlayerController : MonoBehaviour
             isTouchUI = false;
             currentMagicButton = null;
         }
+        #endregion
 
         #region クリック版のインタラクト
         if (Input.GetMouseButton(0)) 
