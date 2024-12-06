@@ -326,7 +326,7 @@ public class PlayerController : MonoBehaviour
                         {
                             currentMagicButton = UIhit.collider.gameObject.GetComponent<MagicButton>(); //コンポーネント取得
                             isTouchUI = true; //フラグtrue
-                            dragStartPos = Input.mousePosition;
+                            dragStartPos = UiTouch.position;
                         }
                         currentMagicButton.FollowFingerPosY(UIhit.point); //マウスのy軸の位置とボタンの位置を同じよう\
                     }
@@ -340,7 +340,7 @@ public class PlayerController : MonoBehaviour
         //タッチが終了した際のフリック判定
         else if(isTouchUI && UiTouch.phase == TouchPhase.Ended)
         {
-            Vector3 dragEndPos = Input.mousePosition;
+            Vector3 dragEndPos = UiTouch.position;
             Vector3 dragVector = dragEndPos - dragStartPos;
             currentMagicButton.FrickUpper(dragVector);
             isTouchUI = false;
