@@ -3,28 +3,29 @@ using UnityEngine;
 public class Tresure : MonoBehaviour
 {
     private UIFade uiFade;
-    private CameraControll cameraControll;
+    private PlayerController _playerController;
+    const string playerTagName = "Player";
 
     private void Start()
     {
         uiFade = FindObjectOfType<UIFade>();
-        cameraControll = FindObjectOfType<CameraControll>();
+        _playerController = FindObjectOfType<PlayerController>();
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Player"))
-        {
-            cameraControll.OffCameraControll();
-            uiFade.FadeInImage();
-        }
-    }
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    if (other.gameObject.CompareTag(playerTagName))
+    //    {
+    //        _playerController.isControllCam = false;
+    //        uiFade.FadeInImage();
+    //    }
+    //}
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag(playerTagName))
         {
-            cameraControll.ActiveCameraControll();
+            _playerController.isControllCam = true;
             uiFade.FadeOutImage();
         }
     }

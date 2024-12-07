@@ -18,7 +18,7 @@ public class MagicButton : MonoBehaviour
 
     [SerializeField] float minVerticalRatio = 0.8f;
 
-    bool isActive = true;
+    bool isActive = true;//魔法使い終わりで使用
 
     [SerializeField] Transform MoveEndPos;
     private Vector3 localMoveEndPos;
@@ -32,9 +32,13 @@ public class MagicButton : MonoBehaviour
 
     [SerializeField] GameObject ButtonGuideObj;
 
-    private void Start()
+    private void OnEnable()
     {
         SetDissolveMatOffset(maxButtonAlpha);
+    }
+
+    private void Start()
+    {
         localMoveEndPos = transform.parent.InverseTransformPoint(MoveEndPos.position);
         locabuttonOriginPos = transform.parent.InverseTransformPoint(buttonOriginPos.position);
     }
@@ -137,5 +141,11 @@ public class MagicButton : MonoBehaviour
     private void SetDissolveMatOffset(float dissolveValue)
     {
         buttonDissolveMat.SetVector(offsetName, new Vector4(0f, dissolveValue, 0f, 0f));
+    }
+
+    public void ActiveButton()
+    {
+        isActive = true;
+        this.gameObject.SetActive(true);
     }
 }
