@@ -9,28 +9,31 @@ public class UIFade : MonoBehaviour
     [SerializeField] float fadeDuration;
     DrawCircle drawCircle;
 
+    [Range(0f,1f)]
+    [SerializeField] float maxImageAlpha = 1f;
+
     private void Start()
     {
         drawCircle = this.gameObject.GetComponent<DrawCircle>();
     }
 
-    #region ƒtƒF[ƒhƒCƒ“ƒƒ\ƒbƒh
+    #region ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ãƒ¡ã‚½ãƒƒãƒ‰
     public void FadeInCanvasGroup()
     {
         StartCoroutine(ActiveCanvas());
-        StartCoroutine(FadeCanvasGroup(canvasGroup, canvasGroup.alpha, 1, fadeDuration));
+        StartCoroutine(FadeCanvasGroup(canvasGroup, canvasGroup.alpha, 1f, fadeDuration));
     }
     public void FadeInImage()
     {
         StartCoroutine(ActiveCanvas());
-        StartCoroutine(FadeImage(panelImage, 0f, 0.5f, fadeDuration));
+        StartCoroutine(FadeImage(panelImage, 0f, maxImageAlpha, fadeDuration));
     }
     #endregion
 
-    #region ƒtƒF[ƒhƒAƒEƒgƒƒ\ƒbƒh
+    #region ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
     public void FadeOutCanvasGroup()
     {
-        StartCoroutine(FadeCanvasGroup(canvasGroup, canvasGroup.alpha, 0, fadeDuration));
+        StartCoroutine(FadeCanvasGroup(canvasGroup, canvasGroup.alpha, 0f, fadeDuration));
         StartCoroutine(NotActiveCanvas());
     }
     public void FadeOutImage()
@@ -40,8 +43,8 @@ public class UIFade : MonoBehaviour
     }
     #endregion
 
-    #region ƒtƒF[ƒh‚³‚¹‚éƒRƒ‹[ƒ`ƒ“
-    //ƒLƒƒƒ“ƒoƒX
+    #region ãƒ•ã‚§ãƒ¼ãƒ‰ã•ã›ã‚‹ã‚³ãƒ«ãƒ¼ãƒãƒ³
+    //ã‚­ãƒ£ãƒ³ãƒã‚¹
     private IEnumerator FadeCanvasGroup(CanvasGroup cg, float start, float end, float duration)
     {
         float elapsedTime = 0f;
@@ -53,7 +56,7 @@ public class UIFade : MonoBehaviour
         }
         cg.alpha = end;
     }
-    //‰æ‘œ
+    //ç”»åƒ
     private IEnumerator FadeImage(Image image, float startalpha, float endalpha, float duration)
     {
         Color color = image.color;

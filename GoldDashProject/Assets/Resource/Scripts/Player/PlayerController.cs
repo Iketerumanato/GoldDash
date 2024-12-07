@@ -27,7 +27,8 @@ public class NormalState : IPlayerState
     {
         playerController.ControllPlayerLeftJoystick();
 
-        if (!playerController.isTouchUI) playerController.ControllPlayerRightJoystick();
+        if (!playerController.isTouchUI &&
+            playerController.isControllCam) playerController.ControllPlayerRightJoystick();
 
         playerController.UIInteract();
 
@@ -145,11 +146,13 @@ public class PlayerController : MonoBehaviour
     [Header("UI関連")]
     [SerializeField] Camera MagicButtonCam;
     [SerializeField] LayerMask MagicButtonLayer;
+    [SerializeField] UIFade uiFade;
     const string EnemyTag = "Enemy";
     const string ChestTag = "Chest";
     const string MagicButtonTag = "MagicButton";
     const string MagicButtonBackTag = "MagicButtonBack";
     public bool isTouchUI = false;
+    public bool isControllCam = true;
     private Vector3 dragStartPos;
     private MagicButton currentMagicButton;
 
@@ -504,6 +507,9 @@ public class PlayerController : MonoBehaviour
         //送信用クラスを宣言しておく
         ActionPacket myActionPacket;
         Header myHeader;
+
+        isControllCam = false;
+        chestController.ActivateEntity();
 
         //仮！！！！！！
         //宝箱を開錠したことをパケット送信

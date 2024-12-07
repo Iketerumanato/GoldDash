@@ -9468,6 +9468,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 860138911863560392, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: m_Alpha
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1397636643559747622, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_Name
       value: FixedPlayer
@@ -9523,6 +9527,10 @@ PrefabInstance:
     - target: {fileID: 1918282393654621835, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_Name
       value: ButtonOriginPos02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1943255415715867193, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: fadeDuration
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 1958557656696444380, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_Name
