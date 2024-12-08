@@ -531,7 +531,7 @@ public class PlayerController : MonoBehaviour
         ActionPacket myActionPacket;
         Header myHeader;
         isControllCam = false;
-        chestController.ActivateEntity()
+        chestController.ActivateEntity();
 
         //仮！！！！！！
         //宝箱を開錠したことをパケット送信
@@ -551,7 +551,6 @@ public class PlayerController : MonoBehaviour
         //カメラ演出
         shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium); //振動中
     }
-    #endregion
 
     //背面から殴られたときの処理。GameClientManagerから呼ばれる
     public void GetPunchBack()
@@ -577,6 +576,7 @@ public class PlayerController : MonoBehaviour
             isPickable = true; //金貨を拾えるようにする
         }
     }
+    #endregion
 
     //落下していたらリスポーン
     public void PlayerRespawn()
