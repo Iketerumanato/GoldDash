@@ -7,6 +7,7 @@ public class PlayerAnimator : MonoBehaviour
     private readonly string strPunchTrigger = "ArmPunchTrigger";
     private readonly string strGetPunchFrontTrigger = "HitedFrontArmTrigger";
     private readonly string strGetPunchBackTrigger = "HitedBackArmTrigger";
+    private readonly string strIsUsingScroll = "isUsingScroll";
 
     //走りモーションの再生(プレイヤーの移動量に依存)
     public void  PlayFPSRunAnimation(Vector3 playerMoveVec)
@@ -30,5 +31,10 @@ public class PlayerAnimator : MonoBehaviour
     public void PlayFPSHitedBackAnimation()
     {
         playerAnimator.SetTrigger(strGetPunchBackTrigger);
+    }
+
+    public void SetScrollBool(bool flag)
+    {
+        playerAnimator.SetBool(strIsUsingScroll, flag);
     }
 }

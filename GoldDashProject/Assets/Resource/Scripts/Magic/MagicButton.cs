@@ -52,7 +52,8 @@ public class MagicButton : MonoBehaviour
         return Diff_Y;
     }
 
-    public void FrickUpper(Vector3 dragVector)
+    //playerControllerのstateを変えるためにインスタンス取得
+    public void FrickUpper(Vector3 dragVector, PlayerController playerController)
     {
         //Vector3 EndPosVec = transform.parent.InverseTransformPoint(MoveEndPos.position);
         ButtonGuideObj.SetActive(false);
@@ -61,6 +62,8 @@ public class MagicButton : MonoBehaviour
         {
             OnFlickAnimation(localMoveEndPos);
             Debug.Log("上にフリックされたぞ！");
+            playerController.ChangePlayerState(new ScrollState()); //スクロールステートにする
+            //有効にする巻物を選ぶ
         }
         else ReturnToOriginPos();
     }

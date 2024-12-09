@@ -52,6 +52,10 @@ public class ScrollState : IPlayerState
 {
     public void EnterState(PlayerController playerController)
     {
+        playerController.playerAnimator.SetScrollBool(true);
+        playerController.mb1.gameObject.SetActive(false);
+        playerController.mb2.gameObject.SetActive(false);
+        playerController.mb3.gameObject.SetActive(false);
         Debug.Log("巻物を開きます");
     }
 
@@ -63,6 +67,11 @@ public class ScrollState : IPlayerState
     public void ExitState(PlayerController playerController)
     {
         Debug.Log("巻物を閉じます");
+        playerController.playerAnimator.SetScrollBool(false);
+
+        playerController.mb1.gameObject.SetActive(true);
+        playerController.mb2.gameObject.SetActive(true);
+        playerController.mb3.gameObject.SetActive(true);
     }
 }
 
@@ -152,7 +161,7 @@ public class PlayerController : MonoBehaviour
     public ushort SessionID { set; get; } //パケットに差出人情報を書くため必要
 
     [Header("以下演出関連")]
-    [SerializeField] PlayerAnimator playerAnimator;
+    [SerializeField] public PlayerAnimator playerAnimator;
 
     //パンチのクールダウン管理用
     private bool isPunchable = true; //punch + ableなので単に「パンチ可能」という意味だけど、英語圏のスラングでは「殴りたくなる」みたいな意味になるそうですよ。（例：punchable face）
@@ -174,6 +183,10 @@ public class PlayerController : MonoBehaviour
     public bool isControllCam = true;
     private Vector3 dragStartPos;
     private MagicButton currentMagicButton;
+
+    [SerializeField] public MagicButton mb1;
+    [SerializeField] public MagicButton mb2;
+    [SerializeField] public MagicButton mb3;
 
     private void Start()
     {
@@ -330,44 +343,44 @@ public class PlayerController : MonoBehaviour
         RaycastHit UIhit;
 
         #region タブレット版のインタラクト
-        //タブレットでのタッチ操作を行うための宣言
-        Touch UiTouch = Input.GetTouch(0);
-        //どこかしらタッチされているなら（＝タッチ対応デバイスを使っているなら）
-        if (Input.touchCount > 0 && UiTouch.phase == TouchPhase.Began)
-        {
-            foreach (Touch t in Input.touches)
-            {
-                //同時に魔法ボタンを映しているカメラからもRayを飛ばす
-                Ray UIrayTouch = MagicButtonCam.ScreenPointToRay(t.position);
+        ////タブレットでのタッチ操作を行うための宣言
+        ///Touch UiTouch = Input.GetTouch(0);
+        ////どこかしらタッチされているなら（＝タッチ対応デバイスを使っているなら）
+        //if (Input.touchCount > 0 && UiTouch.phase == TouchPhase.Began)
+        //{
+        //    foreach (Touch t in Input.touches)
+        //    {
+        //        //同時に魔法ボタンを映しているカメラからもRayを飛ばす
+        //        Ray UIrayTouch = MagicButtonCam.ScreenPointToRay(t.position);
 
-                if (Physics.Raycast(UIrayTouch, out UIhit, Mathf.Infinity, MagicButtonLayer))
-                {
-                    if (UIhit.collider.CompareTag(MagicButtonTag)) //タグを見て
-                    {
-                        if (!isTouchUI) //このフレームに触れ始めたなら
-                        {
-                            currentMagicButton = UIhit.collider.gameObject.GetComponent<MagicButton>(); //コンポーネント取得
-                            isTouchUI = true; //フラグtrue
-                            dragStartPos = UiTouch.position;
-                        }
-                        currentMagicButton.FollowFingerPosY(UIhit.point); //マウスのy軸の位置とボタンの位置を同じよう\
-                    }
-                    else if (UIhit.collider.CompareTag(MagicButtonBackTag)) //背景にrayが当たっていたら
-                    {
-                        if (isTouchUI) currentMagicButton.FollowFingerPosY(UIhit.point); //UI操作中なら引き続き追従処理を行う
-                    }
-                }
-            }
-        }
-        //タッチが終了した際のフリック判定
-        else if(isTouchUI && UiTouch.phase == TouchPhase.Ended)
-        {
-            Vector3 dragEndPos = UiTouch.position;
-            Vector3 dragVector = dragEndPos - dragStartPos;
-            currentMagicButton.FrickUpper(dragVector);
-            isTouchUI = false;
-            currentMagicButton = null;
-        }
+        //        if (Physics.Raycast(UIrayTouch, out UIhit, Mathf.Infinity, MagicButtonLayer))
+        //        {
+        //            if (UIhit.collider.CompareTag(MagicButtonTag)) //タグを見て
+        //            {
+        //                if (!isTouchUI) //このフレームに触れ始めたなら
+        //                {
+        //                    currentMagicButton = UIhit.collider.gameObject.GetComponent<MagicButton>(); //コンポーネント取得
+        //                    isTouchUI = true; //フラグtrue
+        //                    dragStartPos = UiTouch.position;
+        //                }
+        //                currentMagicButton.FollowFingerPosY(UIhit.point); //マウスのy軸の位置とボタンの位置を同じよう\
+        //            }
+        //            else if (UIhit.collider.CompareTag(MagicButtonBackTag)) //背景にrayが当たっていたら
+        //            {
+        //                if (isTouchUI) currentMagicButton.FollowFingerPosY(UIhit.point); //UI操作中なら引き続き追従処理を行う
+        //            }
+        //        }
+        //    }
+        //}
+        ////タッチが終了した際のフリック判定
+        //else if(isTouchUI && UiTouch.phase == TouchPhase.Ended)
+        //{
+        //    Vector3 dragEndPos = UiTouch.position;
+        //    Vector3 dragVector = dragEndPos - dragStartPos;
+        //    currentMagicButton.FrickUpper(dragVector, this);
+        //    isTouchUI = false;
+        //    currentMagicButton = null;
+        //}
         #endregion
 
         #region クリック版のインタラクト
@@ -428,7 +441,7 @@ public class PlayerController : MonoBehaviour
 
             Vector3 dragEndPos = Input.mousePosition;
             Vector3 dragVector = dragEndPos - dragStartPos;
-            currentMagicButton.FrickUpper(dragVector);
+            currentMagicButton.FrickUpper(dragVector, this);
             isTouchUI = false;
             currentMagicButton = null;
             #region　旧UI操作終了処理
