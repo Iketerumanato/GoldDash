@@ -1859,7 +1859,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1470805afa7a823429d606edc73e0dec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerAnimator: {fileID: 0}
+  PlayerAnimator: {fileID: 5200685968124531673}
   runThreshold: 1
   animationLerpSpeed: 70
   goldText: {fileID: 0}
@@ -1911,3 +1911,8 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5, y: 1.1129832, z: 0.38778368}
   m_Center: {x: 0, y: 0.011491537, z: 0.0061081797}
+--- !u!95 &5200685968124531673 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 3caf8d39eeb1d67468bf86a8208d7438, type: 3}
+  m_PrefabInstance: {fileID: 1821171672085655112}
+  m_PrefabAsset: {fileID: 0}
