@@ -48,11 +48,30 @@ public class NormalState : IPlayerState
 }
 
 //プレイヤーが動けなくなった時(雷や罠などで)
-public class IncapacitatedState : IPlayerState
+public class ScrollState : IPlayerState
 {
     public void EnterState(PlayerController playerController)
     {
-        Debug.Log("Playerに対して何かしらのアクション");
+        Debug.Log("巻物を開きます");
+    }
+
+    public void UpdateProcess(PlayerController playerController)
+    {
+        Debug.Log("巻物使用中");
+    }
+
+    public void ExitState(PlayerController playerController)
+    {
+        Debug.Log("巻物を閉じます");
+    }
+}
+
+//プレイヤーが動けなくなった時(雷や罠などで)
+public class StunedState : IPlayerState
+{
+    public void EnterState(PlayerController playerController)
+    {
+        Debug.Log("スタンしました");
     }
 
     public void UpdateProcess(PlayerController playerController)
@@ -62,7 +81,7 @@ public class IncapacitatedState : IPlayerState
 
     public void ExitState(PlayerController playerController)
     {
-        Debug.Log("Playerの気絶解除");
+        Debug.Log("スタン終了");
     }
 }
 #endregion
