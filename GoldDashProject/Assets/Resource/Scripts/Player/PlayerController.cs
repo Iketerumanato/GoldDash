@@ -25,22 +25,17 @@ public class NormalState : IPlayerState
 
     public void UpdateProcess(PlayerController playerController)
     {
-        playerController.MovePlayer();
+        playerController.ControllPlayerLeftJoystick();
 
-        //UIに触れてる間と、宝箱の開錠中にカメラが動かないようにする。
-        if (!playerController.isTouchUI && playerController.isControllCam)
-        {
-            playerController.CameraControllPlayer();
-        }
+        if (!playerController.isTouchUI &&
+            playerController.isControllCam) playerController.ControllPlayerRightJoystick();
+
+        playerController.UIInteract();
 
         //1点以上のタッチまたはクリックが確認されたらインタラクト
-        //UIに対するインタラクトを優先して実行する。UIインタラクトに成功した場合trueが返却されるため、Interact()は実行されない。
         if (Input.touchCount > 0 || Input.GetMouseButtonDown(0))
         {
-            if (!playerController.UIInteract())
-            {
-                playerController.Interact();
-            }
+            playerController.Interact();
         }
 
         playerController.PlayerRespawn();
@@ -211,7 +206,7 @@ public class PlayerController : MonoBehaviour
     }
 
     #region ジョイスティックによるキャラクターとカメラの操作
-    public void MovePlayer()
+    public void ControllPlayerLeftJoystick()
     {
         //WASDの入力をベクトルにする
         Vector3 playerMoveVec = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
@@ -225,7 +220,7 @@ public class PlayerController : MonoBehaviour
         this.transform.Translate(-playerMoveVec * playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
     }
 
-    public void CameraControllPlayer()
+    public void ControllPlayerRightJoystick()
     {
         //カメラ操作の入力がないなら回転しない
         if (!Mathf.Approximately(rightJoystick.Horizontal, 0) || !Mathf.Approximately(rightJoystick.Vertical, 0)) //右スティックの水平垂直どちらの入力も"ほぼ0"でないなら
@@ -310,7 +305,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public bool UIInteract()
+    public void UIInteract()
     {
         //カメラの位置からタッチした(クリックした)位置に向けrayを飛ばす
         RaycastHit UIhit;
