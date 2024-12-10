@@ -258,6 +258,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: key Prefab
       objectReference: {fileID: 0}
+    - target: {fileID: 6859723641505373410, guid: 67e159620a27c014aac2476713043849, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7150686927325051683, guid: 67e159620a27c014aac2476713043849, type: 3}
       propertyPath: m_Drag
       value: 0

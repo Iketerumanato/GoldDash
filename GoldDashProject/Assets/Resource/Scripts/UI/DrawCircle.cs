@@ -56,20 +56,20 @@ public class DrawCircle : MonoBehaviour
         #endregion
 
         #region 円を描く(クリックver)
-        if (Input.GetMouseButtonDown(0))
-        {
-            StartDrawCircle();
-        }
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    StartDrawCircle();
+        //}
 
-        if (Input.GetMouseButton(0))
-        {
-            DrawingCircle();
-        }
+        //if (Input.GetMouseButton(0))
+        //{
+        //    DrawingCircle();
+        //}
 
-        if (Input.GetMouseButtonUp(0))
-        {
-            ResetCircleDraw();
-        }
+        //if (Input.GetMouseButtonUp(0))
+        //{
+        //    ResetCircleDraw();
+        //}
         #endregion
     }
 
