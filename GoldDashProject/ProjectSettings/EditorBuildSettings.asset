@@ -5,13 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/UDP.unity
     guid: b383c7854508ca84b80b70a02eac627c
   - enabled: 0
     path: Assets/Scenes/CommandTest.unity
     guid: 54d1faf08e1afcf4493d528812d8c37f
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/FPSMotionTest.unity
     guid: e667af7c76e9baa45a77b6f58a5e4549
   m_configObjects: {}

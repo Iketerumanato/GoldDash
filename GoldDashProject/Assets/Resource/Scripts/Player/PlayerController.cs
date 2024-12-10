@@ -311,53 +311,57 @@ public class PlayerController : MonoBehaviour
         RaycastHit UIhit;
 
         #region タブレット版のインタラクト
-        //タブレットでのタッチ操作を行うための宣言
-        Touch UiTouch = Input.GetTouch(0);
         //どこかしらタッチされているなら（＝タッチ対応デバイスを使っているなら）
-        if (Input.touchCount > 0 && UiTouch.phase == TouchPhase.Began)
+        if (Input.touchCount > 0)
         {
-            foreach (Touch t in Input.touches)
-            {
-                //同時に魔法ボタンを映しているカメラからもRayを飛ばす
-                Ray UIrayTouch = MagicButtonCam.ScreenPointToRay(t.position);
+            //タブレットでのタッチ操作を行うための宣言
+            Touch UiTouch = Input.GetTouch(0);
+            //同時に魔法ボタンを映しているカメラからもRayを飛ばす
+            Ray UIrayTouch = MagicButtonCam.ScreenPointToRay(UiTouch.position);
 
-                if (Physics.Raycast(UIrayTouch, out UIhit, Mathf.Infinity, MagicButtonLayer))
-                {
-                    if (UIhit.collider.CompareTag(MagicButtonTag)) //タグを見て
+            switch (UiTouch.phase)
+            {
+                case TouchPhase.Began:
+                    if (Physics.Raycast(UIrayTouch, out UIhit, Mathf.Infinity, MagicButtonLayer))
                     {
-                        if (!isTouchUI) //このフレームに触れ始めたなら
+                        if (UIhit.collider.CompareTag(MagicButtonTag)) //タグを見て
                         {
-                            currentMagicButton = UIhit.collider.gameObject.GetComponent<MagicButton>(); //コンポーネント取得
-                            isTouchUI = true; //フラグtrue
-                            dragStartPos = UiTouch.position;
+                            if (!isTouchUI) //このフレームに触れ始めたなら
+                            {
+                                currentMagicButton = UIhit.collider.gameObject.GetComponent<MagicButton>(); //コンポーネント取得
+                                isTouchUI = true; //フラグtrue
+                                dragStartPos = UiTouch.position;
+                            }
+                            currentMagicButton.FollowFingerPosY(UIhit.point); //マウスのy軸の位置とボタンの位置を同じよう\
                         }
-                        currentMagicButton.FollowFingerPosY(UIhit.point); //マウスのy軸の位置とボタンの位置を同じよう\
+                        else if (UIhit.collider.CompareTag(MagicButtonBackTag)) //背景にrayが当たっていたら
+                        {
+                            if (isTouchUI) currentMagicButton.FollowFingerPosY(UIhit.point); //UI操作中なら引き続き追従処理を行う
+                        }
                     }
-                    else if (UIhit.collider.CompareTag(MagicButtonBackTag)) //背景にrayが当たっていたら
+                    break;
+
+                case TouchPhase.Ended:
+                    if(isTouchUI)
                     {
-                        if (isTouchUI) currentMagicButton.FollowFingerPosY(UIhit.point); //UI操作中なら引き続き追従処理を行う
+                        Vector3 dragEndPos = UiTouch.position;
+                        Vector3 dragVector = dragEndPos - dragStartPos;
+                        currentMagicButton.FrickUpper(dragVector);
+                        isTouchUI = false;
+                        currentMagicButton = null;
                     }
-                }
+                    break;
             }
-        }
-        //タッチが終了した際のフリック判定
-        else if(isTouchUI && UiTouch.phase == TouchPhase.Ended)
-        {
-            Vector3 dragEndPos = UiTouch.position;
-            Vector3 dragVector = dragEndPos - dragStartPos;
-            currentMagicButton.FrickUpper(dragVector);
-            isTouchUI = false;
-            currentMagicButton = null;
         }
         #endregion
 
         #region クリック版のインタラクト
-        if (Input.GetMouseButton(0)) 
+        if (Input.GetMouseButton(0))
         {
             Ray UIrayClick = MagicButtonCam.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(UIrayClick, out UIhit, Mathf.Infinity, MagicButtonLayer))
-            { 
+            {
                 if (UIhit.collider.CompareTag(MagicButtonTag)) //タグを見て
                 {
                     if (!isTouchUI) //このフレームに触れ始めたなら
