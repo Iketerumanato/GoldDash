@@ -29,7 +29,33 @@ public class DrawCircle : MonoBehaviour
 
     void Update()
     {
-        #region 円を描く
+        #region 円を描く(タブレットver)
+        if (Input.touchCount > 0)
+        {
+            //タブレットでのタッチ操作を行うための宣言
+            Touch UiTouch = Input.GetTouch(0);
+
+            switch (UiTouch.phase)
+            {
+                //タッチ始め
+                case TouchPhase.Began:
+                    StartDrawCircle();
+                    break;
+
+                //タッチ中
+                case TouchPhase.Moved:
+                    DrawingCircle();
+                    break;
+
+                //タッチ終わり
+                case TouchPhase.Ended:
+                    ResetCircleDraw();
+                    break;
+            }
+        }
+        #endregion
+
+        #region 円を描く(クリックver)
         if (Input.GetMouseButtonDown(0))
         {
             StartDrawCircle();
@@ -94,9 +120,10 @@ public class DrawCircle : MonoBehaviour
                     uiFade.FadeOutImage();
                     _playerController.isControllCam = true;
                     //magicList.GrantRandomMagics(_magicmanagement);
-                    for (int buttonNum = 0; buttonNum < 3; buttonNum++) {
+                    for (int buttonNum = 0; buttonNum < 3; buttonNum++)
+                    {
                         _magicButton[buttonNum].ActiveButton();
-                    }                     
+                    }
                     circleCount = NoneNum;
                 }
             }
