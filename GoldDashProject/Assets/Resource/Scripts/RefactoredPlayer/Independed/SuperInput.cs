@@ -48,7 +48,7 @@ public static class SuperInput
         }
 
         public Vector2 position;
-        SuperTouchPhase phase;
+        public SuperTouchPhase phase;
 
         public enum SuperTouchPhase
         {

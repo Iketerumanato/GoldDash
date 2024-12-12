@@ -182,6 +182,12 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         _playerControllState.UpdateProcess(this);
+
+        foreach (SuperInput.SuperTouch st in SuperInput.SuperTouches)
+        {
+            Debug.Log("ST!!" + st.position);
+            Debug.Log("ST!!" + st.phase);
+        }
     }
 
     //エンティティに接触したとき
