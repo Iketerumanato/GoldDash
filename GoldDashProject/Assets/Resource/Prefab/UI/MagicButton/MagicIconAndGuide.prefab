@@ -143,7 +143,6 @@ Transform:
   m_LocalScale: {x: 0.05, y: 0.050008334, z: 0.050008334}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6318788494703029378}
   - {fileID: 8934910186583155027}
   - {fileID: 4762875964730351034}
   - {fileID: 1110477667013149531}
@@ -181,7 +180,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: -0.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 6318788494703029378}
   m_Father: {fileID: 4364239831771405505}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2514326784603684970
@@ -388,14 +388,14 @@ Transform:
   m_GameObject: {fileID: 5963534714321559727}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.6999998, z: -0.3}
-  m_LocalScale: {x: 20, y: 19.996666, z: 19.996666}
+  m_LocalPosition: {x: 0, y: 3.6999998, z: 0}
+  m_LocalScale: {x: 20, y: 19.996664, z: 19.996664}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4586463524168634672}
   - {fileID: 140814427160212488}
   - {fileID: 4180161618613654054}
-  m_Father: {fileID: 4364239831771405505}
+  m_Father: {fileID: 8934910186583155027}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &2275542593091749889
 Animator:

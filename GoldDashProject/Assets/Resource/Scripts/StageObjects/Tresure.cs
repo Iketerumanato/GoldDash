@@ -26,7 +26,7 @@ public class Tresure : MonoBehaviour
         if (other.gameObject.CompareTag(playerTagName))
         {
             _playerController.isControllCam = true;
-            uiFade.FadeOutImage();
+            uiFade.FadeInCanvasGroup();
         }
     }
 }

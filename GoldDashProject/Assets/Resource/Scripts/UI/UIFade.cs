@@ -7,40 +7,38 @@ public class UIFade : MonoBehaviour
     [SerializeField] CanvasGroup canvasGroup;
     [SerializeField] Image panelImage;
     [SerializeField] float fadeDuration;
-    DrawCircle drawCircle;
+    [SerializeField] DrawCircle drawCircle;
 
-    [Range(0f,1f)]
-    [SerializeField] float maxImageAlpha = 1f;
+    //[Range(0f,1f)]
+    //[SerializeField] float maxImageAlpha = 1f;
 
-    private void Start()
-    {
-        drawCircle = this.gameObject.GetComponent<DrawCircle>();
-    }
 
     #region フェードインメソッド
     public void FadeInCanvasGroup()
     {
-        StartCoroutine(ActiveCanvas());
+        //drawCircle.NotActiveKey();
+        //StartCoroutine(NotActiveDrawSys());
         StartCoroutine(FadeCanvasGroup(canvasGroup, canvasGroup.alpha, 1f, fadeDuration));
     }
-    public void FadeInImage()
-    {
-        StartCoroutine(ActiveCanvas());
-        StartCoroutine(FadeImage(panelImage, 0f, maxImageAlpha, fadeDuration));
-    }
+    //public void FadeInImage()
+    //{
+    //    StartCoroutine(ActiveCanvas());
+    //    StartCoroutine(FadeImage(panelImage, 0f, maxImageAlpha, fadeDuration));
+    //}
     #endregion
 
     #region フェードアウトメソッド
     public void FadeOutCanvasGroup()
     {
         StartCoroutine(FadeCanvasGroup(canvasGroup, canvasGroup.alpha, 0f, fadeDuration));
-        StartCoroutine(NotActiveCanvas());
+        StartCoroutine(ActiveDrawSys());
+        drawCircle.ActiveKey();
     }
-    public void FadeOutImage()
-    {
-        StartCoroutine(FadeImage(panelImage, panelImage.color.a, 0f, fadeDuration));
-        StartCoroutine(NotActiveCanvas());
-    }
+    //public void FadeOutImage()
+    //{
+    //    StartCoroutine(FadeImage(panelImage, panelImage.color.a, 0f, fadeDuration));
+    //    StartCoroutine(NotActiveCanvas());
+    //}
     #endregion
 
     #region フェードさせるコルーチン
@@ -57,34 +55,32 @@ public class UIFade : MonoBehaviour
         cg.alpha = end;
     }
     //画像
-    private IEnumerator FadeImage(Image image, float startalpha, float endalpha, float duration)
-    {
-        Color color = image.color;
-        float elapsedTime = 0f;
-        while (elapsedTime < duration)
-        {
-            elapsedTime += Time.deltaTime;
-            color.a = Mathf.Lerp(startalpha, endalpha, elapsedTime / duration);
-            image.color = color;
-            yield return null;
-        }
-        color.a = endalpha;
-        image.color = color;
-    }
+    //private IEnumerator FadeImage(Image image, float startalpha, float endalpha, float duration)
+    //{
+    //    Color color = image.color;
+    //    float elapsedTime = 0f;
+    //    while (elapsedTime < duration)
+    //    {
+    //        elapsedTime += Time.deltaTime;
+    //        color.a = Mathf.Lerp(startalpha, endalpha, elapsedTime / duration);
+    //        image.color = color;
+    //        yield return null;
+    //    }
+    //    color.a = endalpha;
+    //    image.color = color;
+    //}
     #endregion
 
     #region CanvasActive true/false
-    IEnumerator ActiveCanvas()
+    IEnumerator ActiveDrawSys()
     {
-        panelImage.enabled = true;
         drawCircle.enabled = true;
         yield return new WaitForSeconds(fadeDuration);
     }
 
-    IEnumerator NotActiveCanvas()
+    IEnumerator NotActiveDrawSys()
     {
         yield return new WaitForSeconds(fadeDuration);
-        panelImage.enabled = false;
         drawCircle.enabled = false;
     }
     #endregion
