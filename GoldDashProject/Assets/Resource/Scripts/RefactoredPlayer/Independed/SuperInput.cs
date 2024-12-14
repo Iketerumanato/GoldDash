@@ -16,7 +16,7 @@ public static class SuperInput
             bool clicked = Input.GetMouseButton(0) || Input.GetMouseButtonUp(0); //マウスクリックの有無を調べる
 
             //返す配列のサイズ決定　クリック入力があるならサイズを1確保し、そこにタッチの数を足す。
-            int num = (clicked ? 1 : 0) + (clicked ? Input.touchCount - 1 : Input.touchCount); //fingerID1番のタッチ情報はクリックのそれと同じなので破棄するので、タッチのカウントはひとつ少なくする
+            int num = (clicked ? 1 : 0) + Input.touchCount;
             //配列を作る
             SuperTouch[] array = new SuperTouch[num];
             for (int i = 0; i < num; i++)
@@ -27,7 +27,6 @@ public static class SuperInput
                 }
                 else if (clicked) //クリック入力を格納済なら、iから1引いた数をfingerIDとしてInput.GetTouch(fingerID)を呼んでいく
                 {
-                    if (i == 1) continue; //クリック入力があるなら、fingerID1番のタッチ情報はクリックのそれと同じなので破棄する
                     array[i] = new SuperTouch(false, i - 1);
                 }
                 else //クリック入力を格納済でないならiをfingerIDとしてInput.GetTouch(fingerID)を呼んでいく
