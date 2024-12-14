@@ -158,8 +158,6 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        Input.simulateMouseWithTouches = true;
-
         //stateをノーマルにする
         ChangePlayerState(new NormalState());
 
