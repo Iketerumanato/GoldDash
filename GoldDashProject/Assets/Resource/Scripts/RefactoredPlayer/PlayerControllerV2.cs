@@ -51,6 +51,7 @@ public class PlayerControllerV2 : MonoBehaviour
     private void NormalUpdate()
     {
         //STEP1 カメラを動かそう
+        m_playerCameraController.RotateCamara(InputVertical);
 
         //STEP2 移動を実行しよう
 
