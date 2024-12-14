@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PlayerState
+public enum PlayerState : int //enumの型はデフォルトでintだが、int型であることを期待しているスクリプト（PlayerMoverなど）があるので明示的にintにしておく
 {
     NORMAL = 0, //通常
     OPENING_SCROLL, //巻物を開いている間
@@ -14,9 +14,50 @@ public enum PlayerState
 
 public class PlayerControllerV2 : MonoBehaviour
 {
+    [Header("WASD移動を有効化する。ただしMathf.Maxが毎フレーム呼ばれるようになるので注意。")]
+    [SerializeField] private bool m_WASD_Available;
+
+    [Header("プレイヤーを操作するジョイスティック")]
+    [SerializeField] private VariableJoystick m_variableJoystick;
+    [SerializeField] private DynamicJoystick m_dynamicJoystick;
+
     //入力取得用プロパティ
-    private float InputHorizontal { get { return Input.GetAxis("Horizontal"); } }
-    private float InputVertical { get { return Input.GetAxis("Vertical"); } }
+    private float V_InputHorizontal
+    {
+        get
+        {
+            if (m_WASD_Available)
+            {
+                return Mathf.Max(m_variableJoystick.Horizontal, Input.GetAxis("Horizontal"));
+            }
+            else return m_variableJoystick.Horizontal;
+        }
+    }
+    private float V_InputVertical
+    {
+        get
+        {
+            if (m_WASD_Available)
+            {
+                return Mathf.Max(m_variableJoystick.Vertical, Input.GetAxis("Vertical"));
+            }
+            else return m_variableJoystick.Vertical;
+        }
+    }
+    private float D_InputHorizontal
+    {
+        get
+        {
+            return m_dynamicJoystick.Horizontal;
+        }
+    }
+    private float D_InputVertical
+    {
+        get
+        {
+            return m_dynamicJoystick.Vertical;
+        }
+    }
 
     //stateプロパティ
     private PlayerState m_state;
@@ -51,9 +92,9 @@ public class PlayerControllerV2 : MonoBehaviour
     private void NormalUpdate()
     {
         //STEP1 カメラを動かそう
-        m_playerCameraController.RotateCamara(InputVertical);
+        m_playerCameraController.RotateCamara(V_InputVertical);
 
-        //STEP2 移動を実行しよう
+        //STEP2 移動・旋回を実行しよう
 
         //STEP3 インタラクトを実行しよう
 
