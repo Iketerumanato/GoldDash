@@ -95,6 +95,7 @@ public class PlayerControllerV2 : MonoBehaviour
         m_playerCameraController.RotateCamara(V_InputVertical);
 
         //STEP2 移動・旋回を実行しよう
+        m_playerMover.MovePlayer();
 
         //STEP3 インタラクトを実行しよう
 

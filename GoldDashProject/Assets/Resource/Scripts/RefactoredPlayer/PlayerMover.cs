@@ -32,6 +32,13 @@ public class PlayerMover : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// プレイヤーをtransform.Translate()で移動させるよ。
+    /// </summary>
+    /// <param name="currentState">移動速度を算出するためにstateを教えてね。</param>
+    /// <param name="V_InputHorizontal">VariableJoystickの水平方向入力</param>
+    /// <param name="V_InputVertical">VariableJoystickの垂直方向入力</param>
+    /// <param name="D_InputHorizontal">DynamicJoystickの水平方向入力</param>
     public void MovePlayer(PlayerState currentState, float V_InputHorizontal, float V_InputVertical, float D_InputHorizontal)
     { 
         //TODO 移動旋回
