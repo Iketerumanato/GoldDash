@@ -5,7 +5,7 @@ using UnityEngine;
 
 public static class SuperInput
 {
-    //HorizontalとVerticalについて、Inputクラスをラップ
+    //HorizontalとVerticalの入力を取得できるように、Input.GetAxisを実行するゲッター
     public static float Horizontal { get { return Input.GetAxis("Horizontal"); } }
     public static float Vertical { get { return Input.GetAxis("Vertical"); } }
 
@@ -13,7 +13,8 @@ public static class SuperInput
     {
         get
         {
-            bool clicked = Input.GetMouseButton(0) || Input.GetMouseButtonUp(0); //マウスクリックの有無を調べる
+            bool clicked = Input.GetMouseButton(0) || Input.GetMouseButtonUp(0) //マウスクリックの有無を調べる
+                        　　　　　　　　　　　　　 && Input.touchCount != 1; //また、touchCountが1の場合、それはクリックとして扱われるので配列から除外する
 
             //返す配列のサイズ決定　クリック入力があるならサイズを1確保し、そこにタッチの数を足す。
             int num = (clicked ? 1 : 0) + Input.touchCount;
@@ -52,11 +53,9 @@ public static class SuperInput
 
         public enum SuperTouchPhase
         {
-            //パッと開かずグッと握って
-            DAN = 0, //ダン！入力開始
-            GYUN, //ギューン！入力継続
-            DOKAN, //ドカーン！入力終了
-            //正義の！鉄！拳！
+            BEGAN = 0, //入力開始
+            CONTINUING, //入力継続
+            ENDED, //入力終了
         }
 
         //コンストラクタで使用する静的メソッド。クリックとタッチのフェーズをSuperTouchPhaseに変換する
@@ -64,24 +63,24 @@ public static class SuperInput
         {
             if (isClick) //クリックの場合
             {
-                if (Input.GetMouseButtonUp(0)) return SuperTouchPhase.DAN;
-                if (Input.GetMouseButtonDown(0)) return SuperTouchPhase.DOKAN;
-                else return SuperTouchPhase.GYUN;
+                if (Input.GetMouseButtonUp(0)) return SuperTouchPhase.BEGAN;
+                if (Input.GetMouseButtonDown(0)) return SuperTouchPhase.ENDED;
+                else return SuperTouchPhase.CONTINUING;
             }
             else //タッチの場合
             {
                 switch (Input.GetTouch(fingerID).phase)
                 {
                     case TouchPhase.Began:
-                        return SuperTouchPhase.DAN;
+                        return SuperTouchPhase.BEGAN;
                     case TouchPhase.Moved:
-                        return SuperTouchPhase.GYUN;
+                        return SuperTouchPhase.CONTINUING;
                     case TouchPhase.Stationary:
-                        return SuperTouchPhase.GYUN;
+                        return SuperTouchPhase.CONTINUING;
                     case TouchPhase.Ended:
-                        return SuperTouchPhase.DOKAN;
+                        return SuperTouchPhase.ENDED;
                     default: //次はTouchPhase.Canceledが来るはずだけど構文エラー回避のためここでdefaultを使う
-                        return SuperTouchPhase.DOKAN;
+                        return SuperTouchPhase.ENDED;
                 }
             }
         }
