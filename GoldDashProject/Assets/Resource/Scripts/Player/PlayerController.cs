@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 
@@ -188,6 +189,7 @@ public class PlayerController : MonoBehaviour
             //Debug.Log("ST!!" + st.position);
             Debug.Log("ST!!" + st.phase);
         }
+        Debug.Log(SuperInput.SuperTouches.Count());
     }
 
     //エンティティに接触したとき
