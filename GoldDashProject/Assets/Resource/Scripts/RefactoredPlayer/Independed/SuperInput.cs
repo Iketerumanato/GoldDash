@@ -13,8 +13,7 @@ public static class SuperInput
     {
         get
         {
-            bool clicked = Input.GetMouseButton(0) || Input.GetMouseButtonUp(0) //マウスクリックの有無を調べる
-                        　　　　　　　　　　　　　 && Input.touchCount != 1; //また、touchCountが1の場合、それはクリックとして扱われるので配列から除外する
+            bool clicked = Input.GetMouseButton(0) || Input.GetMouseButtonUp(0); //マウスクリックの有無を調べる
 
             //返す配列のサイズ決定　クリック入力があるならサイズを1確保し、そこにタッチの数を足す。
             int num = (clicked ? 1 : 0) + Input.touchCount;

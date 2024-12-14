@@ -185,7 +185,7 @@ public class PlayerController : MonoBehaviour
 
         foreach (SuperInput.SuperTouch st in SuperInput.SuperTouches)
         {
-            Debug.Log("ST!!" + st.position);
+            //Debug.Log("ST!!" + st.position);
             Debug.Log("ST!!" + st.phase);
         }
     }
