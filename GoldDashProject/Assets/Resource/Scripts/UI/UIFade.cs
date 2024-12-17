@@ -30,7 +30,7 @@ public class UIFade : MonoBehaviour
     #region フェードアウトメソッド
     public void FadeOutCanvasGroup()
     {
-        StartCoroutine(FadeCanvasGroup(canvasGroup, canvasGroup.alpha, 0f, fadeDuration));
+        //StartCoroutine(FadeCanvasGroup(canvasGroup, canvasGroup.alpha, 0f, fadeDuration));
         StartCoroutine(ActiveDrawSys());
         drawCircle.ActiveKey();
     }

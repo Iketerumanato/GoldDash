@@ -1,36 +1,30 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
+using TMPro;
 
 public class DrawCircle : MonoBehaviour
 {
-    //[SerializeField] RectTransform drawPanel;
-    //[SerializeField] MagicManagement _magicmanagement;
     [SerializeField] PlayerController _playerController;
     [SerializeField] UIFade uiFade;
-    //MagicList magicList;
     [SerializeField] GameObject KeyObj;
     [SerializeField] MagicButton[] _magicButton;
     [SerializeField] Animator keyAnimator;
 
-    readonly private List<Vector2> drawpoints = new();
+    private readonly List<Vector2> drawPoints = new();
     private Vector2 center = Vector2.zero;
-    private float angleSum = 0;//角度の合計値
-    private int circleCount = 0;//描いた円の数
-    private float previousSign = 0;//描き途中のsin角の値
+    private float totalAngle = 0f; // 累計角度
+    private float previousAngle = 0f; // 前回の角度
+    private int circleCount = 0; // 完了した円の数
+    private int currentCircleCount = 0; // 現在描いた円の数の保存
+    private bool isClockwise = true; // 時計回りかどうかを記録
+
+    const int MaxButtonCount = 3;
     const int MaxDrawCount = 5;
     const float MaxCircleAngle = 360f;
-
-    const int NoneNum = 0;
-    const float NoneAngle = 0f;
-    const int MaxCirclePoint = 2;
     const string isActiveKeyAnim = "isOpenTresure";
+    const float noneAngle = 0f;
 
-    //private void Start()
-    //{
-    //    magicList = FindObjectOfType<MagicList>();
-    //    uiFade = this.gameObject.GetComponent<UIFade>();
-    //}
+    [SerializeField] TMP_Text[] DebugTexts;
 
     void Update()
     {
@@ -39,6 +33,7 @@ public class DrawCircle : MonoBehaviour
         {
             //タブレットでのタッチ操作を行うための宣言
             Touch UiTouch = Input.GetTouch(0);
+            DebugTexts[2].text = $"TouchPos is {UiTouch.position}";
 
             switch (UiTouch.phase)
             {
@@ -49,7 +44,7 @@ public class DrawCircle : MonoBehaviour
 
                 //タッチ中
                 case TouchPhase.Moved:
-                    DrawingCircle();
+                    DrawingCircle(UiTouch.position);
                     break;
 
                 //タッチ終わり
@@ -61,105 +56,91 @@ public class DrawCircle : MonoBehaviour
         #endregion
 
         #region 円を描く(クリックver)
-        if (Input.GetMouseButtonDown(0))
-        {
-            StartDrawCircle();
-        }
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    StartDrawCircle();
+        //}
 
-        if (Input.GetMouseButton(0))
-        {
-            DrawingCircle();
-        }
+        //if (Input.GetMouseButton(0))
+        //{
+        //    DrawingCircle(Input.mousePosition);
+        //}
 
-        if (Input.GetMouseButtonUp(0))
-        {
-            ResetCircleDraw();
-        }
+        //if (Input.GetMouseButtonUp(0))
+        //{
+        //    ResetCircleDraw();
+        //}
         #endregion
     }
 
     private void StartDrawCircle()
     {
-        drawpoints.Clear();
-        angleSum = 0;
-        previousSign = 0;
+        drawPoints.Clear();
+        totalAngle = 0f;
+        previousAngle = 0f;
+        isClockwise = true; // 初期値をリセット
     }
 
-    private void DrawingCircle()
+    private void DrawingCircle(Vector2 inputPosition)
     {
-        Vector2 localPoint = Input.mousePosition;
-        //Vector2 localPoint = UiTouch.position;
-        //RectTransformUtility.ScreenPointToLocalPointInRectangle(drawPanel, Input.mousePosition, null, out Vector2 localPoint);
-        drawpoints.Add(localPoint);
+        // 入力ポイントを記録
+        drawPoints.Add(inputPosition);
 
-        if (drawpoints.Count > 1)
+        if (drawPoints.Count > 1)
         {
-            if (drawpoints.Count > 1) center = GetCenter(drawpoints);
-            float angle = CalculateAngle(drawpoints, center);
-            float sign = Mathf.Sign(Vector2.SignedAngle(drawpoints[drawpoints.Count - 2] - center, drawpoints[drawpoints.Count - 1] - center));
+            if (drawPoints.Count > 1) center = GetCenter(drawPoints);
 
-            if (previousSign == 0f)
+            // 現在の角度を計算
+            Vector2 currentVector = drawPoints[drawPoints.Count - 1] - center;
+            float currentAngle = Mathf.Atan2(currentVector.y, currentVector.x) * Mathf.Rad2Deg;
+
+            DebugTexts[0].text = $"currentAngle is {currentAngle}";
+
+            // 角度の差分を計算
+            if (drawPoints.Count > 2)
             {
-                previousSign = sign;
-            }
-            else if (sign != previousSign)
-            {
-                circleCount = 0;
-                angleSum = 0;
-                previousSign = sign;
-            }
+                float deltaAngle = Mathf.DeltaAngle(previousAngle, currentAngle);
 
-            angleSum += angle;
-
-            if (angleSum >= MaxCircleAngle)
-            {
-                circleCount++;
-                angleSum -= MaxCircleAngle;
-
-                // アニメーション同期
-                if (circleCount <= MaxDrawCount)
+                // 回転方向が切り替わったかチェック
+                if ((isClockwise && deltaAngle < noneAngle) || (!isClockwise && deltaAngle > noneAngle))
                 {
-                    string paramName = $"{isActiveKeyAnim}{circleCount}";
-                    keyAnimator.SetBool(paramName, true);
-                    Debug.Log($"パラメータ {paramName} を true にしました");
+                    totalAngle = 0f; // 累計角度をリセット
+                    isClockwise = deltaAngle > 0; // 回転方向を更新
                 }
-                if (circleCount == MaxDrawCount)
+
+                totalAngle += deltaAngle;
+
+                // 円を描いたか確認
+                if (Mathf.Abs(totalAngle) >= MaxCircleAngle)
                 {
-                    uiFade.FadeInCanvasGroup();
+                    circleCount++;
+                    currentCircleCount = circleCount; // 円の数を保存
+                    Debug.Log($"現在{currentCircleCount}周完了中（{(isClockwise ? "時計回り" : "反時計回り")}）");
+                    DebugTexts[1].text =$"currentCircleCount is {currentCircleCount}";
+
+                    totalAngle %= MaxCircleAngle; // 累計角度を更新
+
+                    // アニメーション同期
+                    if (currentCircleCount <= MaxDrawCount)
+                    {
+                        string paramName = $"{isActiveKeyAnim}{currentCircleCount}";
+                        keyAnimator.SetBool(paramName, true);
+                    }
+                    if (currentCircleCount == MaxDrawCount)
+                    {
+                        for (int buttonCnt = 0; buttonCnt < MaxButtonCount; buttonCnt++) _magicButton[buttonCnt].ActiveButton();
+                        uiFade.FadeInCanvasGroup();
+                    }
                 }
             }
+
+            previousAngle = currentAngle; // 前回の角度を更新
         }
     }
 
     private void ResetCircleDraw()
     {
-        circleCount = 0;
-        // アニメーションを逆再生
-        //StartCoroutine(ReverseAnimation());
-    }
-
-    private IEnumerator ReverseAnimation()
-    {
-        // 現在再生中のアニメーションの状態を取得
-        AnimatorStateInfo stateInfo = keyAnimator.GetCurrentAnimatorStateInfo(0);
-
-        // アニメーションが再生中か確認
-        if (stateInfo.length > 0)
-        {
-            // アニメーションの速度を負にして逆再生開始
-            keyAnimator.speed = -2.0f; // 負の値を大きくするほど速く逆再生
-
-            // アニメーションの進行度が0に戻るまで待機
-            while (stateInfo.normalizedTime > 0)
-            {
-                stateInfo = keyAnimator.GetCurrentAnimatorStateInfo(0);
-                yield return null;
-            }
-
-            // アニメーションを停止し速度をリセット
-            keyAnimator.speed = 1.0f;
-            keyAnimator.Play(isActiveKeyAnim, -1, 0); // 0フレームに戻す
-        }
+        totalAngle = 0f;
     }
 
     public void ActiveKey()
@@ -178,7 +159,7 @@ public class DrawCircle : MonoBehaviour
         keyAnimator.SetBool($"{isActiveKeyAnim}{6}", true);
     }
 
-    Vector2 GetCenter(List<Vector2> points)
+    private Vector2 GetCenter(List<Vector2> points)
     {
         if (points.Count < 2)
             return Vector2.zero;
@@ -189,17 +170,5 @@ public class DrawCircle : MonoBehaviour
             sum += point;
         }
         return sum / points.Count;
-    }
-
-    float CalculateAngle(List<Vector2> points, Vector2 center)
-    {
-        if (points.Count < 2)
-            return 0;
-
-        Vector2 prevVector = points[points.Count - 2] - center;
-        Vector2 currentVector = points[points.Count - 1] - center;
-        float angle = Vector2.SignedAngle(prevVector, currentVector);
-
-        return Mathf.Abs(angle);
     }
 }
