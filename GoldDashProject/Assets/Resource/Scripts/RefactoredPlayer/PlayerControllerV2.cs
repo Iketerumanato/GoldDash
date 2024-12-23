@@ -83,6 +83,11 @@ public class PlayerControllerV2 : MonoBehaviour
     private PlayerAnimationController m_playerAnimationController;
     private UIDisplayer m_UIDisplayer;
 
+    //パケット関連
+    //GameClientManagerからプレイヤーの生成タイミングでsetterを呼び出し
+    public UdpGameClient UdpGameClient { set; get; } //パケット送信用。
+    public ushort SessionID { set; get; } //パケットに差出人情報を書くため必要
+
     private void Update()
     {
         switch (this.State)
@@ -113,11 +118,13 @@ public class PlayerControllerV2 : MonoBehaviour
         float moveLength = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
 
         //STEP3 インタラクトを実行しよう
-        (INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID) interactInfo = m_playerInteractor.Interact();
+        (INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact();
 
         //STEP4 パケット送信が必要なら送ろう
+        this.MakePacketFromInteract(interactInfo);
 
         //STEP5 カメラを揺らす必要があれば揺らそう
+
 
         //STEP5 モーションを決めよう
 
@@ -130,5 +137,48 @@ public class PlayerControllerV2 : MonoBehaviour
 
     private void StunedUpdate()
     {
+    }
+
+    private void MakePacketFromInteract((INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo)
+    {
+        //送信用クラスを外側のスコープで宣言しておく
+        ActionPacket myActionPacket;
+        Header myHeader;
+
+        switch (interactInfo.interactType)
+        {
+            case INTERACT_TYPE.ENEMY_MISS:
+                //スカしたことをパケット送信
+                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.MISS);
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
+                break;
+            case INTERACT_TYPE.ENEMY_FRONT:
+                //正面に命中させたことをパケット送信
+                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_FRONT, interactInfo.targetID);
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
+                break;
+            case INTERACT_TYPE.ENEMY_BACK:
+                //背面に命中させたことをパケット送信
+                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.HIT_BACK, interactInfo.targetID, default, interactInfo.punchHitVec);
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
+                break;
+            case INTERACT_TYPE.CHEST:
+                //宝箱を開錠したことをパケット送信
+                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, interactInfo.targetID);
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
+                break;
+            case INTERACT_TYPE.MAGIC_USE:
+                //魔法を使用したことをパケット送信
+                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.USE_MAGIC, interactInfo.targetID, (int)interactInfo.magicID);
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
+                break;
+            default:
+                break;
+        }
     }
 }

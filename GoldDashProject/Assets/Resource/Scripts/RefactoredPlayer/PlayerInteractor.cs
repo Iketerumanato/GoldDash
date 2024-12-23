@@ -30,12 +30,13 @@ public class PlayerInteractor : MonoBehaviour
     //パンチのクールダウン管理用
     private bool m_isPunchable = true;
 
-    public (INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID) Interact()
+    public (INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) Interact()
     {
         //返り値宣言
         INTERACT_TYPE interactType = INTERACT_TYPE.NONE;
         ushort targetID = 0;
         Definer.MID magicID = Definer.MID.NONE;
+        Vector3 punchHitVec = Vector3.zero;
 
         if (!m_clickIsAvailable) //タッチ版インタラクト処理
         {
@@ -79,6 +80,8 @@ public class PlayerInteractor : MonoBehaviour
                                 else interactType = INTERACT_TYPE.ENEMY_BACK;
                                 //パンチした相手のsessionID
                                 targetID = actorController.SessionID;
+                                //パンチのベクトル
+                                punchHitVec = punchVec;
 
                                 //パンチしたならクールダウン実行
                                 UniTask u = UniTask.RunOnThreadPool(() => PunchCoolDown());
@@ -155,6 +158,8 @@ public class PlayerInteractor : MonoBehaviour
                             else interactType = INTERACT_TYPE.ENEMY_BACK;
                             //パンチした相手のsessionID
                             targetID = actorController.SessionID;
+                            //パンチのベクトル
+                            punchHitVec = punchVec;
 
                             //パンチしたならクールダウン実行
                             UniTask u = UniTask.RunOnThreadPool(() => PunchCoolDown());
@@ -195,7 +200,7 @@ public class PlayerInteractor : MonoBehaviour
         }
 
         //タプルで返却
-        return (interactType, targetID, magicID);
+        return (interactType, targetID, magicID, punchHitVec);
 
         //一定時間パンチができなくなるローカル関数
         async void PunchCoolDown()
