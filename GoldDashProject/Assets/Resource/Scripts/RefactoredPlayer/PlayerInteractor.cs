@@ -30,6 +30,10 @@ public class PlayerInteractor : MonoBehaviour
     //パンチのクールダウン管理用
     private bool m_isPunchable = true;
 
+    /// <summary>
+    /// パラメータで指定されたカメラを基準にインタラクトを実行するよ。インタラクトの情報はタプルで返却するよ。
+    /// </summary>
+    /// <returns>成立したインタラクト種別、パケット送信に必要な相手のSessionIDやEntityID、実行が成立した魔法のID、背面取りが成立したパンチのベクトル</returns>
     public (INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) Interact()
     {
         //返り値宣言

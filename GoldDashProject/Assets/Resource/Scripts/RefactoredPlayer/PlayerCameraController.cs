@@ -48,6 +48,10 @@ public class PlayerCameraController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// インタラクトの結果を受け取って、必要なら時間差をつけて画面振動を実行するよ。
+    /// </summary>
+    /// <param name="interactType">インタラクトの種別</param>
     async public void InvokeShakeEffectFromInteract(INTERACT_TYPE interactType)
     {
         switch (interactType)
@@ -66,6 +70,31 @@ public class PlayerCameraController : MonoBehaviour
                 //画面揺れ中
                 await UniTask.Delay(400);
                 m_shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /// <summary>
+    /// プレイヤーのStateが更新されたときに呼ぶことを想定しているよ。State更新時に画面振動が必要なときは振動させるよ。
+    /// </summary>
+    /// <param name="state">現在のプレイヤーState</param>
+    public void InvokeShakeEffectFromState(PLAYER_STATE state)
+    {
+        switch (state)
+        {
+            case PLAYER_STATE.DASH:
+                //画面揺れ小
+                m_shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Small);
+                break;
+            case PLAYER_STATE.KNOCKED:
+                //画面揺れ大
+                m_shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large);
+                break;
+            case PLAYER_STATE.STUNNED:
+                //画面揺れ大
+                m_shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large);
                 break;
             default:
                 break;
