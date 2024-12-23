@@ -124,7 +124,7 @@ public class PlayerControllerV2 : MonoBehaviour
         this.MakePacketFromInteract(interactInfo);
 
         //STEP5 カメラを揺らす必要があれば揺らそう
-
+        m_playerCameraController.InvokeShakeEffectFromInteract(interactInfo.interactType);
 
         //STEP5 モーションを決めよう
 
