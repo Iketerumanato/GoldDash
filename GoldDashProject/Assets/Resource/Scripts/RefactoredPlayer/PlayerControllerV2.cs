@@ -2,14 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PlayerState : int //enumの型はデフォルトでintだが、int型であることを期待しているスクリプト（PlayerMoverなど）があるので明示的にintにしておく
+public enum PLAYER_STATE : int //enumの型はデフォルトでintだが、int型であることを期待しているスクリプト（PlayerMoverなど）があるので明示的にintにしておく
 {
     NORMAL = 0, //通常
+    DASH, //ダッシュ魔法発動中
     OPENING_SCROLL, //巻物を開いている間
     WAITING_MAP_ACTION, //魔法を使用したのち、地図による座標決定を待っている間
     KNOCKED, //殴られたリアクションを取っている間
     STUNNED, //スタンしている間
     UNCONTROLLABLE, //リザルト画面など、操作不能にしたい間
+}
+
+public enum INTERACT_TYPE : int
+{ 
+    NONE,
+    ENEMY_MISS,
+    ENEMY_FRONT,
+    ENEMY_BACK,
+    CHEST,
+    MAGIC_ICON,
+    MAGIC_USE,
+    MAGIC_CANCEL,
 }
 
 public class PlayerControllerV2 : MonoBehaviour
@@ -60,8 +73,8 @@ public class PlayerControllerV2 : MonoBehaviour
     }
 
     //stateプロパティ
-    private PlayerState m_state;
-    public PlayerState State { set { m_state = value; } get { return m_state; } }
+    private PLAYER_STATE m_state;
+    public PLAYER_STATE State { set { m_state = value; } get { return m_state; } }
 
     //プレイヤー制御用コンポーネント
     private PlayerCameraController m_playerCameraController;
@@ -74,17 +87,19 @@ public class PlayerControllerV2 : MonoBehaviour
     {
         switch (this.State)
         { 
-            case PlayerState.NORMAL:
+            case PLAYER_STATE.NORMAL:
                 break;
-            case PlayerState.OPENING_SCROLL:
+            case PLAYER_STATE.DASH:
                 break;
-            case PlayerState.WAITING_MAP_ACTION:
+            case PLAYER_STATE.OPENING_SCROLL:
                 break;
-            case PlayerState.KNOCKED:
+            case PLAYER_STATE.WAITING_MAP_ACTION:
                 break;
-            case PlayerState.STUNNED:
+            case PLAYER_STATE.KNOCKED:
                 break;
-            case PlayerState.UNCONTROLLABLE:
+            case PLAYER_STATE.STUNNED:
+                break;
+            case PLAYER_STATE.UNCONTROLLABLE:
                 break;
         }
     }
@@ -95,11 +110,14 @@ public class PlayerControllerV2 : MonoBehaviour
         m_playerCameraController.RotateCamara(V_InputVertical);
 
         //STEP2 移動・旋回を実行しよう
-        m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
+        float moveLength = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
 
         //STEP3 インタラクトを実行しよう
+        (INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID) interactInfo = m_playerInteractor.Interact();
 
-        //STEP4 カメラを揺らす必要があれば、揺らそう
+        //STEP4 パケット送信が必要なら送ろう
+
+        //STEP5 カメラを揺らす必要があれば揺らそう
 
         //STEP5 モーションを決めよう
 

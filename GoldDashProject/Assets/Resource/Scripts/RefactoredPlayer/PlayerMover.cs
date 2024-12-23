@@ -18,7 +18,7 @@ public class PlayerMover : MonoBehaviour
     [Serializable]
     private class MoveSpeedMagnification
     {
-        public PlayerState playerState;
+        public PLAYER_STATE playerState;
         public float magnification;
     }
 
@@ -45,7 +45,7 @@ public class PlayerMover : MonoBehaviour
     /// <param name="V_InputHorizontal">VariableJoystickの水平方向入力</param>
     /// <param name="V_InputVertical">VariableJoystickの垂直方向入力</param>
     /// <param name="D_InputHorizontal">DynamicJoystickの水平方向入力</param>
-    public float MovePlayer(PlayerState currentState, float V_InputHorizontal, float V_InputVertical, float D_InputHorizontal)
+    public float MovePlayer(PLAYER_STATE currentState, float V_InputHorizontal, float V_InputVertical, float D_InputHorizontal)
     {
         //プレイヤーの旋回
         if (!Mathf.Approximately(D_InputHorizontal, 0)) //ダイナミックジョイスティックの水平方向入力がほぼ0でないなら
