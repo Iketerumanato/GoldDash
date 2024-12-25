@@ -77,6 +77,7 @@ public class ResultImage : MonoBehaviour
         float previousAngle = 0f;
         float elapsedTime = 0f;
 
+        // アニメーション中
         while (elapsedTime < lerpDuration)
         {
             elapsedTime += Time.deltaTime;
@@ -101,49 +102,57 @@ public class ResultImage : MonoBehaviour
                     previousAngle += segmentImages[PieChartNum].fillAmount * 360f;
                 }
             }
+
             yield return null;
         }
-        previousAngle = 0f;
+
+        // アニメーションが終わった後にオブジェクトを生成
+        GenerateSegmentObjects();
+    }
+
+    // アニメーション終了後に各セグメントの中心にオブジェクトを生成するメソッド
+    private void GenerateSegmentObjects()
+    {
+        float previousAngle = 0f;
+        Vector3 pieChartCenter = transform.position; // 円グラフ全体の中心座標
+
         for (int PieChartNum = 0; PieChartNum < segmentImages.Length; PieChartNum++)
         {
             if (segmentImages[PieChartNum] != null)
             {
-                // セグメントの半径を動的に取得
-                float radius = segmentImages[PieChartNum].rectTransform.rect.width * segmentImages[PieChartNum].transform.lossyScale.x / 2f; // セグメントの横幅の半分を半径とする
+                // セグメントの角度を計算
+                float segmentAngle = segmentImages[PieChartNum].fillAmount * 360f;
 
-                // セグメントの中心座標を計算
-                Vector3 segmentCenter = CalculateSegmentCenter(previousAngle, segmentImages[PieChartNum].fillAmount, radius);
+                // セグメントの開始角度と終了角度
+                float startAngle = previousAngle;
+                float endAngle = previousAngle + segmentAngle;
 
-                // 各セグメントの中心にオブジェクトを配置
+                // セグメントの中心角度を計算
+                float midAngle = (startAngle + endAngle) / 2f;
+
+                // midAngleをラジアンに変換
+                float midAngleRad = midAngle * Mathf.Deg2Rad;
+
+                // 円の中心からオブジェクトを配置するために、円の半径を指定
+                float radius = 100f; // 適切な半径に調整してください
+
+                // セグメントの中心位置を計算（円の中心からのオフセット）
+                Vector3 segmentCenter = pieChartCenter + new Vector3(Mathf.Cos(midAngleRad) * radius, Mathf.Sin(midAngleRad) * radius, 0);
+
+                // オブジェクトをその位置に生成
                 if (segmentObjectPrefab != null)
                 {
-                    // オブジェクトをインスタンス化して配置
                     GameObject segmentObject = Instantiate(segmentObjectPrefab, segmentCenter, Quaternion.identity);
-                    segmentObject.transform.SetParent(transform); // 親オブジェクトを設定（必要に応じて変更）
+                    segmentObject.transform.SetParent(transform, false); // 親オブジェクトのスケールなどを無視
                 }
 
-                // 次のセグメントの開始角度を計算
-                previousAngle += segmentImages[PieChartNum].fillAmount * 360f;
+                // 次のセグメントの開始角度を設定
+                previousAngle += segmentAngle;
 
-                // 各セグメントの中心をデバッグログで表示
-                Debug.Log($"Segment {PieChartNum + 1} Center: {segmentCenter}");
+                // デバッグログ
+                Debug.Log($"Segment {PieChartNum + 1}: Segment Center = {segmentCenter}");
             }
         }
-    }
-
-    private Vector3 CalculateSegmentCenter(float startAngle, float fillAmount, float radius)
-    {
-        // セグメントの中心角を計算
-        float centerAngle = startAngle + (fillAmount * 360f) / 2f;
-
-        // ラジアンに変換
-        float radians = centerAngle * Mathf.Deg2Rad;
-
-        // セグメント中心の座標を計算
-        float centerX = radius * Mathf.Cos(radians);
-        float centerY = radius * Mathf.Sin(radians);
-
-        return new Vector3(centerX, centerY, 0); // z座標は0で中心に配置
     }
 
     public void ChangeAnimatorSpeed()
