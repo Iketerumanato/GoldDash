@@ -20,6 +20,8 @@ public class ResultImage : MonoBehaviour
     private float[] scoreRatios;
 
     [SerializeField] private GameObject segmentObjectPrefab;
+    [SerializeField] float ResultCharaFallHeight = 470f;
+    [SerializeField] Quaternion ResultCharaQuaternion;
 
     private void Start()
     {
@@ -134,15 +136,15 @@ public class ResultImage : MonoBehaviour
                 float midAngleRad = midAngle * Mathf.Deg2Rad;
 
                 // 円の中心からオブジェクトを配置するために、円の半径を指定
-                float radius = 100f; // 適切な半径に調整してください
+                float radius = 150f; // 適切な半径に調整してください
 
                 // セグメントの中心位置を計算（円の中心からのオフセット）
-                Vector3 segmentCenter = pieChartCenter + new Vector3(Mathf.Cos(midAngleRad) * radius, Mathf.Sin(midAngleRad) * radius, 0);
+                Vector3 segmentCenter = pieChartCenter + new Vector3(Mathf.Cos(midAngleRad) * radius, Mathf.Sin(midAngleRad) * radius, -ResultCharaFallHeight);
 
                 // オブジェクトをその位置に生成
                 if (segmentObjectPrefab != null)
                 {
-                    GameObject segmentObject = Instantiate(segmentObjectPrefab, segmentCenter, Quaternion.identity);
+                    GameObject segmentObject = Instantiate(segmentObjectPrefab, segmentCenter, ResultCharaQuaternion);
                     segmentObject.transform.SetParent(transform, false); // 親オブジェクトのスケールなどを無視
                 }
 
