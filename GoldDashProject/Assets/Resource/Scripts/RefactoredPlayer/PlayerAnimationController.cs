@@ -19,13 +19,13 @@ public class PlayerAnimationController : MonoBehaviour
     /// インタラクトの結果からモーションを決定する。
     /// </summary>
     /// <param name="interactType">インタラクトの種別</param>
-    /// <param name="moveAmount">そのフレームのプレイヤーの移動量</param>
-    public void SetAnimationFromInteract(INTERACT_TYPE interactType, float moveAmount)
+    /// <param name="moveAmount">そのフレームのプレイヤーの速度</param>
+    public void SetAnimationFromInteract(INTERACT_TYPE interactType, float runSpeed)
     {
         switch (interactType)
         {
             case INTERACT_TYPE.NONE: //インタラクトしていないなら走りモーションのスピード変更
-                m_animator.SetFloat(strRunSpeed, Mathf.Clamp01(moveAmount));
+                m_animator.SetFloat(strRunSpeed, Mathf.Clamp01(runSpeed));
                 break;
             case INTERACT_TYPE.ENEMY_MISS: //パンチした結果にならパンチモーション
             case INTERACT_TYPE.ENEMY_FRONT:

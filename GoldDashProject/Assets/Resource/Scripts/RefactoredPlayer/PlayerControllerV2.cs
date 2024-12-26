@@ -156,7 +156,7 @@ public class PlayerControllerV2 : MonoBehaviour
         m_playerCameraController.RotateCamara(D_InputVertical);
 
         //STEP2 移動・旋回を実行しよう
-        float moveAmount = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
+        float runSpeed = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
 
         //STEP3 インタラクトを実行しよう
         (INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact();
@@ -173,7 +173,7 @@ public class PlayerControllerV2 : MonoBehaviour
             m_playerAnimationController.SetAnimationFromState(this.State);
             m_playedStateAnimation = true; //再生済フラグを格納
         }
-        m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, moveAmount); //インタラクト結果に応じてモーションを再生
+        m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
 
         //STEP7 次フレームのStateを決めよう
         PLAYER_STATE nextState = DecideNextStateFromInteract(interactInfo.interactType, interactInfo.magicID); //インタラクト結果に応じて次のState決定

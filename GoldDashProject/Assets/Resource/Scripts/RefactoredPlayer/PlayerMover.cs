@@ -66,7 +66,7 @@ public class PlayerMover : MonoBehaviour
             //注意！プレイヤーオブジェクトの腕やカメラは、オブジェクトのforwardとは逆を向いているので移動方向にマイナスをかける。Mayaの座標系がすべての元凶
             this.transform.Translate(-playerMoveVec * m_playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
 
-            return (transform.position - oldPos).magnitude; //移動量を計算して返却
+            return (playerMoveVec * m_playerMoveSpeed).magnitude; //移動量スピードを計算して返却
         }
 
             return 0f; //移動していないなら0fを返却
