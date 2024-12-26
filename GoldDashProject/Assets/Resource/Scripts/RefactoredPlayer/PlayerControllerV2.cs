@@ -6,7 +6,8 @@ public enum PLAYER_STATE : int //enumの型はデフォルトでintだが、int�
 {
     NORMAL = 0, //通常
     DASH, //ダッシュ魔法発動中
-    OPENING_SCROLL, //巻物を開いている間
+    OPENING_CHEST, //宝箱を開いている間
+    USING_SCROLL, //巻物を開いている間
     WAITING_MAP_ACTION, //魔法を使用したのち、地図による座標決定を待っている間
     KNOCKED, //殴られたリアクションを取っている間
     STUNNED, //スタンしている間
@@ -74,7 +75,17 @@ public class PlayerControllerV2 : MonoBehaviour
 
     //stateプロパティ
     private PLAYER_STATE m_state;
-    public PLAYER_STATE State { set { m_state = value; } get { return m_state; } }
+    //そのstateに入った時のモーションを再生したか
+    private bool m_playedStateAnimation;
+    public PLAYER_STATE State
+    {
+        set
+        {
+            m_state = value;
+            m_playedStateAnimation = false; //stateに入った時のモーションを再生するためboolをfalseに
+        }
+        get { return m_state; }
+    }
 
     //プレイヤー制御用コンポーネント
     private PlayerCameraController m_playerCameraController;
@@ -96,7 +107,9 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
             case PLAYER_STATE.DASH:
                 break;
-            case PLAYER_STATE.OPENING_SCROLL:
+            case PLAYER_STATE.OPENING_CHEST:
+                break;
+            case PLAYER_STATE.USING_SCROLL:
                 break;
             case PLAYER_STATE.WAITING_MAP_ACTION:
                 break;
@@ -115,7 +128,7 @@ public class PlayerControllerV2 : MonoBehaviour
         m_playerCameraController.RotateCamara(V_InputVertical);
 
         //STEP2 移動・旋回を実行しよう
-        float moveLength = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
+        float moveAmount = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
 
         //STEP3 インタラクトを実行しよう
         (INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact();
@@ -126,9 +139,16 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP5 カメラを揺らす必要があれば揺らそう
         m_playerCameraController.InvokeShakeEffectFromInteract(interactInfo.interactType);
 
-        //STEP5 モーションを決めよう
+        //STEP6 モーションを決めよう
+        if (!m_playedStateAnimation) //state固有のモーションを再生していないなら再生
+        {
+            m_playerAnimationController.SetAnimationFromState(this.State);
+            m_playedStateAnimation = true; //再生済フラグを格納
+        }
+        m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, moveAmount); //インタラクト結果に応じてモーションを再生
 
-        //STEP6 次フレームのStateを決めよう
+        //STEP7 次フレームのStateを決めよう
+
     }
 
     private void KnockedUpdate()
