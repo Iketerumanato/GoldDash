@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,7 +22,9 @@ public class ResultImage : MonoBehaviour
 
     [SerializeField] private GameObject segmentObjectPrefab;
     [SerializeField] float ResultCharaFallHeight = 470f;
-    [SerializeField] Quaternion ResultCharaQuaternion;
+    [SerializeField] Vector3 ResultCharaQuaternion;
+    [SerializeField] GameObject centerPoint;
+    [SerializeField] bool isDirectionCenter;
 
     private void Start()
     {
@@ -140,11 +143,12 @@ public class ResultImage : MonoBehaviour
 
                 // セグメントの中心位置を計算（円の中心からのオフセット）
                 Vector3 segmentCenter = pieChartCenter + new Vector3(Mathf.Cos(midAngleRad) * radius, Mathf.Sin(midAngleRad) * radius, -ResultCharaFallHeight);
+                Quaternion charaRota = Quaternion.Euler(ResultCharaQuaternion);
 
                 // オブジェクトをその位置に生成
                 if (segmentObjectPrefab != null)
                 {
-                    GameObject segmentObject = Instantiate(segmentObjectPrefab, segmentCenter, ResultCharaQuaternion);
+                    GameObject segmentObject = Instantiate(segmentObjectPrefab, segmentCenter, charaRota);
                     segmentObject.transform.SetParent(transform, false); // 親オブジェクトのスケールなどを無視
                 }
 
