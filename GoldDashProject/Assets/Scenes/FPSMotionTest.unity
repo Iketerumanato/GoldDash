@@ -7849,6 +7849,11 @@ Transform:
   - {fileID: 1694794552}
   m_Father: {fileID: 255417155}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1822682534 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2569514226366646463, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+  m_PrefabInstance: {fileID: 4655737573122132708}
+  m_PrefabAsset: {fileID: 0}
 --- !u!20 &1822682536 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 5282947614058381013, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
@@ -8340,7 +8345,7 @@ MonoBehaviour:
   m_playerCamera: {fileID: 1822682536}
   m_interactableDistance: 1.5
   m_punchReachableDistance: 1
-  m_punchCooldownTime: 1000
+  m_punchCooldownTime: 1250
   m_flontRange: 120
   m_chestReachableDistance: 1
   m_clickIsAvailable: 1
@@ -9580,6 +9585,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 309811829379649407, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: shakeCameraTransform
+      value: 
+      objectReference: {fileID: 1822682534}
     - target: {fileID: 349858837828385637, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_IsActive
       value: 0
