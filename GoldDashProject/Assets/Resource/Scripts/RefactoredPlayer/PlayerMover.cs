@@ -57,7 +57,7 @@ public class PlayerMover : MonoBehaviour
             this.transform.eulerAngles = new Vector3(0f, m_rotationY, 0f);
         }
         //プレイヤーの移動量
-        if (!Mathf.Approximately(V_InputHorizontal, 0) && !Mathf.Approximately(V_InputVertical, 0))
+        if (!Mathf.Approximately(V_InputHorizontal, 0) || !Mathf.Approximately(V_InputVertical, 0))
         {
             Vector3 oldPos = transform.position;
 

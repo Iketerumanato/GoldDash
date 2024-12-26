@@ -53,9 +53,9 @@ public class PlayerControllerV2 : MonoBehaviour
         {
             if (m_WASD_Available)
             {
-                return Mathf.Max(m_variableJoystick.Horizontal, Input.GetAxis("Horizontal"));
+                if(Mathf.Abs(m_variableJoystick.Horizontal) < Mathf.Abs(Input.GetAxis("Horizontal"))) return Input.GetAxis("Horizontal");
             }
-            else return m_variableJoystick.Horizontal;
+            return m_variableJoystick.Horizontal;
         }
     }
     private float V_InputVertical
@@ -64,9 +64,9 @@ public class PlayerControllerV2 : MonoBehaviour
         {
             if (m_WASD_Available)
             {
-                return Mathf.Max(m_variableJoystick.Vertical, Input.GetAxis("Vertical"));
+                if (Mathf.Abs(m_variableJoystick.Horizontal) < Mathf.Abs(Input.GetAxis("Vertical"))) return Input.GetAxis("Vertical");
             }
-            else return m_variableJoystick.Vertical;
+            return m_variableJoystick.Vertical;
         }
     }
     private float D_InputHorizontal
@@ -102,12 +102,12 @@ public class PlayerControllerV2 : MonoBehaviour
     private CancellationToken m_stateLockCt; //同ct
 
     //プレイヤー制御用コンポーネント
-    private PlayerCameraController m_playerCameraController;
-    private PlayerMover m_playerMover;
-    private PlayerInteractor m_playerInteractor;
-    private PlayerAnimationController m_playerAnimationController;
-    private UIDisplayer m_UIDisplayer;
-    private Rigidbody m_Rigidbody;
+    [SerializeField] private PlayerCameraController m_playerCameraController;
+    [SerializeField] private PlayerMover m_playerMover;
+    [SerializeField] private PlayerInteractor m_playerInteractor;
+    [SerializeField] private PlayerAnimationController m_playerAnimationController;
+    [SerializeField] private UIDisplayer m_UIDisplayer;
+    [SerializeField] private Rigidbody m_Rigidbody;
 
     //金貨を拾うことを禁止する処理
     private bool m_forbiddenPicking; //金貨を拾うことを禁止されているか
