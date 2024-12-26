@@ -78,16 +78,15 @@ public class ResultImage : MonoBehaviour
 
     private IEnumerator SmoothUpdatePieChart()
     {
-        float previousAngle = 0f;
         float elapsedTime = 0f;
 
         // アニメーション中
         while (elapsedTime < lerpDuration)
         {
             elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / lerpDuration);
+            float segAnimationTime = Mathf.Clamp01(elapsedTime / lerpDuration);
 
-            previousAngle = 0f;
+            float previousAngle = 0f;
 
             for (int PieChartNum = 0; PieChartNum < segmentImages.Length; PieChartNum++)
             {
@@ -97,7 +96,7 @@ public class ResultImage : MonoBehaviour
                     float currentFillAmount = segmentImages[PieChartNum].fillAmount;
 
                     // LerpでスムーズにfillAmountを変更
-                    segmentImages[PieChartNum].fillAmount = Mathf.Lerp(currentFillAmount, scoreRatios[PieChartNum], t);
+                    segmentImages[PieChartNum].fillAmount = Mathf.Lerp(currentFillAmount, scoreRatios[PieChartNum], segAnimationTime);
 
                     // 回転を更新
                     segmentImages[PieChartNum].transform.localRotation = Quaternion.Euler(0, 0, -previousAngle);
@@ -138,11 +137,11 @@ public class ResultImage : MonoBehaviour
                 float midAngleRad = midAngle * Mathf.Deg2Rad;
 
                 // 円の中心からオブジェクトを配置するために、円の半径を指定
-                float radius = 150f; // 適切な半径に調整してください
+                float radius = 150f;
 
-                // セグメントの中心位置を計算（Z座標の調整は後で適用）
+                // セグメントの中心位置を計算
                 Vector3 segmentCenter = pieChartCenter + new Vector3(Mathf.Cos(midAngleRad) * radius, Mathf.Sin(midAngleRad) * radius, 0);
-                segmentCenter.z = -ResultCharaFallHeight; // Z座標は後で適用
+                segmentCenter.z = -ResultCharaFallHeight;
 
                 // オブジェクトをその位置に生成
                 if (segmentObjectPrefab != null)
@@ -153,7 +152,6 @@ public class ResultImage : MonoBehaviour
                     // セグメント中心を向かせる
                     segmentObject.transform.LookAt(new Vector3(pieChartCenter.x, pieChartCenter.y, segmentCenter.z), Vector3.up);
 
-                    // デバッグログ
                     Debug.Log($"Segment {PieChartNum + 1}: Segment Center = {segmentCenter}, Direction = {pieChartCenter - segmentCenter}");
                 }
 
