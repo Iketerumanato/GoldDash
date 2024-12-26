@@ -1,4 +1,3 @@
-using DG.Tweening;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -141,22 +140,25 @@ public class ResultImage : MonoBehaviour
                 // 円の中心からオブジェクトを配置するために、円の半径を指定
                 float radius = 150f; // 適切な半径に調整してください
 
-                // セグメントの中心位置を計算（円の中心からのオフセット）
-                Vector3 segmentCenter = pieChartCenter + new Vector3(Mathf.Cos(midAngleRad) * radius, Mathf.Sin(midAngleRad) * radius, -ResultCharaFallHeight);
-                Quaternion charaRota = Quaternion.Euler(ResultCharaQuaternion);
+                // セグメントの中心位置を計算（Z座標の調整は後で適用）
+                Vector3 segmentCenter = pieChartCenter + new Vector3(Mathf.Cos(midAngleRad) * radius, Mathf.Sin(midAngleRad) * radius, 0);
+                segmentCenter.z = -ResultCharaFallHeight; // Z座標は後で適用
 
                 // オブジェクトをその位置に生成
                 if (segmentObjectPrefab != null)
                 {
-                    GameObject segmentObject = Instantiate(segmentObjectPrefab, segmentCenter, charaRota);
+                    GameObject segmentObject = Instantiate(segmentObjectPrefab, segmentCenter, Quaternion.identity);
                     segmentObject.transform.SetParent(transform, false); // 親オブジェクトのスケールなどを無視
+
+                    // セグメント中心を向かせる
+                    segmentObject.transform.LookAt(new Vector3(pieChartCenter.x, pieChartCenter.y, segmentCenter.z), Vector3.up);
+
+                    // デバッグログ
+                    Debug.Log($"Segment {PieChartNum + 1}: Segment Center = {segmentCenter}, Direction = {pieChartCenter - segmentCenter}");
                 }
 
                 // 次のセグメントの開始角度を設定
                 previousAngle += segmentAngle;
-
-                // デバッグログ
-                Debug.Log($"Segment {PieChartNum + 1}: Segment Center = {segmentCenter}");
             }
         }
     }
