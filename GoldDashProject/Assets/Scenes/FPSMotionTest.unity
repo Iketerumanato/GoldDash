@@ -8343,7 +8343,7 @@ MonoBehaviour:
   m_punchCooldownTime: 1000
   m_flontRange: 120
   m_chestReachableDistance: 1
-  m_clickIsAvailable: 0
+  m_clickIsAvailable: 1
 --- !u!114 &1927976706
 MonoBehaviour:
   m_ObjectHideFlags: 0

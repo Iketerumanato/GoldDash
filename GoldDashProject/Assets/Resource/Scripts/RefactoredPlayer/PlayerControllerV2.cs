@@ -167,6 +167,8 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP5 カメラを揺らす必要があれば揺らそう
         m_playerCameraController.InvokeShakeEffectFromInteract(interactInfo.interactType);
 
+        Debug.Log(interactInfo.interactType);
+
         //STEP6 モーションを決めよう
         if (!m_playedStateAnimation) //state固有のモーションを再生していないなら再生
         {
@@ -278,6 +280,13 @@ public class PlayerControllerV2 : MonoBehaviour
 
     private void MakePacketFromInteract((INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo)
     {
+        if (UdpGameClient == null)
+        {
+            if(interactInfo.interactType != INTERACT_TYPE.NONE)
+            Debug.LogWarning("UdpGameClientの参照が無いため、パケット送信をキャンセルしました。");
+            return;
+        }
+
         //送信用クラスを外側のスコープで宣言しておく
         ActionPacket myActionPacket;
         Header myHeader;
