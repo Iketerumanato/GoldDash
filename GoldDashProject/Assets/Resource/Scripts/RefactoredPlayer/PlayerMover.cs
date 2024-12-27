@@ -63,8 +63,15 @@ public class PlayerMover : MonoBehaviour
 
             Vector3 playerMoveVec = new Vector3(V_InputHorizontal, 0f, V_InputVertical); //移動方向のベクトルを計算
 
+            float currentMoveSpeedMagnification; //移動速度倍率を格納
+            if (!m_moveSpeedMagnificationsDictionary.TryGetValue((int)currentState, out currentMoveSpeedMagnification))
+            {
+                currentMoveSpeedMagnification = 1f; //現在のstateに対して移動速度倍率が設定されていないなら1倍速にする
+            }
+            float currentMoveSpeed = m_playerMoveSpeed * currentMoveSpeedMagnification;
+
             //注意！プレイヤーオブジェクトの腕やカメラは、オブジェクトのforwardとは逆を向いているので移動方向にマイナスをかける。Mayaの座標系がすべての元凶
-            this.transform.Translate(-playerMoveVec * m_playerMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
+            this.transform.Translate(-playerMoveVec * currentMoveSpeed * Time.deltaTime); //求めたベクトルに移動速度とdeltaTimeをかけて座標書き換え
 
             return (playerMoveVec * m_playerMoveSpeed).magnitude; //移動量スピードを計算して返却
         }

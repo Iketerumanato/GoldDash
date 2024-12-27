@@ -88,18 +88,18 @@ public class PlayerControllerV2 : MonoBehaviour
 
     //stateプロパティ
     private PLAYER_STATE m_state;
-    //そのstateに入った時のモーションを再生したか
-    private bool m_playedStateAnimation;
+    //そのstateに入った最初のフレームか
+    private bool m_isFirstFrameOfState;
     public PLAYER_STATE State
     {
         set
         {
             m_state = value;
-            m_playedStateAnimation = false; //stateに入った時のモーションを再生するためboolをfalseに
+            m_isFirstFrameOfState = true; //stateに入った時のモーションを再生するためboolをfalseに
         }
         get { return m_state; }
     }
-    private bool m_allowedUnlockState = true; //NormalStateに戻る条件(ステートロックの解除条件)を満たしているか
+    [SerializeField] private bool m_allowedUnlockState = true; //NormalStateに戻る条件(ステートロックの解除条件)を満たしているか
     private CancellationTokenSource m_stateLockCts; //ステートロックの非同期処理を中心するcts
     private CancellationToken m_stateLockCt; //同ct
 
@@ -177,10 +177,10 @@ public class PlayerControllerV2 : MonoBehaviour
         Debug.Log(interactInfo.interactType);
 
         //STEP6 モーションを決めよう
-        if (!m_playedStateAnimation) //state固有のモーションを再生していないなら再生
+        if (!m_isFirstFrameOfState) //state固有のモーションを再生していないなら再生
         {
             m_playerAnimationController.SetAnimationFromState(this.State);
-            m_playedStateAnimation = true; //再生済フラグを格納
+            m_isFirstFrameOfState = true; //再生済フラグを格納
         }
         m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
 
@@ -192,13 +192,13 @@ public class PlayerControllerV2 : MonoBehaviour
 
     private void KnockedUpdate()
     {
-        if (!m_playedStateAnimation) //このstateに入った最初のフレームなら
+        if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
         {
             //もし既にステートロック中なら、実行中の非同期処理があるはずなのでキャンセルする
             if (!m_allowedUnlockState) m_stateLockCts.Cancel();
             //一定時間ステートロックする
             m_allowedUnlockState = false;
-            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(300), default, m_stateLockCt);
+            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(1500), default, m_stateLockCt);
 
             //STEP_A 吹き飛ぼう
             //金貨を拾えない状態にする
@@ -220,25 +220,27 @@ public class PlayerControllerV2 : MonoBehaviour
 
             //STEP_B カメラを揺らそう
             m_playerCameraController.InvokeShakeEffectFromState(this.State);
+
+            //STEP_C モーションを再生しよう
+            m_playerAnimationController.SetAnimationFromState(this.State);
+
+            //STEP_D 最初のフレームではなくなるのでフラグを書き変えよう
+            m_isFirstFrameOfState = false;
         }
 
         //STEP1 カメラを動かそう
         m_playerCameraController.RotateCamara(D_InputVertical);
+        
+        //STEP_X 移動・旋回を実行しよう
+        float runSpeed = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
 
-        //STEP2 モーションを決めよう
-        if (!m_playedStateAnimation) //state固有のモーションを再生していないなら再生
-        {
-            m_playerAnimationController.SetAnimationFromState(this.State);
-            m_playedStateAnimation = true; //再生済フラグを格納
-        }
-
-        //STEP3 通常stateに戻ることができるなら戻ろう
-        if(m_allowedUnlockState) this.State = PLAYER_STATE.NORMAL;
+        //STEP2 通常stateに戻ることができるなら戻ろう
+        if (m_allowedUnlockState) this.State = PLAYER_STATE.NORMAL;
     }
 
     private void StunedUpdate()
     {
-        if (!m_playedStateAnimation) //このstateに入った最初のフレームなら
+        if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
         {
             //もし既にステートロック中なら、実行中の非同期処理があるはずなのでキャンセルする
             if (!m_allowedUnlockState) m_stateLockCts.Cancel();
@@ -248,19 +250,18 @@ public class PlayerControllerV2 : MonoBehaviour
 
             //STEP_A カメラを揺らそう
             m_playerCameraController.InvokeShakeEffectFromState(this.State);
+
+            //STEP_B モーションを再生しよう
+            m_playerAnimationController.SetAnimationFromState(this.State);
+
+            //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
+            m_isFirstFrameOfState = false;
         }
 
         //STEP1 カメラを動かそう
         m_playerCameraController.RotateCamara(V_InputVertical);
 
-        //STEP2 モーションを決めよう
-        if (!m_playedStateAnimation) //state固有のモーションを再生していないなら再生
-        {
-            m_playerAnimationController.SetAnimationFromState(this.State);
-            m_playedStateAnimation = true; //再生済フラグを格納
-        }
-
-        //STEP3 通常stateに戻ることができるなら戻ろう
+        //STEP2 通常stateに戻ることができるなら戻ろう
         if (m_allowedUnlockState) this.State = PLAYER_STATE.NORMAL;
     }
 

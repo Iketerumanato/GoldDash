@@ -9075,6 +9075,7 @@ MonoBehaviour:
   m_blownPowerHorizontal: 4
   m_blownPowerVertical: 2
   m_forbidPickTime: 1000
+  m_allowedUnlockState: 1
   m_playerCameraController: {fileID: 7647838643402749367}
   m_playerMover: {fileID: 2124854647343611678}
   m_playerInteractor: {fileID: 5204228447290793358}
@@ -9112,7 +9113,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_playerMoveSpeed: 1
   m_playerRorateSpeed: 180
-  m_moveSpeedMagnificationsList: []
+  m_moveSpeedMagnificationsList:
+  - playerState: 5
+    magnification: 0.2
+  - playerState: 3
+    magnification: 0.5
+  - playerState: 1
+    magnification: 3
 --- !u!114 &5204228447290793358
 MonoBehaviour:
   m_ObjectHideFlags: 0
