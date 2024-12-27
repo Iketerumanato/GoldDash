@@ -99,7 +99,7 @@ public class PlayerControllerV2 : MonoBehaviour
         }
         get { return m_state; }
     }
-    private bool m_allowedUnlockState; //NormalStateに戻る条件(ステートロックの解除条件)を満たしているか
+    private bool m_allowedUnlockState = true; //NormalStateに戻る条件(ステートロックの解除条件)を満たしているか
     private CancellationTokenSource m_stateLockCts; //ステートロックの非同期処理を中心するcts
     private CancellationToken m_stateLockCt; //同ct
 
@@ -112,7 +112,7 @@ public class PlayerControllerV2 : MonoBehaviour
     [SerializeField] private Rigidbody m_Rigidbody;
 
     //金貨を拾うことを禁止する処理
-    private bool m_forbiddenPicking; //金貨を拾うことを禁止されているか
+    private bool m_forbiddenPicking = false; //金貨を拾うことを禁止されているか
     private CancellationTokenSource m_forbidPickCts; //金貨を拾うことを禁止する非同期処理を中心するcts
     private CancellationToken m_forbidPickCt; //同ct
 
@@ -194,23 +194,26 @@ public class PlayerControllerV2 : MonoBehaviour
     {
         if (!m_playedStateAnimation) //このstateに入った最初のフレームなら
         {
-            //発動中のステートロックを解除
-            m_stateLockCts.Cancel();
+            //もし既にステートロック中なら、実行中の非同期処理があるはずなのでキャンセルする
+            if (!m_allowedUnlockState) m_stateLockCts.Cancel();
             //一定時間ステートロックする
+            m_allowedUnlockState = false;
             UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(300), default, m_stateLockCt);
 
             //STEP_A 吹き飛ぼう
             //金貨を拾えない状態にする
-            m_forbidPickCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
-            UniTask.RunOnThreadPool(() => ForbidPick(), default, m_forbidPickCt);
+            if (m_forbiddenPicking) m_forbidPickCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
+            //一定時間金貨を拾えない状態にする
+            m_forbiddenPicking = true;
+            UniTask.RunOnThreadPool(() => CountForbidPickTime(), default, m_forbidPickCt);
 
             //前に吹っ飛ぶ
-            m_Rigidbody.AddForce(this.transform.forward * m_blownPowerHorizontal + Vector3.up * m_blownPowerVertical, ForceMode.Impulse);
+            //transform.forwardと実際の前方は（カメラの向きに合わせた関係で）逆なのでマイナスをかける
+            m_Rigidbody.AddForce(-this.transform.forward * m_blownPowerHorizontal + Vector3.up * m_blownPowerVertical, ForceMode.Impulse);
 
             //金貨を一定時間拾えないようにするローカル関数
-            async void ForbidPick()
+            async void CountForbidPickTime()
             {
-                m_forbiddenPicking = true; //金貨を拾えない状態にする
                 await UniTask.Delay(m_forbidPickTime); //指定された時間待つ
                 m_forbiddenPicking = false; //金貨を拾えるようにする
             }
@@ -231,16 +234,16 @@ public class PlayerControllerV2 : MonoBehaviour
 
         //STEP3 通常stateに戻ることができるなら戻ろう
         if(m_allowedUnlockState) this.State = PLAYER_STATE.NORMAL;
-        Debug.Log(m_allowedUnlockState + ": allowed");
     }
 
     private void StunedUpdate()
     {
         if (!m_playedStateAnimation) //このstateに入った最初のフレームなら
         {
-            //発動中のステートロックを解除
-            m_stateLockCts.Cancel();
+            //もし既にステートロック中なら、実行中の非同期処理があるはずなのでキャンセルする
+            if (!m_allowedUnlockState) m_stateLockCts.Cancel();
             //一定時間ステートロックする
+            m_allowedUnlockState = false;
             UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(3000), default, m_stateLockCt);
 
             //STEP_A カメラを揺らそう
@@ -281,7 +284,6 @@ public class PlayerControllerV2 : MonoBehaviour
 
     private async void CountStateLockTime(int cooldownTimeMilliSec)
     {
-        m_allowedUnlockState = false; //クールダウン開始
         await UniTask.Delay(cooldownTimeMilliSec); //指定された秒数待ったら
         m_allowedUnlockState = true; //クールダウン終了
     }
