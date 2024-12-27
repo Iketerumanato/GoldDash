@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using TMPro;
 using UnityEngine;
 
 public enum PLAYER_STATE : int //enumの型はデフォルトでintだが、int型であることを期待しているスクリプト（PlayerMoverなど）があるので明示的にintにしておく
@@ -128,6 +129,9 @@ public class PlayerControllerV2 : MonoBehaviour
         m_forbidPickCt = m_forbidPickCts.Token;
     }
 
+    //デバッグ用
+    [SerializeField] TextMeshProUGUI stateTxt;
+
     private void Update()
     {
         switch (this.State)
@@ -148,6 +152,8 @@ public class PlayerControllerV2 : MonoBehaviour
             case PLAYER_STATE.UNCONTROLLABLE:
                 break;
         }
+
+        stateTxt.text = this.State.ToString();
     }
 
     private void NormalUpdate()
