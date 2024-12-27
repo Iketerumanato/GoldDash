@@ -57,7 +57,7 @@ public class ActorController : MonoBehaviour
     private void Start()
     {
         //プレイヤーか否か確認する
-        isPlayer = (GetComponent<PlayerController>() != null);
+        isPlayer = (GetComponent<PlayerControllerV2>() != null);
         //2乗した定数の計算
         sqrRunThreshold = runThreshold * runThreshold;
     }

@@ -22,7 +22,7 @@ public class GameClientManager : MonoBehaviour
     private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを保管。自分以外のプレイヤー（アクター）のセッションIDも記録していく
     private Dictionary<ushort, Entity> entityDictionary; //entityIDを鍵としてentityインスタンスを管理
 
-    private PlayerController playerController; //プレイヤーが操作するキャラクターのplayerController
+    private PlayerControllerV2 playerController; //プレイヤーが操作するキャラクターのplayerController
 
 
     private int numOfActors; //アクターの人数
@@ -122,8 +122,7 @@ public class GameClientManager : MonoBehaviour
         while (true) 
         {
             //プレイヤーアクターの座標をMOVで送信
-            //プレイヤーの視点的な正面(カメラの向き)とオブジェクトの正面ベクトルは逆になっているので、forwardにはマイナスをかける必要がある
-            myActionPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, default, playerController.transform.position, -playerController.transform.forward);
+            myActionPacket = new ActionPacket((byte)Definer.RID.MOV, default, sessionID, default, playerController.transform.position, playerController.transform.forward);
             myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             udpGameClient.Send(myHeader.ToByte());
 
@@ -233,7 +232,7 @@ public class GameClientManager : MonoBehaviour
                                             //プレイヤーをインスタンス化しながらActorControllerを取得
                                             actorController = Instantiate(PlayerPrefab).GetComponent<ActorController>();
                                             //playerControllerはアクセスしやすいように取得しておく
-                                            playerController = actorController.gameObject.GetComponent<PlayerController>();
+                                            playerController = actorController.gameObject.GetComponent<PlayerControllerV2>();
                                             //Playerクラスには別にSessionIDとUdpGameClientを渡し、パケット送信を自分でやらせる。
                                             playerController.SessionID = this.sessionID;
                                             playerController.UdpGameClient = this.udpGameClient;
