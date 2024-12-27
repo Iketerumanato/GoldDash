@@ -17,7 +17,7 @@ public class Chest : Entity
 
     public override void ActivateEntity()
     {
-        uiFade.FadeInImage();
+        uiFade.FadeOutCanvasGroup();
     }
 
     public override void DestroyEntity()
