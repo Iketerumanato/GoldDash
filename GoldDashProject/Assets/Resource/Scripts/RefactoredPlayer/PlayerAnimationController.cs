@@ -65,4 +65,9 @@ public class PlayerAnimationController : MonoBehaviour
                 break;
         }
     }
+
+    public void SetTriggerGuard()
+    {
+        m_animator.SetTrigger(strGuardTrigger);
+    }
 }

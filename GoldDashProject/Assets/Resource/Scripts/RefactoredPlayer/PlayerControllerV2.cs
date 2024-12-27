@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -332,5 +333,15 @@ public class PlayerControllerV2 : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    public void GetPunchFront()
+    {
+        m_playerAnimationController.SetTriggerGuard();
+    }
+
+    public void GetPunchBack()
+    {
+        this.State = PLAYER_STATE.KNOCKED;
     }
 }
