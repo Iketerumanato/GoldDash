@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class PlayerInteractor : MonoBehaviour
 {
+    [Header("クリックによるインタラクトを有効化する。ただしタッチを受け付けなくなるので注意。")]
+    [SerializeField] private bool m_clickIsAvailable;
+
     [Header("レイを飛ばしたいカメラ")]
     [SerializeField] private Camera m_playerCamera;
 
@@ -23,9 +26,6 @@ public class PlayerInteractor : MonoBehaviour
 
     [Header("宝箱開錠の射程")]
     [SerializeField] private float m_chestReachableDistance = 1f;
-
-    [Header("クリックによるインタラクトを有効化する。ただしタッチを受け付けなくなるので注意。")]
-    [SerializeField] private bool m_clickIsAvailable;
 
     //パンチのクールダウン管理用
     private bool m_isPunchable = true;
