@@ -220,7 +220,7 @@ public class PlayerControllerV2 : MonoBehaviour
         }
 
         //STEP1 カメラを動かそう
-        m_playerCameraController.RotateCamara(V_InputVertical);
+        m_playerCameraController.RotateCamara(D_InputVertical);
 
         //STEP2 モーションを決めよう
         if (!m_playedStateAnimation) //state固有のモーションを再生していないなら再生
@@ -231,6 +231,7 @@ public class PlayerControllerV2 : MonoBehaviour
 
         //STEP3 通常stateに戻ることができるなら戻ろう
         if(m_allowedUnlockState) this.State = PLAYER_STATE.NORMAL;
+        Debug.Log(m_allowedUnlockState + ": allowed");
     }
 
     private void StunedUpdate()
