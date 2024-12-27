@@ -2949,7 +2949,7 @@ MonoBehaviour:
   - {fileID: 1304374946}
   lerpDuration: 2
   ChangeAnimSpeed: 0.4
-  segmentObjectPrefab: {fileID: 3175356293647906947, guid: 8cfcd5b424e2f564fbc55e21d65437e2, type: 3}
+  segmentObjectPrefab: {fileID: 4030698455688459352, guid: 9f7ac80f0b29e3045b89019efc747ebc, type: 3}
   ResultCharaFallHeight: 50
   ResultCharaQuaternion: {x: 0, y: 0, z: 0}
   centerPoint: {fileID: 327854667}
