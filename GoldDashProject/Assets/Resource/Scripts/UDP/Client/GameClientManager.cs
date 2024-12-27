@@ -22,7 +22,7 @@ public class GameClientManager : MonoBehaviour
     private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを保管。自分以外のプレイヤー（アクター）のセッションIDも記録していく
     private Dictionary<ushort, Entity> entityDictionary; //entityIDを鍵としてentityインスタンスを管理
 
-    private PlayerController playerController; //プレイヤーが操作するキャラクターのplayerController
+    private PlayerControllerV2 playerController; //プレイヤーが操作するキャラクターのplayerController
 
 
     private int numOfActors; //アクターの人数
@@ -233,7 +233,7 @@ public class GameClientManager : MonoBehaviour
                                             //プレイヤーをインスタンス化しながらActorControllerを取得
                                             actorController = Instantiate(PlayerPrefab).GetComponent<ActorController>();
                                             //playerControllerはアクセスしやすいように取得しておく
-                                            playerController = actorController.gameObject.GetComponent<PlayerController>();
+                                            playerController = actorController.gameObject.GetComponent<PlayerControllerV2>();
                                             //Playerクラスには別にSessionIDとUdpGameClientを渡し、パケット送信を自分でやらせる。
                                             playerController.SessionID = this.sessionID;
                                             playerController.UdpGameClient = this.udpGameClient;
