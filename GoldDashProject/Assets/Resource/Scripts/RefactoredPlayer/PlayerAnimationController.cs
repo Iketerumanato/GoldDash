@@ -52,7 +52,7 @@ public class PlayerAnimationController : MonoBehaviour
                 m_animator.SetBool(strStunnedFlag, false);
                 break;
             case PLAYER_STATE.OPENING_CHEST:
-                m_animator.SetBool(strScrollFlag, true);
+                m_animator.SetBool(strChestFlag, true);
                 break;
             case PLAYER_STATE.USING_SCROLL:
                 m_animator.SetBool(strScrollFlag, true);
