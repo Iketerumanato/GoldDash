@@ -9012,7 +9012,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!65 &273578667315963843
 BoxCollider:
@@ -9072,8 +9072,8 @@ MonoBehaviour:
   m_WASD_Available: 1
   m_variableJoystick: {fileID: 3015399711445905654}
   m_dynamicJoystick: {fileID: 7284966120084178288}
-  m_blownPowerHorizontal: 1
-  m_blownPowerVertical: 1
+  m_blownPowerHorizontal: 4
+  m_blownPowerVertical: 2
   m_forbidPickTime: 1000
   m_playerCameraController: {fileID: 7647838643402749367}
   m_playerMover: {fileID: 2124854647343611678}

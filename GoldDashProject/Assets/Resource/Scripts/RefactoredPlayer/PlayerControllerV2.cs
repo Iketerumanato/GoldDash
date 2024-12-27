@@ -192,7 +192,7 @@ public class PlayerControllerV2 : MonoBehaviour
 
     private void KnockedUpdate()
     {
-        if (m_playedStateAnimation) //このstateに入った最初のフレームなら
+        if (!m_playedStateAnimation) //このstateに入った最初のフレームなら
         {
             //発動中のステートロックを解除
             m_stateLockCts.Cancel();
@@ -235,7 +235,7 @@ public class PlayerControllerV2 : MonoBehaviour
 
     private void StunedUpdate()
     {
-        if (m_playedStateAnimation) //このstateに入った最初のフレームなら
+        if (!m_playedStateAnimation) //このstateに入った最初のフレームなら
         {
             //発動中のステートロックを解除
             m_stateLockCts.Cancel();
