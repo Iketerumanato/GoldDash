@@ -561,7 +561,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &377543644
 Transform:
   m_ObjectHideFlags: 0
@@ -2752,8 +2752,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1955288931}
   - {fileID: 1834305326}
+  - {fileID: 1955288931}
   - {fileID: 1321285963}
   - {fileID: 1051842059}
   - {fileID: 1469145184}
@@ -4861,6 +4861,77 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1955288930}
   m_CullTransparentMesh: 1
+--- !u!1 &2030600038
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2030600041}
+  - component: {fileID: 2030600040}
+  - component: {fileID: 2030600039}
+  m_Layer: 0
+  m_Name: UIManager_verTeru
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2030600039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2030600038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b309c8f95e98f304d928ee9296e69494, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _title: {fileID: 2030600040}
+  StartClientButton: {fileID: 1834305325}
+  StartServerButton: {fileID: 1955288930}
+  StartGameButton: {fileID: 1580499884}
+  GameTitle: {fileID: 585139159}
+  PlayerNameSetting: {fileID: 0}
+  StartConnectButton: {fileID: 2099534995}
+  BackStateButton: {fileID: 1560170461}
+  TitleExplanationText: []
+--- !u!114 &2030600040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2030600038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5188cdf8612ae84eaeebb6150239ee8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartClientButton: {fileID: 1834305327}
+  StartServerButton: {fileID: 1955288932}
+  StartGameButton: {fileID: 1580499886}
+  StartConnectButton: {fileID: 2099534997}
+  BackStateButton: {fileID: 1560170463}
+--- !u!4 &2030600041
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2030600038}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2099534995
 GameObject:
   m_ObjectHideFlags: 0
@@ -4989,6 +5060,7 @@ SceneRoots:
   - {fileID: 801294304}
   - {fileID: 1597825854}
   - {fileID: 55633220}
+  - {fileID: 2030600041}
   - {fileID: 377543644}
   - {fileID: 1250031076}
   - {fileID: 346718033}

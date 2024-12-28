@@ -87,30 +87,20 @@ public class Title : MonoBehaviour
         MODE_CREATE_MAP
     }
 
-    [Header("Mode_Selectのobjectたち")]
+    [Header("モード決定のボタン")]
     [SerializeField] Button StartClientButton;
     [SerializeField] Button StartServerButton;
 
     #region クライアントモードのオブジェクト群
-    [Header("Mode_Logoのオブジェクトたち")]
-    [SerializeField] Button StartButton;
+    [Header("Mode_Logoのボタン")]
+    [SerializeField] Button StartGameButton;
 
-    [Header("Mode_Settingのオブジェクトたち")]
-    [SerializeField] GameObject PlayerNameSetting;
+    [Header("Mode_Settingのボタン")]
     [SerializeField] Button StartConnectButton;
 
     [Header("Stateによって振る舞いを違うものにする(前のStateに戻るか,サーバーへの接続をなしにするか両方か)")]
-    [SerializeField] GameObject BackStateButton;
+    [SerializeField] Button BackStateButton;
     #endregion
-
-    #region サーバーモードのオブジェクト群
-    //[Header("サーバーの画面で扱われるオブジェクト(主に演出)")]
-    //エフェクトなどの宣言
-    #endregion
-
-    [Header("各Stateによって異なる振る舞いを行うオブジェクト(サーバーとクライアント共通)")]
-    [SerializeField] GameObject TitleObjs;
-    [SerializeField] GameObject[] TitleExplanationText;
 
     ITitleMode_Client _currentClientState;//現在のState(クライアント)
     ITitleMode_Client _previousClientState;//前のState(クライアント)
@@ -121,34 +111,35 @@ public class Title : MonoBehaviour
     Dictionary<SERVER_MODE, ITitleMode_Server> _serverStateTable;//サーバーStateのテーブル
 
     //ボタン処理まとめ
-    public enum TITLE_BUTTON_EVENT_CLIENT : byte
+    public enum TITLE_BUTTON_EVENT : byte
     {
         //サーバー側ボタンの処理一覧
-        BUTTON_START_SERVER_MODE,//サーバーモード起動
-
+        BUTTON_START_SERVER_ACTIVATE,//サーバーモード起動
         //クライアント側ボタンの処理一覧
         BUTTON_CLIENT_GO_TITLE,//クライアントとして起動(タイトルロゴのあるStateへ移動)
-        BUTTON_CLIENT_GO_SETTING,
+
+        BUTTON_CLIENT_GO_SETTING,//名前決めと接続画面
         BUTTON_CLIENT_CONNECT,//サーバーへの通信開始
+
         BUTTON_CLIENT_DISCONNECT,//サーバーへの通信取りやめ
         BUTTON_CLIENT_BACK//ひとつ前のStateに移動
     }
 
     //通知するSubjectの宣言
-    public Subject<TITLE_BUTTON_EVENT_CLIENT> titleButtonSubject;
+    public Subject<TITLE_BUTTON_EVENT> titleButtonSubject;
 
     //各ボタンの処理登録とステートクラスの初期化
     public void InitObservationClient(Title title)
     {
         //通知用にsubjectのインスタンス作成　外部から購読する
-        titleButtonSubject = new Subject<TITLE_BUTTON_EVENT_CLIENT>();
+        titleButtonSubject = new Subject<TITLE_BUTTON_EVENT>();
 
-        StartServerButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT_CLIENT.BUTTON_START_SERVER_MODE));
+        StartServerButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_START_SERVER_ACTIVATE));
 
         //各ボタンをクリック(タッチ)で処理の実行(クライアント側)
-        StartClientButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT_CLIENT.BUTTON_CLIENT_GO_TITLE));
-        StartButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT_CLIENT.BUTTON_CLIENT_GO_SETTING));
-        StartConnectButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT_CLIENT.BUTTON_CLIENT_CONNECT));
+        StartClientButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_GO_TITLE));
+        StartGameButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_GO_SETTING));
+        StartConnectButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT));
 
         if (_clientStateTable != null && _serverStateTable != null) return;
 
@@ -194,4 +185,6 @@ public class Title : MonoBehaviour
         _currentServerState = nextState;
         _currentServerState.Title_EntryMode_Server();
     }
+
+    public void Awake() => InitObservationClient(this);
 }
