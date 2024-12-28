@@ -4893,6 +4893,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _title: {fileID: 2030600040}
   gameClientManager: {fileID: 1385810820}
+  gameServerManager: {fileID: 1385810818}
   StartClientButton: {fileID: 1834305325}
   StartServerButton: {fileID: 1955288930}
   StartGameButton: {fileID: 1580499884}
@@ -4900,7 +4901,8 @@ MonoBehaviour:
   PlayerNameSetting: {fileID: 1008121265}
   StartConnectButton: {fileID: 2099534995}
   BackStateButton: {fileID: 1560170461}
-  TitleExplanationText: []
+  TitleExplanationText:
+  - {fileID: 1829652682}
 --- !u!114 &2030600040
 MonoBehaviour:
   m_ObjectHideFlags: 0
