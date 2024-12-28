@@ -25,7 +25,7 @@ public class SubscribeOrderManager : MonoBehaviour
 
         //マネージャー
         gameServerManager.InitObservation(udpButtonManager);
-        gameClientManager.InitObservation(udpButtonManager);
+        //gameClientManager.InitObservation(udpButtonManager);
 
         //UI関連
 

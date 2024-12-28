@@ -138,6 +138,8 @@ public class Title : MonoBehaviour
 
         //各ボタンをクリック(タッチ)で処理の実行(クライアント側)
         StartClientButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_GO_TITLE));
+       
+
         StartGameButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_GO_SETTING));
         StartConnectButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT));
 
@@ -162,10 +164,7 @@ public class Title : MonoBehaviour
 
     //Stateの遷移(クライアント)
     public void ChangeStateClient(CLIENT_MODE nextClientState)
-    {
-        if (_clientStateTable == null) return;//初期化してない場合は無視
-        if (_currentClientState == null || _currentClientState.clientState == nextClientState) return;//同じ状態には遷移しないように
-
+    { 
         var nextState = _clientStateTable[nextClientState];
         _previousClientState = _currentClientState;//現在のステートを取得
         _previousClientState?.Title_ExitMode_Client();//前のステートから出る
@@ -176,9 +175,6 @@ public class Title : MonoBehaviour
     //Stateの遷移(サーバー)※やることはクライアントと同じ
     public void ChangeStateServer(SERVER_MODE nextServerState)
     {
-        if (_serverStateTable == null) return;
-        if (_currentServerState == null || _currentServerState.serverState == nextServerState) return;
-
         var nextState = _serverStateTable[nextServerState];
         _previousServerState = _currentServerState;
         _previousServerState?.Title_ExitMode_Server();
@@ -186,5 +182,10 @@ public class Title : MonoBehaviour
         _currentServerState.Title_EntryMode_Server();
     }
 
-    public void Awake() => InitObservationClient(this);
+    //いち早く初期化を行う
+    public void Awake()
+    { 
+        InitObservationClient(this);
+        Application.targetFrameRate = 45;
+    }
 }

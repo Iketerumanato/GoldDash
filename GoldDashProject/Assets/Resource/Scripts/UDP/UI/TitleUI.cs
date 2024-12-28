@@ -8,6 +8,9 @@ public class TitleUI : MonoBehaviour
     [Header("Titleクラスのボタンイベントを取得")]
     [SerializeField] Title _title;
 
+    [Header("GameClientManagerの接続準備")]
+    [SerializeField] GameClientManager gameClientManager;
+
     [Header("Mode_Selectのobjectたち")]
     [SerializeField] GameObject StartClientButton;
     [SerializeField] GameObject StartServerButton;
@@ -18,7 +21,7 @@ public class TitleUI : MonoBehaviour
     [SerializeField] TMP_Text GameTitle;
 
     [Header("Mode_Settingのオブジェクトたち")]
-    [SerializeField] InputField PlayerNameSetting;
+    [SerializeField] TMP_InputField PlayerNameSetting;
     [SerializeField] GameObject StartConnectButton;
 
     [Header("前に戻るボタン")]
@@ -32,6 +35,11 @@ public class TitleUI : MonoBehaviour
     //[Header("サーバーの画面で扱われるオブジェクト(主に演出の)")]
     #endregion
 
+    private void Start()
+    {
+        InitObserver(_title);
+    }
+
     public void InitObserver(Title title)
     {
         title.titleButtonSubject.Subscribe(buttonevent => ProcessUdpManagerEvent(buttonevent));
@@ -39,7 +47,6 @@ public class TitleUI : MonoBehaviour
 
     private void ProcessUdpManagerEvent(Title.TITLE_BUTTON_EVENT clientbuttonEvent)
     {
-
         switch (clientbuttonEvent)
         {
             case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_GO_TITLE:
@@ -49,6 +56,7 @@ public class TitleUI : MonoBehaviour
                 //表示
                 StartGameButton.SetActive(true);
                 GameTitle.enabled = true;
+                _title.ChangeStateClient(Title.CLIENT_MODE.MODE_LOGO);
                 break;
             case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_GO_SETTING:
                 StartGameButton.SetActive(false);
@@ -56,10 +64,13 @@ public class TitleUI : MonoBehaviour
 
                 PlayerNameSetting.enabled = true;
                 StartConnectButton.SetActive(true);
+                _title.ChangeStateClient(Title.CLIENT_MODE.MODE_SETTING);
                 break;
             case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
                 PlayerNameSetting.enabled = false;
                 StartConnectButton.SetActive(false);
+                gameClientManager.InitObservation(_title);
+                _title.ChangeStateClient(Title.CLIENT_MODE.MODE_WAITING);
                 break;
         }
 

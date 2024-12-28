@@ -52,20 +52,62 @@ public class GameClientManager : MonoBehaviour
     public Subject<CLIENT_INTERNAL_EVENT> ClientInternalSubject;
 
     #region ボタンが押されたら有効化したり無効化したり
-    public void InitObservation(UdpButtonManager udpUIManager)
+    //public void InitObservation(UdpButtonManager udpUIManager)
+    //{
+    //    ClientInternalSubject = new Subject<CLIENT_INTERNAL_EVENT>();
+    //    udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
+    //}
+
+    public void InitObservation(Title title)
     {
         ClientInternalSubject = new Subject<CLIENT_INTERNAL_EVENT>();
-        udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
+        title.titleButtonSubject.Subscribe(e => ProcessUdpManagerEvent(e));
     }
 
-    private void ProcessUdpManagerEvent(UdpButtonManager.UDP_BUTTON_EVENT e)
+    //private void ProcessUdpManagerEvent(UdpButtonManager.UDP_BUTTON_EVENT e)
+    //{
+    //    switch (e)
+    //    {
+    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
+    //            if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
+    //            break;
+    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
+    //            if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
+    //            if (this.sessionID != 0) break; //既に接続中なら何もしない
+    //            isRunning = true;
+    //            //Initパケット送信
+    //            //再送処理など時間がかかるので非同期に行う
+    //            sendCts = new CancellationTokenSource();
+    //            token = sendCts.Token;
+    //            Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte()), token);
+
+    //            break;
+    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
+    //            isRunning = false;
+    //            sendCts.Cancel(); //送信を非同期で行っているなら止める
+    //            if (this.sessionID != 0) //サーバーに接続中なら切断パケット
+    //            {
+    //                udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
+    //            }
+    //            if (udpGameClient != null) udpGameClient.Dispose();
+    //            udpGameClient = null;
+    //            this.sessionID = 0; //変数リセットなど
+    //            break;
+    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
+    //            if (udpGameClient != null) udpGameClient.Dispose();
+    //            udpGameClient = null;
+    //            isRunning = false;
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //}
+
+    private void ProcessUdpManagerEvent(Title.TITLE_BUTTON_EVENT titlebuttonEvent)
     {
-        switch (e)
+        switch (titlebuttonEvent)
         {
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
-                if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
-                break;
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
+            case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
                 if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
                 if (this.sessionID != 0) break; //既に接続中なら何もしない
                 isRunning = true;
@@ -76,7 +118,7 @@ public class GameClientManager : MonoBehaviour
                 Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte()), token);
 
                 break;
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
+            case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
                 isRunning = false;
                 sendCts.Cancel(); //送信を非同期で行っているなら止める
                 if (this.sessionID != 0) //サーバーに接続中なら切断パケット
@@ -87,7 +129,7 @@ public class GameClientManager : MonoBehaviour
                 udpGameClient = null;
                 this.sessionID = 0; //変数リセットなど
                 break;
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
+            case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_BACK:
                 if (udpGameClient != null) udpGameClient.Dispose();
                 udpGameClient = null;
                 isRunning = false;

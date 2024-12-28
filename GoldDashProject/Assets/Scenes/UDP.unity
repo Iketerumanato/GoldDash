@@ -412,7 +412,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &176831868
 Transform:
   m_ObjectHideFlags: 0
@@ -440,10 +440,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9619c48f74d749b46931220698d01117, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  udpButtonManager: {fileID: 377543645}
-  udpUIDisplayer: {fileID: 377543646}
-  udpTextWriter: {fileID: 377543647}
-  udpUIColorChanger: {fileID: 377543648}
+  udpButtonManager: {fileID: 0}
+  udpUIDisplayer: {fileID: 0}
+  udpTextWriter: {fileID: 0}
+  udpUIColorChanger: {fileID: 0}
   gameServerManager: {fileID: 1385810818}
   gameClientManager: {fileID: 1385810820}
   mapGenerator: {fileID: 1585246434}
@@ -1973,7 +1973,7 @@ GameObject:
   - component: {fileID: 1008121266}
   - component: {fileID: 1008121265}
   m_Layer: 5
-  m_Name: InputField (TMP)
+  m_Name: InputNameField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4892,11 +4892,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _title: {fileID: 2030600040}
+  gameClientManager: {fileID: 1385810820}
   StartClientButton: {fileID: 1834305325}
   StartServerButton: {fileID: 1955288930}
   StartGameButton: {fileID: 1580499884}
   GameTitle: {fileID: 585139159}
-  PlayerNameSetting: {fileID: 0}
+  PlayerNameSetting: {fileID: 1008121265}
   StartConnectButton: {fileID: 2099534995}
   BackStateButton: {fileID: 1560170461}
   TitleExplanationText: []
