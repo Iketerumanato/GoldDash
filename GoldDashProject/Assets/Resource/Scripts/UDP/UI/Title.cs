@@ -47,7 +47,7 @@ public class Mode_Waiting : ITitleMode_Client
 public interface ITitleMode_Server
 {
     Title.SERVER_MODE serverState { get; }
-    void Title_EnterMode_Server();
+    void Title_EntryMode_Server();
     void Title_ExitMode_Server();
 }
 
@@ -57,7 +57,7 @@ public class Mode_Activate : ITitleMode_Server
     Title _title;
     public Title.SERVER_MODE serverState => Title.SERVER_MODE.MODE_ACTIVATE;
     public Mode_Activate(Title title) => _title = title;
-    public void Title_EnterMode_Server() { Debug.Log($"{serverState}に入ります"); }
+    public void Title_EntryMode_Server() { Debug.Log($"{serverState}に入ります"); }
     public void Title_ExitMode_Server() { Debug.Log($"{serverState}を出ます"); }
 }
 
@@ -67,7 +67,7 @@ public class Mode_Create_Map : ITitleMode_Server
     Title _title;
     public Title.SERVER_MODE serverState => Title.SERVER_MODE.MODE_CREATE_MAP;
     public Mode_Create_Map(Title title) => _title = title;
-    public void Title_EnterMode_Server() { Debug.Log($"{serverState}に入ります"); }
+    public void Title_EntryMode_Server() { Debug.Log($"{serverState}に入ります"); }
     public void Title_ExitMode_Server() { Debug.Log($"{serverState}を出ます"); }
 }
 #endregion
@@ -97,9 +97,9 @@ public class Title : MonoBehaviour
 
     [Header("Mode_Settingのオブジェクトたち")]
     [SerializeField] GameObject PlayerNameSetting;
-    [SerializeField] GameObject StartConnectButton;
+    [SerializeField] Button StartConnectButton;
 
-    [Header("Stateによって振る舞いを違うものにする(前のStateに戻るか,サーバーへの接続をなしにするか)")]
+    [Header("Stateによって振る舞いを違うものにする(前のStateに戻るか,サーバーへの接続をなしにするか両方か)")]
     [SerializeField] GameObject BackStateButton;
     #endregion
 
@@ -123,26 +123,34 @@ public class Title : MonoBehaviour
     //ボタン処理まとめ
     public enum TITLE_BUTTON_EVENT_CLIENT : byte
     {
-        //どちらのモードで起動するか
+        //サーバー側ボタンの処理一覧
         BUTTON_START_SERVER_MODE,//サーバーモード起動
-        BUTTON_START_CLIENT_MODE,//クライアントモード起動
 
-        //クライアント処理一覧
-        BUTTON_CLIENT_GO_TITLE,//タイトルロゴのあるStateへ移動
+        //クライアント側ボタンの処理一覧
+        BUTTON_CLIENT_GO_TITLE,//クライアントとして起動(タイトルロゴのあるStateへ移動)
+        BUTTON_CLIENT_GO_SETTING,
         BUTTON_CLIENT_CONNECT,//サーバーへの通信開始
         BUTTON_CLIENT_DISCONNECT,//サーバーへの通信取りやめ
         BUTTON_CLIENT_BACK//ひとつ前のStateに移動
     }
 
     //通知するSubjectの宣言
-    public Subject<TITLE_BUTTON_EVENT_CLIENT> clientUISubject;
+    public Subject<TITLE_BUTTON_EVENT_CLIENT> titleButtonSubject;
 
+    //各ボタンの処理登録とステートクラスの初期化
     public void InitObservationClient(Title title)
     {
         //通知用にsubjectのインスタンス作成　外部から購読する
-        clientUISubject = new Subject<TITLE_BUTTON_EVENT_CLIENT>();
+        titleButtonSubject = new Subject<TITLE_BUTTON_EVENT_CLIENT>();
 
-        if (_clientStateTable != null) return;
+        StartServerButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT_CLIENT.BUTTON_START_SERVER_MODE));
+
+        //各ボタンをクリック(タッチ)で処理の実行(クライアント側)
+        StartClientButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT_CLIENT.BUTTON_CLIENT_GO_TITLE));
+        StartButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT_CLIENT.BUTTON_CLIENT_GO_SETTING));
+        StartConnectButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT_CLIENT.BUTTON_CLIENT_CONNECT));
+
+        if (_clientStateTable != null && _serverStateTable != null) return;
 
         //各テーブルの初期化
         Dictionary<CLIENT_MODE, ITitleMode_Client> clienttable = new()
@@ -153,30 +161,37 @@ public class Title : MonoBehaviour
         };
         _clientStateTable = clienttable;
 
-    }
-
-    public void InitObservationServer(Title title)
-    {
-        if (_serverStateTable != null) return;
-
         Dictionary<SERVER_MODE, ITitleMode_Server> servertable = new()
         {
             { SERVER_MODE.MODE_ACTIVATE,new Mode_Activate(title) },
             { SERVER_MODE.MODE_CREATE_MAP,new Mode_Create_Map(title) }
         };
-
         _serverStateTable = servertable;
     }
 
+    //Stateの遷移(クライアント)
     public void ChangeStateClient(CLIENT_MODE nextClientState)
     {
         if (_clientStateTable == null) return;//初期化してない場合は無視
         if (_currentClientState == null || _currentClientState.clientState == nextClientState) return;//同じ状態には遷移しないように
 
         var nextState = _clientStateTable[nextClientState];
-        _previousClientState = _currentClientState;
-        _previousClientState?.Title_ExitMode_Client();
-        _currentClientState = nextState;
-        _currentClientState.Title_EntryMode_Client();
+        _previousClientState = _currentClientState;//現在のステートを取得
+        _previousClientState?.Title_ExitMode_Client();//前のステートから出る
+        _currentClientState = nextState;//次のステートを取得
+        _currentClientState.Title_EntryMode_Client();//次のステートに入る
+    }
+
+    //Stateの遷移(サーバー)※やることはクライアントと同じ
+    public void ChangeStateServer(SERVER_MODE nextServerState)
+    {
+        if (_serverStateTable == null) return;
+        if (_currentServerState == null || _currentServerState.serverState == nextServerState) return;
+
+        var nextState = _serverStateTable[nextServerState];
+        _previousServerState = _currentServerState;
+        _previousServerState?.Title_ExitMode_Server();
+        _currentServerState = nextState;
+        _currentServerState.Title_EntryMode_Server();
     }
 }
