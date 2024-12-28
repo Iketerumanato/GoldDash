@@ -143,6 +143,9 @@ public class Title : MonoBehaviour
         StartGameButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_GO_SETTING));
         StartConnectButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT));
 
+        //各ボタンをクリック(タッチ)して処理の実行(サーバー側)
+        StartServerButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_START_SERVER_ACTIVATE));
+
         if (_clientStateTable != null && _serverStateTable != null) return;
 
         //各テーブルの初期化
@@ -186,6 +189,7 @@ public class Title : MonoBehaviour
     public void Awake()
     { 
         InitObservationClient(this);
+         
         Application.targetFrameRate = 45;
     }
 }

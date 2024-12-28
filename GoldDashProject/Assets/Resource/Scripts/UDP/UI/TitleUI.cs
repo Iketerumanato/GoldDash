@@ -11,6 +11,9 @@ public class TitleUI : MonoBehaviour
     [Header("GameClientManagerの接続準備")]
     [SerializeField] GameClientManager gameClientManager;
 
+    [Header("GameServerManagerの通信準備")]
+    [SerializeField] GameServerManager gameServerManager;
+
     [Header("Mode_Selectのobjectたち")]
     [SerializeField] GameObject StartClientButton;
     [SerializeField] GameObject StartServerButton;
@@ -38,6 +41,8 @@ public class TitleUI : MonoBehaviour
     private void Start()
     {
         InitObserver(_title);
+        gameClientManager.InitObservation(_title);
+        gameServerManager.InitObservation(_title);
     }
 
     public void InitObserver(Title title)
@@ -69,10 +74,15 @@ public class TitleUI : MonoBehaviour
             case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
                 PlayerNameSetting.enabled = false;
                 StartConnectButton.SetActive(false);
-                gameClientManager.InitObservation(_title);
                 _title.ChangeStateClient(Title.CLIENT_MODE.MODE_WAITING);
                 break;
-        }
 
+            case Title.TITLE_BUTTON_EVENT.BUTTON_START_SERVER_ACTIVATE:
+                StartClientButton.SetActive(false);
+                StartServerButton.SetActive(false);
+                TitleExplanationText[0].text = "WAITING_CONNECT";
+                _title.ChangeStateServer(Title.SERVER_MODE.MODE_ACTIVATE);
+                break;
+        }
     }
 }

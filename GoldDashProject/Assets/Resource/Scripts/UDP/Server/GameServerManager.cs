@@ -183,43 +183,78 @@ public class GameServerManager : MonoBehaviour
     #endregion
 
     #region ボタンが押されたらサーバーを有効化したり無効化したり
-    public void InitObservation(UdpButtonManager udpUIManager)
+    //public void InitObservation(UdpButtonManager udpUIManager)
+    //{
+    //    ServerInternalSubject = new Subject<SERVER_INTERNAL_EVENT>();
+    //    udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
+    //}
+
+    public void InitObservation(Title title)
     {
         ServerInternalSubject = new Subject<SERVER_INTERNAL_EVENT>();
-        udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
+        title.titleButtonSubject.Subscribe(e => ProcessUdpManagerEvent(e));
     }
 
-    private void ProcessUdpManagerEvent(UdpButtonManager.UDP_BUTTON_EVENT e)
+    //private void ProcessUdpManagerEvent(UdpButtonManager.UDP_BUTTON_EVENT e)
+    //{
+    //    switch (e)
+    //    {
+    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE:
+    //            udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
+    //            rcvPort = udpGameServer.GetReceivePort(); //受信用ポート番号とサーバーのセッションIDがここで決まるので取得
+    //            serverSessionID = udpGameServer.GetServerSessionID();
+    //            break;
+    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
+    //            if (udpGameServer == null) udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
+    //            isRunning = true;
+    //            break;
+    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
+    //            if (isRunning) //稼働中なら切断パケット
+    //            {
+    //                udpGameServer.Send(new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
+    //            }
+    //            if (udpGameServer != null) udpGameServer.Dispose();
+    //            udpGameServer = null;
+    //            actorDictionary.Clear(); //変数リセットなど
+    //            preparedPlayers = 0;
+    //            isRunning = false;
+    //            break;
+    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
+    //            if (udpGameServer != null) udpGameServer.Dispose();
+    //            udpGameServer = null;
+    //            isRunning = false;
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    private void ProcessUdpManagerEvent(Title.TITLE_BUTTON_EVENT titlebuttonEvent)
     {
-        switch (e)
+        switch (titlebuttonEvent)
         {
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE:
+            case Title.TITLE_BUTTON_EVENT.BUTTON_START_SERVER_ACTIVATE:
                 udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
                 rcvPort = udpGameServer.GetReceivePort(); //受信用ポート番号とサーバーのセッションIDがここで決まるので取得
                 serverSessionID = udpGameServer.GetServerSessionID();
-                break;
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
-                if (udpGameServer == null) udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
                 isRunning = true;
                 break;
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
-                if (isRunning) //稼働中なら切断パケット
-                {
-                    udpGameServer.Send(new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
-                }
-                if (udpGameServer != null) udpGameServer.Dispose();
-                udpGameServer = null;
-                actorDictionary.Clear(); //変数リセットなど
-                preparedPlayers = 0;
-                isRunning = false;
-                break;
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
-                if (udpGameServer != null) udpGameServer.Dispose();
-                udpGameServer = null;
-                isRunning = false;
-                break;
-            default:
-                break;
+            //case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
+            //    if (isRunning) //稼働中なら切断パケット
+            //    {
+            //        udpGameServer.Send(new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
+            //    }
+            //    if (udpGameServer != null) udpGameServer.Dispose();
+            //    udpGameServer = null;
+            //    actorDictionary.Clear(); //変数リセットなど
+            //    preparedPlayers = 0;
+            //    isRunning = false;
+            //    break;
+            //case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
+            //    if (udpGameServer != null) udpGameServer.Dispose();
+            //    udpGameServer = null;
+            //    isRunning = false;
+            //    break;
+            //default:
+            //    break;
         }
     }
     #endregion

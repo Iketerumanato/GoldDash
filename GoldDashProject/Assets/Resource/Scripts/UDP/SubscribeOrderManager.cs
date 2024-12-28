@@ -24,7 +24,7 @@ public class SubscribeOrderManager : MonoBehaviour
         udpButtonManager.InitObservation(); //InitObservationに引数がないということは、何にも依存していないいうことなので、最初に初期化できる
 
         //マネージャー
-        gameServerManager.InitObservation(udpButtonManager);
+        //gameServerManager.InitObservation(udpButtonManager);
         //gameClientManager.InitObservation(udpButtonManager);
 
         //UI関連

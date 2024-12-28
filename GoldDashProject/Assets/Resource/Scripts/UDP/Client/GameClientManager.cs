@@ -108,6 +108,7 @@ public class GameClientManager : MonoBehaviour
         switch (titlebuttonEvent)
         {
             case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
+                Debug.Log("サーバーへの接続開始");
                 if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
                 if (this.sessionID != 0) break; //既に接続中なら何もしない
                 isRunning = true;

@@ -440,10 +440,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9619c48f74d749b46931220698d01117, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  udpButtonManager: {fileID: 0}
-  udpUIDisplayer: {fileID: 0}
-  udpTextWriter: {fileID: 0}
-  udpUIColorChanger: {fileID: 0}
+  udpButtonManager: {fileID: 377543645}
+  udpUIDisplayer: {fileID: 377543646}
+  udpTextWriter: {fileID: 377543647}
+  udpUIColorChanger: {fileID: 377543648}
   gameServerManager: {fileID: 1385810818}
   gameClientManager: {fileID: 1385810820}
   mapGenerator: {fileID: 1585246434}
