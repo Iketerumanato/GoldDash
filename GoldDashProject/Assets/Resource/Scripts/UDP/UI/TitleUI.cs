@@ -47,13 +47,15 @@ public class Mode_Setting : ITitleMode_Client
     {
         _titleUi.playernameSetting.gameObject.SetActive(true);
         _titleUi.startconnectButton.SetActive(true);
+        _titleUi.backstateButton.SetActive(true);
         _titleUi.titleExplanationText[0].gameObject.SetActive(true);
         _titleUi.titleExplanationText[0].text = "SETTING_NAME_AND\nTAP_TO_CONNECT";
     }
-    public void Title_ExitMode_Client() 
+    public void Title_ExitMode_Client()
     {
         _titleUi.playernameSetting.gameObject.SetActive(false);
         _titleUi.startconnectButton.SetActive(false);
+        _titleUi.backstateButton.SetActive(false);
         _titleUi.titleExplanationText[0].gameObject.SetActive(false);
 
     }
@@ -70,11 +72,13 @@ public class Mode_Waiting : ITitleMode_Client
         _titleUi.titleExplanationText[1].gameObject.SetActive(true);
         _titleUi.titleExplanationText[1].text = "CONNECT_COMPLETE";
         _titleUi.titleExplanationText[2].gameObject.SetActive(true);
-        _titleUi.titleExplanationText[2].text = $"PLEYER_{_titleUi.gameserverManager.actorDictionary.Count} / 4";
+        _titleUi.titleExplanationText[2].text = "PLEYER_ 0 / 4";
+        _titleUi.backstateButton.SetActive(true);
     }
-    public void Title_ExitMode_Client() 
+    public void Title_ExitMode_Client()
     {
-        
+        _titleUi.titleExplanationText[1].gameObject.SetActive(false);
+        _titleUi.titleExplanationText[2].gameObject.SetActive(false);
     }
 }
 #endregion
@@ -124,6 +128,7 @@ public class TitleUI : MonoBehaviour
         MODE_SETTING,
         MODE_WAITING
     }
+    public CLIENT_MODE? CurrentClientMode => _currentClientState?.clientState;
 
     public enum SERVER_MODE
     {
@@ -240,6 +245,10 @@ public class TitleUI : MonoBehaviour
                 ChangeStateClient(CLIENT_MODE.MODE_WAITING);
                 break;
 
+            case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
+                BackStateClient();
+                break;
+
             case Title.TITLE_BUTTON_EVENT.BUTTON_START_SERVER_ACTIVATE:
                 ChangeStateServer(SERVER_MODE.MODE_ACTIVATE);
                 break;
@@ -301,5 +310,25 @@ public class TitleUI : MonoBehaviour
         _previousServerState?.Title_ExitMode_Server();
         _currentServerState = nextState;
         _currentServerState.Title_EntryMode_Server();
+    }
+
+    // 前のステートに戻る
+    public void BackStateClient()
+    {
+        if (_previousClientState == null)
+        {
+            Debug.LogWarning("前のステートが存在しません。");
+            return;
+        }
+
+        // 現在のステートから出る
+        _currentClientState?.Title_ExitMode_Client();
+
+        // 前のステートに戻る
+        _currentClientState = _previousClientState;
+        _previousClientState = null; // 前のステートは一度戻ると無効化
+        _currentClientState.Title_EntryMode_Client();
+
+        Debug.Log($"ステートを{_currentClientState.clientState}に戻しました。");
     }
 }

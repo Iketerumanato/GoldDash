@@ -16,7 +16,7 @@ public class GameServerManager : MonoBehaviour
     private ushort serverSessionID; //クライアントにサーバーを判別させるためのID
     private ConcurrentQueue<Header> packetQueue; //udpGameServerは”勝手に”このキューにパケットを入れてくれる。不正パケット処理なども済んだ状態で入る。
 
-    public Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを管理
+    private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを管理
     private Dictionary<ushort, Entity> entityDictionary; //entityIDを鍵としてentityインスタンスを管理
 
     private HashSet<string> usedName; //プレイヤーネームの重複防止に使う。

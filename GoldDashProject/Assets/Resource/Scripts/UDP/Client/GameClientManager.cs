@@ -34,6 +34,8 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
 
+    [SerializeField] TitleUI _titleUi;
+
     private bool inGame; //ゲームは始まっているか
 
     private CancellationTokenSource sendCts; //パケット送信タスクのキャンセル用。ブロードキャストは時間がかかるので
@@ -122,18 +124,20 @@ public class GameClientManager : MonoBehaviour
             case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
                 isRunning = false;
                 sendCts.Cancel(); //送信を非同期で行っているなら止める
-                if (this.sessionID != 0) //サーバーに接続中なら切断パケット
+                if (this.sessionID != 0 && _titleUi.CurrentClientMode == TitleUI.CLIENT_MODE.MODE_WAITING) //サーバーに接続中なら切断パケット
                 {
+                    Debug.Log("ついでにサーバーへの接続を切りました");
                     udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
                 }
                 if (udpGameClient != null) udpGameClient.Dispose();
                 udpGameClient = null;
                 this.sessionID = 0; //変数リセットなど
                 break;
-            case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_BACK:
-                if (udpGameClient != null) udpGameClient.Dispose();
-                udpGameClient = null;
-                isRunning = false;
+            //case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_BACK:
+            //    Debug.Log("接続の切断はしませんが戻ります");
+            //    if (udpGameClient != null) udpGameClient.Dispose();
+            //    udpGameClient = null;
+            //    isRunning = false;
                 break;
             default:
                 break;

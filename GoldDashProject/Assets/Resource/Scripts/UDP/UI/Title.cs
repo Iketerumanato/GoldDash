@@ -33,7 +33,7 @@ public class Title : MonoBehaviour
         BUTTON_CLIENT_CONNECT,//サーバーへの通信開始
 
         BUTTON_CLIENT_DISCONNECT,//サーバーへの通信取りやめ
-        BUTTON_CLIENT_BACK//ひとつ前のStateに移動
+        //BUTTON_CLIENT_BACK//ひとつ前のStateに移動
     }
 
     //通知するSubjectの宣言
@@ -47,10 +47,9 @@ public class Title : MonoBehaviour
 
         //各ボタンをクリック(タッチ)で処理の実行(クライアント側)
         StartClientButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_GO_TITLE));
-       
-
         StartGameButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_GO_SETTING));
         StartConnectButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT));
+        BackStateButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT));
 
         //各ボタンをクリック(タッチ)して処理の実行(サーバー側)
         StartServerButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_START_SERVER_ACTIVATE));
