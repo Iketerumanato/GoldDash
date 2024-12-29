@@ -16,7 +16,7 @@ public class GameServerManager : MonoBehaviour
     private ushort serverSessionID; //クライアントにサーバーを判別させるためのID
     private ConcurrentQueue<Header> packetQueue; //udpGameServerは”勝手に”このキューにパケットを入れてくれる。不正パケット処理なども済んだ状態で入る。
 
-    private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを管理
+    public Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを管理
     private Dictionary<ushort, Entity> entityDictionary; //entityIDを鍵としてentityインスタンスを管理
 
     private HashSet<string> usedName; //プレイヤーネームの重複防止に使う。
@@ -40,7 +40,7 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private BGGradientController gradientController;
 
     //12/29追記
-    [SerializeField] Title _title;
+    [SerializeField] TitleUI _titleUi;
 
     //サーバーが内部をコントロールするための通知　マップ生成など
     //クライアントサーバーのクライアント部分の処理をここでやると機能過多になるため、通知を飛ばすだけにする。脳が体内の器官に命令を送るようなイメージ。実行するのはあくまで器官側。
@@ -414,7 +414,7 @@ public class GameServerManager : MonoBehaviour
                             ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
                             ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.EDIT_GUI_FOR_GAME); //UIレイアウトを変更せよ
 
-                            _title.ChangeStateServer(Title.SERVER_MODE.MODE_CREATE_MAP);
+                            _titleUi.ChangeStateServer(TitleUI.SERVER_MODE.MODE_CREATE_MAP);
 
                             //全クライアントにアクターの生成命令を送る
 
