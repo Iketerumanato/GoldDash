@@ -139,7 +139,6 @@ public class TitleUI : MonoBehaviour
     }
 
     ITitleMode_Client _currentClientState;//現在のState(クライアント)
-    ITitleMode_Client _previousClientState;//前のState(クライアント)
     Dictionary<CLIENT_MODE, ITitleMode_Client> _clientStateTable;//クライアントStateのテーブル
     Stack<ITitleMode_Client> _clientStateHistory = new();
 
