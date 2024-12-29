@@ -42,7 +42,7 @@ public class GameServerManager : MonoBehaviour
     //サーバーが内部をコントロールするための通知　マップ生成など
     //クライアントサーバーのクライアント部分の処理をここでやると機能過多になるため、通知を飛ばすだけにする。脳が体内の器官に命令を送るようなイメージ。実行するのはあくまで器官側。
     public enum SERVER_INTERNAL_EVENT
-    { 
+    {
         GENERATE_MAP = 0, //マップを生成せよ
         EDIT_GUI_FOR_GAME, //インゲーム用のUIレイアウトに変更せよ
     }
@@ -161,7 +161,7 @@ public class GameServerManager : MonoBehaviour
                                     //entityDictionaryをスレッドセーフなコレクションにしてUpdate()内でオブジェクト生成を行うことは禁忌だし、この実装が一番よさそうだね！
                                     //参考:https://learn.microsoft.com/ja-jp/dotnet/standard/collections/thread-safe/when-to-use-a-thread-safe-collection
                                     //スレッドセーフにしてくれてマジ、感謝。
-                                    
+
                                     gameServerManager.ChangeServerState(new NormalState()); //雷を落としたらノーマルステートに戻る
                                     break;
                                 default:
@@ -227,6 +227,7 @@ public class GameServerManager : MonoBehaviour
     //        default:
     //            break;
     //    }
+    //}
     private void ProcessUdpManagerEvent(Title.TITLE_BUTTON_EVENT titlebuttonEvent)
     {
         switch (titlebuttonEvent)
@@ -253,8 +254,8 @@ public class GameServerManager : MonoBehaviour
             //    udpGameServer = null;
             //    isRunning = false;
             //    break;
-            //default:
-            //    break;
+            default:
+                break;
         }
     }
     #endregion
@@ -703,10 +704,10 @@ public class GameServerManager : MonoBehaviour
                                             udpGameServer.Send(myHeader.ToByte());
                                         }
                                         break;
-                                    #endregion
+                                        #endregion
                                 }
                                 break;
-                            #endregion
+                                #endregion
                         }
                         break;
                     #endregion

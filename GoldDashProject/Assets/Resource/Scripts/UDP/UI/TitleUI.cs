@@ -40,14 +40,17 @@ public class TitleUI : MonoBehaviour
 
     private void Start()
     {
+        _title.InitObservationClient(_title);
         InitObserver(_title);
         gameClientManager.InitObservation(_title);
         gameServerManager.InitObservation(_title);
     }
 
-    public void InitObserver(Title title)
+    public void InitObserver(Title title)//,GameClientManager gameClientManager,GameServerManager gameServerManager)
     {
         title.titleButtonSubject.Subscribe(buttonevent => ProcessUdpManagerEvent(buttonevent));
+        //gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
+        //gameClientManager.ClientInternalSubject.Subscribe(e => ProcessClientInternalEvent(e));
     }
 
     private void ProcessUdpManagerEvent(Title.TITLE_BUTTON_EVENT clientbuttonEvent)
@@ -69,6 +72,7 @@ public class TitleUI : MonoBehaviour
 
                 PlayerNameSetting.enabled = true;
                 StartConnectButton.SetActive(true);
+                TitleExplanationText[0].text = "TAP_TO_CONNECT";
                 _title.ChangeStateClient(Title.CLIENT_MODE.MODE_SETTING);
                 break;
             case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:

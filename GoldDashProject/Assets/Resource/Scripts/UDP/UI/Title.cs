@@ -187,9 +187,7 @@ public class Title : MonoBehaviour
 
     //いち早く初期化を行う
     public void Awake()
-    { 
-        InitObservationClient(this);
-         
+    {   
         Application.targetFrameRate = 45;
     }
 }
