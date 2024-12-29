@@ -336,20 +336,11 @@ public class TitleUI : MonoBehaviour
             return;
         }
 
-        // 現在のステートを一時保存
-        tempClientState = _currentClientState;
+        // 前のステートを取得
+        var previousState = _previousClientState;
+        _previousClientState = null; // 前のステートを一度戻ると無効化
 
-        // 現在のステートから出る
-        _currentClientState?.Title_ExitMode_Client();
-
-        // 前のステートに戻る
-        _currentClientState = _previousClientState;
-        _previousClientState = null; // 前のステートは一度戻ると無効化
-        _currentClientState.Title_EntryMode_Client();
-
-        Debug.Log($"ステートを{_currentClientState.clientState}に戻しました。");
-
-        // 必要であれば、tempClientStateを復元するための処理を追加
-        _currentClientState = tempClientState; 
+        // ChangeStateClientを使用して状態を戻す
+        ChangeStateClient(previousState.clientState);
     }
 }
