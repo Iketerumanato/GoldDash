@@ -298,6 +298,12 @@ public class TitleUI : MonoBehaviour
     //Stateの遷移(クライアント)
     public void ChangeStateClient(CLIENT_MODE nextClientState)
     {
+        if (_currentClientState != null)
+        {
+            _previousClientState = _currentClientState;  // 現在のステートを保存
+            _currentClientState.Title_ExitMode_Client();
+        }
+
         var nextState = _clientStateTable[nextClientState];
 
         // 現在の状態を前の状態に保存
