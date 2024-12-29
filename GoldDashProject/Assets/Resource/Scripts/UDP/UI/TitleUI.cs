@@ -204,6 +204,7 @@ public class TitleUI : MonoBehaviour
         _gameServerManager.InitObservation(_title);
         InitObserver(_title,_gameClientManager,_gameServerManager);
         _mapGenerator.InitObservation(_gameServerManager, _gameClientManager);
+
     }
 
     public void InitObserver(Title title,GameClientManager gameClientManager,GameServerManager gameServerManager)
@@ -298,10 +299,16 @@ public class TitleUI : MonoBehaviour
     public void ChangeStateClient(CLIENT_MODE nextClientState)
     {
         var nextState = _clientStateTable[nextClientState];
-        _previousClientState = _currentClientState;//現在のステートを取得
-        _previousClientState?.Title_ExitMode_Client();//前のステートから出る
-        _currentClientState = nextState;//次のステートを取得
-        _currentClientState.Title_EntryMode_Client();//次のステートに入る
+
+        // 現在の状態を前の状態に保存
+        _previousClientState = _currentClientState;
+
+        // 前のステートから出る
+        _currentClientState?.Title_ExitMode_Client();
+
+        // 次のステートに移行
+        _currentClientState = nextState;
+        _currentClientState.Title_EntryMode_Client();
     }
 
     //Stateの遷移(サーバー)※やることはクライアントと同じ
