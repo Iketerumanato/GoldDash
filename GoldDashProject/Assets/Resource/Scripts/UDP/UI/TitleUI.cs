@@ -140,8 +140,8 @@ public class TitleUI : MonoBehaviour
 
     ITitleMode_Client _currentClientState;//現在のState(クライアント)
     ITitleMode_Client _previousClientState;//前のState(クライアント)
-    ITitleMode_Client tempClientState;//保存用のステート
     Dictionary<CLIENT_MODE, ITitleMode_Client> _clientStateTable;//クライアントStateのテーブル
+    Stack<ITitleMode_Client> _clientStateHistory = new();
 
     ITitleMode_Server _currentServerState;//現在のState(サーバー)
     ITitleMode_Server _previousServerState;//現在のState(サーバー)
@@ -300,20 +300,11 @@ public class TitleUI : MonoBehaviour
     {
         if (_currentClientState != null)
         {
-            _previousClientState = _currentClientState;  // 現在のステートを保存
+            _clientStateHistory.Push(_currentClientState); // 現在の状態を履歴に追加
             _currentClientState.Title_ExitMode_Client();
         }
 
-        var nextState = _clientStateTable[nextClientState];
-
-        // 現在の状態を前の状態に保存
-        _previousClientState = _currentClientState;
-
-        // 前のステートから出る
-        _currentClientState?.Title_ExitMode_Client();
-
-        // 次のステートに移行
-        _currentClientState = nextState;
+        _currentClientState = _clientStateTable[nextClientState];
         _currentClientState.Title_EntryMode_Client();
     }
 
@@ -330,17 +321,19 @@ public class TitleUI : MonoBehaviour
     // 前のステートに戻る
     public void BackStateClient()
     {
-        if (_previousClientState == null)
+        if (_clientStateHistory.Count == 0)
         {
             Debug.LogWarning("前のステートが存在しません。");
             return;
         }
 
-        // 前のステートを取得
-        var previousState = _previousClientState;
-        _previousClientState = null; // 前のステートを一度戻ると無効化
+        // 現在のステートから抜ける
+        _currentClientState?.Title_ExitMode_Client();
 
-        // ChangeStateClientを使用して状態を戻す
-        ChangeStateClient(previousState.clientState);
+        // 前のステートを取得し適用
+        _currentClientState = _clientStateHistory.Pop();
+        _currentClientState.Title_EntryMode_Client();
+
+        Debug.Log($"ステートを{_currentClientState.clientState}に戻しました。");
     }
 }
