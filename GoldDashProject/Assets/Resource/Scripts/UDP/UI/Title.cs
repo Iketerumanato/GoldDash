@@ -144,7 +144,7 @@ public class Title : MonoBehaviour
         StartConnectButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT));
 
         //各ボタンをクリック(タッチ)して処理の実行(サーバー側)
-        StartServerButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_START_SERVER_ACTIVATE));
+        //StartServerButton.OnClickAsObservable().Subscribe(_ => titleButtonSubject.OnNext(TITLE_BUTTON_EVENT.BUTTON_START_SERVER_ACTIVATE));
 
         if (_clientStateTable != null && _serverStateTable != null) return;
 
