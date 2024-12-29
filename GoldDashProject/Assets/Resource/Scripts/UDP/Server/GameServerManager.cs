@@ -39,6 +39,9 @@ public class GameServerManager : MonoBehaviour
 
     [SerializeField] private BGGradientController gradientController;
 
+    //12/29追記
+    [SerializeField] Title _title;
+
     //サーバーが内部をコントロールするための通知　マップ生成など
     //クライアントサーバーのクライアント部分の処理をここでやると機能過多になるため、通知を飛ばすだけにする。脳が体内の器官に命令を送るようなイメージ。実行するのはあくまで器官側。
     public enum SERVER_INTERNAL_EVENT
@@ -410,6 +413,8 @@ public class GameServerManager : MonoBehaviour
                             //内部通知
                             ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
                             ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.EDIT_GUI_FOR_GAME); //UIレイアウトを変更せよ
+
+                            _title.ChangeStateServer(Title.SERVER_MODE.MODE_CREATE_MAP);
 
                             //全クライアントにアクターの生成命令を送る
 

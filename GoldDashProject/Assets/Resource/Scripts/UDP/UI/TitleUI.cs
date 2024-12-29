@@ -9,10 +9,13 @@ public class TitleUI : MonoBehaviour
     [SerializeField] Title _title;
 
     [Header("GameClientManagerの接続準備")]
-    [SerializeField] GameClientManager gameClientManager;
+    [SerializeField] GameClientManager _gameClientManager;
 
     [Header("GameServerManagerの通信準備")]
-    [SerializeField] GameServerManager gameServerManager;
+    [SerializeField] GameServerManager _gameServerManager;
+
+    [Header("マップ作成準備")]
+    [SerializeField] MapGenerator _mapGenerator;
 
     [Header("Mode_Selectのobjectたち")]
     [SerializeField] GameObject StartClientButton;
@@ -42,8 +45,9 @@ public class TitleUI : MonoBehaviour
     {
         _title.InitObservationClient(_title);
         InitObserver(_title);
-        gameClientManager.InitObservation(_title);
-        gameServerManager.InitObservation(_title);
+        _gameClientManager.InitObservation(_title);
+        _gameServerManager.InitObservation(_title);
+        _mapGenerator.InitObservation(_gameServerManager, _gameClientManager);
     }
 
     public void InitObserver(Title title)//,GameClientManager gameClientManager,GameServerManager gameServerManager)

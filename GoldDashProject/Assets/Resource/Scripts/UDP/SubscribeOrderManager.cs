@@ -21,7 +21,7 @@ public class SubscribeOrderManager : MonoBehaviour
         Application.targetFrameRate = 45;
 
         //ボタン関連
-        udpButtonManager.InitObservation(); //InitObservationに引数がないということは、何にも依存していないいうことなので、最初に初期化できる
+        //udpButtonManager.InitObservation(); //InitObservationに引数がないということは、何にも依存していないいうことなので、最初に初期化できる
 
         //マネージャー
         //gameServerManager.InitObservation(udpButtonManager);
@@ -29,13 +29,13 @@ public class SubscribeOrderManager : MonoBehaviour
 
         //UI関連
 
-        udpUIDisplayer.InitObservation(udpButtonManager, gameServerManager, gameClientManager);
+        //udpUIDisplayer.InitObservation(udpButtonManager, gameServerManager, gameClientManager);
         udpTextWriter.InitObservation(udpButtonManager, gameServerManager, gameClientManager);
         udpUIColorChanger.InitObservation(udpButtonManager, gameServerManager, gameClientManager);
 
         soundManager.InitObservation(udpButtonManager);
 
         //サーバー関連
-        mapGenerator.InitObservation(gameServerManager, gameClientManager);
+        //mapGenerator.InitObservation(gameServerManager, gameClientManager);
     }
 }

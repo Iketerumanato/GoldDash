@@ -3000,6 +3000,7 @@ MonoBehaviour:
   ChestPrefab: {fileID: 5283063881264726642, guid: f99816d4e2a842047bc8f89cd40346a8, type: 3}
   ThunderPrefab: {fileID: 8666734358453998117, guid: 2dff9d1b170394642984e801a4cdf773, type: 3}
   gradientController: {fileID: 0}
+  _title: {fileID: 2030600040}
   mapCamera: {fileID: 801294303}
 --- !u!4 &1385810819
 Transform:
@@ -4892,8 +4893,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _title: {fileID: 2030600040}
-  gameClientManager: {fileID: 1385810820}
-  gameServerManager: {fileID: 1385810818}
+  _gameClientManager: {fileID: 1385810820}
+  _gameServerManager: {fileID: 1385810818}
+  _mapGenerator: {fileID: 1585246434}
   StartClientButton: {fileID: 1834305325}
   StartServerButton: {fileID: 1955288930}
   StartGameButton: {fileID: 1580499884}
