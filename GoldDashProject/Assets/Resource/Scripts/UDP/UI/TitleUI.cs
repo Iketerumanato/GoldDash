@@ -338,7 +338,7 @@ public class TitleUI : MonoBehaviour
 
         // 前のステートに戻る
         _currentClientState = _previousClientState;
-        //_previousClientState = null; // 前のステートは一度戻ると無効化
+        _previousClientState = null; // 前のステートは一度戻ると無効化
         _currentClientState.Title_EntryMode_Client();
 
         Debug.Log($"ステートを{_currentClientState.clientState}に戻しました。");
