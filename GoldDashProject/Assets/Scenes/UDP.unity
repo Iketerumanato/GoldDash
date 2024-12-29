@@ -4899,12 +4899,15 @@ MonoBehaviour:
   StartClientButton: {fileID: 1834305325}
   StartServerButton: {fileID: 1955288930}
   StartGameButton: {fileID: 1580499884}
-  GameTitle: {fileID: 585139159}
+  GameTitle: {fileID: 585139157}
   PlayerNameSetting: {fileID: 1008121265}
   StartConnectButton: {fileID: 2099534995}
   BackStateButton: {fileID: 1560170461}
   TitleExplanationText:
   - {fileID: 1829652682}
+  TitleUICamvas:
+  - {fileID: 1250031072}
+  - {fileID: 346718029}
 --- !u!114 &2030600040
 MonoBehaviour:
   m_ObjectHideFlags: 0
