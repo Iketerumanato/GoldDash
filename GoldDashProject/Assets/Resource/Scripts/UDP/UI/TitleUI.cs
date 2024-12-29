@@ -69,14 +69,16 @@ public class Mode_Waiting : ITitleMode_Client
     public Mode_Waiting(TitleUI titleUi) => _titleUi = titleUi;
     public void Title_EntryMode_Client()
     {
+        _titleUi.backstateButton.SetActive(true);
         _titleUi.titleExplanationText[1].gameObject.SetActive(true);
         _titleUi.titleExplanationText[1].text = "CONNECT_COMPLETE";
         _titleUi.titleExplanationText[2].gameObject.SetActive(true);
         _titleUi.titleExplanationText[2].text = "PLEYER_ 0 / 4";
-        _titleUi.backstateButton.SetActive(true);
+        
     }
     public void Title_ExitMode_Client()
     {
+        _titleUi.backstateButton.SetActive(false);
         _titleUi.titleExplanationText[1].gameObject.SetActive(false);
         _titleUi.titleExplanationText[2].gameObject.SetActive(false);
     }
@@ -322,7 +324,10 @@ public class TitleUI : MonoBehaviour
         }
 
         // 現在のステートから出る
-        _currentClientState?.Title_ExitMode_Client();
+        if (_currentClientState != null)
+        {
+            _currentClientState.Title_ExitMode_Client();
+        }
 
         // 前のステートに戻る
         _currentClientState = _previousClientState;

@@ -111,34 +111,47 @@ public class GameClientManager : MonoBehaviour
         {
             case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
                 Debug.Log("サーバーへの接続開始");
-                if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
-                if (this.sessionID != 0) break; //既に接続中なら何もしない
+                // udpGameClientがnullの場合に初期化
+                if (udpGameClient == null)
+                {
+                    udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
+                }
+
+                // 既に接続中なら何もしない
+                if (this.sessionID != 0) break;
+
                 isRunning = true;
-                //Initパケット送信
-                //再送処理など時間がかかるので非同期に行う
+                // Initパケット送信 (非同期)
                 sendCts = new CancellationTokenSource();
                 token = sendCts.Token;
                 Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte()), token);
 
                 break;
+
             case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
                 isRunning = false;
-                sendCts.Cancel(); //送信を非同期で行っているなら止める
-                if (this.sessionID != 0 && _titleUi.CurrentClientMode == TitleUI.CLIENT_MODE.MODE_WAITING) //サーバーに接続中なら切断パケット
+                sendCts?.Cancel(); // 送信を非同期で行っているなら止める
+
+                // サーバーに接続中なら切断パケットを送信
+                if (this.sessionID != 0 && _titleUi.CurrentClientMode == TitleUI.CLIENT_MODE.MODE_WAITING)
                 {
                     Debug.Log("ついでにサーバーへの接続を切りました");
-                    udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
+                    if (udpGameClient != null)
+                    {
+                        udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
+                    }
                 }
-                if (udpGameClient != null) udpGameClient.Dispose();
-                udpGameClient = null;
-                this.sessionID = 0; //変数リセットなど
+
+                // udpGameClientがnullでない場合にDisposeを呼び出す
+                if (udpGameClient != null)
+                {
+                    udpGameClient.Dispose();
+                    udpGameClient = null;
+                }
+
+                this.sessionID = 0; // 変数リセットなど
                 break;
-            //case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_BACK:
-            //    Debug.Log("接続の切断はしませんが戻ります");
-            //    if (udpGameClient != null) udpGameClient.Dispose();
-            //    udpGameClient = null;
-            //    isRunning = false;
-                break;
+
             default:
                 break;
         }
