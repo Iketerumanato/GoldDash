@@ -140,6 +140,7 @@ public class TitleUI : MonoBehaviour
 
     ITitleMode_Client _currentClientState;//現在のState(クライアント)
     ITitleMode_Client _previousClientState;//前のState(クライアント)
+    ITitleMode_Client tempClientState;//保存用のステート
     Dictionary<CLIENT_MODE, ITitleMode_Client> _clientStateTable;//クライアントStateのテーブル
 
     ITitleMode_Server _currentServerState;//現在のState(サーバー)
@@ -204,7 +205,6 @@ public class TitleUI : MonoBehaviour
         _gameServerManager.InitObservation(_title);
         InitObserver(_title,_gameClientManager,_gameServerManager);
         _mapGenerator.InitObservation(_gameServerManager, _gameClientManager);
-
     }
 
     public void InitObserver(Title title,GameClientManager gameClientManager,GameServerManager gameServerManager)
@@ -336,11 +336,11 @@ public class TitleUI : MonoBehaviour
             return;
         }
 
+        // 現在のステートを一時保存
+        tempClientState = _currentClientState;
+
         // 現在のステートから出る
-        if (_currentClientState != null)
-        {
-            _currentClientState.Title_ExitMode_Client();
-        }
+        _currentClientState?.Title_ExitMode_Client();
 
         // 前のステートに戻る
         _currentClientState = _previousClientState;
@@ -348,5 +348,8 @@ public class TitleUI : MonoBehaviour
         _currentClientState.Title_EntryMode_Client();
 
         Debug.Log($"ステートを{_currentClientState.clientState}に戻しました。");
+
+        // 必要であれば、tempClientStateを復元するための処理を追加
+        _currentClientState = tempClientState; 
     }
 }
