@@ -335,4 +335,10 @@ public class TitleUI : MonoBehaviour
 
         Debug.Log($"ステートを{_currentClientState.clientState}に戻しました。");
     }
+
+    public void InputPlayerName()
+    {
+        _gameClientManager.myName = PlayerNameSetting.text;
+        Debug.Log($"{_gameClientManager.myName}の名前でゲームを始めます");
+    }
 }

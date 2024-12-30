@@ -15,7 +15,7 @@ public class GameClientManager : MonoBehaviour
 
     [SerializeField] private ushort sessionPass; //サーバーに接続するためのパスコード
     [SerializeField] private ushort initSessionPass; //初回通信時、サーバーからの返信が安全なものか判別するためのパスコード。今後乱数化する
-    [SerializeField] private string myName; //仮です。登録に使うプレイヤーネーム
+    public string myName; //仮です。登録に使うプレイヤーネーム(TitleUIのインプットフィールドからもらう)
 
     private ushort sessionID; //自分のセッションID。サーバー側で決めてもらう。
 
