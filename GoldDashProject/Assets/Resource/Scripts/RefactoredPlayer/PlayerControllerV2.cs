@@ -139,7 +139,7 @@ public class PlayerControllerV2 : MonoBehaviour
         m_playerMover = this.gameObject.GetComponent<PlayerMover>();
         m_playerInteractor = this.gameObject.GetComponent<PlayerInteractor>();
         m_playerAnimationController = this.gameObject.GetComponent<PlayerAnimationController>();
-        //m_UIDisplayer = this.gameObject.GetComponent<UIDisplayer>(); ここだけまだ実装してない
+        m_UIDisplayer = this.gameObject.GetComponent<UIDisplayer>();
         m_Rigidbody = this.gameObject.GetComponent<Rigidbody>();
     }
 
@@ -152,11 +152,10 @@ public class PlayerControllerV2 : MonoBehaviour
         { 
             case PLAYER_STATE.NORMAL:
             case PLAYER_STATE.DASH:
-                NormalUpdate();
-                break;
             case PLAYER_STATE.OPENING_CHEST:
             case PLAYER_STATE.USING_SCROLL:
             case PLAYER_STATE.WAITING_MAP_ACTION:
+                NormalUpdate();
                 break;
             case PLAYER_STATE.KNOCKED:
                 KnockedUpdate();
@@ -175,10 +174,13 @@ public class PlayerControllerV2 : MonoBehaviour
     {
         if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
         {
-            //STEP_A モーションを切り替えよう
+            //STEP_A UI表示を切り替えよう
+            m_UIDisplayer.ActivateUIFromState(this.State);
+
+            //STEP_B モーションを切り替えよう
             m_playerAnimationController.SetAnimationFromState(this.State);
 
-            //STEP_B 最初のフレームではなくなるのでフラグを書き変えよう
+            //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
         }
 
@@ -202,8 +204,11 @@ public class PlayerControllerV2 : MonoBehaviour
 
         //STEP7 次フレームのStateを決めよう
         PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, interactInfo.magicID); //インタラクト結果に応じて次のState決定
-        if(this.State != nextState) this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
-
+        if (this.State != nextState)
+        {
+            this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
+            this.m_UIDisplayer.ActivateUIFromState(this.State, interactInfo.magicID); //次フレームのStateに応じてUI表示状況を切り替え
+        }
     }
 
     private void KnockedUpdate()
@@ -283,7 +288,7 @@ public class PlayerControllerV2 : MonoBehaviour
             case INTERACT_TYPE.MAGIC_ICON: //巻物を開く
                 return PLAYER_STATE.USING_SCROLL;
             case INTERACT_TYPE.MAGIC_USE: //マップアクションを待機するか、ダッシュ状態になる
-                if (magicID == Definer.MID.GOLDDASH) return PLAYER_STATE.DASH;
+                if (magicID == Definer.MID.DASH) return PLAYER_STATE.DASH;
                 else return PLAYER_STATE.WAITING_MAP_ACTION;
             case INTERACT_TYPE.MAGIC_CANCEL: //通常状態になる
                 return PLAYER_STATE.NORMAL;
