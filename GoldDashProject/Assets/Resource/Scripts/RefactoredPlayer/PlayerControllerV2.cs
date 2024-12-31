@@ -109,15 +109,15 @@ public class PlayerControllerV2 : MonoBehaviour
     private CancellationToken m_stateLockCt; //同ct
 
     //プレイヤー制御用コンポーネント
-    [SerializeField] private PlayerCameraController m_playerCameraController;
-    [SerializeField] private PlayerMover m_playerMover;
-    [SerializeField] private PlayerInteractor m_playerInteractor;
-    [SerializeField] private PlayerAnimationController m_playerAnimationController;
-    [SerializeField] private UIDisplayer m_UIDisplayer;
-    [SerializeField] private Rigidbody m_Rigidbody;
+    private PlayerCameraController m_playerCameraController;
+    private PlayerMover m_playerMover;
+    private PlayerInteractor m_playerInteractor;
+    private PlayerAnimationController m_playerAnimationController;
+    private UIDisplayer m_UIDisplayer;
+    private Rigidbody m_Rigidbody;
 
     //金貨を拾うことを禁止する処理
-    private bool m_isAbleToPickUpGold = true; //金貨を拾うことができるか
+    [SerializeField] private bool m_isAbleToPickUpGold = true; //金貨を拾うことができるか
     private CancellationTokenSource m_forbidPickUpGoldCts; //金貨を拾うことを禁止する非同期処理を中心するcts
     private CancellationToken m_forbidPickUpGoldCt; //同ct
 
