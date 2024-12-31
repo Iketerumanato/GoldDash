@@ -23,6 +23,8 @@ public class DrawCircle : MonoBehaviour
     const float MaxCircleAngle = 360f;
     const string isActiveKeyAnim = "isOpenTresure";
     const float noneAngle = 0f;
+    private const float MinDistanceThreshold = 5f;
+    const int CenterRecalculationInterval = 10;
 
     [SerializeField] TMP_Text[] DebugTexts;
 
@@ -84,16 +86,28 @@ public class DrawCircle : MonoBehaviour
 
     private void DrawingCircle(Vector2 inputPosition)
     {
+        // ポイント間隔をフィルタリング
+        if (drawPoints.Count > 0)
+        {
+            float distance = Vector2.Distance(drawPoints[drawPoints.Count - 1], inputPosition);
+            if (distance < MinDistanceThreshold)
+                return;
+        }
+
         // 入力ポイントを記録
         drawPoints.Add(inputPosition);
 
         if (drawPoints.Count > 1)
         {
-            if (drawPoints.Count > 1) center = GetCenter(drawPoints);
+            // 一定間隔で中心点を再計算
+            if (drawPoints.Count % CenterRecalculationInterval == 0)
+            {
+                center = GetCenter(drawPoints);
+            }
 
             // 現在の角度を計算
             Vector2 currentVector = drawPoints[drawPoints.Count - 1] - center;
-            float currentAngle = Mathf.Atan2(currentVector.y, currentVector.x) * Mathf.Rad2Deg;
+            float currentAngle = Mathf.Repeat(Mathf.Atan2(currentVector.y, currentVector.x) * Mathf.Rad2Deg + 360f, 360f);
 
             DebugTexts[0].text = $"currentAngle is {currentAngle}";
 
@@ -117,7 +131,7 @@ public class DrawCircle : MonoBehaviour
                     circleCount++;
                     currentCircleCount = circleCount; // 円の数を保存
                     Debug.Log($"現在{currentCircleCount}周完了中（{(isClockwise ? "時計回り" : "反時計回り")}）");
-                    DebugTexts[1].text =$"currentCircleCount is {currentCircleCount}";
+                    DebugTexts[1].text = $"currentCircleCount is {currentCircleCount}";
 
                     totalAngle %= MaxCircleAngle; // 累計角度を更新
 
