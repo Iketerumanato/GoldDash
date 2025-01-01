@@ -23,9 +23,10 @@ public class DrawCircle : MonoBehaviour
     const float MaxCircleAngle = 360f;
     const string isActiveKeyAnim = "isOpenTresure";
     const float noneAngle = 0f;
-    private const float MinDistanceThreshold = 5f;
-    const int CenterRecalculationInterval = 10;
+    private const float MinDistanceThreshold = 5f;//
+    const int CenterRecalculationInterval = 10;//
 
+    //修正でき次第消す
     [SerializeField] TMP_Text[] DebugTexts;
 
     void Update()
@@ -33,55 +34,55 @@ public class DrawCircle : MonoBehaviour
         #region 円を描く(タブレットver)
         if (Input.touchCount > 0)
         {
-            ////タブレットでのタッチ操作を行うための宣言
-            //Touch UiTouch = Input.GetTouch(0);
-            //DebugTexts[2].text = $"TouchPos is {UiTouch.position}";
+            //タブレットでのタッチ操作を行うための宣言
+            Touch UiTouch = Input.GetTouch(0);
+            DebugTexts[2].text = $"TouchPos is {UiTouch.position}";
 
-            //switch (UiTouch.phase)
-            //{
-            //    //タッチ始め
-            //    case TouchPhase.Began:
-            //        StartDrawCircle();
-            //        break;
+            switch (UiTouch.phase)
+            {
+                //タッチ始め
+                case TouchPhase.Began:
+                    StartDrawCircle();
+                    break;
 
-            //    //タッチ中
-            //    case TouchPhase.Moved:
-            //        DrawingCircle(UiTouch.position);
-            //        break;
+                //タッチ中
+                case TouchPhase.Moved:
+                    DrawingCircle(UiTouch.position);
+                    break;
 
-            //    //タッチ終わり
-            //    case TouchPhase.Ended:
-            //        ResetCircleDraw();
-            //        break;
-            //}
+                //タッチ終わり
+                case TouchPhase.Ended:
+                    ResetCircleDraw();
+                    break;
+            }
         }
         #endregion
 
         #region 円を描く(クリックver)
-        if (Input.GetMouseButtonDown(0))
-        {
-            StartDrawCircle();
-        }
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    StartDrawCircle();
+        //}
 
-        if (Input.GetMouseButton(0))
-        {
-            DrawingCircle(Input.mousePosition);
-        }
+        //if (Input.GetMouseButton(0))
+        //{
+        //    DrawingCircle(Input.mousePosition);
+        //}
 
-        if (Input.GetMouseButtonUp(0))
-        {
-            ResetCircleDraw();
-        }
-
+        //if (Input.GetMouseButtonUp(0))
+        //{
+        //    ResetCircleDraw();
+        //}
         #endregion
     }
 
+    //画面から指を離す(クリックから離す)ごとに呼び出す
     private void StartDrawCircle()
     {
-        drawPoints.Clear();
-        totalAngle = 0f;
-        previousAngle = 0f;
-        isClockwise = true; // 初期値をリセット
+        drawPoints.Clear();//タッチしたポイントの削除
+        totalAngle = 0f;//描いた円の角度の合計値を初期化
+        previousAngle = 0f;//前フレーム(閾値との比較用)の値を初期化
+        isClockwise = true; //デフォルトの向きに直す(時計回り)
     }
 
     private void DrawingCircle(Vector2 inputPosition)
@@ -90,6 +91,7 @@ public class DrawCircle : MonoBehaviour
         if (drawPoints.Count > 0)
         {
             float distance = Vector2.Distance(drawPoints[drawPoints.Count - 1], inputPosition);
+            //あまりにも描く円の直径と指(カーソル)の位置が近いと円として認識されない
             if (distance < MinDistanceThreshold)
                 return;
         }
@@ -107,13 +109,14 @@ public class DrawCircle : MonoBehaviour
 
             // 現在の角度を計算
             Vector2 currentVector = drawPoints[drawPoints.Count - 1] - center;
-            float currentAngle = Mathf.Repeat(Mathf.Atan2(currentVector.y, currentVector.x) * Mathf.Rad2Deg + 360f, 360f);
+            float currentAngle = Mathf.Repeat(Mathf.Atan2(currentVector.y, currentVector.x) * Mathf.Rad2Deg + 360f, 360f);//180 ~ -180の範囲でラップ
 
             DebugTexts[0].text = $"currentAngle is {currentAngle}";
 
             // 角度の差分を計算
             if (drawPoints.Count > 2)
             {
+                //更新し続ける値
                 float deltaAngle = Mathf.DeltaAngle(previousAngle, currentAngle);
 
                 // 回転方向が切り替わったかチェック
@@ -174,6 +177,7 @@ public class DrawCircle : MonoBehaviour
         keyAnimator.SetBool($"{isActiveKeyAnim}{6}", true);
     }
 
+    //円の中心点の取得
     private Vector2 GetCenter(List<Vector2> points)
     {
         if (points.Count < 2)
