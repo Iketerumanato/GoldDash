@@ -32,47 +32,47 @@ public class DrawCircle : MonoBehaviour
     void Update()
     {
         #region 円を描く(タブレットver)
-        if (Input.touchCount > 0)
-        {
-            //タブレットでのタッチ操作を行うための宣言
-            Touch UiTouch = Input.GetTouch(0);
-            DebugTexts[2].text = $"TouchPos is {UiTouch.position}";
+        //if (Input.touchCount > 0)
+        //{
+        //    //タブレットでのタッチ操作を行うための宣言
+        //    Touch UiTouch = Input.GetTouch(0);
+        //    DebugTexts[2].text = $"TouchPos is {UiTouch.position}";
 
-            switch (UiTouch.phase)
-            {
-                //タッチ始め
-                case TouchPhase.Began:
-                    StartDrawCircle();
-                    break;
+        //    switch (UiTouch.phase)
+        //    {
+        //        //タッチ始め
+        //        case TouchPhase.Began:
+        //            StartDrawCircle();
+        //            break;
 
-                //タッチ中
-                case TouchPhase.Moved:
-                    DrawingCircle(UiTouch.position);
-                    break;
+        //        //タッチ中
+        //        case TouchPhase.Moved:
+        //            DrawingCircle(UiTouch.position);
+        //            break;
 
-                //タッチ終わり
-                case TouchPhase.Ended:
-                    ResetCircleDraw();
-                    break;
-            }
-        }
+        //        //タッチ終わり
+        //        case TouchPhase.Ended:
+        //            ResetCircleDraw();
+        //            break;
+        //    }
+        //}
         #endregion
 
         #region 円を描く(クリックver)
-        //if (Input.GetMouseButtonDown(0))
-        //{
-        //    StartDrawCircle();
-        //}
+        if (Input.GetMouseButtonDown(0))
+        {
+            StartDrawCircle();
+        }
 
-        //if (Input.GetMouseButton(0))
-        //{
-        //    DrawingCircle(Input.mousePosition);
-        //}
+        if (Input.GetMouseButton(0))
+        {
+            DrawingCircle(Input.mousePosition);
+        }
 
-        //if (Input.GetMouseButtonUp(0))
-        //{
-        //    ResetCircleDraw();
-        //}
+        if (Input.GetMouseButtonUp(0))
+        {
+            ResetCircleDraw();
+        }
         #endregion
     }
 
