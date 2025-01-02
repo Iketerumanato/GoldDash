@@ -168,6 +168,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 NormalUpdate();
                 break;
             case PLAYER_STATE.OPENING_CHEST:
+                ChestUpdate();
                 break;
             case PLAYER_STATE.USING_SCROLL:
                 ScrollUpdate();
@@ -228,6 +229,21 @@ public class PlayerControllerV2 : MonoBehaviour
         }
     }
 
+    private void ChestUpdate()
+    {
+        if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
+        {
+            //STEP_A UI表示を切り替えよう
+            m_UIDisplayer.ActivateUIFromState(this.State, m_currentMagicID);
+
+            //STEP_B モーションを切り替えよう
+            m_playerAnimationController.SetAnimationFromState(this.State);
+
+            //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
+            m_isFirstFrameOfState = false;
+        }
+    }
+
     private void ScrollUpdate()
     {
         if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
@@ -257,10 +273,10 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP5 巻物を使ったならホットバー情報を書き換えよう
         if(interactInfo.interactType == INTERACT_TYPE.MAGIC_USE) m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex);
 
-        //STEP5 モーションを決めよう
+        //STEP6 モーションを決めよう
         m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
 
-        //STEP6 次フレームのStateを決めよう
+        //STEP7 次フレームのStateを決めよう
         PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, m_currentMagicID); //インタラクト結果に応じて次のState決定
         if (this.State != nextState)
         {
