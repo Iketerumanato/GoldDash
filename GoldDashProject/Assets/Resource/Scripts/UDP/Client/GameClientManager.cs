@@ -53,6 +53,11 @@ public class GameClientManager : MonoBehaviour
 
     public Subject<CLIENT_INTERNAL_EVENT> ClientInternalSubject;
 
+    private void Update()
+    {
+        Debug.Log($"{numOfActors}で受け付けて{preparedActors}が参加人数だよ");
+    }
+
     #region ボタンが押されたら有効化したり無効化したり
     //public void InitObservation(UdpButtonManager udpUIManager)
     //{
@@ -320,7 +325,6 @@ public class GameClientManager : MonoBehaviour
                                         //準備が完了したアクターの数を加算
                                         //ここバグ疑惑あり
                                         preparedActors++;
-                                        Debug.Log($"{numOfActors}で受け付けて{preparedActors}が参加人数だよ");
                                         if (preparedActors == numOfActors) //準備完了通知をサーバに送る
                                         {
                                             Debug.Log("PSGを送信しました。");
