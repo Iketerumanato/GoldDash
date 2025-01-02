@@ -76,7 +76,7 @@ public class UIDisplayer : MonoBehaviour
 
     private async void ActivateScrollObjects(Definer.MID magicID)
     {
-        await UniTask.Delay(470);
+        await UniTask.Delay(520);
         m_magicIDAndExplainPrefabDictionary[magicID].scrollExplainPrefab.SetActive(true); //magicIDに対応した巻物UIを表示する
         m_ScrollLongPaper.SetActive(true); //長い紙を表示する
     }
