@@ -32,6 +32,9 @@ public class UIDisplayer : MonoBehaviour
     [Header("巻物の長い紙")]
     [SerializeField] private GameObject m_ScrollLongPaper;
 
+    [Header("宝箱を開錠するときの鍵")]
+    [SerializeField] private GameObject m_key;
+
     private void Start()
     {
         //インスペクタで設定した値をDictionaryに登録する
@@ -52,11 +55,15 @@ public class UIDisplayer : MonoBehaviour
         switch (state)
         {
             case PLAYER_STATE.OPENING_CHEST:
+                m_key.SetActive(true); //鍵を表示
+
                 m_variableJoystick.SetActive(false); //宝箱の開錠中、移動スティック非表示
                 m_dynamicJoystick.SetActive(false);
                 m_HotbarParent.SetActive(false); //ホットバー非表示
                 break;
             case PLAYER_STATE.USING_SCROLL: //巻物を開いたとき、巻物に表示するUIを決定する
+                m_key.SetActive(false); //鍵を非表示
+
                 foreach (KeyValuePair<Definer.MID, MIDAndExplainObjects> k in m_magicIDAndExplainPrefabDictionary) //表示中の巻物UIをすべて非表示にする
                 {
                     k.Value.scrollExplainPrefab.SetActive(false);
@@ -64,12 +71,13 @@ public class UIDisplayer : MonoBehaviour
                 UniTask u = UniTask.RunOnThreadPool(() => ActivateScrollObjects(magicID)); //モーションに合わせて時間差でUI表示
                 m_HotbarParent.SetActive(false); //ホットバー非表示
                 break;
-            default: //基本的にすべて表示する
+            default: //基本的なものはすべて表示する
                 m_variableJoystick.SetActive(true);
                 m_dynamicJoystick.SetActive(true);
                 m_HotbarParent.SetActive(true);
 
-                m_ScrollLongPaper.SetActive(false); //巻物の長い紙のみ非表示に
+                m_ScrollLongPaper.SetActive(false); //巻物の長い紙を非表示
+                m_key.SetActive(false); //鍵を非表示
                 break;
         }
     }

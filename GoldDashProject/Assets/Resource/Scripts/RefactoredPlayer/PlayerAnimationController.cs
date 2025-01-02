@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerAnimationController : MonoBehaviour
 {
     [Header("使用するAnimator")]
-    [SerializeField] Animator m_animator;
+    [SerializeField] private Animator m_animator;
 
     private readonly string strRunSpeed = "RunSpeed";
     private readonly string strScrollFlag = "ScrollFlag";

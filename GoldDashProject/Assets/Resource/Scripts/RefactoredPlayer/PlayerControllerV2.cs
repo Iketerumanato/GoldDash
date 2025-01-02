@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum PLAYER_STATE : int //enumの型はデフォルトでintだが、int型であることを期待しているスクリプト（PlayerMoverなど）があるので明示的にintにしておく
@@ -119,6 +120,7 @@ public class PlayerControllerV2 : MonoBehaviour
     private PlayerAnimationController m_playerAnimationController;
     private UIDisplayer m_UIDisplayer;
     private HotbarManager m_hotbarManager;
+    private ChestUnlocker m_chestUnlocker;
     private Rigidbody m_Rigidbody;
 
     //金貨を拾うことを禁止する処理
@@ -146,6 +148,7 @@ public class PlayerControllerV2 : MonoBehaviour
         m_playerAnimationController = this.gameObject.GetComponent<PlayerAnimationController>();
         m_UIDisplayer = this.gameObject.GetComponent<UIDisplayer>();
         m_hotbarManager = this.gameObject.GetComponent<HotbarManager>();
+        m_chestUnlocker = this.gameObject.GetComponent<ChestUnlocker>();
         m_Rigidbody = this.gameObject.GetComponent<Rigidbody>();
     }
 
@@ -239,8 +242,45 @@ public class PlayerControllerV2 : MonoBehaviour
             //STEP_B モーションを切り替えよう
             m_playerAnimationController.SetAnimationFromState(this.State);
 
+            //STEP_C 宝箱を開錠するために必要な回転数をサーバーから取得してプロパティに書き込もう
+            m_chestUnlocker.MaxDrawCount = 5; //仮に5
+
             //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
+        }
+
+        //STEP1 宝箱を開錠できたかどうかのフラグを宣言しておこう
+        bool isUnlocked = false;
+
+        //STEP1 タッチ・クリックされている座標を使って宝箱を開錠しよう
+        if (Input.GetMouseButtonDown(0))
+        {
+            m_chestUnlocker.StartDrawCircle();
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            isUnlocked = m_chestUnlocker.DrawingCircle(Input.mousePosition); //開錠できたかどうか変数で受け取る
+        }
+
+        //STEP2 開錠できたらパケットを送信しよう
+        //if (isUnlocked)
+        //{ 
+
+        //}
+
+        //STEP3 開錠できたら通常stateに戻ろう
+        PLAYER_STATE nextState = this.State;
+        if (isUnlocked)
+        {
+            nextState = PLAYER_STATE.NORMAL;
+        }
+
+        //STEP4 次フレームのStateを決めよう
+        //宝箱を開錠済で、殴られていたり雷に打たれていたりした場合は対応したStateに行こう。このとき開錠したというパケットはサーバーに送られているが、その後巻物が振り込まれることは許容する。
+        if (this.State != nextState)
+        {
+            m_chestUnlocker.ResetCircleDraw(); //他のstateに行く前に、鍵の状態をリセットしておこう
+            this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
         }
     }
 
