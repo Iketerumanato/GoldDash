@@ -387,7 +387,7 @@ public class GameServerManager : MonoBehaviour
                         actorController.PlayerName = receivedInitPacket.playerName;
 
                         //0103追記(アクターの色書き込み)
-                        actorController.actorRenderer.material.SetTexture(ActorColorTex, PlayerTextures[actorDictionary.Count]);
+                        //actorController.actorRenderer.material.SetTexture(ActorColorTex, PlayerTextures[actorDictionary.Count]);
 
                         //アクターのゲームオブジェクト
                         actorController.name = $"Actor: {receivedInitPacket.playerName} ({receivedHeader.sessionID})"; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
