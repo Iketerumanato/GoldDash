@@ -494,6 +494,7 @@ public class GameServerManager : MonoBehaviour
                                 {
                                     case (byte)Definer.NDID.PSG:
                                         preparedPlayers++; //準備ができたプレイヤーの人数を加算
+                                        Debug.Log($"{preparedPlayers}が今の人数だよ");
                                         if (preparedPlayers == numOfPlayers) //全プレイヤーの準備ができたら
                                         {
                                             await UniTask.Delay(1000);
@@ -502,7 +503,6 @@ public class GameServerManager : MonoBehaviour
                                             myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
                                             myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameServer.Send(myHeader.ToByte());
-                                            Debug.Log($"{preparedPlayers}が今の人数だよ");
 
                                             Debug.Log("やったー！全プレイヤーの準備ができたよ！");
 
