@@ -42,6 +42,10 @@ public class ActorController : MonoBehaviour
     float sqrRunThreshold;
     [SerializeField] float animationLerpSpeed = 70f;
 
+    //0103追記
+    [SerializeField] Renderer actorBodyRender;
+    public Renderer actorRenderer => actorBodyRender;
+
     //歩行アニメーションのメソッドに渡す
     float blendSpeed;
 

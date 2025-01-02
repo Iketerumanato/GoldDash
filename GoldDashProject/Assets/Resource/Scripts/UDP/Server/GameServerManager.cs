@@ -5,6 +5,7 @@ using R3;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
+using Unity.VisualScripting;
 
 public class GameServerManager : MonoBehaviour
 {
@@ -41,6 +42,9 @@ public class GameServerManager : MonoBehaviour
 
     //12/29追記
     [SerializeField] TitleUI _titleUi;
+    //0103追記
+    const string ActorColorTex = "_BaseMap";
+    [SerializeField] Texture[] PlayerTextures;//赤、青、緑、黄の順でサーバーからアクター(クライアント)に渡される
 
     //サーバーが内部をコントロールするための通知　マップ生成など
     //クライアントサーバーのクライアント部分の処理をここでやると機能過多になるため、通知を飛ばすだけにする。脳が体内の器官に命令を送るようなイメージ。実行するのはあくまで器官側。
@@ -381,6 +385,10 @@ public class GameServerManager : MonoBehaviour
 
                         //アクターの名前を書き込み
                         actorController.PlayerName = receivedInitPacket.playerName;
+
+                        //0103追記(アクターの色書き込み)
+                        actorController.actorRenderer.material.SetTexture(ActorColorTex, PlayerTextures[actorDictionary.Count]);
+
                         //アクターのゲームオブジェクト
                         actorController.name = $"Actor: {receivedInitPacket.playerName} ({receivedHeader.sessionID})"; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
                         actorController.gameObject.SetActive(false); //初期設定が済んだら無効化して処理を止める。ゲーム開始時に有効化して座標などをセットする
