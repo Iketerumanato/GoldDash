@@ -2719,7 +2719,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5156343533446368009
 Transform:
   m_ObjectHideFlags: 0
@@ -8936,6 +8936,7 @@ MonoBehaviour:
   m_variableJoystick: {fileID: 3015399711445905652}
   m_dynamicJoystick: {fileID: 5632003833503160062}
   m_HotbarParent: {fileID: 2342493314918289500}
+  m_ScrollLongPaper: {fileID: 3502408557107182188}
 --- !u!114 &4853172994399964449
 MonoBehaviour:
   m_ObjectHideFlags: 0

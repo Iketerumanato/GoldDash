@@ -109,6 +109,8 @@ public class PlayerControllerV2 : MonoBehaviour
     private CancellationToken m_stateLockCt; //同ct
     //巻物を開いているとき、使おうとしている魔法のID
     private Definer.MID m_currentMagicID;
+    //巻物を開いているとき、使おうとしている魔法のホットバースロット番号
+    private int m_currentMagicIndex;
 
     //プレイヤー制御用コンポーネント
     private PlayerCameraController m_playerCameraController;
@@ -116,6 +118,7 @@ public class PlayerControllerV2 : MonoBehaviour
     private PlayerInteractor m_playerInteractor;
     private PlayerAnimationController m_playerAnimationController;
     private UIDisplayer m_UIDisplayer;
+    private HotbarManager m_hotbarManager;
     private Rigidbody m_Rigidbody;
 
     //金貨を拾うことを禁止する処理
@@ -142,6 +145,7 @@ public class PlayerControllerV2 : MonoBehaviour
         m_playerInteractor = this.gameObject.GetComponent<PlayerInteractor>();
         m_playerAnimationController = this.gameObject.GetComponent<PlayerAnimationController>();
         m_UIDisplayer = this.gameObject.GetComponent<UIDisplayer>();
+        m_hotbarManager = this.gameObject.GetComponent<HotbarManager>();
         m_Rigidbody = this.gameObject.GetComponent<Rigidbody>();
     }
 
@@ -209,7 +213,7 @@ public class PlayerControllerV2 : MonoBehaviour
         m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
 
         //STEP7 次フレームのStateを決めよう
-        PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, interactInfo.magicID); //インタラクト結果に応じて次のState決定
+        PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, interactInfo.magicID, interactInfo.targetID); //インタラクト結果に応じて次のState決定
         if (this.State != nextState)
         {
             this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
@@ -243,11 +247,14 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP4 パケット送信が必要なら送ろう
         this.MakePacketFromInteract(interactInfo);
 
+        //STEP5 巻物を使ったならホットバー情報を書き換えよう
+        if(interactInfo.interactType == INTERACT_TYPE.MAGIC_USE) m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex);
+
         //STEP5 モーションを決めよう
         m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
 
         //STEP6 次フレームのStateを決めよう
-        PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, interactInfo.magicID); //インタラクト結果に応じて次のState決定
+        PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, m_currentMagicID); //インタラクト結果に応じて次のState決定
         if (this.State != nextState)
         {
             this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
@@ -323,7 +330,7 @@ public class PlayerControllerV2 : MonoBehaviour
         if (m_allowedUnlockState) this.State = PLAYER_STATE.NORMAL;
     }
 
-    private PLAYER_STATE GetNextStateFromInteract(INTERACT_TYPE interactType, Definer.MID magicID)
+    private PLAYER_STATE GetNextStateFromInteract(INTERACT_TYPE interactType, Definer.MID magicID, int magicIndex = 0)
     {
         switch (interactType)
         {
@@ -331,6 +338,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 return PLAYER_STATE.OPENING_CHEST;
             case INTERACT_TYPE.MAGIC_ICON: //巻物を開く
                 m_currentMagicID = magicID; //使う魔法のIDを書き込み
+                m_currentMagicIndex = magicIndex;
                 return PLAYER_STATE.USING_SCROLL;
             case INTERACT_TYPE.MAGIC_USE: //マップアクションを待機するか、ダッシュ状態になる
                 if (magicID == Definer.MID.DASH) return PLAYER_STATE.DASH;
@@ -417,5 +425,10 @@ public class PlayerControllerV2 : MonoBehaviour
     public void GetPunchBack()
     {
         this.State = PLAYER_STATE.KNOCKED;
+    }
+
+    public void SetMagicToHotbar(Definer.MID magicID)
+    { 
+        m_hotbarManager.SetMagicToHotbar(magicID);
     }
 }

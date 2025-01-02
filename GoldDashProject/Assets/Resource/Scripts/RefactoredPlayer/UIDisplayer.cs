@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,6 +29,9 @@ public class UIDisplayer : MonoBehaviour
     [Header("ホットバー全体の親オブジェクト")]
     [SerializeField] private GameObject m_HotbarParent;
 
+    [Header("巻物の長い紙")]
+    [SerializeField] private GameObject m_ScrollLongPaper;
+
     private void Start()
     {
         //インスペクタで設定した値をDictionaryに登録する
@@ -57,18 +61,23 @@ public class UIDisplayer : MonoBehaviour
                 {
                     k.Value.scrollExplainPrefab.SetActive(false);
                 }
-                MIDAndExplainObjects currentScrollUISet; //null参照防止にTryGetValueしておく
-                if (m_magicIDAndExplainPrefabDictionary.TryGetValue(magicID, out currentScrollUISet)) //取得に成功したら
-                {
-                    currentScrollUISet.scrollExplainPrefab.SetActive(true); //magicIDに対応した巻物UIを表示する
-                }
+                UniTask u = UniTask.RunOnThreadPool(() => ActivateScrollObjects(magicID)); //モーションに合わせて時間差でUI表示
                 m_HotbarParent.SetActive(false); //ホットバー非表示
                 break;
             default: //基本的にすべて表示する
                 m_variableJoystick.SetActive(true);
                 m_dynamicJoystick.SetActive(true);
                 m_HotbarParent.SetActive(true);
+
+                m_ScrollLongPaper.SetActive(false); //巻物の長い紙のみ非表示に
                 break;
         }
+    }
+
+    private async void ActivateScrollObjects(Definer.MID magicID)
+    {
+        await UniTask.Delay(470);
+        m_magicIDAndExplainPrefabDictionary[magicID].scrollExplainPrefab.SetActive(true); //magicIDに対応した巻物UIを表示する
+        m_ScrollLongPaper.SetActive(true); //長い紙を表示する
     }
 }
