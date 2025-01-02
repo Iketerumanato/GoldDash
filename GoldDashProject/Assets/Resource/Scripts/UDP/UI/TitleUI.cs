@@ -101,7 +101,7 @@ public class Mode_Activate : ITitleMode_Server
     public Mode_Activate(TitleUI titleUi) => _titleUi = titleUi;
     public void Title_EntryMode_Server()
     {
-        Debug.Log($"{serverState}を出ます");
+        Debug.Log($"{serverState}に入ります");
         _titleUi.startclientButton.SetActive(false);
         _titleUi.startserverButton.SetActive(false);
         _titleUi.titleExplanationText[0].text = "WAITING_CONNECT";
