@@ -186,6 +186,7 @@ public static class Definer
     {
         NONE = -1,
         THUNDER,
-        GOLDDASH,
+        DASH,
+        TELEPORT,
     }
 }

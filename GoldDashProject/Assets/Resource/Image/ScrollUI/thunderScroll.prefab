@@ -300,7 +300,7 @@ GameObject:
   - component: {fileID: 6703383167412132621}
   m_Layer: 6
   m_Name: CANCEL_PLANE
-  m_TagString: Untagged
+  m_TagString: CancelMagic
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -407,7 +407,7 @@ GameObject:
   - component: {fileID: 4087231113032965107}
   m_Layer: 6
   m_Name: USE_PLANE
-  m_TagString: Untagged
+  m_TagString: UseMagic
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

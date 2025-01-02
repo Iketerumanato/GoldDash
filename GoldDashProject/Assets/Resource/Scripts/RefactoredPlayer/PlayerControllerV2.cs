@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -40,20 +39,26 @@ public class PlayerControllerV2 : MonoBehaviour
     [SerializeField] private DynamicJoystick m_dynamicJoystick;
 
     [Header("背面を殴られたときの水平方向への吹っ飛び倍率")]
-    [SerializeField] float m_blownPowerHorizontal = 1f;
+    [SerializeField] private float m_blownPowerHorizontal = 4f;
 
     [Header("背面を殴られたときの垂直方向への吹っ飛び倍率")]
-    [SerializeField] float m_blownPowerVertical = 1f;
+    [SerializeField] private float m_blownPowerVertical = 2f;
 
     [Header("背面を殴られてから金貨を拾えるようになるまでの時間（ミリ秒）")]
-    [SerializeField] int m_forbidPickTime = 1000;
+    [SerializeField] private int m_forbidPickTime = 1000;
+
+    [Header("背面を殴られてからNormalStateに戻るまでの時間（ミリ秒）")]
+    [SerializeField] private int m_lockStateTimeKnocked = 1500;
+
+    [Header("スタンしてからNormalStateに戻るまでの時間（ミリ秒）")]
+    [SerializeField] private int m_lockStateTimeStunned = 3000;
 
     //入力取得用プロパティ
     private float V_InputHorizontal
     {
         get
         {
-            if (m_WASD_Available)
+            if (m_WASD_Available) //WASDが有効化されているなら、WASD入力とスティック入力について、絶対値がより大きい方を採用して返却する
             {
                 if(Mathf.Abs(m_variableJoystick.Horizontal) < Mathf.Abs(Input.GetAxis("Horizontal"))) return Input.GetAxis("Horizontal");
             }
@@ -64,7 +69,7 @@ public class PlayerControllerV2 : MonoBehaviour
     {
         get
         {
-            if (m_WASD_Available)
+            if (m_WASD_Available) //WASDが有効化されているなら、WASD入力とスティック入力について、絶対値がより大きい方を採用して返却する
             {
                 if (Mathf.Abs(m_variableJoystick.Horizontal) < Mathf.Abs(Input.GetAxis("Vertical"))) return Input.GetAxis("Vertical");
             }
@@ -89,8 +94,8 @@ public class PlayerControllerV2 : MonoBehaviour
     //stateプロパティ
     private PLAYER_STATE m_state;
     //そのstateに入った最初のフレームか
-    private bool m_isFirstFrameOfState;
-    public PLAYER_STATE State
+    private bool m_isFirstFrameOfState = true;
+    private PLAYER_STATE State
     {
         set
         {
@@ -102,19 +107,24 @@ public class PlayerControllerV2 : MonoBehaviour
     [SerializeField] private bool m_allowedUnlockState = true; //NormalStateに戻る条件(ステートロックの解除条件)を満たしているか
     private CancellationTokenSource m_stateLockCts; //ステートロックの非同期処理を中心するcts
     private CancellationToken m_stateLockCt; //同ct
+    //巻物を開いているとき、使おうとしている魔法のID
+    private Definer.MID m_currentMagicID;
+    //巻物を開いているとき、使おうとしている魔法のホットバースロット番号
+    private int m_currentMagicIndex;
 
     //プレイヤー制御用コンポーネント
-    [SerializeField] private PlayerCameraController m_playerCameraController;
-    [SerializeField] private PlayerMover m_playerMover;
-    [SerializeField] private PlayerInteractor m_playerInteractor;
-    [SerializeField] private PlayerAnimationController m_playerAnimationController;
-    [SerializeField] private UIDisplayer m_UIDisplayer;
-    [SerializeField] private Rigidbody m_Rigidbody;
+    private PlayerCameraController m_playerCameraController;
+    private PlayerMover m_playerMover;
+    private PlayerInteractor m_playerInteractor;
+    private PlayerAnimationController m_playerAnimationController;
+    private UIDisplayer m_UIDisplayer;
+    private HotbarManager m_hotbarManager;
+    private Rigidbody m_Rigidbody;
 
     //金貨を拾うことを禁止する処理
-    private bool m_forbiddenPicking = false; //金貨を拾うことを禁止されているか
-    private CancellationTokenSource m_forbidPickCts; //金貨を拾うことを禁止する非同期処理を中心するcts
-    private CancellationToken m_forbidPickCt; //同ct
+    [SerializeField] private bool m_isAbleToPickUpGold = true; //金貨を拾うことができるか
+    private CancellationTokenSource m_forbidPickUpGoldCts; //金貨を拾うことを禁止する非同期処理を中心するcts
+    private CancellationToken m_forbidPickUpGoldCt; //同ct
 
     //パケット関連
     //GameClientManagerからプレイヤーの生成タイミングでsetterを呼び出し
@@ -126,8 +136,17 @@ public class PlayerControllerV2 : MonoBehaviour
         //ctの発行
         m_stateLockCts = new CancellationTokenSource();
         m_stateLockCt = m_stateLockCts.Token;
-        m_forbidPickCts = new CancellationTokenSource();
-        m_forbidPickCt = m_forbidPickCts.Token;
+        m_forbidPickUpGoldCts = new CancellationTokenSource();
+        m_forbidPickUpGoldCt = m_forbidPickUpGoldCts.Token;
+
+        //コンポーネントの取得
+        m_playerCameraController = this.gameObject.GetComponent<PlayerCameraController>();
+        m_playerMover = this.gameObject.GetComponent<PlayerMover>();
+        m_playerInteractor = this.gameObject.GetComponent<PlayerInteractor>();
+        m_playerAnimationController = this.gameObject.GetComponent<PlayerAnimationController>();
+        m_UIDisplayer = this.gameObject.GetComponent<UIDisplayer>();
+        m_hotbarManager = this.gameObject.GetComponent<HotbarManager>();
+        m_Rigidbody = this.gameObject.GetComponent<Rigidbody>();
     }
 
     //デバッグ用
@@ -135,14 +154,18 @@ public class PlayerControllerV2 : MonoBehaviour
 
     private void Update()
     {
-        switch (this.State)
+        switch (this.State) //Stateによって実行するUpdate関数を変える
         { 
             case PLAYER_STATE.NORMAL:
             case PLAYER_STATE.DASH:
-            case PLAYER_STATE.OPENING_CHEST:
-            case PLAYER_STATE.USING_SCROLL:
-            case PLAYER_STATE.WAITING_MAP_ACTION:
                 NormalUpdate();
+                break;
+            case PLAYER_STATE.OPENING_CHEST:
+                break;
+            case PLAYER_STATE.USING_SCROLL:
+                ScrollUpdate();
+                break;
+            case PLAYER_STATE.WAITING_MAP_ACTION:
                 break;
             case PLAYER_STATE.KNOCKED:
                 KnockedUpdate();
@@ -154,11 +177,23 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
         }
 
-        stateTxt.text = this.State.ToString();
+        stateTxt.text = this.State.ToString(); //デバッグ用
     }
 
     private void NormalUpdate()
     {
+        if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
+        {
+            //STEP_A UI表示を切り替えよう
+            m_UIDisplayer.ActivateUIFromState(this.State);
+
+            //STEP_B モーションを切り替えよう
+            m_playerAnimationController.SetAnimationFromState(this.State);
+
+            //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
+            m_isFirstFrameOfState = false;
+        }
+
         //STEP1 カメラを動かそう
         m_playerCameraController.RotateCamara(D_InputVertical);
 
@@ -174,20 +209,57 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP5 カメラを揺らす必要があれば揺らそう
         m_playerCameraController.InvokeShakeEffectFromInteract(interactInfo.interactType);
 
-        Debug.Log(interactInfo.interactType);
-
         //STEP6 モーションを決めよう
-        if (!m_isFirstFrameOfState) //state固有のモーションを再生していないなら再生
-        {
-            m_playerAnimationController.SetAnimationFromState(this.State);
-            m_isFirstFrameOfState = true; //再生済フラグを格納
-        }
         m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
 
         //STEP7 次フレームのStateを決めよう
-        PLAYER_STATE nextState = DecideNextStateFromInteract(interactInfo.interactType, interactInfo.magicID); //インタラクト結果に応じて次のState決定
-        if(this.State != nextState) this.State = nextState; //Stateが変更されていたらプロパティのセッター呼び出し
+        PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, interactInfo.magicID, interactInfo.targetID); //インタラクト結果に応じて次のState決定
+        if (this.State != nextState)
+        {
+            this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
+            this.m_UIDisplayer.ActivateUIFromState(this.State, interactInfo.magicID); //次フレームのStateに応じてUI表示状況を切り替え
+        }
+    }
 
+    private void ScrollUpdate()
+    {
+        if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
+        {
+            //STEP_A UI表示を切り替えよう
+            m_UIDisplayer.ActivateUIFromState(this.State, m_currentMagicID);
+
+            //STEP_B モーションを切り替えよう
+            m_playerAnimationController.SetAnimationFromState(this.State);
+
+            //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
+            m_isFirstFrameOfState = false;
+        }
+
+        //STEP1 カメラを動かそう
+        m_playerCameraController.RotateCamara(D_InputVertical);
+
+        //STEP2 移動・旋回を実行しよう
+        float runSpeed = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
+
+        //STEP3 インタラクトを実行しよう
+        (INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact();
+
+        //STEP4 パケット送信が必要なら送ろう
+        this.MakePacketFromInteract(interactInfo);
+
+        //STEP5 巻物を使ったならホットバー情報を書き換えよう
+        if(interactInfo.interactType == INTERACT_TYPE.MAGIC_USE) m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex);
+
+        //STEP5 モーションを決めよう
+        m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
+
+        //STEP6 次フレームのStateを決めよう
+        PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, m_currentMagicID); //インタラクト結果に応じて次のState決定
+        if (this.State != nextState)
+        {
+            this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
+            this.m_UIDisplayer.ActivateUIFromState(this.State, interactInfo.magicID); //次フレームのStateに応じてUI表示状況を切り替え
+        }
     }
 
     private void KnockedUpdate()
@@ -202,22 +274,15 @@ public class PlayerControllerV2 : MonoBehaviour
 
             //STEP_A 吹き飛ぼう
             //金貨を拾えない状態にする
-            if (m_forbiddenPicking) m_forbidPickCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
+            if (!m_isAbleToPickUpGold) m_forbidPickUpGoldCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
             //一定時間金貨を拾えない状態にする
-            m_forbiddenPicking = true;
-            UniTask.RunOnThreadPool(() => CountForbidPickTime(), default, m_forbidPickCt);
+            m_isAbleToPickUpGold = false;
+            UniTask.RunOnThreadPool(() => CountForbidPickTime(1000), default, m_forbidPickUpGoldCt);
 
             //前に吹っ飛ぶ
             //transform.forwardと実際の前方は（カメラの向きに合わせた関係で）逆なのでマイナスをかける
             m_Rigidbody.AddForce(-this.transform.forward * m_blownPowerHorizontal + Vector3.up * m_blownPowerVertical, ForceMode.Impulse);
-
-            //金貨を一定時間拾えないようにするローカル関数
-            async void CountForbidPickTime()
-            {
-                await UniTask.Delay(m_forbidPickTime); //指定された時間待つ
-                m_forbiddenPicking = false; //金貨を拾えるようにする
-            }
-
+            
             //STEP_B カメラを揺らそう
             m_playerCameraController.InvokeShakeEffectFromState(this.State);
 
@@ -231,10 +296,10 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP1 カメラを動かそう
         m_playerCameraController.RotateCamara(D_InputVertical);
         
-        //STEP_X 移動・旋回を実行しよう
+        //STEP2 移動・旋回を実行しよう
         float runSpeed = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
 
-        //STEP2 通常stateに戻ることができるなら戻ろう
+        //STEP3 通常stateに戻ることができるなら戻ろう
         if (m_allowedUnlockState) this.State = PLAYER_STATE.NORMAL;
     }
 
@@ -265,16 +330,18 @@ public class PlayerControllerV2 : MonoBehaviour
         if (m_allowedUnlockState) this.State = PLAYER_STATE.NORMAL;
     }
 
-    private PLAYER_STATE DecideNextStateFromInteract(INTERACT_TYPE interactType, Definer.MID magicID)
+    private PLAYER_STATE GetNextStateFromInteract(INTERACT_TYPE interactType, Definer.MID magicID, int magicIndex = 0)
     {
         switch (interactType)
         {
             case INTERACT_TYPE.CHEST: //宝箱を開ける
                 return PLAYER_STATE.OPENING_CHEST;
             case INTERACT_TYPE.MAGIC_ICON: //巻物を開く
+                m_currentMagicID = magicID; //使う魔法のIDを書き込み
+                m_currentMagicIndex = magicIndex;
                 return PLAYER_STATE.USING_SCROLL;
             case INTERACT_TYPE.MAGIC_USE: //マップアクションを待機するか、ダッシュ状態になる
-                if (magicID == Definer.MID.GOLDDASH) return PLAYER_STATE.DASH;
+                if (magicID == Definer.MID.DASH) return PLAYER_STATE.DASH;
                 else return PLAYER_STATE.WAITING_MAP_ACTION;
             case INTERACT_TYPE.MAGIC_CANCEL: //通常状態になる
                 return PLAYER_STATE.NORMAL;
@@ -283,10 +350,18 @@ public class PlayerControllerV2 : MonoBehaviour
         }
     }
 
+    //ステートロック用フラグを一定時間後に解除する
     private async void CountStateLockTime(int cooldownTimeMilliSec)
     {
         await UniTask.Delay(cooldownTimeMilliSec); //指定された秒数待ったら
         m_allowedUnlockState = true; //クールダウン終了
+    }
+
+    //金貨を拾うためのフラグを一定時間後にtrueにする
+    private async void CountForbidPickTime(int cooldownTimeMilliSec)
+    {
+        await UniTask.Delay(cooldownTimeMilliSec); //指定された時間待つ
+        m_isAbleToPickUpGold = true; //金貨を拾えるようにする
     }
 
     private void MakePacketFromInteract((INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo)
@@ -339,13 +414,21 @@ public class PlayerControllerV2 : MonoBehaviour
         }
     }
 
+    //GameClientManagerが、サーバーから命令があったときに呼び出す。
+    //正面から殴られたとき演出を行う
     public void GetPunchFront()
     {
         m_playerAnimationController.SetTriggerGuard();
     }
 
+    //背面から殴られたときStateを強制的に変更する
     public void GetPunchBack()
     {
         this.State = PLAYER_STATE.KNOCKED;
+    }
+
+    public void SetMagicToHotbar(Definer.MID magicID)
+    { 
+        m_hotbarManager.SetMagicToHotbar(magicID);
     }
 }
