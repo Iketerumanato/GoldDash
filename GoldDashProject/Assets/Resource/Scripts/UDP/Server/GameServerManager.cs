@@ -502,7 +502,7 @@ public class GameServerManager : MonoBehaviour
                                             myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
                                             myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameServer.Send(myHeader.ToByte());
-                                            Debug.Log("STGを送ったよ!");
+                                            Debug.Log($"{preparedPlayers}が今の人数だよ");
 
                                             Debug.Log("やったー！全プレイヤーの準備ができたよ！");
 
