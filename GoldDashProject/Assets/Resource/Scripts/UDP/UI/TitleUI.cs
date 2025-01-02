@@ -286,6 +286,8 @@ public class TitleUI : MonoBehaviour
 
     private void ProcessClientInternalEvent(GameClientManager.CLIENT_INTERNAL_EVENT e)
     {
+        Debug.Log("インゲームに入ります");
+
         switch (e)
         {
             case GameClientManager.CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME:
