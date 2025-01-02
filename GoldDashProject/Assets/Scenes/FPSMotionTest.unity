@@ -13222,13 +13222,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67f89c6768f43c84384fb7976cd89030, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_clickIsAvailable: 0
   m_playerCamera: {fileID: 1822682536}
   m_interactableDistance: 1.5
   m_punchReachableDistance: 1
   m_punchCooldownTime: 1000
   m_flontRange: 120
   m_chestReachableDistance: 1
-  m_clickIsAvailable: 0
 --- !u!114 &1927976706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13278,12 +13278,14 @@ MonoBehaviour:
   m_blownPowerHorizontal: 1
   m_blownPowerVertical: 1
   m_forbidPickTime: 1000
+  m_allowedUnlockState: 1
   m_playerCameraController: {fileID: 1927976707}
   m_playerMover: {fileID: 1927976706}
   m_playerInteractor: {fileID: 1927976705}
   m_playerAnimationController: {fileID: 1927976704}
   m_UIDisplayer: {fileID: 0}
   m_Rigidbody: {fileID: 0}
+  stateTxt: {fileID: 0}
 --- !u!1001 &1930212887
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14475,7 +14477,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 709497318126284965, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 713362415310924446, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_LocalPosition.x
@@ -14629,6 +14631,14 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: e386e06d921be43409f4c3e6554faccd, type: 2}
+    - target: {fileID: 3848118063671863802, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848118063671863802, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: _playerController
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5124432897554132498, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_IsTrigger
       value: 1
@@ -14652,6 +14662,10 @@ PrefabInstance:
     - target: {fileID: 6329354454314618132, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_IsTrigger
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6778358046547372332, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6897993866421088452, guid: 512d35e9c2a70ea4da04d7f64c06c230, type: 3}
       propertyPath: m_Constraints
