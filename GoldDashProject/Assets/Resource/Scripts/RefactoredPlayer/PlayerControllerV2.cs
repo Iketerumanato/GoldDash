@@ -154,6 +154,13 @@ public class PlayerControllerV2 : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Alpha1)) SetMagicToHotbar(Definer.MID.THUNDER);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) SetMagicToHotbar(Definer.MID.DASH);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) SetMagicToHotbar(Definer.MID.TELEPORT);
+        if (Input.GetKeyDown(KeyCode.Alpha4)) m_hotbarManager.RemoveMagicFromHotbar(0);
+        if (Input.GetKeyDown(KeyCode.Alpha5)) m_hotbarManager.RemoveMagicFromHotbar(1);
+        if (Input.GetKeyDown(KeyCode.Alpha6)) m_hotbarManager.RemoveMagicFromHotbar(2);
+
         switch (this.State) //Stateによって実行するUpdate関数を変える
         { 
             case PLAYER_STATE.NORMAL:

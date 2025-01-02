@@ -6598,9 +6598,21 @@ PrefabInstance:
       propertyPath: slotNum
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3275942806499092404, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+      propertyPath: iconSpriteRenderer
+      value: 
+      objectReference: {fileID: 1479179073055089556}
+    - target: {fileID: 3275942806499092404, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+      propertyPath: nameSpriteRenderer
+      value: 
+      objectReference: {fileID: 8620221513100040570}
     - target: {fileID: 5309845614748169703, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
       propertyPath: m_Name
       value: 'ScrollForUI: 1'
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309845614748169703, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8474920467217339730, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -6611,6 +6623,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+--- !u!212 &1479179073055089556 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 392911169731652590, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+  m_PrefabInstance: {fileID: 1293939536543385722}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4315242749262215976 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3032661211873948498, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
@@ -6619,6 +6636,11 @@ Transform:
 --- !u!1 &6360388150828367261 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5309845614748169703, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+  m_PrefabInstance: {fileID: 1293939536543385722}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &8620221513100040570 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 7374031877839163648, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
   m_PrefabInstance: {fileID: 1293939536543385722}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2018948285485471297
@@ -6906,9 +6928,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3275942806499092404, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+      propertyPath: iconSpriteRenderer
+      value: 
+      objectReference: {fileID: 2310053131721854653}
+    - target: {fileID: 3275942806499092404, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+      propertyPath: nameSpriteRenderer
+      value: 
+      objectReference: {fileID: 4839330389580231763}
     - target: {fileID: 5309845614748169703, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
       propertyPath: m_Name
       value: 'ScrollForUI: 0'
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309845614748169703, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7374031877839163648, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
       propertyPath: m_Sprite
@@ -6926,6 +6960,16 @@ PrefabInstance:
 --- !u!4 &1111050972067927553 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3032661211873948498, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+  m_PrefabInstance: {fileID: 2701337019680564563}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &2310053131721854653 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 392911169731652590, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+  m_PrefabInstance: {fileID: 2701337019680564563}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &4839330389580231763 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 7374031877839163648, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
   m_PrefabInstance: {fileID: 2701337019680564563}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &7840010217400488116 stripped
@@ -9039,9 +9083,21 @@ PrefabInstance:
       propertyPath: slotNum
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 3275942806499092404, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+      propertyPath: iconSpriteRenderer
+      value: 
+      objectReference: {fileID: 7808732974197607105}
+    - target: {fileID: 3275942806499092404, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+      propertyPath: nameSpriteRenderer
+      value: 
+      objectReference: {fileID: 1114646441802625071}
     - target: {fileID: 5309845614748169703, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
       propertyPath: m_Name
       value: 'ScrollForUI: 2'
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309845614748169703, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7374031877839163648, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
       propertyPath: m_Sprite
@@ -9056,6 +9112,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+--- !u!212 &1114646441802625071 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 7374031877839163648, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+  m_PrefabInstance: {fileID: 7578951122401812783}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2350188031752017096 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5309845614748169703, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
@@ -9064,6 +9125,11 @@ GameObject:
 --- !u!4 &4844741432169517693 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3032661211873948498, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
+  m_PrefabInstance: {fileID: 7578951122401812783}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &7808732974197607105 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 392911169731652590, guid: e4fa8108f42b18745bfd9e4bb9dd1a93, type: 3}
   m_PrefabInstance: {fileID: 7578951122401812783}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &9110437069863139027

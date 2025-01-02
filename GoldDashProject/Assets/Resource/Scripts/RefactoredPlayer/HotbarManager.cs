@@ -49,13 +49,17 @@ public class HotbarManager : MonoBehaviour
         //インスペクターで設定したオブジェクトへの参照を使って、各コンポーネントへの参照を取得する
         for (int i = 0; i < m_objectSlots.Length; i++)
         {
-            m_hotbarNameSprites[i] = m_objectSlots[i].GetComponent<SpriteRenderer>();
-            m_hotbarIconSprites[i] = m_objectSlots[i].GetComponent<SpriteRenderer>();
             m_hotbarSlotInfos[i] = m_objectSlots[i].GetComponent<HotbarSlotInfo>();
+            m_hotbarNameSprites[i] = m_hotbarSlotInfos[i].nameSpriteRenderer;
+            m_hotbarIconSprites[i] = m_hotbarSlotInfos[i].iconSpriteRenderer;
         }
 
         //ホットバー用配列の初期化
         m_hotbarArray = new Definer.MID[HOTBAR_SIZE];
+        for (int i = 0; i < HOTBAR_SIZE; i++)
+        {
+            m_hotbarArray[i] = Definer.MID.NONE; //初期状態で持っている巻物はなし
+        }
     }
 
     //ホットバー関連
