@@ -8,7 +8,10 @@ public class PlayerInteractor : MonoBehaviour
     [Header("クリックによるインタラクトを有効化する。ただしタッチを受け付けなくなるので注意。")]
     [SerializeField] private bool m_clickIsAvailable;
 
-    [Header("レイを飛ばしたいカメラ")]
+    [Header("ホットバーにレイを飛ばしたいカメラ")]
+    [SerializeField] private Camera m_HotbarCamera;
+
+    [Header("風景にレイを飛ばしたいカメラ")]
     [SerializeField] private Camera m_playerCamera;
 
     [Header("インタラクト可能な距離")]
@@ -122,6 +125,20 @@ public class PlayerInteractor : MonoBehaviour
                                 break;
                         }
                     }
+
+                    //次にホットバーに触ったかどうか調べ、触っていたらインタラクト情報を上書き
+                    ray = m_HotbarCamera.ScreenPointToRay(t.position);
+                    if (Physics.Raycast(ray, out hit))
+                    {
+                        if (hit.collider.gameObject.tag == "Hotbar")
+                        {
+                            HotbarSlotInfo slotInfo = hit.collider.gameObject.GetComponent<HotbarSlotInfo>();
+
+                            interactType = INTERACT_TYPE.MAGIC_ICON;
+                            targetID = slotInfo.slotNum;
+                            magicID = slotInfo.magicID;
+                        }
+                    }
                 }
             }
         }
@@ -198,6 +215,20 @@ public class PlayerInteractor : MonoBehaviour
 
                         default: //そうでないものはインタラクト不可能なオブジェクトなので無視
                             break;
+                    }
+                }
+
+                //次にホットバーに触ったかどうか調べ、触っていたらインタラクト情報を上書き
+                ray = m_HotbarCamera.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (hit.collider.gameObject.tag == "Hotbar")
+                    {
+                        HotbarSlotInfo slotInfo = hit.collider.gameObject.GetComponent<HotbarSlotInfo>();
+
+                        interactType = INTERACT_TYPE.MAGIC_ICON;
+                        targetID = slotInfo.slotNum;
+                        magicID = slotInfo.magicID;
                     }
                 }
             }

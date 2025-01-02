@@ -8893,6 +8893,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_clickIsAvailable: 1
+  m_HotbarCamera: {fileID: 6973855709987891972}
   m_playerCamera: {fileID: 3975254240555154285}
   m_interactableDistance: 1.5
   m_punchReachableDistance: 1
@@ -8950,10 +8951,10 @@ MonoBehaviour:
   - magicID: 0
     magicNameSprite: {fileID: 21300000, guid: 2fa18fabdfbefaf4aa06572a6810f0f5, type: 3}
     magicIconSprite: {fileID: 21300000, guid: 07a2eefe4a23b854a94a964821bdcacf, type: 3}
-  - magicID: 0
+  - magicID: 1
     magicNameSprite: {fileID: 21300000, guid: 238219d3c5e78934ab723db7d1fcca23, type: 3}
     magicIconSprite: {fileID: 21300000, guid: 351ccf3db3cf3304a8afd3f91e7e9952, type: 3}
-  - magicID: 0
+  - magicID: 2
     magicNameSprite: {fileID: 21300000, guid: 0738e468f81076c4a97ea75c0dbb5fa8, type: 3}
     magicIconSprite: {fileID: 21300000, guid: 850ab9e265726ac418b0865d8c992ede, type: 3}
   m_objectSlots:
