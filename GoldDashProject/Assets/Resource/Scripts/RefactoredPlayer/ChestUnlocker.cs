@@ -22,29 +22,31 @@ public class ChestUnlocker : MonoBehaviour
                 m_maxDrawCount = Mathf.Abs(value - lowerMultiple) <= Mathf.Abs(value - upperMultiple) ? lowerMultiple : upperMultiple;
             }
             else m_maxDrawCount = value; //5の倍数ならそのまま代入
+
+            m_spanOfAnimations = m_maxDrawCount / 5; //アニメーションを再生するのに必要な回転数は開錠に必要な回転数を5で割った値なので、ここで同時に変更
         }
         get { return m_maxDrawCount; }
     }
 
     //鍵が崩れていく5段階のモーション
-    private readonly string strUnlockTrigger1 = "UnlockTrigger1"; //最初
-    private readonly string strUnlockTrigger2 = "UnlockTrigger2";
-    private readonly string strUnlockTrigger3 = "UnlockTrigger3";
-    private readonly string strUnlockTrigger4 = "UnlockTrigger4";
-    private readonly string strUnlockTrigger5 = "UnlockTrigger5"; //最後
+    //private readonly string strUnlockTrigger1 = "UnlockTrigger1"; //最初
+    //private readonly string strUnlockTrigger2 = "UnlockTrigger2";
+    //private readonly string strUnlockTrigger3 = "UnlockTrigger3";
+    //private readonly string strUnlockTrigger4 = "UnlockTrigger4";
+    //private readonly string strUnlockTrigger5 = "UnlockTrigger5"; //最後
     //アニメーションの進行状況をリセットする
     private readonly string strResetTrigger = "ResetTrigger";
 
     //円を描く判定に使うプライベート変数
-    private readonly List<Vector2> drawPoints = new List<Vector2>();
-    private float totalAngle = 0f; // 累計角度
-    private float previousAngle = 0f; // 前回の角度
-    private bool isCounterClockwise = true; // 反時計回りかどうかを記録
-    private Vector2 center = Vector2.zero; // プレイヤーが描こうとしている円の推定される中心点
+    private readonly List<Vector2> m_drawPoints = new List<Vector2>();
+    private float m_totalAngle = 0f; // 累計角度
+    private float m_previousAngle = 0f; // 前回の角度
+    private bool m_isCounterClockwise = true; // 反時計回りかどうかを記録
+    private Vector2 m_center = Vector2.zero; // プレイヤーが描こうとしている円の推定される中心点
 
-    private int circleCount = 0; // 描ききった円の数
-    private int spanOfAnimations = 1; //描ききった円がこの数増えるごとに次のアニメーションを再生 
-    private int currentStageOfAnimations; //現在何番目のアニメーションまで再生したか
+    private int m_circleCount = 0; // 描ききった円の数
+    private int m_spanOfAnimations = 1; //描ききった円がこの数増えるごとに次のアニメーションを再生 
+    private int m_currentStageOfAnimations; //現在何番目のアニメーションまで再生したか
 
     //円を描く判定に使う定数
     private const float MIN_DISTANCE_THRESHOLD = 5f; //あまりにも小さいグルグル行為は無視するため
@@ -61,10 +63,10 @@ public class ChestUnlocker : MonoBehaviour
     /// </summary>
     public void StartDrawCircle()
     {
-        drawPoints.Clear(); //記録したスクリーン座標データの削除
-        totalAngle = 0f; //累計角度の初期化
-        previousAngle = 0f; //前フレームの角度保存用変数を初期化
-        isCounterClockwise = true; //デフォルトの向きに直す(反時計回り)
+        m_drawPoints.Clear(); //記録したスクリーン座標データの削除
+        m_totalAngle = 0f; //累計角度の初期化
+        m_previousAngle = 0f; //前フレームの角度保存用変数を初期化
+        m_isCounterClockwise = true; //デフォルトの向きに直す(反時計回り)
     }
 
     /// <summary>
@@ -75,73 +77,74 @@ public class ChestUnlocker : MonoBehaviour
     public bool DrawingCircle(Vector2 inputPosition)
     {
         // ポイント間隔をフィルタリング
-        if (drawPoints.Count > 0)
+        if (m_drawPoints.Count > 0)
         {
-            float distance = Vector2.Distance(drawPoints[drawPoints.Count - 1], inputPosition);
+            float distance = Vector2.Distance(m_drawPoints[m_drawPoints.Count - 1], inputPosition);
             //最後に記録した点と今回入力された点の位置がMIN_DISTANCE_THRESHOLDより近いと記録されない
             if (distance < MIN_DISTANCE_THRESHOLD) return false;
         }
 
         // 入力ポイントを記録
-        drawPoints.Add(inputPosition);
+        m_drawPoints.Add(inputPosition);
 
-        if (drawPoints.Count > 1)
+        if (m_drawPoints.Count > 1)
         {
             // 一定間隔で点群の重心を再計算する。プレイヤーが円を描くことを期待するならば、点データが増えるほど円の中心点に近づく
-            if (drawPoints.Count % CENTER_RECALCULATION_INTERVAL == 0)
+            if (m_drawPoints.Count % CENTER_RECALCULATION_INTERVAL == 0)
             {
-                center = GetCenter(drawPoints);
+                m_center = GetCenter(m_drawPoints);
             }
 
             // 点群の重心を原点として、現在描いている点の角度（ラジアン）を求め、度に変換
             // -180~180度で得られる角度を0~360度の範囲に変換
-            Vector2 currentVector = drawPoints[drawPoints.Count - 1] - center;
+            Vector2 currentVector = m_drawPoints[m_drawPoints.Count - 1] - m_center;
             float currentAngle = Mathf.Repeat(Mathf.Atan2(currentVector.y, currentVector.x) * Mathf.Rad2Deg, 360f);
 
             // 2点以上が記録されている時、角度の差分を計算
-            if (drawPoints.Count > 2)
+            if (m_drawPoints.Count > 2)
             {
                 //前フレームで求めたcurrentAngleと、今フレームのcurrentAngleを角度差を計算（-179～180度）
-                float deltaAngle = Mathf.DeltaAngle(previousAngle, currentAngle);
+                float deltaAngle = Mathf.DeltaAngle(m_previousAngle, currentAngle);
 
                 // 回転方向が切り替わったかチェック
                 // 反時計回りを期待しているとき角度差が負であれば逆回転している、時計回りのとき正であれば逆回転しているとみなす
-                if ((isCounterClockwise && deltaAngle < 0f) || (!isCounterClockwise && deltaAngle > 0f))
+                if ((m_isCounterClockwise && deltaAngle < 0f) || (!m_isCounterClockwise && deltaAngle > 0f))
                 {
-                    totalAngle = 0f; // 累計角度をリセット
-                    isCounterClockwise = !isCounterClockwise; // 回転方向を反転
+                    m_totalAngle = 0f; // 累計角度をリセット
+                    m_isCounterClockwise = !m_isCounterClockwise; // 回転方向を反転
                 }
 
-                totalAngle += deltaAngle; //累計角度に加算。累計角度は負の値にもなり得る
+                m_totalAngle += deltaAngle; //累計角度に加算。累計角度は負の値にもなり得る
 
                 // 円を描いたか確認。負の値の可能性があるので絶対値を求めてから比較
-                if (Mathf.Abs(totalAngle) >= MAX_CIRCLE_ANGLE)
+                if (Mathf.Abs(m_totalAngle) >= MAX_CIRCLE_ANGLE)
                 {
-                    circleCount++; //描ききった円の数を加算する
+                    m_circleCount++; //描ききった円の数を加算する
 
-                    totalAngle %= MAX_CIRCLE_ANGLE; // 累計角度を0~360度の範囲に戻す
+                    m_totalAngle %= MAX_CIRCLE_ANGLE; // 累計角度を0~360度の範囲に戻す
 
                     // アニメーション再生
-                    if (circleCount <= MaxDrawCount)
+                    if (m_circleCount <= MaxDrawCount)
                     {
-                        int stageOfAnimation = circleCount / spanOfAnimations; //spanOfAnimationsはMaxDrawCount(5の倍数)を5で割った値
+                        int stageOfAnimation = m_circleCount / m_spanOfAnimations; //spanOfAnimationsはMaxDrawCount(5の倍数)を5で割った値
 
                         //前フレームのアニメーション段階よりも今フレームのアニメーション段階の方が大きいなら
-                        if (stageOfAnimation > 0 && stageOfAnimation > currentStageOfAnimations)
+                        if (stageOfAnimation > 0 && stageOfAnimation > m_currentStageOfAnimations)
                         {
+                            m_currentStageOfAnimations = stageOfAnimation; //現在のアニメーション段階を記録
                             string triggerName = "UnlockTrigger" + stageOfAnimation.ToString(); //triggerのパラメータ名を作成する
                             m_animator.SetTrigger(triggerName); //作成したパラメータ名を使ってアニメーションを再生
                         }
                         
                     }
-                    if (circleCount == MaxDrawCount)
+                    if (m_circleCount == MaxDrawCount)
                     {
                         return true; //円を既定の回数以上描いていたならtrueを返却
                     }
                 }
             }
 
-            previousAngle = currentAngle; // 今フレームに入力した点の、重心からの角度を保存
+            m_previousAngle = currentAngle; // 今フレームに入力した点の、重心からの角度を保存
         }
 
         return false; //円を既定の回数以上描いていないのでfalseを返却
@@ -167,9 +170,9 @@ public class ChestUnlocker : MonoBehaviour
     /// </summary>
     public void ResetCircleDraw()
     {
-        drawPoints.Clear(); //記録したスクリーン座標データの削除
-        circleCount = 0; //描いた円の数を0に
-        currentStageOfAnimations = 0; //アニメーション段階を0に
-        m_animator.Play("idle");
+        m_drawPoints.Clear(); //記録したスクリーン座標データの削除
+        m_circleCount = 0; //描いた円の数を0に
+        m_currentStageOfAnimations = 0; //アニメーション段階を0に
+        //m_animator モーションリセット
     }
 }
