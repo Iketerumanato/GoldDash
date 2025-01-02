@@ -19,6 +19,10 @@ public class UdpUIDisplayer : MonoBehaviour
     //テキストオブジェクト
     [SerializeField] private GameObject stateMessage;
     [SerializeField] private GameObject stateMessageMini;
+    //12/27追記
+    [SerializeField] GameObject TitleTextObj;
+    [SerializeField] GameObject StartButton;
+    [SerializeField] GameObject PlayerTextField;
 
     //装飾
     [SerializeField] private GameObject line;
@@ -35,13 +39,13 @@ public class UdpUIDisplayer : MonoBehaviour
     {
         udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
         gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
-        gameClientManager.ClientInternalSubject.Subscribe(e=>ProcessClientInternalEvent(e));
+        gameClientManager.ClientInternalSubject.Subscribe(e => ProcessClientInternalEvent(e));
     }
 
     private void ProcessUdpManagerEvent(UdpButtonManager.UDP_BUTTON_EVENT e)
     {
         switch (e)
-        { 
+        {
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE:
                 //非表示
                 buttonServerMode.SetActive(false);
@@ -56,14 +60,19 @@ public class UdpUIDisplayer : MonoBehaviour
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
                 //非表示
-                buttonServerMode.gameObject.SetActive(false);
-                buttonClientMode.gameObject.SetActive(false);
-                buttonQuitApp.gameObject.SetActive(false);
+                //buttonServerMode.gameObject.SetActive(false);
+                //buttonClientMode.gameObject.SetActive(false);
+                //buttonQuitApp.gameObject.SetActive(false);
+                TitleTextObj.SetActive(false);
+                StartButton.SetActive(false);
+
 
                 //表示
                 buttonConnect.gameObject.SetActive(true);
                 buttonDisconnect.gameObject.SetActive(true);
-                buttonBack.gameObject.SetActive(true);
+                //buttonBack.gameObject.SetActive(true);
+                PlayerTextField.SetActive(true);
+                stateMessage.SetActive(true);
                 break;
 
             case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
@@ -78,6 +87,17 @@ public class UdpUIDisplayer : MonoBehaviour
                 buttonServerMode.gameObject.SetActive(true);
                 buttonClientMode.gameObject.SetActive(true);
                 buttonQuitApp.gameObject.SetActive(true);
+                break;
+
+            //12/27追記
+            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_GO_TITLE:
+                //非表示
+                buttonServerMode.SetActive(false);
+                buttonClientMode.SetActive(false);
+                stateMessage.SetActive(false);
+                //表示
+                TitleTextObj.SetActive(true);
+                StartButton.SetActive(true);
                 break;
 
             default:

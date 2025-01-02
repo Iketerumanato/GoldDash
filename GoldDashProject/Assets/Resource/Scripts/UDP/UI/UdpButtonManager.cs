@@ -19,6 +19,9 @@ public class UdpButtonManager : MonoBehaviour
         BUTTON_CLIENT_CONNECT,
         BUTTON_CLIENT_DISCONNECT,
 
+        //追記12/27
+        BUTTON_CLIENT_GO_TITLE
+
         //BUTTON_QUIT_APP,
     }
 
@@ -34,7 +37,10 @@ public class UdpButtonManager : MonoBehaviour
     [SerializeField] private Button buttonConnect;
     [SerializeField] private Button buttonDisconnect;
 
-    [SerializeField] private Button buttonBack;
+    //[SerializeField] private Button buttonBack;
+
+    //12/27
+    [SerializeField] Button startButton;
 
     //通知用subject
     public Subject<UDP_BUTTON_EVENT> udpUIManagerSubject;
@@ -52,11 +58,14 @@ public class UdpButtonManager : MonoBehaviour
         buttonActivate.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE));
         buttonDeactivate.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE));
 
-        buttonClientMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE));
+        //buttonClientMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE));
+        buttonClientMode.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_CLIENT_GO_TITLE));
+        startButton.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE));
+
         buttonConnect.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT));
         buttonDisconnect.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT));
 
-        buttonBack.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT));
+        //buttonBack.OnClickAsObservable().Subscribe(_ => udpUIManagerSubject.OnNext(UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT));
 
         //ここは通知を送るのではなくアプリ終了に
         buttonQuitApp.OnClickAsObservable().Subscribe(_ => QuitApplication());

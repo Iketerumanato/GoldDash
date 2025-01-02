@@ -39,10 +39,13 @@ public class GameServerManager : MonoBehaviour
 
     [SerializeField] private BGGradientController gradientController;
 
+    //12/29追記
+    [SerializeField] TitleUI _titleUi;
+
     //サーバーが内部をコントロールするための通知　マップ生成など
     //クライアントサーバーのクライアント部分の処理をここでやると機能過多になるため、通知を飛ばすだけにする。脳が体内の器官に命令を送るようなイメージ。実行するのはあくまで器官側。
     public enum SERVER_INTERNAL_EVENT
-    { 
+    {
         GENERATE_MAP = 0, //マップを生成せよ
         EDIT_GUI_FOR_GAME, //インゲーム用のUIレイアウトに変更せよ
     }
@@ -161,7 +164,7 @@ public class GameServerManager : MonoBehaviour
                                     //entityDictionaryをスレッドセーフなコレクションにしてUpdate()内でオブジェクト生成を行うことは禁忌だし、この実装が一番よさそうだね！
                                     //参考:https://learn.microsoft.com/ja-jp/dotnet/standard/collections/thread-safe/when-to-use-a-thread-safe-collection
                                     //スレッドセーフにしてくれてマジ、感謝。
-                                    
+
                                     gameServerManager.ChangeServerState(new NormalState()); //雷を落としたらノーマルステートに戻る
                                     break;
                                 default:
@@ -183,41 +186,77 @@ public class GameServerManager : MonoBehaviour
     #endregion
 
     #region ボタンが押されたらサーバーを有効化したり無効化したり
-    public void InitObservation(UdpButtonManager udpUIManager)
+    //public void InitObservation(UdpButtonManager udpUIManager)
+    //{
+    //    ServerInternalSubject = new Subject<SERVER_INTERNAL_EVENT>();
+    //    udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
+    //}
+
+    public void InitObservation(Title title)
     {
         ServerInternalSubject = new Subject<SERVER_INTERNAL_EVENT>();
-        udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
+        title.titleButtonSubject.Subscribe(e => ProcessUdpManagerEvent(e));
     }
 
-    private void ProcessUdpManagerEvent(UdpButtonManager.UDP_BUTTON_EVENT e)
+    //private void ProcessUdpManagerEvent(UdpButtonManager.UDP_BUTTON_EVENT e)
+    //{
+    //    switch (e)
+    //    {
+    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE:
+    //            udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
+    //            rcvPort = udpGameServer.GetReceivePort(); //受信用ポート番号とサーバーのセッションIDがここで決まるので取得
+    //            serverSessionID = udpGameServer.GetServerSessionID();
+    //            break;
+    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
+    //            if (udpGameServer == null) udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
+    //            isRunning = true;
+    //            break;
+    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
+    //            if (isRunning) //稼働中なら切断パケット
+    //            {
+    //                udpGameServer.Send(new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
+    //            }
+    //            if (udpGameServer != null) udpGameServer.Dispose();
+    //            udpGameServer = null;
+    //            actorDictionary.Clear(); //変数リセットなど
+    //            preparedPlayers = 0;
+    //            isRunning = false;
+    //            break;
+    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
+    //            if (udpGameServer != null) udpGameServer.Dispose();
+    //            udpGameServer = null;
+    //            isRunning = false;
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //}
+    private void ProcessUdpManagerEvent(Title.TITLE_BUTTON_EVENT titlebuttonEvent)
     {
-        switch (e)
+        switch (titlebuttonEvent)
         {
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE:
+            case Title.TITLE_BUTTON_EVENT.BUTTON_START_SERVER_ACTIVATE:
                 udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
                 rcvPort = udpGameServer.GetReceivePort(); //受信用ポート番号とサーバーのセッションIDがここで決まるので取得
                 serverSessionID = udpGameServer.GetServerSessionID();
-                break;
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
-                if (udpGameServer == null) udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
                 isRunning = true;
                 break;
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
-                if (isRunning) //稼働中なら切断パケット
-                {
-                    udpGameServer.Send(new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
-                }
-                if (udpGameServer != null) udpGameServer.Dispose();
-                udpGameServer = null;
-                actorDictionary.Clear(); //変数リセットなど
-                preparedPlayers = 0;
-                isRunning = false;
-                break;
-            case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
-                if (udpGameServer != null) udpGameServer.Dispose();
-                udpGameServer = null;
-                isRunning = false;
-                break;
+            //case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
+            //    if (isRunning) //稼働中なら切断パケット
+            //    {
+            //        udpGameServer.Send(new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
+            //    }
+            //    if (udpGameServer != null) udpGameServer.Dispose();
+            //    udpGameServer = null;
+            //    actorDictionary.Clear(); //変数リセットなど
+            //    preparedPlayers = 0;
+            //    isRunning = false;
+            //    break;
+            //case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
+            //    if (udpGameServer != null) udpGameServer.Dispose();
+            //    udpGameServer = null;
+            //    isRunning = false;
+            //    break;
             default:
                 break;
         }
@@ -374,6 +413,8 @@ public class GameServerManager : MonoBehaviour
                             //内部通知
                             ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
                             ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.EDIT_GUI_FOR_GAME); //UIレイアウトを変更せよ
+
+                            _titleUi.ChangeStateServer(TitleUI.SERVER_MODE.MODE_CREATE_MAP);
 
                             //全クライアントにアクターの生成命令を送る
 
@@ -668,10 +709,10 @@ public class GameServerManager : MonoBehaviour
                                             udpGameServer.Send(myHeader.ToByte());
                                         }
                                         break;
-                                    #endregion
+                                        #endregion
                                 }
                                 break;
-                            #endregion
+                                #endregion
                         }
                         break;
                     #endregion
