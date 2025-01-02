@@ -8877,7 +8877,7 @@ MonoBehaviour:
   - playerState: 5
     magnification: 0.2
   - playerState: 3
-    magnification: 0.5
+    magnification: 0.2
   - playerState: 1
     magnification: 3
 --- !u!114 &5204228447290793358
@@ -8894,6 +8894,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_clickIsAvailable: 1
   m_HotbarCamera: {fileID: 6973855709987891972}
+  m_HandCamera: {fileID: 6555887835970418255}
   m_playerCamera: {fileID: 3975254240555154285}
   m_interactableDistance: 1.5
   m_punchReachableDistance: 1

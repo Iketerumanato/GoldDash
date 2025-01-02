@@ -243,13 +243,10 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP4 パケット送信が必要なら送ろう
         this.MakePacketFromInteract(interactInfo);
 
-        //STEP5 カメラを揺らす必要があれば揺らそう
-        m_playerCameraController.InvokeShakeEffectFromInteract(interactInfo.interactType);
-
-        //STEP6 モーションを決めよう
+        //STEP5 モーションを決めよう
         m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
 
-        //STEP7 次フレームのStateを決めよう
+        //STEP6 次フレームのStateを決めよう
         PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, interactInfo.magicID); //インタラクト結果に応じて次のState決定
         if (this.State != nextState)
         {

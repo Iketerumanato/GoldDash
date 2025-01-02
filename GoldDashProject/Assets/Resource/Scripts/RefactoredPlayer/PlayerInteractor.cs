@@ -11,6 +11,9 @@ public class PlayerInteractor : MonoBehaviour
     [Header("ホットバーにレイを飛ばしたいカメラ")]
     [SerializeField] private Camera m_HotbarCamera;
 
+    [Header("巻物にレイを飛ばしたいカメラ")]
+    [SerializeField] private Camera m_HandCamera;
+
     [Header("風景にレイを飛ばしたいカメラ")]
     [SerializeField] private Camera m_playerCamera;
 
@@ -103,24 +106,7 @@ public class PlayerInteractor : MonoBehaviour
                                 interactType = INTERACT_TYPE.CHEST;
                                 //宝箱のID
                                 targetID = hit.collider.gameObject.GetComponent<Chest>().EntityID;
-
                                 break;
-
-                            case "MagicIcon": //魔法のUIならその魔法の巻物を開く
-                                //インタラクト結果
-                                interactType = INTERACT_TYPE.MAGIC_ICON;
-                                break;
-
-                            case "MagicUse":
-                                //インタラクト結果
-                                interactType = INTERACT_TYPE.MAGIC_USE;
-                                break;
-
-                            case "MagicCancel":
-                                //インタラクト結果
-                                interactType = INTERACT_TYPE.MAGIC_CANCEL;
-                                break;
-
                             default: //そうでないものはインタラクト不可能なオブジェクトなので無視
                                 break;
                         }
@@ -137,6 +123,20 @@ public class PlayerInteractor : MonoBehaviour
                             interactType = INTERACT_TYPE.MAGIC_ICON;
                             targetID = slotInfo.slotNum;
                             magicID = slotInfo.magicID;
+                        }
+                    }
+
+                    //次に巻物UIに触ったかどうか調べ、触っていたらインタラクト情報を上書き
+                    ray = m_HandCamera.ScreenPointToRay(t.position);
+                    if (Physics.Raycast(ray, out hit))
+                    {
+                        if (hit.collider.gameObject.tag == "UseMagic")
+                        {
+                            interactType = INTERACT_TYPE.MAGIC_USE;
+                        }
+                        else if (hit.collider.gameObject.tag == "CancelMagic")
+                        {
+                            interactType = INTERACT_TYPE.MAGIC_CANCEL;
                         }
                     }
                 }
@@ -195,22 +195,6 @@ public class PlayerInteractor : MonoBehaviour
                             interactType = INTERACT_TYPE.CHEST;
                             //宝箱のID
                             targetID = hit.collider.gameObject.GetComponent<Chest>().EntityID;
-
-                            break;
-
-                        case "MagicIcon": //魔法のUIならその魔法の巻物を開く
-                                          //インタラクト結果
-                            interactType = INTERACT_TYPE.MAGIC_ICON;
-                            break;
-
-                        case "MagicUse":
-                            //インタラクト結果
-                            interactType = INTERACT_TYPE.MAGIC_USE;
-                            break;
-
-                        case "MagicCancel":
-                            //インタラクト結果
-                            interactType = INTERACT_TYPE.MAGIC_CANCEL;
                             break;
 
                         default: //そうでないものはインタラクト不可能なオブジェクトなので無視
@@ -229,6 +213,20 @@ public class PlayerInteractor : MonoBehaviour
                         interactType = INTERACT_TYPE.MAGIC_ICON;
                         targetID = slotInfo.slotNum;
                         magicID = slotInfo.magicID;
+                    }
+                }
+
+                //次に巻物UIに触ったかどうか調べ、触っていたらインタラクト情報を上書き
+                ray = m_HandCamera.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (hit.collider.gameObject.tag == "UseMagic")
+                    {
+                        interactType = INTERACT_TYPE.MAGIC_USE;
+                    }
+                    else if (hit.collider.gameObject.tag == "CancelMagic")
+                    {
+                        interactType = INTERACT_TYPE.MAGIC_CANCEL;
                     }
                 }
             }
