@@ -320,6 +320,7 @@ public class GameClientManager : MonoBehaviour
                                         //準備が完了したアクターの数を加算
                                         //ここバグ疑惑あり
                                         preparedActors++;
+                                        Debug.Log($"{numOfActors}で受け付けて{preparedActors}が参加人数だよ");
                                         if (preparedActors == numOfActors) //準備完了通知をサーバに送る
                                         {
                                             Debug.Log("PSGを送信しました。");
