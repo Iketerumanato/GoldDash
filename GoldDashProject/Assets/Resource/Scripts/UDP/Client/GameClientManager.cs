@@ -316,6 +316,7 @@ public class GameClientManager : MonoBehaviour
                                         //アクター辞書に登録
                                         actorDictionary.Add(receivedActionPacket.targetID, actorController);
 
+                                        await UniTask.Delay(1000);
                                         //準備が完了したアクターの数を加算
                                         //ここバグ疑惑あり
                                         preparedActors++;

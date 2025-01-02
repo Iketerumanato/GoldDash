@@ -494,7 +494,6 @@ public class GameServerManager : MonoBehaviour
                                 {
                                     case (byte)Definer.NDID.PSG:
                                         preparedPlayers++; //準備ができたプレイヤーの人数を加算
-                                        Debug.Log($"{preparedPlayers}が今の人数だよ");
                                         if (preparedPlayers == numOfPlayers) //全プレイヤーの準備ができたら
                                         {
                                             await UniTask.Delay(1000);
