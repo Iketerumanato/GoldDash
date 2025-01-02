@@ -262,6 +262,7 @@ public class GameClientManager : MonoBehaviour
                                         break;
                                     case (byte)Definer.NDID.STG:
                                         //ここでプレイヤーを有効化してゲーム開始
+                                        await UniTask.Delay(1000);
                                         //内部通知
                                         ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
                                         ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME); //UIレイアウトを変更せよ
