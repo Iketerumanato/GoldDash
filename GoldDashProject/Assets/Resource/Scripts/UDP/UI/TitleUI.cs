@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using static GameServerManager;
 
 #region クライアントのInterafaceとState群
 public interface ITitleMode_Client
@@ -20,6 +21,7 @@ public class Mode_Logo : ITitleMode_Client
     public Mode_Logo(TitleUI titleUi) => _titleUi = titleUi;
     public void Title_EntryMode_Client()
     {
+        Debug.Log($"{clientState}に入ります");
         //非表示
         _titleUi.startclientButton.SetActive(false);
         _titleUi.startserverButton.SetActive(false);
@@ -31,6 +33,7 @@ public class Mode_Logo : ITitleMode_Client
     }
     public void Title_ExitMode_Client()
     {
+        Debug.Log($"{clientState}を出ます");
         //ステートに入って表示したものをここで非表示
         _titleUi.startgameButton.SetActive(false);
         _titleUi.gametitle.gameObject.SetActive(false);
@@ -45,6 +48,7 @@ public class Mode_Setting : ITitleMode_Client
     public Mode_Setting(TitleUI titleUi) => _titleUi = titleUi;
     public void Title_EntryMode_Client() 
     {
+        Debug.Log($"{clientState}に入ります");
         _titleUi.playernameSetting.gameObject.SetActive(true);
         _titleUi.startconnectButton.SetActive(true);
         _titleUi.backstateButton.SetActive(true);
@@ -53,6 +57,7 @@ public class Mode_Setting : ITitleMode_Client
     }
     public void Title_ExitMode_Client()
     {
+        Debug.Log($"{clientState}を出ます");
         _titleUi.playernameSetting.gameObject.SetActive(false);
         _titleUi.startconnectButton.SetActive(false);
         _titleUi.backstateButton.SetActive(false);
@@ -69,6 +74,7 @@ public class Mode_Waiting : ITitleMode_Client
     public Mode_Waiting(TitleUI titleUi) => _titleUi = titleUi;
     public void Title_EntryMode_Client()
     {
+        Debug.Log($"{clientState}に入ります");
         _titleUi.backstateButton.SetActive(true);
         _titleUi.titleExplanationText[1].gameObject.SetActive(true);
         _titleUi.titleExplanationText[1].text = "CONNECT_COMPLETE";
@@ -78,6 +84,7 @@ public class Mode_Waiting : ITitleMode_Client
     }
     public void Title_ExitMode_Client()
     {
+        Debug.Log($"{clientState}を出ます");
         _titleUi.backstateButton.SetActive(false);
         _titleUi.titleExplanationText[1].gameObject.SetActive(false);
         _titleUi.titleExplanationText[2].gameObject.SetActive(false);
