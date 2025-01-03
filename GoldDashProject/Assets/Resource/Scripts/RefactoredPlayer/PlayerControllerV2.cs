@@ -218,7 +218,7 @@ public class PlayerControllerV2 : MonoBehaviour
         float runSpeed = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
 
         //STEP3 インタラクトを実行しよう
-        (INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact();
+        (INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact();
 
         //STEP4 パケット送信が必要なら送ろう
         this.MakePacketFromInteract(interactInfo);
@@ -315,7 +315,7 @@ public class PlayerControllerV2 : MonoBehaviour
         float runSpeed = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
 
         //STEP3 インタラクトを実行しよう
-        (INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact();
+        (INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact();
 
         //STEP4 パケット送信が必要なら送ろう
         this.MakePacketFromInteract(interactInfo);
@@ -436,23 +436,24 @@ public class PlayerControllerV2 : MonoBehaviour
     }
 
     //インタラクト結果から、必要があればメンバ変数を編集する
-    private void SetParameterFromInteract((INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo)
+    private void SetParameterFromInteract((INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) interactInfo)
     {
         switch (interactInfo.interactType)
         {
             case INTERACT_TYPE.CHEST:
                 m_currentChestID = interactInfo.targetID; //アクセスする宝物のEntityIDを書き込み
+                m_currentChestTier = interactInfo.value; //アクセスする宝箱のTierを書き込み
                 break;
             case INTERACT_TYPE.MAGIC_ICON:
                 m_currentMagicID = interactInfo.magicID; //使う魔法のIDを書き込み
-                m_currentMagicIndex = interactInfo.targetID; //使うホットバーのスロット番号を書き込み
+                m_currentMagicIndex = interactInfo.value; //使うホットバーのスロット番号を書き込み
                 break;
             default:
                 break;
         }
     }
 
-    private void MakePacketFromInteract((INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo)
+    private void MakePacketFromInteract((INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) interactInfo)
     {
         if (UdpGameClient == null)
         {
@@ -487,9 +488,9 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
             case INTERACT_TYPE.CHEST:
                 //宝箱を開錠したことをパケット送信
-                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, interactInfo.targetID);
-                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                UdpGameClient.Send(myHeader.ToByte());
+                //myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, interactInfo.targetID);
+                //myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                //UdpGameClient.Send(myHeader.ToByte());
                 break;
             case INTERACT_TYPE.MAGIC_ICON:
                 //巻物を開いたことをパケット送信
@@ -499,7 +500,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
             case INTERACT_TYPE.MAGIC_USE:
                 //魔法を使用したことをパケット送信
-                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.USE_MAGIC, interactInfo.targetID, (int)interactInfo.magicID);
+                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.USE_MAGIC, default, (int)m_currentMagicID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 UdpGameClient.Send(myHeader.ToByte());
                 break;
