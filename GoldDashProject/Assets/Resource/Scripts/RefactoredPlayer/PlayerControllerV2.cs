@@ -237,7 +237,6 @@ public class PlayerControllerV2 : MonoBehaviour
         if (this.State != nextState)
         {
             this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
-            this.m_UIDisplayer.ActivateUIFromState(this.State, interactInfo.magicID); //次フレームのStateに応じてUI表示状況を切り替え
         }
     }
 
@@ -332,7 +331,6 @@ public class PlayerControllerV2 : MonoBehaviour
         if (this.State != nextState)
         {
             this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
-            this.m_UIDisplayer.ActivateUIFromState(this.State, interactInfo.magicID); //次フレームのStateに応じてUI表示状況を切り替え
         }
     }
 
