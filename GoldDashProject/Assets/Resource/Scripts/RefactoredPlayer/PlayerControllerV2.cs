@@ -252,7 +252,8 @@ public class PlayerControllerV2 : MonoBehaviour
             m_playerAnimationController.SetAnimationFromState(this.State);
 
             //STEP_C 宝箱を開錠するために必要な回転数をサーバーから取得してプロパティに書き込もう
-            m_chestUnlocker.MaxDrawCount = 5; //仮に5
+            Debug.Log("宝箱のTierは" + m_currentChestTier);
+            m_chestUnlocker.MaxDrawCount = 5 * m_currentChestTier;
             Debug.Log(m_chestUnlocker.MaxDrawCount + "回 回せ");
 
             //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう

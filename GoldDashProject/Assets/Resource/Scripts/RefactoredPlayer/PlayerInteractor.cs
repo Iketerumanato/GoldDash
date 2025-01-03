@@ -107,7 +107,7 @@ public class PlayerInteractor : MonoBehaviour
                                 interactType = INTERACT_TYPE.CHEST;
                                 //宝箱のIDとティアを取得
                                 targetID = hit.collider.gameObject.GetComponent<Chest>().EntityID;
-                                value = hit.collider.gameObject.GetComponent<Chest>().EntityID;
+                                value = hit.collider.gameObject.GetComponent<Chest>().Tier;
                                 break;
                             default: //そうでないものはインタラクト不可能なオブジェクトなので無視
                                 break;
