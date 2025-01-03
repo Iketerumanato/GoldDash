@@ -108,10 +108,16 @@ public class PlayerControllerV2 : MonoBehaviour
     [SerializeField] private bool m_allowedUnlockState = true; //NormalStateに戻る条件(ステートロックの解除条件)を満たしているか
     private CancellationTokenSource m_stateLockCts; //ステートロックの非同期処理を中心するcts
     private CancellationToken m_stateLockCt; //同ct
+
     //巻物を開いているとき、使おうとしている魔法のID
     private Definer.MID m_currentMagicID;
     //巻物を開いているとき、使おうとしている魔法のホットバースロット番号
     private int m_currentMagicIndex;
+
+    //現在の開けようとしている宝箱のEntityID
+    private ushort m_currentChestID;
+    //現在の開けようとしている宝箱のティア
+    private int m_currentChestTier;
 
     //プレイヤー制御用コンポーネント
     private PlayerCameraController m_playerCameraController;
@@ -217,14 +223,17 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP4 パケット送信が必要なら送ろう
         this.MakePacketFromInteract(interactInfo);
 
-        //STEP5 カメラを揺らす必要があれば揺らそう
+        //STEP5 インタラクト結果をメンバ変数に格納する必要があればそうしよう
+        this.SetParameterFromInteract(interactInfo);
+
+        //STEP6 カメラを揺らす必要があれば揺らそう
         m_playerCameraController.InvokeShakeEffectFromInteract(interactInfo.interactType);
 
-        //STEP6 モーションを決めよう
+        //STEP7 モーションを決めよう
         m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
 
-        //STEP7 次フレームのStateを決めよう
-        PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, interactInfo.magicID, interactInfo.targetID); //インタラクト結果に応じて次のState決定
+        //STEP8 次フレームのStateを決めよう
+        PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, interactInfo.magicID); //インタラクト結果に応じて次のState決定
         if (this.State != nextState)
         {
             this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
@@ -264,10 +273,10 @@ public class PlayerControllerV2 : MonoBehaviour
         }
 
         //STEP2 開錠できたらパケットを送信しよう
-        //if (isUnlocked)
-        //{ 
+        if (isUnlocked)
+        {
 
-        //}
+        }
 
         //STEP3 開錠できたら通常stateに戻ろう
         PLAYER_STATE nextState = this.State;
@@ -394,15 +403,13 @@ public class PlayerControllerV2 : MonoBehaviour
         if (m_allowedUnlockState) this.State = PLAYER_STATE.NORMAL;
     }
 
-    private PLAYER_STATE GetNextStateFromInteract(INTERACT_TYPE interactType, Definer.MID magicID, int magicIndex = 0)
+    private PLAYER_STATE GetNextStateFromInteract(INTERACT_TYPE interactType, Definer.MID magicID)
     {
         switch (interactType)
         {
             case INTERACT_TYPE.CHEST: //宝箱を開ける
                 return PLAYER_STATE.OPENING_CHEST;
             case INTERACT_TYPE.MAGIC_ICON: //巻物を開く
-                m_currentMagicID = magicID; //使う魔法のIDを書き込み
-                m_currentMagicIndex = magicIndex;
                 return PLAYER_STATE.USING_SCROLL;
             case INTERACT_TYPE.MAGIC_USE: //マップアクションを待機するか、ダッシュ状態になる
                 if (magicID == Definer.MID.DASH) return PLAYER_STATE.DASH;
@@ -426,6 +433,23 @@ public class PlayerControllerV2 : MonoBehaviour
     {
         await UniTask.Delay(cooldownTimeMilliSec); //指定された時間待つ
         m_isAbleToPickUpGold = true; //金貨を拾えるようにする
+    }
+
+    //インタラクト結果から、必要があればメンバ変数を編集する
+    private void SetParameterFromInteract((INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo)
+    {
+        switch (interactInfo.interactType)
+        {
+            case INTERACT_TYPE.CHEST:
+                m_currentChestID = interactInfo.targetID; //アクセスする宝物のEntityIDを書き込み
+                break;
+            case INTERACT_TYPE.MAGIC_ICON:
+                m_currentMagicID = interactInfo.magicID; //使う魔法のIDを書き込み
+                m_currentMagicIndex = interactInfo.targetID; //使うホットバーのスロット番号を書き込み
+                break;
+            default:
+                break;
+        }
     }
 
     private void MakePacketFromInteract((INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) interactInfo)
@@ -466,6 +490,12 @@ public class PlayerControllerV2 : MonoBehaviour
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, interactInfo.targetID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 UdpGameClient.Send(myHeader.ToByte());
+                break;
+            case INTERACT_TYPE.MAGIC_ICON:
+                //巻物を開いたことをパケット送信
+                break;
+            case INTERACT_TYPE.MAGIC_CANCEL:
+                //巻物を閉じたことをパケット送信
                 break;
             case INTERACT_TYPE.MAGIC_USE:
                 //魔法を使用したことをパケット送信
