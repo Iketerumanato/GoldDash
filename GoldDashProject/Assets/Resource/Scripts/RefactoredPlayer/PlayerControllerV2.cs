@@ -244,25 +244,28 @@ public class PlayerControllerV2 : MonoBehaviour
     {
         if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
         {
-            //STEP_A UI表示を切り替えよう
+            //STEP_A 無期限にステートロックしよう
+            m_allowedUnlockState = false;
+
+            //STEP_B UI表示を切り替えよう
             m_UIDisplayer.ActivateUIFromState(this.State, m_currentMagicID);
 
-            //STEP_B モーションを切り替えよう
+            //STEP_C モーションを切り替えよう
             m_playerAnimationController.SetAnimationFromState(this.State);
 
-            //STEP_C 宝箱を開錠するために必要な回転数をサーバーから取得してプロパティに書き込もう
+            //STEP_D 宝箱を開錠するために必要な回転数をサーバーから取得してプロパティに書き込もう
             Debug.Log("宝箱のTierは" + m_currentChestTier);
             m_chestUnlocker.MaxDrawCount = 5 * m_currentChestTier;
             Debug.Log(m_chestUnlocker.MaxDrawCount + "回 回せ");
 
-            //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
+            //STEP_E 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
         }
 
         //STEP1 宝箱を開錠できたかどうかのフラグを宣言しておこう
         bool isUnlocked = false;
 
-        //STEP1 タッチ・クリックされている座標を使って宝箱を開錠しよう
+        //STEP2 タッチ・クリックされている座標を使って宝箱を開錠しよう
         if (Input.GetMouseButtonDown(0))
         {
             m_chestUnlocker.StartDrawCircle();
@@ -272,25 +275,23 @@ public class PlayerControllerV2 : MonoBehaviour
             isUnlocked = m_chestUnlocker.DrawingCircle(Input.mousePosition); //開錠できたかどうか変数で受け取る
         }
 
-        //STEP2 開錠できたらパケットを送信しよう
+        //STEP3 開錠できたらパケットを送信しよう
         if (isUnlocked)
         {
 
         }
 
-        //STEP3 開錠できたら通常stateに戻ろう
-        PLAYER_STATE nextState = this.State;
+        //STEP4 開錠できたら少し待ってステートロックを解除しよう
         if (isUnlocked)
         {
-            nextState = PLAYER_STATE.NORMAL;
+            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(500), default, m_stateLockCt);
         }
 
-        //STEP4 次フレームのStateを決めよう
-        //宝箱を開錠済で、殴られていたり雷に打たれていたりした場合は対応したStateに行こう。このとき開錠したというパケットはサーバーに送られているが、その後巻物が振り込まれることは許容する。
-        if (this.State != nextState)
+        //STEP5 通常stateに戻ることができるなら戻ろう
+        if (m_allowedUnlockState)
         {
             m_chestUnlocker.ResetCircleDraw(); //他のstateに行く前に、鍵の状態をリセットしておこう
-            this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
+            this.State = PLAYER_STATE.NORMAL;
         }
     }
 
