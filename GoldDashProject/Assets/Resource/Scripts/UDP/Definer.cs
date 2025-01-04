@@ -79,6 +79,18 @@ public static class Definer
         /// End Game, ゲームを終了します
         /// </summary>
         EDG,
+        /// <summary>
+        /// 魔法の使用を許可します
+        /// </summary>
+        ALLOW_MAGIC,
+        /// <summary>
+        /// 魔法の使用を却下します
+        /// </summary>
+        DECLINE_MAGIC,
+        /// <summary>
+        /// 魔法の使用は正しく履行されました
+        /// </summary>
+        END_MAGIC_SUCCESSFULLY,
     }
 
     /// <summary>
@@ -173,6 +185,10 @@ public static class Definer
         /// このActorにこの魔法（の巻物）を与えろ
         /// </summary>
         GIVE_MAGIC,
+        /// <summary>
+        /// このActorに魔法の使用をやめさせろ
+        /// </summary>
+        QUIT_MAGIC,
         /// <summary>
         /// このActorの魔法をひとつ消費させろ
         /// </summary>

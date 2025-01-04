@@ -62,7 +62,7 @@ public class GameServerManager : MonoBehaviour
     #region Stateインターフェース
     public interface ISetverState
     {
-        void EnterState(GameServerManager gameServerManager, Definer.MID magicID);
+        void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID);
         void UpdateProcess(GameServerManager gameServerManager);
         void ExitState(GameServerManager gameServerManager);
     }
@@ -71,19 +71,23 @@ public class GameServerManager : MonoBehaviour
     private ISetverState currentSetverState;
     //魔法の実行待機ならtrue
     private bool isAwaitingMagic;
+    //待機中の魔法の種類
+    private Definer.MID awaitingMagicID;
+    //魔法を使用をしようとしているプレイヤーのsessionID
+    private ushort magicUserID;
 
     //魔法IDを渡しつつStateの切り替え
-    public void ChangeServerState(ISetverState newState, Definer.MID magicID = Definer.MID.NONE)
+    public void ChangeServerState(ISetverState newState, Definer.MID magicID = Definer.MID.NONE, ushort magicUserID = 0)
     {
         if (currentSetverState != null) currentSetverState.ExitState(this);
         currentSetverState = newState;
-        currentSetverState.EnterState(this, magicID);
+        currentSetverState.EnterState(this, magicID, magicUserID);
     }
 
     //通常の状態
     public class NormalState : ISetverState
     {
-        public void EnterState(GameServerManager gameServerManager, Definer.MID magicID)
+        public void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
         {
         }
 
@@ -119,17 +123,16 @@ public class GameServerManager : MonoBehaviour
     //魔法のための画面タッチを待機している状態
     public class AwaitTouchState : ISetverState
     {
-        Definer.MID awaitMagicID;
-
-        public void EnterState(GameServerManager gameServerManager, Definer.MID magicID)
+        public void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
         {
             gameServerManager.isAwaitingMagic = true;
-            awaitMagicID = magicID;
+            gameServerManager.awaitingMagicID = magicID;
+            gameServerManager.magicUserID = magicUserID;
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
         {
-            switch (awaitMagicID)
+            switch (gameServerManager.awaitingMagicID)
             {
                 case Definer.MID.THUNDER:
                     if (Input.GetMouseButtonDown(0))
@@ -164,6 +167,11 @@ public class GameServerManager : MonoBehaviour
                                     //entityDictionaryをスレッドセーフなコレクションにしてUpdate()内でオブジェクト生成を行うことは禁忌だし、この実装が一番よさそうだね！
                                     //参考:https://learn.microsoft.com/ja-jp/dotnet/standard/collections/thread-safe/when-to-use-a-thread-safe-collection
                                     //スレッドセーフにしてくれてマジ、感謝。
+
+                                    //魔法が正しく実行されたことを通知
+                                    myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.END_MAGIC_SUCCESSFULLY);
+                                    header = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                    gameServerManager.packetQueue.Enqueue(header);
 
                                     gameServerManager.ChangeServerState(new NormalState()); //雷を落としたらノーマルステートに戻る
                                     break;
@@ -740,9 +748,16 @@ public class GameServerManager : MonoBehaviour
                                                     //もし違う魔法の実行待機をしているならエラー返す
                                                     if (isAwaitingMagic)
                                                     {
-                                                        //エラーパケット
+                                                        //魔法の使用却下通知を送る
+                                                        myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DECLINE_MAGIC, receivedHeader.sessionID);
+                                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                        udpGameServer.Send(myHeader.ToByte());
                                                         break;
                                                     }
+                                                    //魔法の使用許可を送る
+                                                    myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.ALLOW_MAGIC, receivedHeader.sessionID);
+                                                    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                    udpGameServer.Send(myHeader.ToByte());
                                                     ChangeServerState(new AwaitTouchState(), Definer.MID.THUNDER); //雷を待機する状態にする
                                                     break;
                                             }

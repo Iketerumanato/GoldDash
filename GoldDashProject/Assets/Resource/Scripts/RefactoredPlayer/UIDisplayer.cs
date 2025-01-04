@@ -70,6 +70,9 @@ public class UIDisplayer : MonoBehaviour
                 UniTask u = UniTask.RunOnThreadPool(() => ActivateScrollObjects(magicID)); //モーションに合わせて時間差でUI表示
                 m_HotbarParent.SetActive(false); //ホットバー非表示
                 break;
+            case PLAYER_STATE.WAITING_MAP_ACTION:
+                m_variableJoystick.SetActive(false); //移動スティック非表示
+                break;
             default: //基本的なものはすべて表示する
                 m_variableJoystick.SetActive(true);
                 m_dynamicJoystick.SetActive(true);

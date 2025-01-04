@@ -326,16 +326,33 @@ public class PlayerControllerV2 : MonoBehaviour
         this.MakePacketFromInteract(interactInfo);
 
         //STEP5 巻物を使ったならホットバー情報を書き換えよう
-        if(interactInfo.interactType == INTERACT_TYPE.MAGIC_USE) m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex);
+        //if(interactInfo.interactType == INTERACT_TYPE.MAGIC_USE) m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex);
+    }
 
-        //STEP6 モーションを決めよう
-        m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
-
-        //STEP7 次フレームのStateを決めよう
-        PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, m_currentMagicID); //インタラクト結果に応じて次のState決定
-        if (this.State != nextState)
+    private void WaitingMapActionUpdate()
+    {
+        if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
         {
-            this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
+            //STEP_A 無期限にステートロックしよう
+            m_allowedUnlockState = false;
+
+            //STEP_A UI表示を切り替えよう
+            m_UIDisplayer.ActivateUIFromState(this.State);
+
+            //STEP_B モーションを切り替えよう
+            m_playerAnimationController.SetAnimationFromState(this.State);
+
+            //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
+            m_isFirstFrameOfState = false;
+        }
+
+        //サーバー側でマップアクションが終わったらm_allowedUnlockStateがtrueになる
+
+        //STEP1 通常stateに戻ることができるなら戻ろう。このときホットバーから使っていた魔法を取り除こう
+        if (m_allowedUnlockState)
+        {
+            m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex); //サーバーからm_allowedUnlockStateがtrueになったときのみ魔法が消費されるので、殴られたときは消費されない
+            this.State = PLAYER_STATE.NORMAL;
         }
     }
 
@@ -491,10 +508,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 UdpGameClient.Send(myHeader.ToByte());
                 break;
             case INTERACT_TYPE.CHEST:
-                //宝箱を開錠したことをパケット送信
-                //myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, interactInfo.targetID);
-                //myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                //UdpGameClient.Send(myHeader.ToByte());
+                //宝箱を開錠し始めたことをパケット送信
                 break;
             case INTERACT_TYPE.MAGIC_ICON:
                 //巻物を開いたことをパケット送信
@@ -524,6 +538,36 @@ public class PlayerControllerV2 : MonoBehaviour
     public void GetPunchBack()
     {
         this.State = PLAYER_STATE.KNOCKED;
+    }
+
+    //サーバーから魔法の使用許可が降りたらStateを変更する
+    public void AcceptUsingMagic()
+    {
+        switch (m_currentMagicID) //使用中の魔法に応じて次のStateを決める
+        {
+            case Definer.MID.DASH:
+                m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex); //ここでダッシュ魔法を消費させる
+                this.State = PLAYER_STATE.DASH;
+                break;
+            default :
+                this.State = PLAYER_STATE.WAITING_MAP_ACTION;
+                break;
+        }
+    }
+
+    //魔法の使用を許可しない
+    public void DeclineUsingMagic()
+    {
+        //メッセージなど出す
+        this.State = PLAYER_STATE.NORMAL;
+    }
+
+    public void EndUsingMagicSuccessfully()
+    {
+        //プレイヤーが殴られるなどして違うStateになっていないかチェック
+        if(this.State != PLAYER_STATE.WAITING_MAP_ACTION) return;
+        
+        m_allowedUnlockState = true; //ステートロックを解除
     }
 
     public void SetMagicToHotbar(Definer.MID magicID)

@@ -131,7 +131,7 @@ public class GameClientManager : MonoBehaviour
 
             case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
                 isRunning = false;
-                sendCts?.Cancel(); // 送信を非同期で行っているなら止める
+                sendCts.Cancel(); // 送信を非同期で行っているなら止める
 
                 // サーバーに接続中なら切断パケットを送信
                 if (this.sessionID != 0 && _titleUi.CurrentClientMode == TitleUI.CLIENT_MODE.MODE_WAITING)
@@ -276,6 +276,24 @@ public class GameClientManager : MonoBehaviour
                                             inGame = true;
                                             break;
                                         case (byte)Definer.NDID.EDG:
+                                            break;
+                                        case (byte)Definer.NDID.ALLOW_MAGIC:
+                                            if (receivedActionPacket.targetID == sessionID) //自分に向けた許可なら
+                                            {
+                                                playerController.AcceptUsingMagic(); //魔法を実行させる
+                                            }
+                                            break;
+                                        case (byte)Definer.NDID.DECLINE_MAGIC:
+                                            if (receivedActionPacket.targetID == sessionID) //自分に向けた許可なら
+                                            {
+                                                playerController.DeclineUsingMagic(); //魔法の使用を許可しない
+                                            }
+                                            break;
+                                        case (byte)Definer.NDID.END_MAGIC_SUCCESSFULLY:
+                                            if (receivedActionPacket.targetID == sessionID) //自分に向けた許可なら
+                                            {
+                                                playerController.EndUsingMagicSuccessfully(); //魔法を正しく終了する
+                                            }
                                             break;
                                     }
                                     break;
