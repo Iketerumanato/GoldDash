@@ -151,18 +151,18 @@ public class GameServerManager : MonoBehaviour
                                 case "Floor": //床にタッチしたら雷落とす
                                               //！あぶない！　ここで雷を生成すると最悪entityDictionaryが別スレッドの処理とぶつかってデッドロックして世界が終わるよ
                                     ActionPacket myActionPacket; //いったい何をするの！？
-                                    Header header; //パケットの送信はメインスレッドでやらないことにしてるよね！？大丈夫！？
+                                    Header myHeader; //パケットの送信はメインスレッドでやらないことにしてるよね！？大丈夫！？
 
                                     //INTERNAL_THUNDER?? サーバーが一体なぜリクエストパケットを？
                                     Vector3 thunderPos = new Vector3(hit.collider.gameObject.transform.position.x, 0.5f, hit.collider.gameObject.transform.position.z);
 
                                     myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.INTERNAL_THUNDER, default, default, thunderPos);
-                                    header = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                    myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
 
                                     //そうか！サーバー内部から別スレッドで使われているConcurrentQueueにパケットを直接エンキューすることで、
                                     //ネットワークを介さずとも他の処理と同様のフローでオブジェクト生成を実行できるだけでなく、
                                     //プレイヤー達のパケット処理の順番を待ってから処理されることでゲームルールの公平性も確保されるんだね！すごいや！
-                                    gameServerManager.packetQueue.Enqueue(header);
+                                    gameServerManager.packetQueue.Enqueue(myHeader);
                                     //Monobehaviorの処理をパケット処理スレッドに一任している（これは俺が決めました）以上、
                                     //entityDictionaryをスレッドセーフなコレクションにしてUpdate()内でオブジェクト生成を行うことは禁忌だし、この実装が一番よさそうだね！
                                     //参考:https://learn.microsoft.com/ja-jp/dotnet/standard/collections/thread-safe/when-to-use-a-thread-safe-collection
@@ -170,8 +170,8 @@ public class GameServerManager : MonoBehaviour
 
                                     //魔法が正しく実行されたことを通知
                                     myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.END_MAGIC_SUCCESSFULLY);
-                                    header = new Header(gameServerManager.magicUserID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                    gameServerManager.packetQueue.Enqueue(header);
+                                    myHeader = new Header(gameServerManager.magicUserID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                    gameServerManager.udpGameServer.Send(myHeader.ToByte());
 
                                     gameServerManager.ChangeServerState(new NormalState()); //雷を落としたらノーマルステートに戻る
                                     break;
