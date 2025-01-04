@@ -196,262 +196,269 @@ public class GameClientManager : MonoBehaviour
         ActionPacket myActionPacket;
         Header myHeader;
 
-        while (true)
+        try
         {
-            //稼働状態になるのを待つ
-            await UniTask.WaitUntil(() => isRunning);
-
-            while (isRunning)
+            while (true)
             {
-                //キューにパケットが入るのを待つ
-                await UniTask.WaitUntil(() => packetQueue.Count > 0);
+                //稼働状態になるのを待つ
+                await UniTask.WaitUntil(() => isRunning);
 
-                Header receivedHeader = packetQueue.Dequeue();
-
-                Debug.Log("パケットを受け取ったぜ！開封するぜ！");
-
-                Debug.Log($"ヘッダーを確認するぜ！パケット種別は{(Definer.PT)receivedHeader.packetType}だぜ！");
-
-                switch (receivedHeader.packetType)
+                while (isRunning)
                 {
-                    case (byte)Definer.PT.IPS:
+                    //キューにパケットが入るのを待つ
+                    await UniTask.WaitUntil(() => packetQueue.Count > 0);
 
-                        //InitPacketを受け取ったときの処理
-                        Debug.Log($"Initパケットを処理するぜ！");
+                    Header receivedHeader = packetQueue.Dequeue();
 
-                        if (this.sessionID != 0)
-                        {
-                            Debug.Log("既にsessionIDは割り振られているぜ。このInitパケットは破棄するぜ。");
-                            break;
-                        }
+                    Debug.Log("パケットを受け取ったぜ！開封するぜ！");
 
-                        //クラスに変換する
-                        InitPacketServer receivedInitPacket = new InitPacketServer(receivedHeader.data);
+                    Debug.Log($"ヘッダーを確認するぜ！パケット種別は{(Definer.PT)receivedHeader.packetType}だぜ！");
 
-                        sessionID = receivedInitPacket.sessionID; //自分のsessionIDを受け取る
-                        Debug.Log($"sessionID:{sessionID}を受け取ったぜ。");
-                        //通信が確立されたことを内部通知
-                        ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED);
+                    switch (receivedHeader.packetType)
+                    {
+                        case (byte)Definer.PT.IPS:
 
-                        //エラーコードがあればここで処理
-                        break;
-                    case (byte)Definer.PT.AP:
+                            //InitPacketを受け取ったときの処理
+                            Debug.Log($"Initパケットを処理するぜ！");
 
-                        //ActionPacketを受け取ったときの処理
-                        Debug.Log($"Actionパケットを処理するぜ！");
-
-                        ActionPacket receivedActionPacket = new ActionPacket(receivedHeader.data);
-
-                        Debug.Log($"{(Definer.RID)receivedActionPacket.roughID}を処理するぜ！");
-
-                        switch (receivedActionPacket.roughID)
-                        {
-                            #region case (byte)Definer.RID.NOT: Noticeの場合
-                            case (byte)Definer.RID.NOT:
-
-                                switch (receivedActionPacket.detailID)
-                                {
-                                    case (byte)Definer.NDID.HELLO:
-                                        break;
-                                    case (byte)Definer.NDID.PSG:
-                                        //生成すべきアクターの数を受け取る
-                                        numOfActors = receivedActionPacket.targetID;
-                                        break;
-                                    case (byte)Definer.NDID.DISCONNECT:
-                                        ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL); //予期せずサーバーから切断された場合エラーを出す
-                                        break;
-                                    case (byte)Definer.NDID.STG:
-                                        //ここでプレイヤーを有効化してゲーム開始
-                                        //内部通知
-                                        ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
-                                        ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME); //UIレイアウトを変更せよ
-                                        //全アクターの有効化
-                                        foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
-                                        { 
-                                            k.Value.gameObject.SetActive(true);
-                                        }
-                                        inGame = true;
-                                        break;
-                                    case (byte)Definer.NDID.EDG:
-                                        break;
-                                }
-                                break;
-                            #endregion
-                            case (byte)Definer.RID.EXE:
-                                switch (receivedActionPacket.detailID)
-                                {
-                                    #region case (byte)Definer.EDID.SPAWN:の場合
-                                    case (byte)Definer.EDID.SPAWN_ACTOR:
-                                        //アクターをスポーンさせる
-
-                                        //ActorControllerインスタンスを作りDictionaryに加える
-                                        ActorController actorController;
-
-                                        if (receivedActionPacket.targetID == this.sessionID) //targetIDが自分のsessionIDと同じなら
-                                        {
-                                            //プレイヤーをインスタンス化しながらActorControllerを取得
-                                            actorController = Instantiate(PlayerPrefab).GetComponent<ActorController>();
-                                            //playerControllerはアクセスしやすいように取得しておく
-                                            playerController = actorController.gameObject.GetComponent<PlayerControllerV2>();
-                                            //Playerクラスには別にSessionIDとUdpGameClientを渡し、パケット送信を自分でやらせる。
-                                            playerController.SessionID = this.sessionID;
-                                            playerController.UdpGameClient = this.udpGameClient;
-                                        }
-                                        else //他人のIDなら
-                                        {
-                                            //アクターををインスタンス化しながらActorControllerを取得
-                                            actorController = Instantiate(ActorPrefab).GetComponent<ActorController>();
-                                        }
-
-                                        //アクターを指定地点へ移動させる
-                                        actorController.Warp(receivedActionPacket.pos, Vector3.forward);
-                                        //アクターの名前を書き込み
-                                        actorController.PlayerName = receivedActionPacket.msg;
-                                        //アクターのSessionIDを書き込み
-                                        actorController.SessionID = receivedActionPacket.targetID;
-                                        //アクターのゲームオブジェクト設定
-                                        actorController.name = $"Actor: {actorController.PlayerName} ({actorController.SessionID})"; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
-                                        actorController.gameObject.SetActive(false); //初期設定が済んだら無効化して処理を止める。ゲーム開始時に有効化して座標などをセットする
-
-                                        //アクター辞書に登録
-                                        actorDictionary.Add(receivedActionPacket.targetID, actorController);
-
-                                        //準備が完了したアクターの数を加算
-                                        //ここバグ疑惑あり
-                                        preparedActors++;
-                                        if (preparedActors == numOfActors) //準備完了通知をサーバに送る
-                                        {
-                                            Debug.Log("PSGを送信しました。");
-                                            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.PSG);
-                                            myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                            udpGameClient.Send(myHeader.ToByte());
-                                        }
-                                        break;
-                                    #endregion
-                                    case (byte)Definer.EDID.PUNCH:
-                                        if (receivedActionPacket.targetID == this.sessionID) break; //プレイヤーが行ったパンチなら無視
-                                        actorDictionary[receivedActionPacket.targetID].PunchAnimation();
-                                        break;
-                                    case (byte)Definer.EDID.HIT_FRONT:
-                                        //殴られたのがプレイヤーなら
-                                        if (receivedActionPacket.targetID == this.sessionID)
-                                        {
-                                            //プレイヤー側で演出
-                                            playerController.GetPunchFront();
-                                        }
-                                        else
-                                        {
-                                            //他人が殴られたならモーション同期
-                                            actorDictionary[receivedActionPacket.targetID].RecoiledAnimation();
-                                        }
-                                        break;
-                                    case (byte)Definer.EDID.HIT_BACK:
-                                        //殴られたのがプレイヤーなら
-                                        if (receivedActionPacket.targetID == this.sessionID)
-                                        {
-                                            //プレイヤー側で演出
-                                            //playerController.Blown(receivedActionPacket.pos); //パンチの方向に吹っ飛ぶ
-                                            playerController.GetPunchBack();
-                                        }
-                                        else
-                                        {
-                                            //他人が殴られたならモーション同期。吹っ飛びの同期はPositionPacketで自動的になされる
-                                            actorDictionary[receivedActionPacket.targetID].BlownAnimation();
-                                        }
-                                        break;
-                                    case (byte)Definer.EDID.EDIT_GOLD:
-                                        //所持金変更の対象がプレイヤーなら
-                                        if (receivedActionPacket.targetID == this.sessionID)
-                                        {
-                                            //プレイヤー側で演出
-                                        }
-                                        //指定されたアクターの所持金を編集
-                                        actorDictionary[receivedActionPacket.targetID].Gold += receivedActionPacket.value;
-                                        Debug.Log($"{actorDictionary[receivedActionPacket.targetID].PlayerName}が({receivedActionPacket.value})ゴールドを入手。現在の所持金は({actorDictionary[receivedActionPacket.targetID].Gold})ゴールド。");
-                                        break;
-                                    case (byte)Definer.EDID.SPAWN_CHEST:
-                                        //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
-                                        //chestという変数名をここでだけ使いたいのでブロック文でスコープ分け
-                                        {
-                                            Chest chest = Instantiate(ChestPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
-                                            entityDictionary.Add(receivedActionPacket.targetID, chest); //管理用のIDと共に辞書へ
-                                            chest.EntityID = receivedActionPacket.targetID; //ID割り当て
-                                            chest.Tier = receivedActionPacket.value; //金額設定
-                                            chest.name = $"Chest ({receivedActionPacket.targetID})";
-                                        }
-                                        break;
-                                    case (byte)Definer.EDID.SPAWN_GOLDPILE:
-                                        //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
-                                        //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
-                                        {
-                                            GoldPile goldPile = Instantiate(GoldPilePrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
-                                            entityDictionary.Add(receivedActionPacket.targetID, goldPile); //管理用のIDと共に辞書へ
-                                            goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
-                                            goldPile.Value = receivedActionPacket.value; //金額設定
-                                            goldPile.name = $"GoldPile ({receivedActionPacket.targetID})";
-                                        }
-                                        break;
-                                    case (byte)Definer.EDID.SPAWN_THUNDER:
-                                        //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
-                                        //thunderという変数名をここでだけ使いたいのでブロック文でスコープ分け
-                                        {
-                                            //雷は自動消滅するのでDictionaryで管理しない
-                                            ThunderEntity thunder = Instantiate(ThunderPrefab, receivedActionPacket.pos, Quaternion.Euler(0, 0, 90)).GetComponent<ThunderEntity>();
-                                            thunder.InitEntity(); //生成時のメソッドを呼ぶ
-                                        }
-                                        break;
-                                    case (byte)Definer.EDID.DELETE_ACTOR:
-                                        //アクターのオブジェクトを削除
-                                        Destroy(actorDictionary[receivedActionPacket.targetID].gameObject);
-                                        //アクター登録の削除
-                                        actorDictionary.Remove(receivedActionPacket.targetID);
-                                        break;
-                                    case (byte)Definer.EDID.DESTROY_ENTITY:
-                                        //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
-                                        entityDictionary[receivedActionPacket.targetID].DestroyEntity();
-                                        entityDictionary.Remove(receivedActionPacket.targetID);
-                                        break;
-                                    case (byte)Definer.EDID.GIVE_MAGIC:
-                                        //アクター側の魔法所持数を変更する。
-                                        actorDictionary[receivedActionPacket.targetID].MagicInventry++;
-                                        //対象がプレイヤーならプレイヤーに魔法の巻物を渡す
-                                        if (receivedActionPacket.targetID == this.sessionID)
-                                        { 
-                                            //valueのmagicIDを見て処理
-                                        }
-                                        break;
-                                }
-                                break;
-                        }
-                        break;
-
-                    case (byte)Definer.PT.PP:
-                        //PositionPacketを受け取ったときの処理
-                        Debug.Log($"Positionパケットを処理するぜ！");
-
-                        //全アクターの位置を更新
-                        PositionPacket positionPacket = new PositionPacket(receivedHeader.data); //バイト配列から変換
-                        foreach (PositionPacket.PosData p in positionPacket.posDatas) //座標情報を格納している配列にforeachでアクセス
-                        {
-                            if (p.sessionID == this.sessionID) continue;//もし自分のIDと紐づいた座標情報なら無視する。画面がガタガタしてしまうので。
-                            else
+                            if (this.sessionID != 0)
                             {
-                                ActorController actorController = null;
-                                //4人未満でプレイするとき、p.sessionIDが0になっている箇所がある。このときdictionaryが例外「KeyNotFoundException」をスローするのを防ぐため、TryGetValueを用いる。
-                                actorDictionary.TryGetValue(p.sessionID, out actorController); //key: sessionIDに対応したvalueが見つからなければoutには何も代入されない。
-                                if (actorController != null) //valueが見つかったなら
+                                Debug.Log("既にsessionIDは割り振られているぜ。このInitパケットは破棄するぜ。");
+                                break;
+                            }
+
+                            //クラスに変換する
+                            InitPacketServer receivedInitPacket = new InitPacketServer(receivedHeader.data);
+
+                            sessionID = receivedInitPacket.sessionID; //自分のsessionIDを受け取る
+                            Debug.Log($"sessionID:{sessionID}を受け取ったぜ。");
+                            //通信が確立されたことを内部通知
+                            ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED);
+
+                            //エラーコードがあればここで処理
+                            break;
+                        case (byte)Definer.PT.AP:
+
+                            //ActionPacketを受け取ったときの処理
+                            Debug.Log($"Actionパケットを処理するぜ！");
+
+                            ActionPacket receivedActionPacket = new ActionPacket(receivedHeader.data);
+
+                            Debug.Log($"{(Definer.RID)receivedActionPacket.roughID}を処理するぜ！");
+
+                            switch (receivedActionPacket.roughID)
+                            {
+                                #region case (byte)Definer.RID.NOT: Noticeの場合
+                                case (byte)Definer.RID.NOT:
+
+                                    switch (receivedActionPacket.detailID)
+                                    {
+                                        case (byte)Definer.NDID.HELLO:
+                                            break;
+                                        case (byte)Definer.NDID.PSG:
+                                            //生成すべきアクターの数を受け取る
+                                            numOfActors = receivedActionPacket.targetID;
+                                            break;
+                                        case (byte)Definer.NDID.DISCONNECT:
+                                            ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL); //予期せずサーバーから切断された場合エラーを出す
+                                            break;
+                                        case (byte)Definer.NDID.STG:
+                                            //ここでプレイヤーを有効化してゲーム開始
+                                            //内部通知
+                                            ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
+                                            ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME); //UIレイアウトを変更せよ
+                                                                                                                   //全アクターの有効化
+                                            foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+                                            {
+                                                k.Value.gameObject.SetActive(true);
+                                            }
+                                            inGame = true;
+                                            break;
+                                        case (byte)Definer.NDID.EDG:
+                                            break;
+                                    }
+                                    break;
+                                #endregion
+                                case (byte)Definer.RID.EXE:
+                                    switch (receivedActionPacket.detailID)
+                                    {
+                                        #region case (byte)Definer.EDID.SPAWN:の場合
+                                        case (byte)Definer.EDID.SPAWN_ACTOR:
+                                            //アクターをスポーンさせる
+
+                                            //ActorControllerインスタンスを作りDictionaryに加える
+                                            ActorController actorController;
+
+                                            if (receivedActionPacket.targetID == this.sessionID) //targetIDが自分のsessionIDと同じなら
+                                            {
+                                                //プレイヤーをインスタンス化しながらActorControllerを取得
+                                                actorController = Instantiate(PlayerPrefab).GetComponent<ActorController>();
+                                                //playerControllerはアクセスしやすいように取得しておく
+                                                playerController = actorController.gameObject.GetComponent<PlayerControllerV2>();
+                                                //Playerクラスには別にSessionIDとUdpGameClientを渡し、パケット送信を自分でやらせる。
+                                                playerController.SessionID = this.sessionID;
+                                                playerController.UdpGameClient = this.udpGameClient;
+                                            }
+                                            else //他人のIDなら
+                                            {
+                                                //アクターををインスタンス化しながらActorControllerを取得
+                                                actorController = Instantiate(ActorPrefab).GetComponent<ActorController>();
+                                            }
+
+                                            //アクターを指定地点へ移動させる
+                                            actorController.Warp(receivedActionPacket.pos, Vector3.forward);
+                                            //アクターの名前を書き込み
+                                            actorController.PlayerName = receivedActionPacket.msg;
+                                            //アクターのSessionIDを書き込み
+                                            actorController.SessionID = receivedActionPacket.targetID;
+                                            //アクターのゲームオブジェクト設定
+                                            actorController.name = $"Actor: {actorController.PlayerName} ({actorController.SessionID})"; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
+                                            actorController.gameObject.SetActive(false); //初期設定が済んだら無効化して処理を止める。ゲーム開始時に有効化して座標などをセットする
+
+                                            //アクター辞書に登録
+                                            actorDictionary.Add(receivedActionPacket.targetID, actorController);
+
+                                            //準備が完了したアクターの数を加算
+                                            //ここバグ疑惑あり
+                                            preparedActors++;
+                                            if (preparedActors == numOfActors) //準備完了通知をサーバに送る
+                                            {
+                                                Debug.Log("PSGを送信しました。");
+                                                myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.PSG);
+                                                myHeader = new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                udpGameClient.Send(myHeader.ToByte());
+                                            }
+                                            break;
+                                        #endregion
+                                        case (byte)Definer.EDID.PUNCH:
+                                            if (receivedActionPacket.targetID == this.sessionID) break; //プレイヤーが行ったパンチなら無視
+                                            actorDictionary[receivedActionPacket.targetID].PunchAnimation();
+                                            break;
+                                        case (byte)Definer.EDID.HIT_FRONT:
+                                            //殴られたのがプレイヤーなら
+                                            if (receivedActionPacket.targetID == this.sessionID)
+                                            {
+                                                //プレイヤー側で演出
+                                                playerController.GetPunchFront();
+                                            }
+                                            else
+                                            {
+                                                //他人が殴られたならモーション同期
+                                                actorDictionary[receivedActionPacket.targetID].RecoiledAnimation();
+                                            }
+                                            break;
+                                        case (byte)Definer.EDID.HIT_BACK:
+                                            //殴られたのがプレイヤーなら
+                                            if (receivedActionPacket.targetID == this.sessionID)
+                                            {
+                                                //プレイヤー側で演出
+                                                //playerController.Blown(receivedActionPacket.pos); //パンチの方向に吹っ飛ぶ
+                                                playerController.GetPunchBack();
+                                            }
+                                            else
+                                            {
+                                                //他人が殴られたならモーション同期。吹っ飛びの同期はPositionPacketで自動的になされる
+                                                actorDictionary[receivedActionPacket.targetID].BlownAnimation();
+                                            }
+                                            break;
+                                        case (byte)Definer.EDID.EDIT_GOLD:
+                                            //所持金変更の対象がプレイヤーなら
+                                            if (receivedActionPacket.targetID == this.sessionID)
+                                            {
+                                                //プレイヤー側で演出
+                                            }
+                                            //指定されたアクターの所持金を編集
+                                            actorDictionary[receivedActionPacket.targetID].Gold += receivedActionPacket.value;
+                                            Debug.Log($"{actorDictionary[receivedActionPacket.targetID].PlayerName}が({receivedActionPacket.value})ゴールドを入手。現在の所持金は({actorDictionary[receivedActionPacket.targetID].Gold})ゴールド。");
+                                            break;
+                                        case (byte)Definer.EDID.SPAWN_CHEST:
+                                            //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                            //chestという変数名をここでだけ使いたいのでブロック文でスコープ分け
+                                            {
+                                                Chest chest = Instantiate(ChestPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
+                                                entityDictionary.Add(receivedActionPacket.targetID, chest); //管理用のIDと共に辞書へ
+                                                chest.EntityID = receivedActionPacket.targetID; //ID割り当て
+                                                chest.Tier = receivedActionPacket.value; //金額設定
+                                                chest.name = $"Chest ({receivedActionPacket.targetID})";
+                                            }
+                                            break;
+                                        case (byte)Definer.EDID.SPAWN_GOLDPILE:
+                                            //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                            //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
+                                            {
+                                                GoldPile goldPile = Instantiate(GoldPilePrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
+                                                entityDictionary.Add(receivedActionPacket.targetID, goldPile); //管理用のIDと共に辞書へ
+                                                goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
+                                                goldPile.Value = receivedActionPacket.value; //金額設定
+                                                goldPile.name = $"GoldPile ({receivedActionPacket.targetID})";
+                                            }
+                                            break;
+                                        case (byte)Definer.EDID.SPAWN_THUNDER:
+                                            //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                            //thunderという変数名をここでだけ使いたいのでブロック文でスコープ分け
+                                            {
+                                                //雷は自動消滅するのでDictionaryで管理しない
+                                                ThunderEntity thunder = Instantiate(ThunderPrefab, receivedActionPacket.pos, Quaternion.Euler(0, 0, 90)).GetComponent<ThunderEntity>();
+                                                thunder.InitEntity(); //生成時のメソッドを呼ぶ
+                                            }
+                                            break;
+                                        case (byte)Definer.EDID.DELETE_ACTOR:
+                                            //アクターのオブジェクトを削除
+                                            Destroy(actorDictionary[receivedActionPacket.targetID].gameObject);
+                                            //アクター登録の削除
+                                            actorDictionary.Remove(receivedActionPacket.targetID);
+                                            break;
+                                        case (byte)Definer.EDID.DESTROY_ENTITY:
+                                            //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
+                                            entityDictionary[receivedActionPacket.targetID].DestroyEntity();
+                                            entityDictionary.Remove(receivedActionPacket.targetID);
+                                            break;
+                                        case (byte)Definer.EDID.GIVE_MAGIC:
+                                            //アクター側の魔法所持数を変更する。
+                                            actorDictionary[receivedActionPacket.targetID].MagicInventry++;
+                                            //対象がプレイヤーならプレイヤーに魔法の巻物を渡す
+                                            if (receivedActionPacket.targetID == this.sessionID)
+                                            {
+                                                //valueのmagicIDを見て処理
+                                            }
+                                            break;
+                                    }
+                                    break;
+                            }
+                            break;
+
+                        case (byte)Definer.PT.PP:
+                            //PositionPacketを受け取ったときの処理
+                            Debug.Log($"Positionパケットを処理するぜ！");
+
+                            //全アクターの位置を更新
+                            PositionPacket positionPacket = new PositionPacket(receivedHeader.data); //バイト配列から変換
+                            foreach (PositionPacket.PosData p in positionPacket.posDatas) //座標情報を格納している配列にforeachでアクセス
+                            {
+                                if (p.sessionID == this.sessionID) continue;//もし自分のIDと紐づいた座標情報なら無視する。画面がガタガタしてしまうので。
+                                else
                                 {
-                                    actorController.Move(p.pos, p.forward); //そのまま座標をいただいて、対応するアクターの座標を書き換える。
+                                    ActorController actorController = null;
+                                    //4人未満でプレイするとき、p.sessionIDが0になっている箇所がある。このときdictionaryが例外「KeyNotFoundException」をスローするのを防ぐため、TryGetValueを用いる。
+                                    actorDictionary.TryGetValue(p.sessionID, out actorController); //key: sessionIDに対応したvalueが見つからなければoutには何も代入されない。
+                                    if (actorController != null) //valueが見つかったなら
+                                    {
+                                        actorController.Move(p.pos, p.forward); //そのまま座標をいただいて、対応するアクターの座標を書き換える。
+                                    }
                                 }
                             }
-                        }
-                        break;
+                            break;
 
-                    default:
-                        Debug.Log($"{(Definer.PT)receivedHeader.packetType}はクライアントでは処理できないぜ。処理を終了するぜ。");
-                        break;
+                        default:
+                            Debug.Log($"{(Definer.PT)receivedHeader.packetType}はクライアントでは処理できないぜ。処理を終了するぜ。");
+                            break;
+                    }
                 }
             }
+        }
+        catch(System.Exception e)
+        {
+            Debug.LogException(e);
         }
     }
 }
