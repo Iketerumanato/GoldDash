@@ -331,7 +331,7 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP4 開錠できたら少し待ってステートロックを解除しよう
         if (isUnlocked)
         {
-            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(1200), default, StateLockCt);
+            UniTask.RunOnThreadPool(() => CountStateLockTime(1200, StateLockCt), cancellationToken: StateLockCt);
         }
 
         //STEP5 通常stateに戻ることができるなら戻ろう
@@ -409,14 +409,14 @@ public class PlayerControllerV2 : MonoBehaviour
             if (!m_allowedUnlockState) m_stateLockCts.Cancel();
             //一定時間ステートロックする
             m_allowedUnlockState = false;
-            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(1500), default, StateLockCt);
+            UniTask.RunOnThreadPool(() => CountStateLockTime(1500, StateLockCt), cancellationToken: StateLockCt);
 
             //STEP_A 吹き飛ぼう
             //金貨を拾えない状態にする
             if (!m_isAbleToPickUpGold) m_forbidPickUpGoldCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
             //一定時間金貨を拾えない状態にする
             m_isAbleToPickUpGold = false;
-            UniTask.RunOnThreadPool(() => CountForbidPickTime(1000), default, ForbidPickUpGoldCt);
+            UniTask.RunOnThreadPool(() => CountForbidPickTime(1000, ForbidPickUpGoldCt), cancellationToken: ForbidPickUpGoldCt);
 
             //前に吹っ飛ぶ
             //transform.forwardと実際の前方は（カメラの向きに合わせた関係で）逆なのでマイナスをかける
@@ -450,7 +450,7 @@ public class PlayerControllerV2 : MonoBehaviour
             if (!m_allowedUnlockState) m_stateLockCts.Cancel();
             //一定時間ステートロックする
             m_allowedUnlockState = false;
-            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(3000), default, StateLockCt);
+            UniTask.RunOnThreadPool(() => CountStateLockTime(3000, StateLockCt), cancellationToken: StateLockCt);
 
             //STEP_A カメラを揺らそう
             m_playerCameraController.InvokeShakeEffectFromState(this.State);
@@ -485,17 +485,33 @@ public class PlayerControllerV2 : MonoBehaviour
     }
 
     //ステートロック用フラグを一定時間後に解除する
-    private async void CountStateLockTime(int cooldownTimeMilliSec)
+    private async void CountStateLockTime(int cooldownTimeMilliSec, CancellationToken cancellationToken)
     {
-        await UniTask.Delay(cooldownTimeMilliSec); //指定された秒数待ったら
-        m_allowedUnlockState = true; //クールダウン終了
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await UniTask.Delay(cooldownTimeMilliSec, cancellationToken: cancellationToken); //指定された時間待つ
+            m_allowedUnlockState = true; //ステートロック解除
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("ステートロックの制限時間カウントをキャンセルします");
+        }
     }
 
     //金貨を拾うためのフラグを一定時間後にtrueにする
-    private async void CountForbidPickTime(int cooldownTimeMilliSec)
+    private async void CountForbidPickTime(int cooldownTimeMilliSec, CancellationToken cancellationToken)
     {
-        await UniTask.Delay(cooldownTimeMilliSec); //指定された時間待つ
-        m_isAbleToPickUpGold = true; //金貨を拾えるようにする
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await UniTask.Delay(cooldownTimeMilliSec, cancellationToken: cancellationToken); //指定された時間待つ
+            m_isAbleToPickUpGold = true; //金貨を拾えるようにする
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("金貨拾得禁止の制限時間カウントをキャンセルします");
+        }
     }
 
     private async UniTask CountDashableTime(int cooldownTimeMilliSec, CancellationToken cancellationToken)
