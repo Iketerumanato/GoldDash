@@ -683,7 +683,7 @@ public class GameServerManager : MonoBehaviour
                                                 //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
                                                 {
                                                     entityID = GetUniqueEntityID();
-                                                    Vector3 scrollPos = new Vector3(entityDictionary[receivedActionPacket.targetID].transform.position.x, 0.4f, entityDictionary[receivedActionPacket.targetID].transform.position.z);
+                                                    Vector3 scrollPos = new Vector3(entityDictionary[receivedActionPacket.targetID].transform.position.x, 0.3f, entityDictionary[receivedActionPacket.targetID].transform.position.z);
                                                     Scroll scroll = Instantiate(ScrollPrefab, scrollPos, Quaternion.identity).GetComponent<Scroll>();
                                                     scroll.EntityID = entityID; //値を書き込み
                                                     //魔法（の巻物）を抽選
