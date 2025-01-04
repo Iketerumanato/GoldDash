@@ -2172,9 +2172,10 @@ GameObject:
   - component: {fileID: 3868644172709064090}
   - component: {fileID: 5856433715625343069}
   - component: {fileID: -2737755156572741994}
+  - component: {fileID: 5352890873965741232}
   m_Layer: 0
   m_Name: Pile Big
-  m_TagString: Untagged
+  m_TagString: GoldPile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2314,6 +2315,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 122
   m_CollisionDetection: 0
+--- !u!114 &5352890873965741232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5957018316467260359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4afdcbc014bf3374a84e9afc5defa116, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6032947124774711388
 GameObject:
   m_ObjectHideFlags: 0
