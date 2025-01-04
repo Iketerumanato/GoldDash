@@ -91,6 +91,10 @@ public static class Definer
         /// </summary>
         GET_GOLDPILE,
         /// <summary>
+        /// 巻物を手に入れようとしました
+        /// </summary>
+        GET_SCROLL,
+        /// <summary>
         /// 空振りました
         /// </summary>
         MISS,
@@ -133,6 +137,10 @@ public static class Definer
         /// 金貨の山をスポーンさせろ
         /// </summary>
         SPAWN_GOLDPILE,
+        /// <summary>
+        /// 巻物をスポーンさせろ
+        /// </summary>
+        SPAWN_SCROLL,
         /// <summary>
         /// 雷をスポーンさせろ。
         /// </summary>

@@ -32,6 +32,7 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private GameObject PlayerPrefab; //プレイヤーのプレハブ
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
+    [SerializeField] private GameObject ScrollPrefab; //巻物のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
 
     [SerializeField] TitleUI _titleUi;

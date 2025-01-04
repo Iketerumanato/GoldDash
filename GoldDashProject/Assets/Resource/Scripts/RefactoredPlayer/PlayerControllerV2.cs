@@ -541,11 +541,22 @@ public class PlayerControllerV2 : MonoBehaviour
         switch (other.tag)
         {
             case "GoldPile":
+                if (!m_isAbleToPickUpGold) return; //金貨を拾えない状態ならreturn
+
                 //金貨の山に触れたというリクエスト送信。（他のプレイヤーが先に触れていた場合、お金は入手できない。早い者勝ち。）
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_GOLDPILE, other.GetComponent<Entity>().EntityID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 UdpGameClient.Send(myHeader.ToByte());
                 Debug.Log("金貨Getリクエスト。");
+                break;
+            case "Scroll":
+                if (!m_isAbleToPickUpGold) return; //金貨を拾えない状態ならreturn
+
+                //巻物をに触れたというリクエスト送信。（他のプレイヤーが先に触れていた場合、巻物は入手できない。早い者勝ち。）
+                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_SCROLL, other.GetComponent<Entity>().EntityID);
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
+                Debug.Log("巻物Getリクエスト。");
                 break;
             default:
                 break;

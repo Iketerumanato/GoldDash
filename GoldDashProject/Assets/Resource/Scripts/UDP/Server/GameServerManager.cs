@@ -33,6 +33,7 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private GameObject ActorPrefab; //アクターのプレハブ
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
+    [SerializeField] private GameObject ScrollPrefab; //巻物のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
 
     private bool inGame; //ゲームは始まっているか
@@ -88,27 +89,26 @@ public class GameServerManager : MonoBehaviour
 
         public void UpdateProcess(GameServerManager gameServerManager)
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.NORMAL;
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_1;
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_2;
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha4))
-            {
-                gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_3;
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha5))
-            {
-                gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_4;
-            }
-
+            //if (Input.GetKeyDown(KeyCode.Alpha1))
+            //{
+            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.NORMAL;
+            //}
+            //else if (Input.GetKeyDown(KeyCode.Alpha2))
+            //{
+            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_1;
+            //}
+            //else if (Input.GetKeyDown(KeyCode.Alpha3))
+            //{
+            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_2;
+            //}
+            //else if (Input.GetKeyDown(KeyCode.Alpha4))
+            //{
+            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_3;
+            //}
+            //else if (Input.GetKeyDown(KeyCode.Alpha5))
+            //{
+            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_4;
+            //}
         }
 
         public void ExitState(GameServerManager gameServerManager)
@@ -594,7 +594,7 @@ public class GameServerManager : MonoBehaviour
                                             }
                                             break;
                                         #endregion
-                                        #region case 金貨の山系:
+                                        #region case 金貨の山・巻物系:
                                         case (byte)Definer.REID.GET_GOLDPILE:
                                             //エンティティが存在するか確かめる。存在しないなら何もしない。エラーコードも返さない。エラーコードを返すとチーターは喜ぶ
                                             if (entityDictionary.TryGetValue(receivedActionPacket.targetID, out entity))
@@ -613,7 +613,29 @@ public class GameServerManager : MonoBehaviour
                                                 entityDictionary[receivedActionPacket.targetID].DestroyEntity();
                                                 entityDictionary.Remove(receivedActionPacket.targetID);
                                                 usedEntityID.Remove(receivedActionPacket.targetID); //IDも解放
-                                                                                                    //パケット送信
+                                                //パケット送信
+                                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.DESTROY_ENTITY, receivedActionPacket.targetID);
+                                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                udpGameServer.Send(myHeader.ToByte());
+                                            }
+                                            break;
+                                        case (byte)Definer.REID.GET_SCROLL:
+                                            //エンティティが存在するか確かめる。存在しないなら何もしない。エラーコードも返さない。エラーコードを返すとチーターは喜ぶ
+                                            if (entityDictionary.TryGetValue(receivedActionPacket.targetID, out entity))
+                                            {
+                                                //エンティティをGoldPileにキャスト
+                                                Scroll scroll = (Scroll)entity;
+
+                                                //存在するなら入手したプレイヤーに巻物を与える
+                                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.GIVE_MAGIC, receivedHeader.sessionID, (int)scroll.MagicID);
+                                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                udpGameServer.Send(myHeader.ToByte());
+                                                //その金貨の山を消す
+                                                //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
+                                                entityDictionary[receivedActionPacket.targetID].DestroyEntity();
+                                                entityDictionary.Remove(receivedActionPacket.targetID);
+                                                usedEntityID.Remove(receivedActionPacket.targetID); //IDも解放
+                                                //パケット送信
                                                 myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.DESTROY_ENTITY, receivedActionPacket.targetID);
                                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                 udpGameServer.Send(myHeader.ToByte());
@@ -651,20 +673,30 @@ public class GameServerManager : MonoBehaviour
                                                     goldPile.name = $"GoldPile ({entityID})";
                                                     entityDictionary.Add(entityID, goldPile); //管理用のIDと共に辞書へ
 
-                                                    //金額を指定して、殴られた人の足元に金貨の山を生成する命令
+                                                    //金額を指定して、宝箱の足元に金貨の山を生成する命令
                                                     myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, chestGold, goldPos);
                                                     myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                     udpGameServer.Send(myHeader.ToByte());
                                                 }
 
-                                                //魔法（の巻物）を抽選して付与
-                                                int magicID = magicLottely.Lottely();
-                                                //まずサーバー側で魔法所持数を1個増やす
-                                                actorDictionary[receivedHeader.sessionID].MagicInventry++;
-                                                //パケット送信
-                                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.GIVE_MAGIC, receivedHeader.sessionID, magicID);
-                                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                                udpGameServer.Send(myHeader.ToByte());
+                                                //重複しないentityIDを作り、オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                                //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
+                                                {
+                                                    entityID = GetUniqueEntityID();
+                                                    Vector3 scrollPos = new Vector3(entityDictionary[receivedActionPacket.targetID].transform.position.x, 0.4f, entityDictionary[receivedActionPacket.targetID].transform.position.z);
+                                                    Scroll scroll = Instantiate(GoldPilePrefab, scrollPos, Quaternion.identity).GetComponent<Scroll>();
+                                                    scroll.EntityID = entityID; //値を書き込み
+                                                    //魔法（の巻物）を抽選
+                                                    int scrollMagicID = magicLottely.Lottely();
+                                                    scroll.MagicID = (Definer.MID)scrollMagicID;
+                                                    scroll.name = $"Scroll ({entityID}) ({scrollMagicID})";
+                                                    entityDictionary.Add(entityID, scroll); //管理用のIDと共に辞書へ
+
+                                                    //魔法IDを指定して、宝箱の足元に巻物を生成する命令
+                                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_SCROLL, entityID, scrollMagicID, scrollPos);
+                                                    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                    udpGameServer.Send(myHeader.ToByte());
+                                                }
 
                                                 //その宝箱を消す
                                                 //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
