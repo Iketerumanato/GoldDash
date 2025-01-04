@@ -107,7 +107,14 @@ public class PlayerControllerV2 : MonoBehaviour
     }
     [SerializeField] private bool m_allowedUnlockState = true; //NormalStateに戻る条件(ステートロックの解除条件)を満たしているか
     private CancellationTokenSource m_stateLockCts; //ステートロックの非同期処理を中心するcts
-    private CancellationToken m_stateLockCt; //同ct
+    private CancellationToken StateLockCt //同ct
+    {
+        get
+        {
+            m_stateLockCts = new CancellationTokenSource();
+            return m_stateLockCts.Token;
+        }
+    }
 
     //巻物を開いているとき、使おうとしている魔法のID
     private Definer.MID m_currentMagicID;
@@ -132,7 +139,14 @@ public class PlayerControllerV2 : MonoBehaviour
     //金貨を拾うことを禁止する処理
     [SerializeField] private bool m_isAbleToPickUpGold = true; //金貨を拾うことができるか
     private CancellationTokenSource m_forbidPickUpGoldCts; //金貨を拾うことを禁止する非同期処理を中心するcts
-    private CancellationToken m_forbidPickUpGoldCt; //同ct
+    private CancellationToken ForbidPickUpGoldCt //同ct
+    {
+        get 
+        {
+            m_forbidPickUpGoldCts = new CancellationTokenSource();
+            return m_forbidPickUpGoldCts.Token;
+        }
+    }
 
     //パケット関連
     //GameClientManagerからプレイヤーの生成タイミングでsetterを呼び出し
@@ -141,12 +155,6 @@ public class PlayerControllerV2 : MonoBehaviour
 
     private void Start()
     {
-        //ctの発行
-        m_stateLockCts = new CancellationTokenSource();
-        m_stateLockCt = m_stateLockCts.Token;
-        m_forbidPickUpGoldCts = new CancellationTokenSource();
-        m_forbidPickUpGoldCt = m_forbidPickUpGoldCts.Token;
-
         //コンポーネントの取得
         m_playerCameraController = this.gameObject.GetComponent<PlayerCameraController>();
         m_playerMover = this.gameObject.GetComponent<PlayerMover>();
@@ -290,7 +298,7 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP4 開錠できたら少し待ってステートロックを解除しよう
         if (isUnlocked)
         {
-            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(1200), default, m_stateLockCt);
+            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(1200), default, StateLockCt);
         }
 
         //STEP5 通常stateに戻ることができるなら戻ろう
@@ -368,14 +376,14 @@ public class PlayerControllerV2 : MonoBehaviour
             if (!m_allowedUnlockState) m_stateLockCts.Cancel();
             //一定時間ステートロックする
             m_allowedUnlockState = false;
-            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(1500), default, m_stateLockCt);
+            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(1500), default, StateLockCt);
 
             //STEP_A 吹き飛ぼう
             //金貨を拾えない状態にする
             if (!m_isAbleToPickUpGold) m_forbidPickUpGoldCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
             //一定時間金貨を拾えない状態にする
             m_isAbleToPickUpGold = false;
-            UniTask.RunOnThreadPool(() => CountForbidPickTime(1000), default, m_forbidPickUpGoldCt);
+            UniTask.RunOnThreadPool(() => CountForbidPickTime(1000), default, ForbidPickUpGoldCt);
 
             //前に吹っ飛ぶ
             //transform.forwardと実際の前方は（カメラの向きに合わせた関係で）逆なのでマイナスをかける
@@ -409,7 +417,7 @@ public class PlayerControllerV2 : MonoBehaviour
             if (!m_allowedUnlockState) m_stateLockCts.Cancel();
             //一定時間ステートロックする
             m_allowedUnlockState = false;
-            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(3000), default, m_stateLockCt);
+            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(3000), default, StateLockCt);
 
             //STEP_A カメラを揺らそう
             m_playerCameraController.InvokeShakeEffectFromState(this.State);
@@ -421,10 +429,7 @@ public class PlayerControllerV2 : MonoBehaviour
             m_isFirstFrameOfState = false;
         }
 
-        //STEP1 カメラを動かそう
-        m_playerCameraController.RotateCamara(V_InputVertical);
-
-        //STEP2 通常stateに戻ることができるなら戻ろう
+        //STEP1 通常stateに戻ることができるなら戻ろう
         if (m_allowedUnlockState) this.State = PLAYER_STATE.NORMAL;
     }
 
@@ -608,6 +613,20 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
             case "Thunder":
                 //痺れたことをパケット送信
+                this.State = PLAYER_STATE.STUNNED;
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        switch (other.tag)
+        {
+            case "Thunder":
+                //痺れたことをパケット送信
+                //スタン状態になる
                 this.State = PLAYER_STATE.STUNNED;
                 break;
             default:
