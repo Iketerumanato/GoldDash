@@ -761,6 +761,19 @@ public class GameServerManager : MonoBehaviour
 
                                                     ChangeServerState(new AwaitTouchState(), Definer.MID.THUNDER, receivedHeader.sessionID); //雷を待機する状態にする
                                                     break;
+                                                //ダッシュ
+                                                case Definer.MID.DASH:
+                                                    //魔法の使用許可を送る（無条件）
+                                                    myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.ALLOW_MAGIC, receivedHeader.sessionID);
+                                                    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                    udpGameServer.Send(myHeader.ToByte());
+                                                    break;
+                                                case Definer.MID.TELEPORT:
+                                                    //魔法の使用却下通知を送る（無条件）
+                                                    myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DECLINE_MAGIC, receivedHeader.sessionID);
+                                                    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                    udpGameServer.Send(myHeader.ToByte());
+                                                    break;
                                             }
                                             break;
                                         #endregion
