@@ -8149,6 +8149,10 @@ PrefabInstance:
       value: FixedPlayer2
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: cfc3b3c745310a947b3add25ef492886, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: cfc3b3c745310a947b3add25ef492886, type: 3}
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}

@@ -15,11 +15,13 @@ TagManager:
   - Hotbar
   - UseMagic
   - CancelMagic
+  - MagicButtonBack
+  - MagicButton
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
   - PlayerHand
