@@ -313,8 +313,12 @@ public class GameServerManager : MonoBehaviour
     }
     #endregion
 
+
+    CancellationTokenSource a;
     private void Start()
     {
+        a = new CancellationTokenSource();
+
         packetQueue = new ConcurrentQueue<Header>();
         actorDictionary = new Dictionary<ushort, ActorController>();
         entityDictionary = new Dictionary<ushort, Entity>();
@@ -810,7 +814,6 @@ public class GameServerManager : MonoBehaviour
                                                     myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                     udpGameServer.Send(myHeader.ToByte());
 
-                                                    CancellationTokenSource a = new CancellationTokenSource();
                                                     UniTask u = UniTask.RunOnThreadPool(() => DropMovingActorsGold(receivedHeader.sessionID, a.Token), cancellationToken: a.Token);
                                                     break;
                                                 case Definer.MID.TELEPORT:
