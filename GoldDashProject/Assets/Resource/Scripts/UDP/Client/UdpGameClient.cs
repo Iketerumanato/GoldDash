@@ -179,7 +179,7 @@ public class UdpGameClient : UdpCommnicator
     public override void Dispose()
     {
         //Taskのキャンセル処理など
-        receiveCts.Cancel();
+        if (receiveCts != null) receiveCts.Cancel();
         sender.Dispose();
         receiver.Dispose();
     }

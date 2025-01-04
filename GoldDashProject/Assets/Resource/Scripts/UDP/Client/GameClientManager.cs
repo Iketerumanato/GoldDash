@@ -136,7 +136,7 @@ public class GameClientManager : MonoBehaviour
 
             case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
                 isRunning = false;
-                sendCts.Cancel(); // 送信を非同期で行っているなら止める
+                if (sendCts != null) sendCts.Cancel(); // 送信を非同期で行っているなら止める
 
                 // サーバーに接続中なら切断パケットを送信
                 if (this.sessionID != 0 && _titleUi.CurrentClientMode == TitleUI.CLIENT_MODE.MODE_WAITING)

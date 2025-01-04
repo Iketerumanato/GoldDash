@@ -155,6 +155,10 @@ public class PlayerControllerV2 : MonoBehaviour
 
     private void Start()
     {
+        //Ctsインスタンス生成
+        m_stateLockCts = new CancellationTokenSource();
+        m_forbidPickUpGoldCts = new CancellationTokenSource();
+
         //コンポーネントの取得
         m_playerCameraController = this.gameObject.GetComponent<PlayerCameraController>();
         m_playerMover = this.gameObject.GetComponent<PlayerMover>();
