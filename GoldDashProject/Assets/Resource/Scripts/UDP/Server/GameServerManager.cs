@@ -627,14 +627,33 @@ public class GameServerManager : MonoBehaviour
                                             Chest chest = (Chest)entity;
 
                                             //存在するなら入手したプレイヤーにランダムなゴールドを振り込む 適当に80~200ゴールド
-                                            System.Random random = new System.Random();
-                                            int chestGold = random.Next(80, 201);
-                                            //まずサーバー側で
-                                            actorDictionary[receivedHeader.sessionID].Gold += chestGold;
-                                            //ゴールド振込パケット送信
-                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, chestGold);
-                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                            udpGameServer.Send(myHeader.ToByte());
+                                            //System.Random random = new System.Random();
+                                            //int chestGold = random.Next(80, 201);
+                                            ////まずサーバー側で
+                                            //actorDictionary[receivedHeader.sessionID].Gold += chestGold;
+                                            ////ゴールド振込パケット送信
+                                            //myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, chestGold);
+                                            //myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            //udpGameServer.Send(myHeader.ToByte());
+
+                                            //重複しないentityIDを作り、オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                            //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
+                                            {
+                                                entityID = GetUniqueEntityID();
+                                                Vector3 goldPos = new Vector3(entityDictionary[receivedActionPacket.targetID].transform.position.x, 0.1f, entityDictionary[receivedActionPacket.targetID].transform.position.z);
+                                                GoldPile goldPile = Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
+                                                goldPile.EntityID = entityID; //値を書き込み
+                                                System.Random random = new System.Random();
+                                                int chestGold = random.Next(80, 201);
+                                                goldPile.Value = chestGold; //ランダムなゴールド量の金貨の山を生成 適当に80~200ゴールド
+                                                goldPile.name = $"GoldPile ({entityID})";
+                                                entityDictionary.Add(entityID, goldPile); //管理用のIDと共に辞書へ
+
+                                                //金額を指定して、殴られた人の足元に金貨の山を生成する命令
+                                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, chestGold, goldPos);
+                                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                udpGameServer.Send(myHeader.ToByte());
+                                            }
 
                                             //魔法（の巻物）を抽選して付与
                                             int magicID = magicLottely.Lottely();
