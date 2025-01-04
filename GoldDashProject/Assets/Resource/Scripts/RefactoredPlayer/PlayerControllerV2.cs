@@ -281,7 +281,9 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP3 開錠できたらパケットを送信しよう
         if (isUnlocked)
         {
-
+            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, m_currentChestID);
+            Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            UdpGameClient.Send(myHeader.ToByte());
         }
 
         //STEP4 開錠できたら少し待ってステートロックを解除しよう
