@@ -40,7 +40,14 @@ public class GameClientManager : MonoBehaviour
     private bool inGame; //ゲームは始まっているか
 
     private CancellationTokenSource sendCts; //パケット送信タスクのキャンセル用。ブロードキャストは時間がかかるので
-    private CancellationToken token;
+    private CancellationToken SendCts
+    {
+        get 
+        {
+            sendCts = new CancellationTokenSource();
+            return sendCts.Token;
+        }
+    }
 
     //クライアントが内部をコントロールするための通知　マップ生成など
     public enum CLIENT_INTERNAL_EVENT
@@ -123,9 +130,7 @@ public class GameClientManager : MonoBehaviour
 
                 isRunning = true;
                 // Initパケット送信 (非同期)
-                sendCts = new CancellationTokenSource();
-                token = sendCts.Token;
-                Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte()), token);
+                Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte()), SendCts);
 
                 break;
 
