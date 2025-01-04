@@ -183,6 +183,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 ScrollUpdate();
                 break;
             case PLAYER_STATE.WAITING_MAP_ACTION:
+                WaitingMapActionUpdate();
                 break;
             case PLAYER_STATE.KNOCKED:
                 KnockedUpdate();

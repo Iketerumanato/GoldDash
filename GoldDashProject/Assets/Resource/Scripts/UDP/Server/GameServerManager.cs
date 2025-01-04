@@ -170,7 +170,7 @@ public class GameServerManager : MonoBehaviour
 
                                     //魔法が正しく実行されたことを通知
                                     myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.END_MAGIC_SUCCESSFULLY);
-                                    header = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                    header = new Header(gameServerManager.magicUserID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                     gameServerManager.packetQueue.Enqueue(header);
 
                                     gameServerManager.ChangeServerState(new NormalState()); //雷を落としたらノーマルステートに戻る
@@ -758,7 +758,8 @@ public class GameServerManager : MonoBehaviour
                                                     myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.ALLOW_MAGIC, receivedHeader.sessionID);
                                                     myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                     udpGameServer.Send(myHeader.ToByte());
-                                                    ChangeServerState(new AwaitTouchState(), Definer.MID.THUNDER); //雷を待機する状態にする
+
+                                                    ChangeServerState(new AwaitTouchState(), Definer.MID.THUNDER, receivedHeader.sessionID); //雷を待機する状態にする
                                                     break;
                                             }
                                             break;
