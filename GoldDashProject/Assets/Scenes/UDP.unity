@@ -3265,9 +3265,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   magicWeightsList:
   - magicID: 0
-    weight: 2
+    weight: 1
   - magicID: 1
-    weight: 3
+    weight: 2
+  - magicID: 2
+    weight: 2
 --- !u!1 &1402952435
 GameObject:
   m_ObjectHideFlags: 0

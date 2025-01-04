@@ -422,6 +422,7 @@ public class GameClientManager : MonoBehaviour
                                             if (receivedActionPacket.targetID == this.sessionID)
                                             {
                                                 //valueのmagicIDを見て処理
+                                                playerController.SetMagicToHotbar((Definer.MID)receivedActionPacket.value);
                                             }
                                             break;
                                     }
