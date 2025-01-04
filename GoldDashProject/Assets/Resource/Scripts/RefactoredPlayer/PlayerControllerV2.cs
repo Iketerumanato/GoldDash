@@ -258,7 +258,10 @@ public class PlayerControllerV2 : MonoBehaviour
             m_chestUnlocker.MaxDrawCount = 5 * m_currentChestTier;
             Debug.Log(m_chestUnlocker.MaxDrawCount + "回 回せ");
 
-            //STEP_E 最初のフレームではなくなるのでフラグを書き変えよう
+            //STEP_E 鍵の状態をリセットしよう
+            m_chestUnlocker.ResetCircleDraw();
+
+            //STEP_F 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
         }
 
@@ -284,13 +287,12 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP4 開錠できたら少し待ってステートロックを解除しよう
         if (isUnlocked)
         {
-            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(500), default, m_stateLockCt);
+            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(1200), default, m_stateLockCt);
         }
 
         //STEP5 通常stateに戻ることができるなら戻ろう
         if (m_allowedUnlockState)
         {
-            m_chestUnlocker.ResetCircleDraw(); //他のstateに行く前に、鍵の状態をリセットしておこう
             this.State = PLAYER_STATE.NORMAL;
         }
     }
