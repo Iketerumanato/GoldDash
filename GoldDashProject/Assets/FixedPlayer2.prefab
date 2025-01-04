@@ -9013,8 +9013,10 @@ MonoBehaviour:
   m_forbidPickTime: 1000
   m_lockStateTimeKnocked: 1500
   m_lockStateTimeStunned: 3000
+  m_dashableTime: 3000
   m_allowedUnlockState: 1
   m_isAbleToPickUpGold: 1
+  m_isDashable: 0
   stateTxt: {fileID: 982244921922224180}
 --- !u!114 &7647838643402749367
 MonoBehaviour:

@@ -1,10 +1,13 @@
 using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using TMPro;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public enum PLAYER_STATE : int //enumの型はデフォルトでintだが、int型であることを期待しているスクリプト（PlayerMoverなど）があるので明示的にintにしておく
 {
@@ -53,6 +56,9 @@ public class PlayerControllerV2 : MonoBehaviour
 
     [Header("スタンしてからNormalStateに戻るまでの時間（ミリ秒）")]
     [SerializeField] private int m_lockStateTimeStunned = 3000;
+
+    [Header("ダッシュ状態からNormalStateに戻るまでの時間（ミリ秒）")]
+    [SerializeField] private int m_dashableTime = 10000;
 
     //入力取得用プロパティ
     private float V_InputHorizontal
@@ -148,6 +154,19 @@ public class PlayerControllerV2 : MonoBehaviour
         }
     }
 
+    private UniTask m_dashableTimeCountTask; //ダッシュ状態の制限時間を記録する処理
+    [SerializeField] private bool m_isDashable = false; //ダッシュすることができるか
+    private CancellationTokenSource m_dashableTimeCountCts; //金貨を拾うことを禁止する非同期処理を中心するcts
+    private CancellationToken DashableTimeCountCt //同ct
+    {
+        get
+        {
+            m_dashableTimeCountCts.Dispose();
+            m_dashableTimeCountCts = new CancellationTokenSource();
+            return m_dashableTimeCountCts.Token;
+        }
+    }
+
     //パケット関連
     //GameClientManagerからプレイヤーの生成タイミングでsetterを呼び出し
     public UdpGameClient UdpGameClient { set; get; } //パケット送信用。
@@ -158,6 +177,7 @@ public class PlayerControllerV2 : MonoBehaviour
         //Ctsインスタンス生成
         m_stateLockCts = new CancellationTokenSource();
         m_forbidPickUpGoldCts = new CancellationTokenSource();
+        m_dashableTimeCountCts = new CancellationTokenSource();
 
         //コンポーネントの取得
         m_playerCameraController = this.gameObject.GetComponent<PlayerCameraController>();
@@ -181,6 +201,9 @@ public class PlayerControllerV2 : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha4)) m_hotbarManager.RemoveMagicFromHotbar(0);
         if (Input.GetKeyDown(KeyCode.Alpha5)) m_hotbarManager.RemoveMagicFromHotbar(1);
         if (Input.GetKeyDown(KeyCode.Alpha6)) m_hotbarManager.RemoveMagicFromHotbar(2);
+
+
+        if (Input.GetKeyDown(KeyCode.Alpha6)) GetPunchBack();
 
         switch (this.State) //Stateによって実行するUpdate関数を変える
         { 
@@ -214,38 +237,44 @@ public class PlayerControllerV2 : MonoBehaviour
     {
         if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
         {
-            //STEP_A UI表示を切り替えよう
+            //STEP_A ダッシュ可能ならダッシュ状態になろう
+            if(m_isDashable) this.State = PLAYER_STATE.DASH;
+
+            //STEP_B UI表示を切り替えよう
             m_UIDisplayer.ActivateUIFromState(this.State);
 
-            //STEP_B モーションを切り替えよう
+            //STEP_C モーションを切り替えよう
             m_playerAnimationController.SetAnimationFromState(this.State);
 
-            //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
+            //STEP_D 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
         }
 
-        //STEP1 カメラを動かそう
+        //STEP1 ダッシュ可能状態でないなら通常stateになろう
+        if (!m_isDashable) this.State = PLAYER_STATE.NORMAL;
+
+        //STEP2 カメラを動かそう
         m_playerCameraController.RotateCamara(D_InputVertical);
 
-        //STEP2 移動・旋回を実行しよう
+        //STEP3 移動・旋回を実行しよう
         float runSpeed = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
 
-        //STEP3 インタラクトを実行しよう
+        //STEP4 インタラクトを実行しよう
         (INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact();
 
-        //STEP4 パケット送信が必要なら送ろう
+        //STEP5 パケット送信が必要なら送ろう
         this.MakePacketFromInteract(interactInfo);
 
-        //STEP5 インタラクト結果をメンバ変数に格納する必要があればそうしよう
+        //STEP6 インタラクト結果をメンバ変数に格納する必要があればそうしよう
         this.SetParameterFromInteract(interactInfo);
 
-        //STEP6 カメラを揺らす必要があれば揺らそう
+        //STEP7 カメラを揺らす必要があれば揺らそう
         m_playerCameraController.InvokeShakeEffectFromInteract(interactInfo.interactType);
 
-        //STEP7 モーションを決めよう
+        //STEP8 モーションを決めよう
         m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
 
-        //STEP8 次フレームのStateを決めよう
+        //STEP9 次フレームのStateを決めよう
         PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, interactInfo.magicID); //インタラクト結果に応じて次のState決定
         if (this.State != nextState)
         {
@@ -469,6 +498,20 @@ public class PlayerControllerV2 : MonoBehaviour
         m_isAbleToPickUpGold = true; //金貨を拾えるようにする
     }
 
+    private async UniTask CountDashableTime(int cooldownTimeMilliSec, CancellationToken cancellationToken)
+    {
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await UniTask.Delay(cooldownTimeMilliSec, cancellationToken: cancellationToken); //指定された時間待つ
+            m_isDashable = false; //ダッシュできない状態にする
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("ダッシュの制限時間カウントをキャンセルします");
+        }
+    }
+
     //インタラクト結果から、必要があればメンバ変数を編集する
     private void SetParameterFromInteract((INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) interactInfo)
     {
@@ -554,13 +597,34 @@ public class PlayerControllerV2 : MonoBehaviour
     }
 
     //サーバーから魔法の使用許可が降りたらStateを変更する
-    public void AcceptUsingMagic()
+    public async void AcceptUsingMagic()
     {
         switch (m_currentMagicID) //使用中の魔法に応じて次のStateを決める
         {
             case Definer.MID.DASH:
                 m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex); //ここでダッシュ魔法を消費させる
                 this.State = PLAYER_STATE.DASH;
+                //ダッシュ可能時間をカウントする非同期処理があるならキャンセルする
+                if (m_isDashable)
+                {
+                    Debug.Log("キャンセルしたい");
+                }
+                if (m_dashableTimeCountTask.Status == UniTaskStatus.Pending)
+                {
+                    m_dashableTimeCountCts.Cancel(); // 既存のタスクをキャンセル
+                    try
+                    {
+                        await m_dashableTimeCountTask; // 既存タスクが終了するのを待つ
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        Debug.Log("タスクがキャンセルされました");
+                    }
+                }
+                m_dashableTimeCountCts.Dispose();
+                m_dashableTimeCountCts = new CancellationTokenSource();
+                m_isDashable = true; //ダッシュ可能にする
+                m_dashableTimeCountTask = UniTask.RunOnThreadPool(() => CountDashableTime(m_dashableTime, m_dashableTimeCountCts.Token), cancellationToken: m_dashableTimeCountCts.Token); //一定時間後にダッシュ可能フラグを解除する
                 break;
             default :
                 this.State = PLAYER_STATE.WAITING_MAP_ACTION;
