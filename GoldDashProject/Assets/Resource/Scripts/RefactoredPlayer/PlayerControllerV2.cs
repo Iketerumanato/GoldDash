@@ -608,6 +608,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
             case "Scroll":
                 if (!m_isAbleToPickUpGold) return; //金貨を拾えない状態ならreturn
+                if (!m_hotbarManager.IsAbleToSetMagic()) return; //魔法をこれ以上持てないならreturn
 
                 //巻物をに触れたというリクエスト送信。（他のプレイヤーが先に触れていた場合、巻物は入手できない。早い者勝ち。）
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_SCROLL, other.GetComponent<Entity>().EntityID);
