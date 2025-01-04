@@ -5,6 +5,9 @@ using R3;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Threading;
+using System;
+using UnityEditor.Experimental.GraphView;
 
 public class GameServerManager : MonoBehaviour
 {
@@ -806,6 +809,9 @@ public class GameServerManager : MonoBehaviour
                                                     myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.ALLOW_MAGIC, receivedHeader.sessionID);
                                                     myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                     udpGameServer.Send(myHeader.ToByte());
+
+                                                    CancellationTokenSource a = new CancellationTokenSource();
+                                                    UniTask u = UniTask.RunOnThreadPool(() => DropMovingActorsGold(receivedHeader.sessionID, a.Token), cancellationToken: a.Token);
                                                     break;
                                                 case Definer.MID.TELEPORT:
                                                     //もし違う魔法の実行待機をしているならエラー返す
@@ -858,6 +864,73 @@ public class GameServerManager : MonoBehaviour
         catch (System.Exception e)
         {
             Debug.LogException(e);
+        }
+    }
+
+    //指定されたプレイヤーが移動しているとき、所持金を少しずつ地面に落とす
+    private void DropMovingActorsGold(ushort sessionID, CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                bool isDropable;
+                //クールダウン開始
+                isDropable = false;
+                UniTask.RunOnThreadPool(() => DropCoolDown(cancellationToken), cancellationToken: cancellationToken);
+
+                if (isDropable)
+                {
+                    //すっからかんなら流石に落とさない
+                    if (actorDictionary[sessionID].Gold <= 0) continue;
+
+                    //落とす金額を抽選
+                    System.Random random = new System.Random();
+
+                    int dropGold;
+                    if (actorDictionary[sessionID].Gold < 10) //所持金が10ゴールド未満なら1~所持金の値ゴールドの間で抽選
+                    {
+                        dropGold = random.Next(1, actorDictionary[sessionID].Gold + 1);
+                    }
+                    else
+                    {
+                        dropGold = random.Next(10, 31); //所持金が10ゴールドより多いなら10~31ゴールドの間で抽選する
+                    }
+                    dropGold = Mathf.Clamp(dropGold, dropGold, actorDictionary[sessionID].Gold + 1); //所持金を超えないようにclampする
+
+                    //対象プレイヤーの所持金を減らす
+                    //まずサーバー側で
+                    actorDictionary[sessionID].Gold -= dropGold;
+
+                    //パケット送信    
+                    ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, sessionID, -dropGold);
+                    Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                    udpGameServer.Send(myHeader.ToByte());
+
+                    //まずサーバー側で金貨の山を生成
+                    ushort entityID = GetUniqueEntityID();
+                    Vector3 goldPos = new Vector3(actorDictionary[sessionID].transform.position.x, 0.1f, actorDictionary[sessionID].transform.position.z) - actorDictionary[sessionID].transform.forward * 0.2f;
+                    GoldPile goldPile = Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
+                    goldPile.EntityID = entityID; //値を書き込み
+
+                    //金額を指定して、対象プレイヤーの背後に金貨の山を生成する命令
+                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, dropGold, goldPos);
+                    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                    udpGameServer.Send(myHeader.ToByte());
+                }
+
+                //一定時間おきに金貨の山を落とすフラグをtrueにする
+                async void DropCoolDown(CancellationToken cancellationToken)
+                {
+                    await UniTask.Delay(1000, cancellationToken: cancellationToken); //指定された秒数待ったら
+                    isDropable = true; //クールダウン終了
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log("ダッシュしているプレイヤーから金貨の山を落とす処理をキャンセルします");
+            }
         }
     }
 
