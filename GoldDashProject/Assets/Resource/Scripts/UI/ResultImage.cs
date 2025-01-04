@@ -19,7 +19,7 @@ public class ResultImage : MonoBehaviour
     private int[] scores;
     private float[] scoreRatios;
 
-    [SerializeField] private GameObject segmentObjectPrefab;
+    [SerializeField] private GameObject ResultActorPrefab;
     [SerializeField] float ResultCharaFallHeight = 470f;
     [SerializeField] Vector3 ResultCharaQuaternion;
     [SerializeField] GameObject centerPoint;
@@ -111,6 +111,7 @@ public class ResultImage : MonoBehaviour
 
         // アニメーションが終わった後にオブジェクトを生成
         GenerateSegmentObjects();
+        DisplayHighestScore();
     }
 
     // アニメーション終了後に各セグメントの中心にオブジェクトを生成するメソッド
@@ -144,9 +145,9 @@ public class ResultImage : MonoBehaviour
                 segmentCenter.z = -ResultCharaFallHeight;
 
                 // オブジェクトをその位置に生成
-                if (segmentObjectPrefab != null)
+                if (ResultActorPrefab != null)
                 {
-                    GameObject segmentObject = Instantiate(segmentObjectPrefab, segmentCenter, Quaternion.identity);
+                    GameObject segmentObject = Instantiate(ResultActorPrefab, segmentCenter, Quaternion.identity);
                     segmentObject.transform.SetParent(transform, false); // 親オブジェクトのスケールなどを無視
 
                     // セグメント中心を向かせる
@@ -170,5 +171,23 @@ public class ResultImage : MonoBehaviour
                 animator.speed = ChangeAnimSpeed;
             }
         }
+    }
+
+    //４人の中で一番高いスコア(プレイヤー)を導き出し表記
+    private void DisplayHighestScore()
+    {
+        int maxScore = scores[0];
+        int maxScorePlayer = 1;
+
+        for (int playerNum = 1; playerNum < scores.Length; playerNum++)
+        {
+            if (scores[playerNum] > maxScore)
+            {
+                maxScore = scores[playerNum];
+                maxScorePlayer = playerNum + 1;
+            }
+        }
+
+        Debug.Log($"最高スコアは: Player {maxScorePlayer} の {maxScore} です。");
     }
 }

@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 33814388}
   m_Layer: 0
   m_Name: Camera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2949,7 +2949,7 @@ MonoBehaviour:
   - {fileID: 1304374946}
   lerpDuration: 2
   ChangeAnimSpeed: 0.4
-  segmentObjectPrefab: {fileID: 4030698455688459352, guid: 9f7ac80f0b29e3045b89019efc747ebc, type: 3}
+  ResultActorPrefab: {fileID: 4030698455688459352, guid: 9f7ac80f0b29e3045b89019efc747ebc, type: 3}
   ResultCharaFallHeight: 50
   ResultCharaQuaternion: {x: 0, y: 0, z: 0}
   centerPoint: {fileID: 327854667}
