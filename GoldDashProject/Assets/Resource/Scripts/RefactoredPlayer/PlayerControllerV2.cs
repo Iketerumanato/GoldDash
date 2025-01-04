@@ -597,7 +597,7 @@ public class PlayerControllerV2 : MonoBehaviour
     }
 
     //サーバーから魔法の使用許可が降りたらStateを変更する
-    public async void AcceptUsingMagic()
+    public void AcceptUsingMagic()
     {
         switch (m_currentMagicID) //使用中の魔法に応じて次のStateを決める
         {
@@ -605,26 +605,9 @@ public class PlayerControllerV2 : MonoBehaviour
                 m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex); //ここでダッシュ魔法を消費させる
                 this.State = PLAYER_STATE.DASH;
                 //ダッシュ可能時間をカウントする非同期処理があるならキャンセルする
-                if (m_isDashable)
-                {
-                    Debug.Log("キャンセルしたい");
-                }
-                if (m_dashableTimeCountTask.Status == UniTaskStatus.Pending)
-                {
-                    m_dashableTimeCountCts.Cancel(); // 既存のタスクをキャンセル
-                    try
-                    {
-                        await m_dashableTimeCountTask; // 既存タスクが終了するのを待つ
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        Debug.Log("タスクがキャンセルされました");
-                    }
-                }
-                m_dashableTimeCountCts.Dispose();
-                m_dashableTimeCountCts = new CancellationTokenSource();
+                if (m_isDashable) m_dashableTimeCountCts.Cancel();
                 m_isDashable = true; //ダッシュ可能にする
-                m_dashableTimeCountTask = UniTask.RunOnThreadPool(() => CountDashableTime(m_dashableTime, m_dashableTimeCountCts.Token), cancellationToken: m_dashableTimeCountCts.Token); //一定時間後にダッシュ可能フラグを解除する
+                UniTask.RunOnThreadPool(() => CountDashableTime(m_dashableTime, m_dashableTimeCountCts.Token), cancellationToken: DashableTimeCountCt); //一定時間後にダッシュ可能フラグを解除する
                 break;
             default :
                 this.State = PLAYER_STATE.WAITING_MAP_ACTION;
