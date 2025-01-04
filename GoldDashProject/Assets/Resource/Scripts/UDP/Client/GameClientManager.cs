@@ -383,6 +383,17 @@ public class GameClientManager : MonoBehaviour
                                                 chest.name = $"Chest ({receivedActionPacket.targetID})";
                                             }
                                             break;
+                                        case (byte)Definer.EDID.SPAWN_SCROLL:
+                                            //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
+                                            //scrollという変数名をここでだけ使いたいのでブロック文でスコープ分け
+                                            {
+                                                Scroll scroll = Instantiate(ScrollPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Scroll>();
+                                                entityDictionary.Add(receivedActionPacket.targetID, scroll); //管理用のIDと共に辞書へ
+                                                scroll.EntityID = receivedActionPacket.targetID; //ID割り当て
+                                                scroll.MagicID = (Definer.MID)receivedActionPacket.value; //金額設定
+                                                scroll.name = $"Scroll ({receivedActionPacket.targetID} ({(Definer.MID)receivedActionPacket.value}))";
+                                            }
+                                            break;
                                         case (byte)Definer.EDID.SPAWN_GOLDPILE:
                                             //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
                                             //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け

@@ -630,7 +630,7 @@ public class GameServerManager : MonoBehaviour
                                                 myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.GIVE_MAGIC, receivedHeader.sessionID, (int)scroll.MagicID);
                                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                 udpGameServer.Send(myHeader.ToByte());
-                                                //その金貨の山を消す
+                                                //その巻物を消す
                                                 //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
                                                 entityDictionary[receivedActionPacket.targetID].DestroyEntity();
                                                 entityDictionary.Remove(receivedActionPacket.targetID);
@@ -684,7 +684,7 @@ public class GameServerManager : MonoBehaviour
                                                 {
                                                     entityID = GetUniqueEntityID();
                                                     Vector3 scrollPos = new Vector3(entityDictionary[receivedActionPacket.targetID].transform.position.x, 0.4f, entityDictionary[receivedActionPacket.targetID].transform.position.z);
-                                                    Scroll scroll = Instantiate(GoldPilePrefab, scrollPos, Quaternion.identity).GetComponent<Scroll>();
+                                                    Scroll scroll = Instantiate(ScrollPrefab, scrollPos, Quaternion.identity).GetComponent<Scroll>();
                                                     scroll.EntityID = entityID; //値を書き込み
                                                     //魔法（の巻物）を抽選
                                                     int scrollMagicID = magicLottely.Lottely();
