@@ -580,7 +580,7 @@ public class GameServerManager : MonoBehaviour
                                             //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
                                             {
                                                 entityID = GetUniqueEntityID();
-                                                Vector3 goldPos = new Vector3(actorDictionary[receivedActionPacket.targetID].transform.position.x, 0, actorDictionary[receivedActionPacket.targetID].transform.position.z);
+                                                Vector3 goldPos = new Vector3(actorDictionary[receivedActionPacket.targetID].transform.position.x, 0.1f, actorDictionary[receivedActionPacket.targetID].transform.position.z);
                                                 GoldPile goldPile = Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
                                                 goldPile.EntityID = entityID; //値を書き込み
                                                 goldPile.Value = lostGold;

@@ -530,4 +530,25 @@ public class PlayerControllerV2 : MonoBehaviour
     { 
         m_hotbarManager.SetMagicToHotbar(magicID);
     }
+
+    //金貨を拾うためのトリガー処理
+    private void OnTriggerEnter(Collider other)
+    {
+        //送信用クラスを外側のスコープで宣言しておく
+        ActionPacket myActionPacket;
+        Header myHeader;
+
+        switch (other.tag)
+        {
+            case "GoldPile":
+                //金貨の山に触れたというリクエスト送信。（他のプレイヤーが先に触れていた場合、お金は入手できない。早い者勝ち。）
+                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_GOLDPILE, other.GetComponent<Entity>().EntityID);
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
+                Debug.Log("金貨Getリクエスト。");
+                break;
+            default:
+                break;
+        }
+    }
 }

@@ -58,7 +58,6 @@ public class UIDisplayer : MonoBehaviour
                 m_key.SetActive(true); //鍵を表示
 
                 m_variableJoystick.SetActive(false); //宝箱の開錠中、移動スティック非表示
-                m_dynamicJoystick.SetActive(false);
                 m_HotbarParent.SetActive(false); //ホットバー非表示
                 break;
             case PLAYER_STATE.USING_SCROLL: //巻物を開いたとき、巻物に表示するUIを決定する

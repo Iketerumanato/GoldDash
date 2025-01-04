@@ -391,6 +391,8 @@ public class GameClientManager : MonoBehaviour
                                                 goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
                                                 goldPile.Value = receivedActionPacket.value; //金額設定
                                                 goldPile.name = $"GoldPile ({receivedActionPacket.targetID})";
+                                                goldPile.InitEntity(); //生成時のメソッドを呼ぶ
+                                                goldPile.ActivateEntity(); //有効化時のメソッドを呼ぶ
                                             }
                                             break;
                                         case (byte)Definer.EDID.SPAWN_THUNDER:
