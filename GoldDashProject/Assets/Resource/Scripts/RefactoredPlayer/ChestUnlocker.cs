@@ -35,7 +35,10 @@ public class ChestUnlocker : MonoBehaviour
     //private readonly string strUnlockTrigger4 = "UnlockTrigger4";
     //private readonly string strUnlockTrigger5 = "UnlockTrigger5"; //最後
     //アニメーションの進行状況をリセットする
-    private readonly string strResetTrigger = "ResetTrigger";
+    //private readonly string strResetTrigger = "ResetTrigger";
+
+    //Triggerで初期stateに戻そうとするとScaleが絡むパーツが正常に戻らないので
+    //m_animator.Play("Start"); で戻すことに
 
     //円を描く判定に使うプライベート変数
     private readonly List<Vector2> m_drawPoints = new List<Vector2>();
@@ -173,6 +176,6 @@ public class ChestUnlocker : MonoBehaviour
         m_drawPoints.Clear(); //記録したスクリーン座標データの削除
         m_circleCount = 0; //描いた円の数を0に
         m_currentStageOfAnimations = 0; //アニメーション段階を0に
-        //m_animator モーションリセット
+        m_animator.Play("Start"); //モーションリセット
     }
 }
