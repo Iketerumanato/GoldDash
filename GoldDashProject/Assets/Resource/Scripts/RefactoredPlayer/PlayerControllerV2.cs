@@ -606,6 +606,10 @@ public class PlayerControllerV2 : MonoBehaviour
                 UdpGameClient.Send(myHeader.ToByte());
                 Debug.Log("巻物Getリクエスト。");
                 break;
+            case "Thunder":
+                //痺れたことをパケット送信
+                this.State = PLAYER_STATE.STUNNED;
+                break;
             default:
                 break;
         }

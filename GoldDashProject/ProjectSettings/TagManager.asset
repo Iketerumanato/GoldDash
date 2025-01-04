@@ -18,6 +18,7 @@ TagManager:
   - MagicButtonBack
   - MagicButton
   - Scroll
+  - Thunder
   layers:
   - Default
   - TransparentFX
