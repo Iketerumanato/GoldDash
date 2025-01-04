@@ -326,8 +326,11 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP4 パケット送信が必要なら送ろう
         this.MakePacketFromInteract(interactInfo);
 
-        //STEP5 巻物を使ったならホットバー情報を書き換えよう
-        //if(interactInfo.interactType == INTERACT_TYPE.MAGIC_USE) m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex);
+        //STEP5 巻物をキャンセルしたなら元のStateに戻ろう
+        if(interactInfo.interactType == INTERACT_TYPE.MAGIC_CANCEL)
+        {
+            this.State = PLAYER_STATE.NORMAL;
+        }
     }
 
     private void WaitingMapActionUpdate()
