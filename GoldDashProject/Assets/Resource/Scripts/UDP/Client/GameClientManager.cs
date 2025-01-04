@@ -460,6 +460,9 @@ public class GameClientManager : MonoBehaviour
                                                 playerController.SetMagicToHotbar((Definer.MID)receivedActionPacket.value);
                                             }
                                             break;
+                                        case (byte)Definer.EDID.TELEPORT_ACTOR:
+                                            actorDictionary[receivedActionPacket.targetID].Warp(receivedActionPacket.pos, actorDictionary[receivedActionPacket.targetID].transform.forward);
+                                            break;
                                     }
                                     break;
                             }

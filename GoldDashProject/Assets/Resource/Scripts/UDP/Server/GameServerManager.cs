@@ -134,6 +134,7 @@ public class GameServerManager : MonoBehaviour
         {
             switch (gameServerManager.awaitingMagicID)
             {
+                //雷待機
                 case Definer.MID.THUNDER:
                     if (Input.GetMouseButtonDown(0))
                     {
@@ -174,6 +175,44 @@ public class GameServerManager : MonoBehaviour
                                     gameServerManager.udpGameServer.Send(myHeader.ToByte());
 
                                     gameServerManager.ChangeServerState(new NormalState()); //雷を落としたらノーマルステートに戻る
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                    break;
+                case Definer.MID.TELEPORT:
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        //カメラの位置からタッチした位置に向けrayを飛ばす
+                        RaycastHit hit;
+                        Ray ray = gameServerManager.mapCamera.ScreenPointToRay(Input.mousePosition);
+
+                        //rayがなにかに当たったら調べる
+                        if (Physics.Raycast(ray, out hit))
+                        {
+                            Debug.Log(hit.collider.gameObject.name);
+
+                            switch (hit.collider.gameObject.tag)
+                            {
+                                case "Floor": //床にタッチしたら転移
+                                    ActionPacket myActionPacket;
+                                    Header myHeader;
+
+                                    //テレポートを実行
+                                    Vector3 teleportPos = new Vector3(hit.collider.gameObject.transform.position.x, 0.5f, hit.collider.gameObject.transform.position.z);
+
+                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.TELEPORT_ACTOR, gameServerManager.magicUserID, default, teleportPos);
+                                    myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                    gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+                                    //魔法が正しく実行されたことを通知
+                                    myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.END_MAGIC_SUCCESSFULLY, gameServerManager.magicUserID);
+                                    myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                    gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+                                    gameServerManager.ChangeServerState(new NormalState()); //転移先を指定したらノーマルステートに戻る
                                     break;
                                 default:
                                     break;
@@ -769,10 +808,21 @@ public class GameServerManager : MonoBehaviour
                                                     udpGameServer.Send(myHeader.ToByte());
                                                     break;
                                                 case Definer.MID.TELEPORT:
-                                                    //魔法の使用却下通知を送る（無条件）
-                                                    myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DECLINE_MAGIC, receivedHeader.sessionID);
+                                                    //もし違う魔法の実行待機をしているならエラー返す
+                                                    if (isAwaitingMagic)
+                                                    {
+                                                        //魔法の使用却下通知を送る
+                                                        myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DECLINE_MAGIC, receivedHeader.sessionID);
+                                                        myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                        udpGameServer.Send(myHeader.ToByte());
+                                                        break;
+                                                    }
+                                                    //魔法の使用許可を送る
+                                                    myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.ALLOW_MAGIC, receivedHeader.sessionID);
                                                     myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                     udpGameServer.Send(myHeader.ToByte());
+
+                                                    ChangeServerState(new AwaitTouchState(), Definer.MID.TELEPORT, receivedHeader.sessionID); //テレポートを待機する状態にする
                                                     break;
                                             }
                                             break;

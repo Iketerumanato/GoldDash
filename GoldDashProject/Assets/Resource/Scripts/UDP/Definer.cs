@@ -194,13 +194,9 @@ public static class Definer
         /// </summary>
         CONSUME_MAGIC,
         /// <summary>
-        /// このアクターをスタンさせろ
+        /// このActorを瞬間移動させろ
         /// </summary>
-        GIVE_STATUS_STUN,
-        /// <summary>
-        /// このアクターをゴールドダッシュ状態にしろ
-        /// </summary>
-        GIVE_STATUS_GOLDDASH,
+        TELEPORT_ACTOR,
     }
 
     /// <summary>
