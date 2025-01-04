@@ -169,8 +169,8 @@ public class GameServerManager : MonoBehaviour
                                     //スレッドセーフにしてくれてマジ、感謝。
 
                                     //魔法が正しく実行されたことを通知
-                                    myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.END_MAGIC_SUCCESSFULLY);
-                                    myHeader = new Header(gameServerManager.magicUserID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                    myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.END_MAGIC_SUCCESSFULLY, gameServerManager.magicUserID);
+                                    myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                     gameServerManager.udpGameServer.Send(myHeader.ToByte());
 
                                     gameServerManager.ChangeServerState(new NormalState()); //雷を落としたらノーマルステートに戻る
