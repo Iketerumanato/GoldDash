@@ -40,11 +40,12 @@ public class PlayerInteractor : MonoBehaviour
     /// パラメータで指定されたカメラを基準にインタラクトを実行するよ。インタラクトの情報はタプルで返却するよ。
     /// </summary>
     /// <returns>成立したインタラクト種別、パケット送信に必要な相手のSessionIDやEntityID、実行が成立した魔法のID、背面取りが成立したパンチのベクトル</returns>
-    public (INTERACT_TYPE interactType, ushort targetID, Definer.MID magicID, Vector3 punchHitVec) Interact()
+    public (INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) Interact()
     {
         //返り値宣言
         INTERACT_TYPE interactType = INTERACT_TYPE.NONE;
         ushort targetID = 0;
+        int value = 0;
         Definer.MID magicID = Definer.MID.NONE;
         Vector3 punchHitVec = Vector3.zero;
 
@@ -104,8 +105,9 @@ public class PlayerInteractor : MonoBehaviour
 
                                 //インタラクト結果
                                 interactType = INTERACT_TYPE.CHEST;
-                                //宝箱のID
+                                //宝箱のIDとティアを取得
                                 targetID = hit.collider.gameObject.GetComponent<Chest>().EntityID;
+                                value = hit.collider.gameObject.GetComponent<Chest>().Tier;
                                 break;
                             default: //そうでないものはインタラクト不可能なオブジェクトなので無視
                                 break;
@@ -121,7 +123,7 @@ public class PlayerInteractor : MonoBehaviour
                             HotbarSlotInfo slotInfo = hit.collider.gameObject.GetComponent<HotbarSlotInfo>();
 
                             interactType = INTERACT_TYPE.MAGIC_ICON;
-                            targetID = slotInfo.slotNum;
+                            value = slotInfo.slotNum;
                             magicID = slotInfo.magicID;
                         }
                     }
@@ -193,8 +195,9 @@ public class PlayerInteractor : MonoBehaviour
 
                             //インタラクト結果
                             interactType = INTERACT_TYPE.CHEST;
-                            //宝箱のID
+                            //宝箱のIDとティアを取得
                             targetID = hit.collider.gameObject.GetComponent<Chest>().EntityID;
+                            value = hit.collider.gameObject.GetComponent<Chest>().Tier;
                             break;
 
                         default: //そうでないものはインタラクト不可能なオブジェクトなので無視
@@ -211,7 +214,7 @@ public class PlayerInteractor : MonoBehaviour
                         HotbarSlotInfo slotInfo = hit.collider.gameObject.GetComponent<HotbarSlotInfo>();
 
                         interactType = INTERACT_TYPE.MAGIC_ICON;
-                        targetID = slotInfo.slotNum;
+                        value = slotInfo.slotNum;
                         magicID = slotInfo.magicID;
                     }
                 }
@@ -233,7 +236,7 @@ public class PlayerInteractor : MonoBehaviour
         }
 
         //タプルで返却
-        return (interactType, targetID, magicID, punchHitVec);
+        return (interactType, targetID, value, magicID, punchHitVec);
 
         //一定時間パンチができなくなるローカル関数
         async void PunchCoolDown()
