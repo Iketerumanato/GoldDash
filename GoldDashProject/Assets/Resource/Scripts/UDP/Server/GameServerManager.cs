@@ -747,11 +747,14 @@ public class GameServerManager : MonoBehaviour
 
                                                 //その宝箱を消す
                                                 //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
+                                                //座標を抽選デッキに戻す
+                                                MapGenerator.instance.AddChestPointToDeck(entityDictionary[receivedActionPacket.targetID].transform.position);
                                                 entityDictionary[receivedActionPacket.targetID].DestroyEntity();
                                                 entityDictionary.Remove(receivedActionPacket.targetID);
                                                 usedEntityID.Remove(receivedActionPacket.targetID); //IDも解放
                                                 currentNumOfChests--; //宝箱の数デクリメント
-                                                                      //パケット送信
+
+                                                //パケット送信
                                                 myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.DESTROY_ENTITY, receivedActionPacket.targetID);
                                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                 udpGameServer.Send(myHeader.ToByte());

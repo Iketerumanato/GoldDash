@@ -527,7 +527,7 @@ public class MapGenerator : MonoBehaviour
 
     public Vector3 GetUniqueChestPointRandomly()
     {
-        //抽選用デッキが空になったなら補充する
+        //抽選用デッキが空なら出現位置候補データを参照する
         if (chestPointsDeck.Count == 0)
         {
             //宝箱の出現地点候補を一つずつコピーする
@@ -549,6 +549,11 @@ public class MapGenerator : MonoBehaviour
         Vector3 ret = chestPointsDeck[0]; //リストの0番目要素を返却用変数に格納する
         chestPointsDeck.RemoveAt(0); //0番目要素をリストから消す。1番目以降のすべての要素はインデックスが繰り下がる
         return ret; //返却
+    }
+
+    public void AddChestPointToDeck(Vector3 chestPos)
+    {
+        chestPointsDeck.Add(chestPos);
     }
 
     public Vector3 GetRespawnPointRandomly()
