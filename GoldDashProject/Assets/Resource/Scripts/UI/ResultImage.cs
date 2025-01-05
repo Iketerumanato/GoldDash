@@ -19,12 +19,6 @@ public class ResultImage : MonoBehaviour
     private int[] scores;
     private float[] scoreRatios;
 
-    [SerializeField] private GameObject ResultActorPrefab;
-    [SerializeField] float ResultCharaFallHeight = 470f;
-    [SerializeField] Vector3 ResultCharaQuaternion;
-    [SerializeField] GameObject centerPoint;
-    [SerializeField] bool isDirectionCenter;
-
     private void Start()
     {
         scores = new int[] { player1Score, player2Score, player3Score, player4Score };
@@ -110,16 +104,16 @@ public class ResultImage : MonoBehaviour
         }
 
         // アニメーションが終わった後にオブジェクトを生成
-        GenerateSegmentObjects();
-        DisplayHighestScore();
+        //GenerateSegmentObjects();
+        //DisplayHighestScore();
     }
 
     // アニメーション終了後に各セグメントの中心にオブジェクトを生成するメソッド
-    private void GenerateSegmentObjects()
-    {
+    //private void GenerateSegmentObjects()
+    //{
         //float previousAngle = 0f;
         //Vector3 pieChartCenter = transform.position; // 円グラフ全体の中心座標
-    }
+    //}
 
     public void ChangeAnimatorSpeed()
     {
@@ -133,20 +127,20 @@ public class ResultImage : MonoBehaviour
     }
 
     //４人の中で一番高いスコア(プレイヤー)を導き出し表記
-    private void DisplayHighestScore()
-    {
-        int maxScore = scores[0];
-        int maxScorePlayer = 1;
+    //private void DisplayHighestScore()
+    //{
+    //    int maxScore = scores[0];
+    //    int maxScorePlayer = 1;
 
-        for (int playerNum = 1; playerNum < scores.Length; playerNum++)
-        {
-            if (scores[playerNum] > maxScore)
-            {
-                maxScore = scores[playerNum];
-                maxScorePlayer = playerNum + 1;
-            }
-        }
+    //    for (int playerNum = 1; playerNum < scores.Length; playerNum++)
+    //    {
+    //        if (scores[playerNum] > maxScore)
+    //        {
+    //            maxScore = scores[playerNum];
+    //            maxScorePlayer = playerNum + 1;
+    //        }
+    //    }
 
-        Debug.Log($"最高スコアは: Player {maxScorePlayer} の {maxScore} です。");
-    }
+    //    Debug.Log($"最高スコアは: Player {maxScorePlayer} の {maxScore} です。");
+    //}
 }
