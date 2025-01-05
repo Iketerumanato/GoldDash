@@ -9012,8 +9012,9 @@ MonoBehaviour:
   m_blownPowerVertical: 2
   m_forbidPickTime: 1000
   m_lockStateTimeKnocked: 1500
-  m_lockStateTimeStunned: 3000
-  m_dashableTime: 3000
+  m_lockStateTimeStunned: 6000
+  m_dashableTime: 10000
+  m_fallThreshold: -3
   m_allowedUnlockState: 1
   m_isAbleToPickUpGold: 1
   m_isDashable: 0
@@ -9054,7 +9055,7 @@ MonoBehaviour:
   - playerState: 3
     magnification: 0.2
   - playerState: 1
-    magnification: 3
+    magnification: 2
 --- !u!114 &5204228447290793358
 MonoBehaviour:
   m_ObjectHideFlags: 0

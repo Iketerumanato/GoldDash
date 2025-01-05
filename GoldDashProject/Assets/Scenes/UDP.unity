@@ -3267,7 +3267,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   magicWeightsList:
   - magicID: 0
-    weight: 1
+    weight: 2
   - magicID: 1
     weight: 2
   - magicID: 2

@@ -59,6 +59,10 @@ public class PlayerControllerV2 : MonoBehaviour
 
     [Header("ダッシュ状態からNormalStateに戻るまでの時間（ミリ秒）")]
     [SerializeField] private int m_dashableTime = 10000;
+    
+    [Header("Y座標がこれ以下になったら落下したとみなしリスポーンする")]
+    [SerializeField] private float m_fallThreshold = -3f;
+    private Vector3 m_RespawnPosition;
 
     //入力取得用プロパティ
     private float V_InputHorizontal
@@ -188,6 +192,9 @@ public class PlayerControllerV2 : MonoBehaviour
         m_hotbarManager = this.gameObject.GetComponent<HotbarManager>();
         m_chestUnlocker = this.gameObject.GetComponent<ChestUnlocker>();
         m_Rigidbody = this.gameObject.GetComponent<Rigidbody>();
+
+        //リスポーン地点の記憶
+        m_RespawnPosition = this.transform.position;
     }
 
     //デバッグ用
@@ -230,7 +237,16 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
         }
 
+        //落下していたらリスポーン
+        CheckPositionRespawn();
+
         stateTxt.text = this.State.ToString(); //デバッグ用
+    }
+
+    //y座標をチェックしてリスポーンを行う
+    private void CheckPositionRespawn()
+    { 
+        if(this.transform.position.y < m_fallThreshold) this.transform.position = m_RespawnPosition;
     }
 
     private void NormalUpdate()
