@@ -863,6 +863,8 @@ public class GameServerManager : MonoBehaviour
                                                 GoldPile goldPile = Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
                                                 goldPile.EntityID = entityID; //値を書き込み
                                                 goldPile.Value = dropGold;
+                                                goldPile.name = $"GoldPile ({entityID})";
+                                                entityDictionary.Add(entityID, goldPile); //管理用のIDと共に辞書へ
 
                                                 //金額を指定して、対象プレイヤーの背後に金貨の山を生成する命令
                                                 myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, dropGold, goldPos);
