@@ -321,7 +321,7 @@ public class PlayerControllerV2 : MonoBehaviour
         if (m_isDashable && m_isDropable)
         {
             Debug.Log("金貨ドロップリクエスト送信");
-            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.DROP_GOLD, default, default, this.transform.position　+ (this.transform.forward * 0.2f));
+            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.DROP_GOLD, default, default, this.transform.position　+ (this.transform.forward * 0.4f));
             Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             UdpGameClient.Send(myHeader.ToByte());
             m_isDropable = false;
