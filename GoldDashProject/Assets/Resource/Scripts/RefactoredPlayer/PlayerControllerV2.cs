@@ -59,7 +59,10 @@ public class PlayerControllerV2 : MonoBehaviour
 
     [Header("ダッシュ状態からNormalStateに戻るまでの時間（ミリ秒）")]
     [SerializeField] private int m_dashableTime = 10000;
-    
+
+    [Header("ダッシュ中、この時間おきに金貨の山をドロップする（ミリ秒）")]
+    [SerializeField] private int m_dashDropInterval = 1500;
+
     [Header("Y座標がこれ以下になったら落下したとみなしリスポーンする")]
     [SerializeField] private float m_fallThreshold = -3f;
     private Vector3 m_RespawnPosition;
@@ -158,7 +161,7 @@ public class PlayerControllerV2 : MonoBehaviour
         }
     }
 
-    private UniTask m_dashableTimeCountTask; //ダッシュ状態の制限時間を記録する処理
+    //ダッシュ状態の制限時間を記録する処理
     [SerializeField] private bool m_isDashable = false; //ダッシュすることができるか
     private CancellationTokenSource m_dashableTimeCountCts; //金貨を拾うことを禁止する非同期処理を中心するcts
     private CancellationToken DashableTimeCountCt //同ct
@@ -168,6 +171,19 @@ public class PlayerControllerV2 : MonoBehaviour
             m_dashableTimeCountCts.Dispose();
             m_dashableTimeCountCts = new CancellationTokenSource();
             return m_dashableTimeCountCts.Token;
+        }
+    }
+
+    //金貨を一定時間おきに落とす処理
+    [SerializeField] private bool m_isDropable; //金貨を落とすべきか
+    private CancellationTokenSource m_dropableTimeCountCts; //金貨を落とさなくてもいい時間をカウントする非同期処理を中心するcts
+    private CancellationToken DropableTimeCountCt
+    {
+        get
+        {
+            m_dropableTimeCountCts.Dispose();
+            m_dropableTimeCountCts = new CancellationTokenSource();
+            return m_dropableTimeCountCts.Token;
         }
     }
 
@@ -182,6 +198,7 @@ public class PlayerControllerV2 : MonoBehaviour
         m_stateLockCts = new CancellationTokenSource();
         m_forbidPickUpGoldCts = new CancellationTokenSource();
         m_dashableTimeCountCts = new CancellationTokenSource();
+        m_dropableTimeCountCts = new CancellationTokenSource();
 
         //コンポーネントの取得
         m_playerCameraController = this.gameObject.GetComponent<PlayerCameraController>();
@@ -254,7 +271,13 @@ public class PlayerControllerV2 : MonoBehaviour
         if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
         {
             //STEP_A ダッシュ可能ならダッシュ状態になろう
-            if(m_isDashable) this.State = PLAYER_STATE.DASH;
+            if (m_isDashable)
+            {
+                this.State = PLAYER_STATE.DASH;
+                m_dropableTimeCountCts.Cancel(); //dashStateから出るときに金貨ドロップのインターバルカウントを止める
+                m_isDropable = false; //クールダウンリセット
+                UniTask.RunOnThreadPool(()=>CountDropableTime(m_dashDropInterval, DropableTimeCountCt),cancellationToken: DropableTimeCountCt); //クールダウン開始
+            }
 
             //STEP_B UI表示を切り替えよう
             m_UIDisplayer.ActivateUIFromState(this.State);
@@ -267,7 +290,11 @@ public class PlayerControllerV2 : MonoBehaviour
         }
 
         //STEP1 ダッシュ可能状態でないなら通常stateになろう
-        if (!m_isDashable) this.State = PLAYER_STATE.NORMAL;
+        if (!m_isDashable)
+        {
+            m_dropableTimeCountCts.Cancel();
+            this.State = PLAYER_STATE.NORMAL;
+        }
 
         //STEP2 カメラを動かそう
         m_playerCameraController.RotateCamara(D_InputVertical);
@@ -290,7 +317,14 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP8 モーションを決めよう
         m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
 
-        //STEP9 次フレームのStateを決めよう
+        //STEP9 ダッシュ中で、かつ金貨ドロップのクールダウンが回っていたら金貨を落とそう
+        if (m_isDashable && m_isDropable)
+        {
+            Debug.Log("金貨落とします");
+            m_isDropable = false;
+        }
+
+        //STEP10 次フレームのStateを決めよう
         PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, interactInfo.magicID); //インタラクト結果に応じて次のState決定
         if (this.State != nextState)
         {
@@ -530,7 +564,7 @@ public class PlayerControllerV2 : MonoBehaviour
         }
     }
 
-    private async UniTask CountDashableTime(int cooldownTimeMilliSec, CancellationToken cancellationToken)
+    private async void CountDashableTime(int cooldownTimeMilliSec, CancellationToken cancellationToken)
     {
         try
         {
@@ -541,6 +575,23 @@ public class PlayerControllerV2 : MonoBehaviour
         catch (OperationCanceledException)
         {
             Debug.Log("ダッシュの制限時間カウントをキャンセルします");
+        }
+    }
+
+    private async void CountDropableTime(int cooldownTimeMilliSec, CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await UniTask.Delay(cooldownTimeMilliSec, cancellationToken: cancellationToken); //指定された時間待つ
+                m_isDropable = true; //金貨を落とさせる
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("金貨ドロップのインターバルカウントをキャンセルします");
         }
     }
 
