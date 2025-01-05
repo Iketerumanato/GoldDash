@@ -4,10 +4,10 @@ using UnityEngine.UI;
 
 public class ResultImage : MonoBehaviour
 {
-    [SerializeField] private int player1Score = 10000;
-    [SerializeField] private int player2Score = 300;
-    [SerializeField] private int player3Score = 2400;
-    [SerializeField] private int player4Score = 34346;
+    [SerializeField] private int player1Score;
+    [SerializeField] private int player2Score;
+    [SerializeField] private int player3Score;
+    [SerializeField] private int player4Score;
 
     [SerializeField] private Image[] segmentImages; // プレイヤー1～4のセグメント画像
 
