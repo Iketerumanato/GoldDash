@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using static UnityEngine.GraphicsBuffer;
 
 public class ResultActorMove : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class ResultActorMove : MonoBehaviour
     [SerializeField] float forcePower = 10f;
 
     [SerializeField] Animator ResultActorAnimator;
+    const string isResultGame = "IsResultGame";
     void Start()
     {
         // 一度だけInvokeを設定
@@ -51,8 +53,16 @@ public class ResultActorMove : MonoBehaviour
     {
         Debug.Log("一位が中心へ");
         isMoving = true;
-        transform.LookAt(centerPoint, Vector3.right);
+        // 現在のオブジェクトとターゲットの方向ベクトルを計算
+        Vector3 directionToTarget = transform.position - centerPoint.position;
+        // LookAtでその方向を向かせる
+        transform.rotation = Quaternion.LookRotation(directionToTarget);
         ResultActorAnimator.enabled = true;
-        this.transform.DOMove(centerPoint.position, 1f).SetEase(Ease.Linear);
+        this.transform.DOMove(centerPoint.position, 1f).SetEase(Ease.Linear).OnComplete(() =>
+        {
+            //transform.position = centerPoint.position;
+            transform.eulerAngles = Vector3.zero;
+            ResultActorAnimator.SetBool(isResultGame, true);
+        });
     }
 }
