@@ -117,49 +117,8 @@ public class ResultImage : MonoBehaviour
     // アニメーション終了後に各セグメントの中心にオブジェクトを生成するメソッド
     private void GenerateSegmentObjects()
     {
-        float previousAngle = 0f;
-        Vector3 pieChartCenter = transform.position; // 円グラフ全体の中心座標
-
-        for (int PieChartNum = 0; PieChartNum < segmentImages.Length; PieChartNum++)
-        {
-            if (segmentImages[PieChartNum] != null)
-            {
-                // セグメントの角度を計算
-                float segmentAngle = segmentImages[PieChartNum].fillAmount * 360f;
-
-                // セグメントの開始角度と終了角度
-                float startAngle = previousAngle;
-                float endAngle = previousAngle + segmentAngle;
-
-                // セグメントの中心角度を計算
-                float midAngle = (startAngle + endAngle) / 2f;
-
-                // midAngleをラジアンに変換
-                float midAngleRad = midAngle * Mathf.Deg2Rad;
-
-                // 円の中心からオブジェクトを配置するために、円の半径を指定
-                float radius = 150f;
-
-                // セグメントの中心位置を計算
-                Vector3 segmentCenter = pieChartCenter + new Vector3(Mathf.Cos(midAngleRad) * radius, Mathf.Sin(midAngleRad) * radius, 0);
-                segmentCenter.z = -ResultCharaFallHeight;
-
-                // オブジェクトをその位置に生成
-                if (ResultActorPrefab != null)
-                {
-                    GameObject segmentObject = Instantiate(ResultActorPrefab, segmentCenter, Quaternion.identity);
-                    segmentObject.transform.SetParent(transform, false); // 親オブジェクトのスケールなどを無視
-
-                    // セグメント中心を向かせる
-                    segmentObject.transform.LookAt(new Vector3(pieChartCenter.x, pieChartCenter.y, segmentCenter.z), Vector3.up);
-
-                    Debug.Log($"Segment {PieChartNum + 1}: Segment Center = {segmentCenter}, Direction = {pieChartCenter - segmentCenter}");
-                }
-
-                // 次のセグメントの開始角度を設定
-                previousAngle += segmentAngle;
-            }
-        }
+        //float previousAngle = 0f;
+        //Vector3 pieChartCenter = transform.position; // 円グラフ全体の中心座標
     }
 
     public void ChangeAnimatorSpeed()
