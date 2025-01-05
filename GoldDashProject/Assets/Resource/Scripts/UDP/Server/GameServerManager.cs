@@ -925,4 +925,17 @@ public class GameServerManager : MonoBehaviour
         usedEntityID.Add(entityID); //このIDは使用済にする。
         return entityID;
     }
+
+    //ゲームの結果発表のために使う
+    public List<(string name, int gold, Definer.PLAYER_COLOR color)> GetGameResult()
+    {
+        List<(string name, int gold, Definer.PLAYER_COLOR color)> ret = new List<(string name, int gold, Definer.PLAYER_COLOR color)>();
+
+        foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+        {
+            ret.Add((k.Value.PlayerName, k.Value.Gold, k.Value.Color));
+        }
+
+        return ret;
+    }
 }

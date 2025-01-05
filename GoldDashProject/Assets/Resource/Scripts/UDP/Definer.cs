@@ -6,8 +6,17 @@ using System.Collections.Generic;
 /// 定数宣言用クラス
 /// </summary>
 public static class Definer
-
 {
+    //プレイヤーの色
+    public enum PLAYER_COLOR : int
+    {
+        BROWN = 0,
+        RED,
+        BLUE,
+        GREEN,
+        YELLOW,
+    }
+
     /// <summary>
     /// PacketType, パケットの種類
     /// </summary>
