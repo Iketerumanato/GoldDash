@@ -15,6 +15,7 @@ public class ActorController : MonoBehaviour
     public string PlayerName { set; get; }
     public ushort SessionID { set; get; } //MonoBehaviourからすると、いちいちDictionaryからIDを取るより目の前のアクターのIDを取得した方が速そうなので
     public int Gold { set; get; } = 100; //所持金
+    public Definer.PLAYER_COLOR Color { set; get; } //アクターの色
 
     private int magicInventry; //魔法の所持数。0より小さくならない。MAGIC_INVENTRY_MAXを越えて増えない。
     public int MagicInventry

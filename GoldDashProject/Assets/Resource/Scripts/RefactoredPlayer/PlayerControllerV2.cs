@@ -4,10 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using TMPro;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public enum PLAYER_STATE : int //enumの型はデフォルトでintだが、int型であることを期待しているスクリプト（PlayerMoverなど）があるので明示的にintにしておく
 {
