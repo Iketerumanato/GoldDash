@@ -15,17 +15,21 @@ TagManager:
   - Hotbar
   - UseMagic
   - CancelMagic
+  - MagicButtonBack
+  - MagicButton
+  - Scroll
+  - Thunder
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
   - PlayerHand
   - ScrollHotbar
   - ResultImage
-  - 
+  - Actor
   - 
   - 
   - 

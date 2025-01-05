@@ -91,6 +91,22 @@ public class HotbarManager : MonoBehaviour
     }
 
     /// <summary>
+    /// ホットバーに空きがあるか調べる
+    /// </summary>
+    /// <returns>空きがあればtrue, なければfalse</returns>
+    public bool IsAbleToSetMagic()
+    {
+        for (int i = 0; i < HOTBAR_SIZE; i++) //ホットバーのサイズぶんループ
+        {
+            if (m_hotbarArray[i] == Definer.MID.NONE)
+            {
+                return true; //代入できるならtrueを返却
+            }
+        }
+        return false; //代入できなければfalseを返却
+    }
+
+    /// <summary>
     /// 指定されたスロット番号の箇所のmagicIDをNONEにする。
     /// </summary>
     /// <param name="index">NONEをセットしたいスロット番号</param>

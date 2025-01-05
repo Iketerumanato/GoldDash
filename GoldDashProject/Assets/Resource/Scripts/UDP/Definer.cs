@@ -79,6 +79,18 @@ public static class Definer
         /// End Game, ゲームを終了します
         /// </summary>
         EDG,
+        /// <summary>
+        /// 魔法の使用を許可します
+        /// </summary>
+        ALLOW_MAGIC,
+        /// <summary>
+        /// 魔法の使用を却下します
+        /// </summary>
+        DECLINE_MAGIC,
+        /// <summary>
+        /// 魔法の使用は正しく履行されました
+        /// </summary>
+        END_MAGIC_SUCCESSFULLY,
     }
 
     /// <summary>
@@ -90,6 +102,10 @@ public static class Definer
         /// 金貨の山を手に入れようとしました
         /// </summary>
         GET_GOLDPILE,
+        /// <summary>
+        /// 巻物を手に入れようとしました
+        /// </summary>
+        GET_SCROLL,
         /// <summary>
         /// 空振りました
         /// </summary>
@@ -110,6 +126,10 @@ public static class Definer
         /// 魔法を使用しました。
         /// </summary>
         USE_MAGIC,
+        /// <summary>
+        /// 金貨の山を落としました
+        /// </summary>
+        DROP_GOLD,
         /// <summary>
         /// サーバー内部専用。雷を生成してください。
         /// </summary>
@@ -133,6 +153,10 @@ public static class Definer
         /// 金貨の山をスポーンさせろ
         /// </summary>
         SPAWN_GOLDPILE,
+        /// <summary>
+        /// 巻物をスポーンさせろ
+        /// </summary>
+        SPAWN_SCROLL,
         /// <summary>
         /// 雷をスポーンさせろ。
         /// </summary>
@@ -166,17 +190,17 @@ public static class Definer
         /// </summary>
         GIVE_MAGIC,
         /// <summary>
+        /// このActorに魔法の使用をやめさせろ
+        /// </summary>
+        QUIT_MAGIC,
+        /// <summary>
         /// このActorの魔法をひとつ消費させろ
         /// </summary>
         CONSUME_MAGIC,
         /// <summary>
-        /// このアクターをスタンさせろ
+        /// このActorを瞬間移動させろ
         /// </summary>
-        GIVE_STATUS_STUN,
-        /// <summary>
-        /// このアクターをゴールドダッシュ状態にしろ
-        /// </summary>
-        GIVE_STATUS_GOLDDASH,
+        TELEPORT_ACTOR,
     }
 
     /// <summary>

@@ -1,10 +1,13 @@
 using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using TMPro;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public enum PLAYER_STATE : int //enumの型はデフォルトでintだが、int型であることを期待しているスクリプト（PlayerMoverなど）があるので明示的にintにしておく
 {
@@ -53,6 +56,16 @@ public class PlayerControllerV2 : MonoBehaviour
 
     [Header("スタンしてからNormalStateに戻るまでの時間（ミリ秒）")]
     [SerializeField] private int m_lockStateTimeStunned = 3000;
+
+    [Header("ダッシュ状態からNormalStateに戻るまでの時間（ミリ秒）")]
+    [SerializeField] private int m_dashableTime = 10000;
+
+    [Header("ダッシュ中、この時間おきに金貨の山をドロップする（ミリ秒）")]
+    [SerializeField] private int m_dashDropInterval = 1500;
+
+    [Header("Y座標がこれ以下になったら落下したとみなしリスポーンする")]
+    [SerializeField] private float m_fallThreshold = -3f;
+    private Vector3 m_RespawnPosition;
 
     //入力取得用プロパティ
     private float V_InputHorizontal
@@ -107,7 +120,14 @@ public class PlayerControllerV2 : MonoBehaviour
     }
     [SerializeField] private bool m_allowedUnlockState = true; //NormalStateに戻る条件(ステートロックの解除条件)を満たしているか
     private CancellationTokenSource m_stateLockCts; //ステートロックの非同期処理を中心するcts
-    private CancellationToken m_stateLockCt; //同ct
+    private CancellationToken StateLockCt //同ct
+    {
+        get
+        {
+            m_stateLockCts = new CancellationTokenSource();
+            return m_stateLockCts.Token;
+        }
+    }
 
     //巻物を開いているとき、使おうとしている魔法のID
     private Definer.MID m_currentMagicID;
@@ -132,7 +152,40 @@ public class PlayerControllerV2 : MonoBehaviour
     //金貨を拾うことを禁止する処理
     [SerializeField] private bool m_isAbleToPickUpGold = true; //金貨を拾うことができるか
     private CancellationTokenSource m_forbidPickUpGoldCts; //金貨を拾うことを禁止する非同期処理を中心するcts
-    private CancellationToken m_forbidPickUpGoldCt; //同ct
+    private CancellationToken ForbidPickUpGoldCt //同ct
+    {
+        get 
+        {
+            m_forbidPickUpGoldCts = new CancellationTokenSource();
+            return m_forbidPickUpGoldCts.Token;
+        }
+    }
+
+    //ダッシュ状態の制限時間を記録する処理
+    [SerializeField] private bool m_isDashable = false; //ダッシュすることができるか
+    private CancellationTokenSource m_dashableTimeCountCts; //金貨を拾うことを禁止する非同期処理を中心するcts
+    private CancellationToken DashableTimeCountCt //同ct
+    {
+        get
+        {
+            m_dashableTimeCountCts.Dispose();
+            m_dashableTimeCountCts = new CancellationTokenSource();
+            return m_dashableTimeCountCts.Token;
+        }
+    }
+
+    //金貨を一定時間おきに落とす処理
+    [SerializeField] private bool m_isDropable; //金貨を落とすべきか
+    private CancellationTokenSource m_dropableTimeCountCts; //金貨を落とさなくてもいい時間をカウントする非同期処理を中心するcts
+    private CancellationToken DropableTimeCountCt
+    {
+        get
+        {
+            m_dropableTimeCountCts.Dispose();
+            m_dropableTimeCountCts = new CancellationTokenSource();
+            return m_dropableTimeCountCts.Token;
+        }
+    }
 
     //パケット関連
     //GameClientManagerからプレイヤーの生成タイミングでsetterを呼び出し
@@ -141,11 +194,11 @@ public class PlayerControllerV2 : MonoBehaviour
 
     private void Start()
     {
-        //ctの発行
+        //Ctsインスタンス生成
         m_stateLockCts = new CancellationTokenSource();
-        m_stateLockCt = m_stateLockCts.Token;
         m_forbidPickUpGoldCts = new CancellationTokenSource();
-        m_forbidPickUpGoldCt = m_forbidPickUpGoldCts.Token;
+        m_dashableTimeCountCts = new CancellationTokenSource();
+        m_dropableTimeCountCts = new CancellationTokenSource();
 
         //コンポーネントの取得
         m_playerCameraController = this.gameObject.GetComponent<PlayerCameraController>();
@@ -156,6 +209,9 @@ public class PlayerControllerV2 : MonoBehaviour
         m_hotbarManager = this.gameObject.GetComponent<HotbarManager>();
         m_chestUnlocker = this.gameObject.GetComponent<ChestUnlocker>();
         m_Rigidbody = this.gameObject.GetComponent<Rigidbody>();
+
+        //リスポーン地点の記憶
+        m_RespawnPosition = this.transform.position;
     }
 
     //デバッグ用
@@ -170,6 +226,9 @@ public class PlayerControllerV2 : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha5)) m_hotbarManager.RemoveMagicFromHotbar(1);
         if (Input.GetKeyDown(KeyCode.Alpha6)) m_hotbarManager.RemoveMagicFromHotbar(2);
 
+
+        if (Input.GetKeyDown(KeyCode.Alpha6)) GetPunchBack();
+
         switch (this.State) //Stateによって実行するUpdate関数を変える
         { 
             case PLAYER_STATE.NORMAL:
@@ -183,6 +242,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 ScrollUpdate();
                 break;
             case PLAYER_STATE.WAITING_MAP_ACTION:
+                WaitingMapActionUpdate();
                 break;
             case PLAYER_STATE.KNOCKED:
                 KnockedUpdate();
@@ -194,45 +254,80 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
         }
 
+        //落下していたらリスポーン
+        CheckPositionRespawn();
+
         stateTxt.text = this.State.ToString(); //デバッグ用
+    }
+
+    //y座標をチェックしてリスポーンを行う
+    private void CheckPositionRespawn()
+    { 
+        if(this.transform.position.y < m_fallThreshold) this.transform.position = m_RespawnPosition;
     }
 
     private void NormalUpdate()
     {
         if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
         {
-            //STEP_A UI表示を切り替えよう
+            //STEP_A ダッシュ可能ならダッシュ状態になろう
+            if (m_isDashable)
+            {
+                this.State = PLAYER_STATE.DASH;
+                m_dropableTimeCountCts.Cancel(); //dashStateから出るときに金貨ドロップのインターバルカウントを止める
+                m_isDropable = false; //クールダウンリセット
+                UniTask.RunOnThreadPool(()=>CountDropableTime(m_dashDropInterval, DropableTimeCountCt),cancellationToken: DropableTimeCountCt); //クールダウン開始
+            }
+
+            //STEP_B UI表示を切り替えよう
             m_UIDisplayer.ActivateUIFromState(this.State);
 
-            //STEP_B モーションを切り替えよう
+            //STEP_C モーションを切り替えよう
             m_playerAnimationController.SetAnimationFromState(this.State);
 
-            //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
+            //STEP_D 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
         }
 
-        //STEP1 カメラを動かそう
+        //STEP1 ダッシュ可能状態でないなら通常stateになろう
+        if (!m_isDashable)
+        {
+            m_dropableTimeCountCts.Cancel();
+            this.State = PLAYER_STATE.NORMAL;
+        }
+
+        //STEP2 カメラを動かそう
         m_playerCameraController.RotateCamara(D_InputVertical);
 
-        //STEP2 移動・旋回を実行しよう
+        //STEP3 移動・旋回を実行しよう
         float runSpeed = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
 
-        //STEP3 インタラクトを実行しよう
+        //STEP4 インタラクトを実行しよう
         (INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact();
 
-        //STEP4 パケット送信が必要なら送ろう
+        //STEP5 パケット送信が必要なら送ろう
         this.MakePacketFromInteract(interactInfo);
 
-        //STEP5 インタラクト結果をメンバ変数に格納する必要があればそうしよう
+        //STEP6 インタラクト結果をメンバ変数に格納する必要があればそうしよう
         this.SetParameterFromInteract(interactInfo);
 
-        //STEP6 カメラを揺らす必要があれば揺らそう
+        //STEP7 カメラを揺らす必要があれば揺らそう
         m_playerCameraController.InvokeShakeEffectFromInteract(interactInfo.interactType);
 
-        //STEP7 モーションを決めよう
+        //STEP8 モーションを決めよう
         m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
 
-        //STEP8 次フレームのStateを決めよう
+        //STEP9 ダッシュ中で、かつ金貨ドロップのクールダウンが回っていたら金貨を落とそう
+        if (m_isDashable && m_isDropable)
+        {
+            Debug.Log("金貨ドロップリクエスト送信");
+            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.DROP_GOLD, default, default, this.transform.position　+ (this.transform.forward * 0.4f));
+            Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            UdpGameClient.Send(myHeader.ToByte());
+            m_isDropable = false;
+        }
+
+        //STEP10 次フレームのStateを決めよう
         PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, interactInfo.magicID); //インタラクト結果に応じて次のState決定
         if (this.State != nextState)
         {
@@ -289,7 +384,7 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP4 開錠できたら少し待ってステートロックを解除しよう
         if (isUnlocked)
         {
-            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(1200), default, m_stateLockCt);
+            UniTask.RunOnThreadPool(() => CountStateLockTime(1200, StateLockCt), cancellationToken: StateLockCt);
         }
 
         //STEP5 通常stateに戻ることができるなら戻ろう
@@ -325,17 +420,37 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP4 パケット送信が必要なら送ろう
         this.MakePacketFromInteract(interactInfo);
 
-        //STEP5 巻物を使ったならホットバー情報を書き換えよう
-        if(interactInfo.interactType == INTERACT_TYPE.MAGIC_USE) m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex);
-
-        //STEP6 モーションを決めよう
-        m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
-
-        //STEP7 次フレームのStateを決めよう
-        PLAYER_STATE nextState = GetNextStateFromInteract(interactInfo.interactType, m_currentMagicID); //インタラクト結果に応じて次のState決定
-        if (this.State != nextState)
+        //STEP5 巻物をキャンセルしたなら元のStateに戻ろう
+        if(interactInfo.interactType == INTERACT_TYPE.MAGIC_CANCEL)
         {
-            this.State = nextState; //nextStateと現在のStateが異なるならStateプロパティのセッター呼び出し
+            this.State = PLAYER_STATE.NORMAL;
+        }
+    }
+
+    private void WaitingMapActionUpdate()
+    {
+        if (m_isFirstFrameOfState) //このstateに入った最初のフレームなら
+        {
+            //STEP_A 無期限にステートロックしよう
+            m_allowedUnlockState = false;
+
+            //STEP_A UI表示を切り替えよう
+            m_UIDisplayer.ActivateUIFromState(this.State);
+
+            //STEP_B モーションを切り替えよう
+            m_playerAnimationController.SetAnimationFromState(this.State);
+
+            //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
+            m_isFirstFrameOfState = false;
+        }
+
+        //サーバー側でマップアクションが終わったらm_allowedUnlockStateがtrueになる
+
+        //STEP1 通常stateに戻ることができるなら戻ろう。このときホットバーから使っていた魔法を取り除こう
+        if (m_allowedUnlockState)
+        {
+            m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex); //サーバーからm_allowedUnlockStateがtrueになったときのみ魔法が消費されるので、殴られたときは消費されない
+            this.State = PLAYER_STATE.NORMAL;
         }
     }
 
@@ -347,14 +462,14 @@ public class PlayerControllerV2 : MonoBehaviour
             if (!m_allowedUnlockState) m_stateLockCts.Cancel();
             //一定時間ステートロックする
             m_allowedUnlockState = false;
-            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(1500), default, m_stateLockCt);
+            UniTask.RunOnThreadPool(() => CountStateLockTime(1500, StateLockCt), cancellationToken: StateLockCt);
 
             //STEP_A 吹き飛ぼう
             //金貨を拾えない状態にする
             if (!m_isAbleToPickUpGold) m_forbidPickUpGoldCts.Cancel(); //既に拾えない状態であれば実行中のForbidPickタスクが存在するはずなので、キャンセルする
             //一定時間金貨を拾えない状態にする
             m_isAbleToPickUpGold = false;
-            UniTask.RunOnThreadPool(() => CountForbidPickTime(1000), default, m_forbidPickUpGoldCt);
+            UniTask.RunOnThreadPool(() => CountForbidPickTime(1000, ForbidPickUpGoldCt), cancellationToken: ForbidPickUpGoldCt);
 
             //前に吹っ飛ぶ
             //transform.forwardと実際の前方は（カメラの向きに合わせた関係で）逆なのでマイナスをかける
@@ -388,7 +503,7 @@ public class PlayerControllerV2 : MonoBehaviour
             if (!m_allowedUnlockState) m_stateLockCts.Cancel();
             //一定時間ステートロックする
             m_allowedUnlockState = false;
-            UniTask u = UniTask.RunOnThreadPool(() => CountStateLockTime(3000), default, m_stateLockCt);
+            UniTask.RunOnThreadPool(() => CountStateLockTime(3000, StateLockCt), cancellationToken: StateLockCt);
 
             //STEP_A カメラを揺らそう
             m_playerCameraController.InvokeShakeEffectFromState(this.State);
@@ -400,10 +515,7 @@ public class PlayerControllerV2 : MonoBehaviour
             m_isFirstFrameOfState = false;
         }
 
-        //STEP1 カメラを動かそう
-        m_playerCameraController.RotateCamara(V_InputVertical);
-
-        //STEP2 通常stateに戻ることができるなら戻ろう
+        //STEP1 通常stateに戻ることができるなら戻ろう
         if (m_allowedUnlockState) this.State = PLAYER_STATE.NORMAL;
     }
 
@@ -426,17 +538,64 @@ public class PlayerControllerV2 : MonoBehaviour
     }
 
     //ステートロック用フラグを一定時間後に解除する
-    private async void CountStateLockTime(int cooldownTimeMilliSec)
+    private async void CountStateLockTime(int cooldownTimeMilliSec, CancellationToken cancellationToken)
     {
-        await UniTask.Delay(cooldownTimeMilliSec); //指定された秒数待ったら
-        m_allowedUnlockState = true; //クールダウン終了
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await UniTask.Delay(cooldownTimeMilliSec, cancellationToken: cancellationToken); //指定された時間待つ
+            m_allowedUnlockState = true; //ステートロック解除
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("ステートロックの制限時間カウントをキャンセルします");
+        }
     }
 
     //金貨を拾うためのフラグを一定時間後にtrueにする
-    private async void CountForbidPickTime(int cooldownTimeMilliSec)
+    private async void CountForbidPickTime(int cooldownTimeMilliSec, CancellationToken cancellationToken)
     {
-        await UniTask.Delay(cooldownTimeMilliSec); //指定された時間待つ
-        m_isAbleToPickUpGold = true; //金貨を拾えるようにする
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await UniTask.Delay(cooldownTimeMilliSec, cancellationToken: cancellationToken); //指定された時間待つ
+            m_isAbleToPickUpGold = true; //金貨を拾えるようにする
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("金貨拾得禁止の制限時間カウントをキャンセルします");
+        }
+    }
+
+    private async void CountDashableTime(int cooldownTimeMilliSec, CancellationToken cancellationToken)
+    {
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await UniTask.Delay(cooldownTimeMilliSec, cancellationToken: cancellationToken); //指定された時間待つ
+            m_isDashable = false; //ダッシュできない状態にする
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("ダッシュの制限時間カウントをキャンセルします");
+        }
+    }
+
+    private async void CountDropableTime(int cooldownTimeMilliSec, CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await UniTask.Delay(cooldownTimeMilliSec, cancellationToken: cancellationToken); //指定された時間待つ
+                m_isDropable = true; //金貨を落とさせる
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("金貨ドロップのインターバルカウントをキャンセルします");
+        }
     }
 
     //インタラクト結果から、必要があればメンバ変数を編集する
@@ -491,10 +650,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 UdpGameClient.Send(myHeader.ToByte());
                 break;
             case INTERACT_TYPE.CHEST:
-                //宝箱を開錠したことをパケット送信
-                //myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, interactInfo.targetID);
-                //myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                //UdpGameClient.Send(myHeader.ToByte());
+                //宝箱を開錠し始めたことをパケット送信
                 break;
             case INTERACT_TYPE.MAGIC_ICON:
                 //巻物を開いたことをパケット送信
@@ -526,8 +682,93 @@ public class PlayerControllerV2 : MonoBehaviour
         this.State = PLAYER_STATE.KNOCKED;
     }
 
+    //サーバーから魔法の使用許可が降りたらStateを変更する
+    public void AcceptUsingMagic()
+    {
+        switch (m_currentMagicID) //使用中の魔法に応じて次のStateを決める
+        {
+            case Definer.MID.DASH:
+                m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex); //ここでダッシュ魔法を消費させる
+                this.State = PLAYER_STATE.DASH;
+                //ダッシュ可能時間をカウントする非同期処理があるならキャンセルする
+                if (m_isDashable) m_dashableTimeCountCts.Cancel();
+                m_isDashable = true; //ダッシュ可能にする
+                UniTask.RunOnThreadPool(() => CountDashableTime(m_dashableTime, m_dashableTimeCountCts.Token), cancellationToken: DashableTimeCountCt); //一定時間後にダッシュ可能フラグを解除する
+                break;
+            default :
+                this.State = PLAYER_STATE.WAITING_MAP_ACTION;
+                break;
+        }
+    }
+
+    //魔法の使用を許可しない
+    public void DeclineUsingMagic()
+    {
+        //メッセージなど出す
+        this.State = PLAYER_STATE.NORMAL;
+    }
+
+    public void EndUsingMagicSuccessfully()
+    {
+        //プレイヤーが殴られるなどして違うStateになっていないかチェック
+        if(this.State != PLAYER_STATE.WAITING_MAP_ACTION) return;
+        
+        m_allowedUnlockState = true; //ステートロックを解除
+    }
+
     public void SetMagicToHotbar(Definer.MID magicID)
     { 
         m_hotbarManager.SetMagicToHotbar(magicID);
+    }
+
+    //金貨を拾うためのトリガー処理
+    private void OnTriggerEnter(Collider other)
+    {
+        //送信用クラスを外側のスコープで宣言しておく
+        ActionPacket myActionPacket;
+        Header myHeader;
+
+        switch (other.tag)
+        {
+            case "GoldPile":
+                if (!m_isAbleToPickUpGold) return; //金貨を拾えない状態ならreturn
+
+                //金貨の山に触れたというリクエスト送信。（他のプレイヤーが先に触れていた場合、お金は入手できない。早い者勝ち。）
+                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_GOLDPILE, other.GetComponent<Entity>().EntityID);
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
+                Debug.Log("金貨Getリクエスト。");
+                break;
+            case "Scroll":
+                if (!m_isAbleToPickUpGold) return; //金貨を拾えない状態ならreturn
+                if (!m_hotbarManager.IsAbleToSetMagic()) return; //魔法をこれ以上持てないならreturn
+
+                //巻物をに触れたというリクエスト送信。（他のプレイヤーが先に触れていた場合、巻物は入手できない。早い者勝ち。）
+                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_SCROLL, other.GetComponent<Entity>().EntityID);
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
+                Debug.Log("巻物Getリクエスト。");
+                break;
+            case "Thunder":
+                //痺れたことをパケット送信
+                this.State = PLAYER_STATE.STUNNED;
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        switch (other.tag)
+        {
+            case "Thunder":
+                //痺れたことをパケット送信
+                //スタン状態になる
+                this.State = PLAYER_STATE.STUNNED;
+                break;
+            default:
+                break;
+        }
     }
 }

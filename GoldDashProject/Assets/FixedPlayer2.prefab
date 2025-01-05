@@ -8149,6 +8149,10 @@ PrefabInstance:
       value: FixedPlayer2
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: cfc3b3c745310a947b3add25ef492886, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: cfc3b3c745310a947b3add25ef492886, type: 3}
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
@@ -9008,9 +9012,14 @@ MonoBehaviour:
   m_blownPowerVertical: 2
   m_forbidPickTime: 1000
   m_lockStateTimeKnocked: 1500
-  m_lockStateTimeStunned: 3000
+  m_lockStateTimeStunned: 6000
+  m_dashableTime: 10000
+  m_dashDropInterval: 1500
+  m_fallThreshold: -3
   m_allowedUnlockState: 1
   m_isAbleToPickUpGold: 1
+  m_isDashable: 0
+  m_isDropable: 0
   stateTxt: {fileID: 982244921922224180}
 --- !u!114 &7647838643402749367
 MonoBehaviour:
@@ -9048,7 +9057,7 @@ MonoBehaviour:
   - playerState: 3
     magnification: 0.2
   - playerState: 1
-    magnification: 3
+    magnification: 2
 --- !u!114 &5204228447290793358
 MonoBehaviour:
   m_ObjectHideFlags: 0
