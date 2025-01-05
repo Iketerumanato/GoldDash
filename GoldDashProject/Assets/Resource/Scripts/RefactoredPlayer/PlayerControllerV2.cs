@@ -320,7 +320,10 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP9 ダッシュ中で、かつ金貨ドロップのクールダウンが回っていたら金貨を落とそう
         if (m_isDashable && m_isDropable)
         {
-            Debug.Log("金貨落とします");
+            Debug.Log("金貨ドロップリクエスト送信");
+            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.DROP_GOLD, default, default, this.transform.position　+ (this.transform.forward * 0.2f));
+            Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            UdpGameClient.Send(myHeader.ToByte());
             m_isDropable = false;
         }
 

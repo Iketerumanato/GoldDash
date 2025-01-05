@@ -827,6 +827,49 @@ public class GameServerManager : MonoBehaviour
                                             }
                                             break;
                                         #endregion
+                                        case (byte)Definer.REID.DROP_GOLD:
+                                            {
+                                                int ownedGold = actorDictionary[receivedHeader.sessionID].Gold;
+
+                                                //所持金がすっからかんなら金貨を生成しない
+                                                if (ownedGold <= 0) break;
+
+                                                //落とす金額を抽選
+                                                int dropGold;
+                                                System.Random random = new System.Random();
+
+                                                if (ownedGold < 10) //所持金が10ゴールド未満なら1~所持金の値ゴールドの間で抽選
+                                                {
+                                                    dropGold = random.Next(1, ownedGold + 1);
+                                                }
+                                                else
+                                                {
+                                                    dropGold = random.Next(10, 51); //所持金が10ゴールドより多いなら10~50ゴールドの間で抽選する
+                                                }
+                                                dropGold = Mathf.Clamp(dropGold, dropGold, ownedGold); //所持金を超えないようにclampする
+
+                                                //プレイヤーから送られてきた座標をもとに金貨の山を生成
+                                                //対象プレイヤーの所持金を減らす
+                                                //まずサーバー側で
+                                                actorDictionary[receivedHeader.sessionID].Gold -= dropGold;
+                                                //パケット送信    
+                                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, -dropGold);
+                                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                udpGameServer.Send(myHeader.ToByte());
+
+                                                //まずサーバー側で金貨の山を生成
+                                                entityID = GetUniqueEntityID();
+                                                Vector3 goldPos = receivedActionPacket.pos;
+                                                GoldPile goldPile = Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
+                                                goldPile.EntityID = entityID; //値を書き込み
+                                                goldPile.Value = dropGold;
+
+                                                //金額を指定して、対象プレイヤーの背後に金貨の山を生成する命令
+                                                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_GOLDPILE, entityID, dropGold, goldPos);
+                                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                udpGameServer.Send(myHeader.ToByte());
+                                            }
+                                            break;
                                         #region case サーバー内部専用パケット:
                                         case (byte)Definer.REID.INTERNAL_THUNDER:
                                             //オブジェクトを生成しつつ、エンティティのコンポーネントを取得

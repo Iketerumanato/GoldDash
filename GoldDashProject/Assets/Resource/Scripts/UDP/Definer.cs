@@ -127,6 +127,10 @@ public static class Definer
         /// </summary>
         USE_MAGIC,
         /// <summary>
+        /// 金貨の山を落としました
+        /// </summary>
+        DROP_GOLD,
+        /// <summary>
         /// サーバー内部専用。雷を生成してください。
         /// </summary>
         INTERNAL_THUNDER,
