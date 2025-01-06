@@ -101,10 +101,10 @@ public class MapGenerator : MonoBehaviour
 
         //ランダム抽選は保留。指定した名前のファイルを４つ読み込む
         TextAsset[] textAsset_array = {
-            Resources.Load("MapPart6x6_debug1") as TextAsset,
-            Resources.Load("MapPart6x6_debug2") as TextAsset,
-            Resources.Load("MapPart6x6_debug3") as TextAsset,
-            Resources.Load("MapPart6x6_debug4") as TextAsset};
+            Resources.Load("MapPart6x6_1") as TextAsset,
+            Resources.Load("MapPart6x6_2") as TextAsset,
+            Resources.Load("MapPart6x6_3") as TextAsset,
+            Resources.Load("MapPart6x6_4") as TextAsset};
 
         map = MergeMap(textAsset_array);
 
@@ -152,7 +152,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 else if (map[i, j].wallLeft == CellInfo.WALL_TYPE.DOOR)
                 {
-                    GameObject leftDoor = Instantiate(doorObj, new Vector3(i + 0.5f, 0.5f, j), Quaternion.Euler(0f, 90f, 0f));
+                    GameObject leftDoor = Instantiate(doorObj, new Vector3(i + 0.5f, 0f, j), Quaternion.identity);
                     leftDoor.transform.parent = Parenttransform;
                 }
                 // 右の壁
@@ -163,7 +163,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 else if (map[i, j].wallRight == CellInfo.WALL_TYPE.DOOR)
                 {
-                    GameObject rightDoor = Instantiate(doorObj, new Vector3(i + 0.5f, 0.5f, j + 1f), Quaternion.Euler(0f, 90f, 0f));
+                    GameObject rightDoor = Instantiate(doorObj, new Vector3(i + 0.5f, 0f, j + 1f), Quaternion.identity);
                     rightDoor.transform.parent = Parenttransform;
                 }
                 // 上の壁
@@ -174,7 +174,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 else if (map[i, j].wallUpper == CellInfo.WALL_TYPE.DOOR)
                 {
-                    GameObject upperDoor = Instantiate(doorObj, new Vector3(i, 0.5f, j + 0.5f), Quaternion.identity);
+                    GameObject upperDoor = Instantiate(doorObj, new Vector3(i, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
                     upperDoor.transform.parent = Parenttransform;
                 }
                 // 下の壁
@@ -185,7 +185,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 else if (map[i, j].wallLower == CellInfo.WALL_TYPE.DOOR)
                 {
-                    GameObject lowerDoor = Instantiate(doorObj, new Vector3(i + 1f, 0.5f, j + 0.5f), Quaternion.identity);
+                    GameObject lowerDoor = Instantiate(doorObj, new Vector3(i + 1f, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
                     lowerDoor.transform.parent = Parenttransform;
                 }
 
