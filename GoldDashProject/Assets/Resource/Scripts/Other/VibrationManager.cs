@@ -29,13 +29,13 @@ public class VibrationManager : MonoBehaviour
 #endif
     }
 
-    //現在のAndroidバージョンが8.0（API 26）以上かどうかを確認
-    private bool AndroidVersionIsOreoOrHigher()
-    {
-#if UNITY_ANDROID
-        AndroidJavaClass versionClass = new AndroidJavaClass("android.os.Build$VERSION");
-        int sdkInt = versionClass.GetStatic<int>("SDK_INT");
-        return sdkInt >= 26;
-#endif
-    }
+//    //現在のAndroidバージョンが8.0（API 26）以上かどうかを確認
+//    private bool AndroidVersionIsOreoOrHigher()
+//    {
+//#if UNITY_ANDROID
+//        AndroidJavaClass versionClass = new AndroidJavaClass("android.os.Build$VERSION");
+//        int sdkInt = versionClass.GetStatic<int>("SDK_INT");
+//        return sdkInt >= 26;
+//#endif
+//    }
 }

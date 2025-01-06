@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 using R3;
 
@@ -120,10 +119,28 @@ public class MapGenerator : MonoBehaviour
         }
 
         //マップ中央に広場生成()
-        map[8, 8] = new CellInfo();
-        map[8, 10] = new CellInfo();
-        map[10, 8] = new CellInfo();
-        map[10, 10] = new CellInfo();
+        map[MAP_PART_SIZE - 1, MAP_PART_SIZE - 1] = new CellInfo();
+        map[MAP_PART_SIZE - 1, MAP_PART_SIZE + 1] = new CellInfo();
+        map[MAP_PART_SIZE + 1, MAP_PART_SIZE - 1] = new CellInfo();
+        map[MAP_PART_SIZE + 1, MAP_PART_SIZE + 1] = new CellInfo();
+
+        //中央行・列上下左右の壁
+        //上
+        CellInfo cellInfo = new CellInfo();
+        cellInfo.wallUpper = CellInfo.WALL_TYPE.WALL;
+        map[0, MAP_PART_SIZE] = cellInfo;
+        //下
+        cellInfo = new CellInfo();
+        cellInfo.wallLower = CellInfo.WALL_TYPE.WALL;
+        map[MAP_SIZE - 1, MAP_PART_SIZE] = cellInfo;
+        //左
+        cellInfo = new CellInfo();
+        cellInfo.wallLeft = CellInfo.WALL_TYPE.WALL;
+        map[MAP_PART_SIZE, 0] = cellInfo;
+        //右
+        cellInfo = new CellInfo();
+        cellInfo.wallRight = CellInfo.WALL_TYPE.WALL;
+        map[MAP_PART_SIZE, MAP_SIZE - 1] = cellInfo;
 
         //重複した壁データの削除
         DeleteDuplicatedWall(map);
