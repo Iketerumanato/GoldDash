@@ -224,7 +224,11 @@ public class PlayerControllerV2 : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha6)) m_hotbarManager.RemoveMagicFromHotbar(2);
 
 
-        if (Input.GetKeyDown(KeyCode.Alpha6)) GetPunchBack();
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            GetPunchBack();
+            PlayLostCoinAnimation();
+        }
 
         switch (this.State) //Stateによって実行するUpdate関数を変える
         { 
