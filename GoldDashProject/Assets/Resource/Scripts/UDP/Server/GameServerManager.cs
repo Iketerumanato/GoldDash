@@ -844,14 +844,8 @@ public class GameServerManager : MonoBehaviour
                                                 int dropGold;
                                                 System.Random random = new System.Random();
 
-                                                if (ownedGold < 10) //所持金が10ゴールド未満なら1~所持金の値ゴールドの間で抽選
-                                                {
-                                                    dropGold = random.Next(1, ownedGold + 1);
-                                                }
-                                                else
-                                                {
-                                                    dropGold = random.Next(10, 51); //所持金が10ゴールドより多いなら10~50ゴールドの間で抽選する
-                                                }
+                                                dropGold = random.Next((ownedGold / 100) * 1, (ownedGold / 100) * 3); //所持金の1%~3%までの間で抽選
+                                                if (dropGold == 0) dropGold++; //落とすゴールドが0になってしまう場合1ゴールドにする 
                                                 dropGold = Mathf.Clamp(dropGold, dropGold, ownedGold); //所持金を超えないようにclampする
 
                                                 //プレイヤーから送られてきた座標をもとに金貨の山を生成
