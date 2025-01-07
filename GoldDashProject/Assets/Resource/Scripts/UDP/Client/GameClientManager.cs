@@ -502,4 +502,9 @@ public class GameClientManager : MonoBehaviour
             Debug.LogException(e);
         }
     }
+
+    private void OnDestroy()
+    {
+        this.udpGameClient?.Dispose();
+    }
 }
