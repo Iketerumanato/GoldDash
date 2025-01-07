@@ -4063,7 +4063,7 @@ MonoBehaviour:
   ceilingObj: {fileID: 2245593692840514771, guid: 4a00a3f5854a82d4f81dc4ce35912571, type: 3}
   wallObj: {fileID: 3049529086512440611, guid: d69d3fa195f8cfe4f95540f955dc80b7, type: 3}
   doorObj: {fileID: 1046110835955259150, guid: 6a319dbb89e98c6448eb105c9f3e693f, type: 3}
-  chestObj: {fileID: 5283063881264726642, guid: f99816d4e2a842047bc8f89cd40346a8, type: 3}
+  chestObj: {fileID: 3941643310326857253, guid: 88a63aaad4124d24f9f43e32443513ab, type: 3}
   respawnObj: {fileID: 4160669350675892000, guid: ce5eafa118884ff4797ae07d23444af0, type: 3}
   Player: {fileID: 5880924705522823218, guid: 95bacd2e0287f3d48b1ae9a7539a6238, type: 3}
 --- !u!4 &1585246435
