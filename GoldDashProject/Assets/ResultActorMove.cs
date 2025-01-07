@@ -1,6 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
-using static UnityEngine.GraphicsBuffer;
+using System.Collections.Generic;
 
 public class ResultActorMove : MonoBehaviour
 {
@@ -17,6 +17,11 @@ public class ResultActorMove : MonoBehaviour
 
     [SerializeField] Animator ResultActorAnimator;
     const string isResultGame = "IsResultGame";
+
+    [SerializeField] ResultImage _resultImage;
+
+    const string WinerActorTag = "1stActor";
+
     void Start()
     {
         // 一度だけInvokeを設定
@@ -41,7 +46,7 @@ public class ResultActorMove : MonoBehaviour
         Debug.Log("動くな");
         Vector3 forceVec = gameObject.transform.position - centerPoint.position;
 
-        if (gameObject.CompareTag("Player")) Invoke(MoveCenterMethod, 0.2f);
+        if (gameObject.CompareTag(WinerActorTag)) Invoke(MoveCenterMethod, 0.2f);
         else
         {
             actorRig.AddForce(forceVec * forcePower, ForceMode.Impulse);
@@ -63,6 +68,7 @@ public class ResultActorMove : MonoBehaviour
             //transform.position = centerPoint.position;
             transform.eulerAngles = Vector3.zero;
             ResultActorAnimator.SetBool(isResultGame, true);
+            _resultImage.ResultTextCanvasAlphaToMax(5f, 0.5f);
         });
     }
 }
