@@ -35,6 +35,14 @@ public class UIDisplayer : MonoBehaviour
     [Header("宝箱を開錠するときの鍵")]
     [SerializeField] private GameObject m_key;
 
+    [Header("殴られた時にこぼすコイン")]
+    [SerializeField] private GameObject m_coinLost;
+    private Animator m_coinLostAnimator;
+
+    [Header("金貨の山に触れたとき吸い込むコイン")]
+    [SerializeField] private GameObject m_coinGet;
+    private Animator m_coinGetAnimator;
+
     private void Start()
     {
         //インスペクタで設定した値をDictionaryに登録する
@@ -43,6 +51,10 @@ public class UIDisplayer : MonoBehaviour
         {
             m_magicIDAndExplainPrefabDictionary.Add(m.magicID, m);
         }
+
+        //アニメーター取得
+        m_coinLostAnimator = m_coinLost.GetComponent<Animator>();
+        m_coinGetAnimator = m_coinGet.GetComponent<Animator>();
     }
 
     /// <summary>
