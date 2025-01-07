@@ -102,4 +102,14 @@ public class UIDisplayer : MonoBehaviour
         m_magicIDAndExplainPrefabDictionary[magicID].scrollExplainPrefab.SetActive(true); //magicIDに対応した巻物UIを表示する
         m_ScrollLongPaper.SetActive(true); //長い紙を表示する
     }
+
+    public void PlayGetCoinAnimation()
+    {
+        m_coinGetAnimator.SetTrigger("GetTrigger");
+    }
+
+    public void PlayLostCoinAnimation()
+    {
+        m_coinLostAnimator.SetTrigger("LostTrigger");
+    }
 }

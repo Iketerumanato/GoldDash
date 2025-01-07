@@ -378,6 +378,7 @@ public class GameClientManager : MonoBehaviour
                                                 //プレイヤー側で演出
                                                 //playerController.Blown(receivedActionPacket.pos); //パンチの方向に吹っ飛ぶ
                                                 playerController.GetPunchBack();
+                                                if (actorDictionary[sessionID].Gold != 0) playerController.PlayLostCoinAnimation(); //所持金が0でなければコインをこぼすアニメーション
                                             }
                                             else
                                             {
@@ -390,6 +391,7 @@ public class GameClientManager : MonoBehaviour
                                             if (receivedActionPacket.targetID == this.sessionID)
                                             {
                                                 //プレイヤー側で演出
+                                                if (receivedActionPacket.value > 0) playerController.PlayGetCoinAnimation(); //所持金が増えたときはコイン吸い取りアニメーション
                                             }
                                             //指定されたアクターの所持金を編集
                                             actorDictionary[receivedActionPacket.targetID].Gold += receivedActionPacket.value;

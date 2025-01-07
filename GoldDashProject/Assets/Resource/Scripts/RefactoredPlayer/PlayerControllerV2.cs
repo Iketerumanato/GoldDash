@@ -679,6 +679,16 @@ public class PlayerControllerV2 : MonoBehaviour
         this.State = PLAYER_STATE.KNOCKED;
     }
 
+    public void PlayGetCoinAnimation()
+    {
+        m_UIDisplayer.PlayGetCoinAnimation();
+    }
+
+    public void PlayLostCoinAnimation()
+    { 
+        m_UIDisplayer.PlayLostCoinAnimation();
+    }
+
     //サーバーから魔法の使用許可が降りたらStateを変更する
     public void AcceptUsingMagic()
     {

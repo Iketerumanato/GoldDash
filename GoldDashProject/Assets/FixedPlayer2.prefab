@@ -9138,6 +9138,8 @@ MonoBehaviour:
   m_HotbarParent: {fileID: 2342493314918289500}
   m_ScrollLongPaper: {fileID: 3502408557107182188}
   m_key: {fileID: 1799925423815284635}
+  m_coinLost: {fileID: 4181294287214549211}
+  m_coinGet: {fileID: 2502891868954704290}
 --- !u!114 &4853172994399964449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9231,11 +9233,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6456877619844639935, guid: 1acc97e09a95cd84b8fed21593d530ca, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.07
+      value: -0.151
       objectReference: {fileID: 0}
     - target: {fileID: 6456877619844639935, guid: 1acc97e09a95cd84b8fed21593d530ca, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.251
+      value: -0.388
       objectReference: {fileID: 0}
     - target: {fileID: 6456877619844639935, guid: 1acc97e09a95cd84b8fed21593d530ca, type: 3}
       propertyPath: m_LocalRotation.w
@@ -9289,6 +9291,11 @@ PrefabInstance:
 --- !u!4 &3552532706509931105 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6456877619844639935, guid: 1acc97e09a95cd84b8fed21593d530ca, type: 3}
+  m_PrefabInstance: {fileID: 7554311532905574110}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4181294287214549211 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5967479859330561541, guid: 1acc97e09a95cd84b8fed21593d530ca, type: 3}
   m_PrefabInstance: {fileID: 7554311532905574110}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7578951122401812783
@@ -9469,6 +9476,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2e803cd8ee721f44bb1bbfdb203c5c5f, type: 3}
+--- !u!1 &2502891868954704290 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5212180042528885307, guid: 2e803cd8ee721f44bb1bbfdb203c5c5f, type: 3}
+  m_PrefabInstance: {fileID: 7703808239482352537}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3024130076744770328 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4836499375999996033, guid: 2e803cd8ee721f44bb1bbfdb203c5c5f, type: 3}
