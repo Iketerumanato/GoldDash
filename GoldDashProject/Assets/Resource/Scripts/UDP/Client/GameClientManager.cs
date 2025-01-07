@@ -31,6 +31,7 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private GameObject ActorPrefab; //アクターのプレハブ
     [SerializeField] private GameObject PlayerPrefab; //プレイヤーのプレハブ
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
+    [SerializeField] private GameObject GoldPileMiniPrefab; //小金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
     [SerializeField] private GameObject ScrollPrefab; //巻物のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
@@ -423,7 +424,7 @@ public class GameClientManager : MonoBehaviour
                                             //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
                                             //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
                                             {
-                                                GoldPile goldPile = Instantiate(GoldPilePrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
+                                                GoldPile goldPile = receivedActionPacket.value > 50 ? Instantiate(GoldPilePrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>() : Instantiate(GoldPileMiniPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
                                                 entityDictionary.Add(receivedActionPacket.targetID, goldPile); //管理用のIDと共に辞書へ
                                                 goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
                                                 goldPile.Value = receivedActionPacket.value; //金額設定

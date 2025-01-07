@@ -32,6 +32,7 @@ public class GameServerManager : MonoBehaviour
 
     [SerializeField] private GameObject ActorPrefab; //アクターのプレハブ
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
+    [SerializeField] private GameObject GoldPileMiniPrefab; //小金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
     [SerializeField] private GameObject ScrollPrefab; //巻物のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
@@ -628,7 +629,8 @@ public class GameServerManager : MonoBehaviour
                                             {
                                                 entityID = GetUniqueEntityID();
                                                 Vector3 goldPos = new Vector3(actorDictionary[receivedActionPacket.targetID].transform.position.x, 0.1f, actorDictionary[receivedActionPacket.targetID].transform.position.z);
-                                                GoldPile goldPile = Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
+                                                //金額によってモデル変更
+                                                GoldPile goldPile = lostGold > 50 ? Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>() : Instantiate(GoldPileMiniPrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
                                                 goldPile.EntityID = entityID; //値を書き込み
                                                 goldPile.Value = lostGold;
                                                 goldPile.name = $"GoldPile ({entityID})";
@@ -712,11 +714,12 @@ public class GameServerManager : MonoBehaviour
                                                 {
                                                     entityID = GetUniqueEntityID();
                                                     Vector3 goldPos = new Vector3(entityDictionary[receivedActionPacket.targetID].transform.position.x, 0.1f, entityDictionary[receivedActionPacket.targetID].transform.position.z);
-                                                    GoldPile goldPile = Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
-                                                    goldPile.EntityID = entityID; //値を書き込み
                                                     System.Random random = new System.Random();
-                                                    int chestGold = random.Next(80, 201);
-                                                    goldPile.Value = chestGold; //ランダムなゴールド量の金貨の山を生成 適当に80~200ゴールド
+                                                    int chestGold = random.Next(80, 201); //ランダムなゴールド量の金貨の山を生成 適当に80~200ゴールド
+                                                    //金額によってモデル変更
+                                                    GoldPile goldPile = chestGold > 50 ? Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>() : Instantiate(GoldPileMiniPrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
+                                                    goldPile.EntityID = entityID; //値を書き込み
+                                                    goldPile.Value = chestGold;
                                                     goldPile.name = $"GoldPile ({entityID})";
                                                     entityDictionary.Add(entityID, goldPile); //管理用のIDと共に辞書へ
 
@@ -863,7 +866,8 @@ public class GameServerManager : MonoBehaviour
                                                 //まずサーバー側で金貨の山を生成
                                                 entityID = GetUniqueEntityID();
                                                 Vector3 goldPos = receivedActionPacket.pos;
-                                                GoldPile goldPile = Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
+                                                //金額によってモデル変更
+                                                GoldPile goldPile = dropGold > 50 ? Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>() : Instantiate(GoldPileMiniPrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
                                                 goldPile.EntityID = entityID; //値を書き込み
                                                 goldPile.Value = dropGold;
                                                 goldPile.name = $"GoldPile ({entityID})";
