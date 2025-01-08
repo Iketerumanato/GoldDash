@@ -100,4 +100,23 @@ public class PlayerCameraController : MonoBehaviour
                 break;
         }
     }
+
+    public void InvokeShakeEffect(ShakeEffect.ShakeType shakeType)
+    {
+        switch (shakeType)
+        {
+            case ShakeEffect.ShakeType.Small:
+                //画面揺れ小
+                m_shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Small);
+                break;
+            case ShakeEffect.ShakeType.Medium:
+                //画面揺れ中
+                m_shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Medium);
+                break;
+            case ShakeEffect.ShakeType.Large:
+                //画面揺れ大
+                m_shakeEffect.ShakeCameraEffect(ShakeEffect.ShakeType.Large);
+                break;
+        }
+    }
 }

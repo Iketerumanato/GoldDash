@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 using R3;
 
@@ -10,7 +9,7 @@ public class MapGenerator : MonoBehaviour
 {
     //定数
     private const int NUM_OF_PARTS = 4; //組み合わせるマップパーツの数。4つ。
-    private const int MAP_SIZE = 13; //マップの一辺のマス数。偶数にしないでください。自動デバッグしようとしたらunreachable code警告が消えない:(
+    private const int MAP_SIZE = 11; //マップの一辺のマス数。偶数にしないでください。自動デバッグしようとしたらunreachable code警告が消えない:(
     private const int MAP_PART_SIZE = (MAP_SIZE - 1) / 2; //マップパーツの一辺のマス数
 
     //ヒエラルキーが見やすいよう、マップのオブジェクトはこの親オブジェクトの子にする
@@ -101,10 +100,10 @@ public class MapGenerator : MonoBehaviour
 
         //ランダム抽選は保留。指定した名前のファイルを４つ読み込む
         TextAsset[] textAsset_array = {
-            Resources.Load("MapPart6x6_debug1") as TextAsset,
-            Resources.Load("MapPart6x6_debug2") as TextAsset,
-            Resources.Load("MapPart6x6_debug3") as TextAsset,
-            Resources.Load("MapPart6x6_debug4") as TextAsset};
+            Resources.Load("MapPart5x5_25") as TextAsset,
+            Resources.Load("MapPart5x5_26") as TextAsset,
+            Resources.Load("MapPart5x5_27") as TextAsset,
+            Resources.Load("MapPart5x5_28") as TextAsset};
 
         map = MergeMap(textAsset_array);
 
@@ -120,10 +119,28 @@ public class MapGenerator : MonoBehaviour
         }
 
         //マップ中央に広場生成()
-        map[8, 8] = new CellInfo();
-        map[8, 10] = new CellInfo();
-        map[10, 8] = new CellInfo();
-        map[10, 10] = new CellInfo();
+        map[MAP_PART_SIZE - 1, MAP_PART_SIZE - 1] = new CellInfo();
+        map[MAP_PART_SIZE - 1, MAP_PART_SIZE + 1] = new CellInfo();
+        map[MAP_PART_SIZE + 1, MAP_PART_SIZE - 1] = new CellInfo();
+        map[MAP_PART_SIZE + 1, MAP_PART_SIZE + 1] = new CellInfo();
+
+        //中央行・列上下左右の壁
+        //上
+        CellInfo cellInfo = new CellInfo();
+        cellInfo.wallUpper = CellInfo.WALL_TYPE.WALL;
+        map[0, MAP_PART_SIZE] = cellInfo;
+        //下
+        cellInfo = new CellInfo();
+        cellInfo.wallLower = CellInfo.WALL_TYPE.WALL;
+        map[MAP_SIZE - 1, MAP_PART_SIZE] = cellInfo;
+        //左
+        cellInfo = new CellInfo();
+        cellInfo.wallLeft = CellInfo.WALL_TYPE.WALL;
+        map[MAP_PART_SIZE, 0] = cellInfo;
+        //右
+        cellInfo = new CellInfo();
+        cellInfo.wallRight = CellInfo.WALL_TYPE.WALL;
+        map[MAP_PART_SIZE, MAP_SIZE - 1] = cellInfo;
 
         //重複した壁データの削除
         DeleteDuplicatedWall(map);
@@ -152,7 +169,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 else if (map[i, j].wallLeft == CellInfo.WALL_TYPE.DOOR)
                 {
-                    GameObject leftDoor = Instantiate(doorObj, new Vector3(i + 0.5f, 0.5f, j), Quaternion.Euler(0f, 90f, 0f));
+                    GameObject leftDoor = Instantiate(doorObj, new Vector3(i + 0.5f, 0f, j), Quaternion.identity);
                     leftDoor.transform.parent = Parenttransform;
                 }
                 // 右の壁
@@ -163,7 +180,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 else if (map[i, j].wallRight == CellInfo.WALL_TYPE.DOOR)
                 {
-                    GameObject rightDoor = Instantiate(doorObj, new Vector3(i + 0.5f, 0.5f, j + 1f), Quaternion.Euler(0f, 90f, 0f));
+                    GameObject rightDoor = Instantiate(doorObj, new Vector3(i + 0.5f, 0f, j + 1f), Quaternion.identity);
                     rightDoor.transform.parent = Parenttransform;
                 }
                 // 上の壁
@@ -174,7 +191,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 else if (map[i, j].wallUpper == CellInfo.WALL_TYPE.DOOR)
                 {
-                    GameObject upperDoor = Instantiate(doorObj, new Vector3(i, 0.5f, j + 0.5f), Quaternion.identity);
+                    GameObject upperDoor = Instantiate(doorObj, new Vector3(i, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
                     upperDoor.transform.parent = Parenttransform;
                 }
                 // 下の壁
@@ -185,7 +202,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 else if (map[i, j].wallLower == CellInfo.WALL_TYPE.DOOR)
                 {
-                    GameObject lowerDoor = Instantiate(doorObj, new Vector3(i + 1f, 0.5f, j + 0.5f), Quaternion.identity);
+                    GameObject lowerDoor = Instantiate(doorObj, new Vector3(i + 1f, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
                     lowerDoor.transform.parent = Parenttransform;
                 }
 
