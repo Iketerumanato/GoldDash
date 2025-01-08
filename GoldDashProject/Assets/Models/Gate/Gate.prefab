@@ -51,7 +51,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 4fe8ad42b8032b8409d1fb865714a173, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 3abcc500d57f5e748997ff33bd3b5334, type: 2}
+      objectReference: {fileID: 2100000, guid: d1c01a5e888549b4da55a0f9db55918d, type: 2}
     - target: {fileID: 919132149155446097, guid: 4fe8ad42b8032b8409d1fb865714a173, type: 3}
       propertyPath: m_Name
       value: Gate
