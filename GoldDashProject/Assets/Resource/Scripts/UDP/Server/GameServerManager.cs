@@ -30,7 +30,11 @@ public class GameServerManager : MonoBehaviour
     //動的に減らしたり増やしたりしても問題ないが、宝箱の出現候補地点の数より多くならないように注意が必要。宝箱が同じ位置に重なって生成されてしまう。
     private int currentNumOfChests; //現在生成されている宝箱の数
 
-    [SerializeField] private GameObject ActorPrefab; //アクターのプレハブ
+    [SerializeField] private GameObject RedActorPrefab; //アクターのプレハブ
+    [SerializeField] private GameObject BlueActorPrefab;
+    [SerializeField] private GameObject GreenActorPrefab;
+    [SerializeField] private GameObject YellowActorPrefab;
+    [SerializeField] private GameObject WhiteActorPrefab;
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
     [SerializeField] private GameObject GoldPileMiniPrefab; //小金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
@@ -427,7 +431,28 @@ public class GameServerManager : MonoBehaviour
 
                             //ActorControllerインスタンスを作りDictionaryに加える
                             //Actorをインスタンス化しながらActorControllerを取得
-                            ActorController actorController = Instantiate(ActorPrefab).GetComponent<ActorController>();
+
+                            GameObject actorPrefab;
+                            switch ((Definer.PLAYER_COLOR)receivedInitPacket.playerColor)
+                            {
+                                case Definer.PLAYER_COLOR.RED:
+                                    actorPrefab = RedActorPrefab;
+                                    break;
+                                case Definer.PLAYER_COLOR.GREEN:
+                                    actorPrefab = GreenActorPrefab;
+                                    break;
+                                case Definer.PLAYER_COLOR.BLUE:
+                                    actorPrefab = BlueActorPrefab;
+                                    break;
+                                case Definer.PLAYER_COLOR.YELLOW:
+                                    actorPrefab = YellowActorPrefab;
+                                    break;
+                                default:
+                                    actorPrefab = WhiteActorPrefab;
+                                    break;
+                            }
+
+                            ActorController actorController = Instantiate(actorPrefab).GetComponent<ActorController>();
 
                             //アクターの名前を書き込み
                             actorController.PlayerName = receivedInitPacket.playerName;
