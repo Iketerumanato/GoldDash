@@ -27,7 +27,7 @@ PrefabInstance:
     - target: {fileID: 4695047622233530533, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
       propertyPath: materialWhite
       value: 
-      objectReference: {fileID: 2100000, guid: dafd079d646f9c648a857e922ef98f14, type: 2}
+      objectReference: {fileID: 2100000, guid: 0a02aacf34f61b34ba6f4ec82ea0a8ed, type: 2}
     - target: {fileID: 4695047622233530533, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
       propertyPath: materialYellow
       value: 
