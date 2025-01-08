@@ -651,6 +651,7 @@ public class GameServerManager : MonoBehaviour
                                             myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedActionPacket.targetID, -lostGold);
                                             myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameServer.Send(myHeader.ToByte());
+                                            EnableShiningEffect();
 
                                             //重複しないentityIDを作り、オブジェクトを生成しつつ、エンティティのコンポーネントを取得
                                             //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
@@ -685,6 +686,7 @@ public class GameServerManager : MonoBehaviour
                                                 myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, goldPile.Value);
                                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                 udpGameServer.Send(myHeader.ToByte());
+                                                EnableShiningEffect();
                                                 //その金貨の山を消す
                                                 //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
                                                 entityDictionary[receivedActionPacket.targetID].DestroyEntity();
@@ -884,6 +886,7 @@ public class GameServerManager : MonoBehaviour
                                                 myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, -dropGold);
                                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                 udpGameServer.Send(myHeader.ToByte());
+                                                EnableShiningEffect();
 
                                                 //まずサーバー側で金貨の山を生成
                                                 entityID = GetUniqueEntityID();
@@ -950,6 +953,30 @@ public class GameServerManager : MonoBehaviour
         while (usedEntityID.Contains(entityID)); //使用済IDと同じ値を生成してしまったならやり直し
         usedEntityID.Add(entityID); //このIDは使用済にする。
         return entityID;
+    }
+
+    private bool EnableShiningEffect()
+    {
+        int topGold = 0;
+        ushort topPlayerID = 0;
+        foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+        {
+            if (k.Value.Gold > topGold)
+            { 
+                topPlayerID = k.Key;
+                topGold = k.Value.Gold;
+            }
+        }
+        if (topPlayerID != 0)
+        {
+            foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+            {
+                if (k.Key == topPlayerID) k.Value.IsShining = true;
+                else k.Value.IsShining = false;
+            }
+            return true;
+        }
+        else return false;
     }
 
     //ゲームの結果発表のために使う

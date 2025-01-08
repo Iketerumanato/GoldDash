@@ -24,6 +24,21 @@ public class ActorController : MonoBehaviour
         get { return magicInventry; }
     }
 
+    //アイコン後光用設定
+    private bool isShining = false;
+    [Header("アイコン用後光")]
+    [SerializeField] private GameObject ShineEffect;
+    public bool IsShining
+    {
+        set
+        {
+            isShining = value;
+            ShineEffect.SetActive(value);
+        }
+
+        get { return isShining; }
+    }
+
     //このアクターはこの場所、この向きを目指してなめらかに移動
     private Vector3 targetPosition;
     private Vector3 targetForward;
