@@ -31,6 +31,7 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private GameObject ActorPrefab; //アクターのプレハブ
     [SerializeField] private GameObject PlayerPrefab; //プレイヤーのプレハブ
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
+    [SerializeField] private GameObject GoldPileMiniPrefab; //小金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
     [SerializeField] private GameObject ScrollPrefab; //巻物のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
@@ -378,6 +379,7 @@ public class GameClientManager : MonoBehaviour
                                                 //プレイヤー側で演出
                                                 //playerController.Blown(receivedActionPacket.pos); //パンチの方向に吹っ飛ぶ
                                                 playerController.GetPunchBack();
+                                                if (actorDictionary[sessionID].Gold != 0) playerController.PlayLostCoinAnimation(); //所持金が0でなければコインをこぼすアニメーション
                                             }
                                             else
                                             {
@@ -390,6 +392,7 @@ public class GameClientManager : MonoBehaviour
                                             if (receivedActionPacket.targetID == this.sessionID)
                                             {
                                                 //プレイヤー側で演出
+                                                if (receivedActionPacket.value > 0) playerController.PlayGetCoinAnimation(); //所持金が増えたときはコイン吸い取りアニメーション
                                             }
                                             //指定されたアクターの所持金を編集
                                             actorDictionary[receivedActionPacket.targetID].Gold += receivedActionPacket.value;
@@ -421,7 +424,7 @@ public class GameClientManager : MonoBehaviour
                                             //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
                                             //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
                                             {
-                                                GoldPile goldPile = Instantiate(GoldPilePrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
+                                                GoldPile goldPile = receivedActionPacket.value > 50 ? Instantiate(GoldPilePrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>() : Instantiate(GoldPileMiniPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<GoldPile>();
                                                 entityDictionary.Add(receivedActionPacket.targetID, goldPile); //管理用のIDと共に辞書へ
                                                 goldPile.EntityID = receivedActionPacket.targetID; //ID割り当て
                                                 goldPile.Value = receivedActionPacket.value; //金額設定
@@ -501,5 +504,10 @@ public class GameClientManager : MonoBehaviour
         {
             Debug.LogException(e);
         }
+    }
+
+    private void OnDestroy()
+    {
+        this.udpGameClient?.Dispose();
     }
 }

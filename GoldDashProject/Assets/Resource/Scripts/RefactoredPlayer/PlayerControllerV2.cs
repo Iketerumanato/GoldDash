@@ -224,7 +224,11 @@ public class PlayerControllerV2 : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha6)) m_hotbarManager.RemoveMagicFromHotbar(2);
 
 
-        if (Input.GetKeyDown(KeyCode.Alpha6)) GetPunchBack();
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            GetPunchBack();
+            PlayLostCoinAnimation();
+        }
 
         switch (this.State) //Stateによって実行するUpdate関数を変える
         { 
@@ -677,6 +681,16 @@ public class PlayerControllerV2 : MonoBehaviour
     public void GetPunchBack()
     {
         this.State = PLAYER_STATE.KNOCKED;
+    }
+
+    public void PlayGetCoinAnimation()
+    {
+        m_UIDisplayer.PlayGetCoinAnimation();
+    }
+
+    public void PlayLostCoinAnimation()
+    { 
+        m_UIDisplayer.PlayLostCoinAnimation();
     }
 
     //サーバーから魔法の使用許可が降りたらStateを変更する
