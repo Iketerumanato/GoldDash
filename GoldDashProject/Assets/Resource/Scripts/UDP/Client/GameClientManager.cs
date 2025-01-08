@@ -134,7 +134,7 @@ public class GameClientManager : MonoBehaviour
 
                 isRunning = true;
                 // Initパケット送信 (非同期)
-                Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName, (int)playerColor).ToByte()).ToByte()), SendCts);
+                Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, (int)playerColor, myName).ToByte()).ToByte()), SendCts);
 
                 break;
 

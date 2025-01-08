@@ -99,18 +99,18 @@ public class InitPacketClient : Packet
     public ushort sessionPass; //マッチング用パスワード
     public ushort rcvPort; //クライアントが受信用に空けているポートの番号
     public ushort initSessionPass; ////初回通信時にプレイヤー側から送るセッションパス。得られたレスポンスがサーバーからのものであると断定するときに使う。
+    public int playerColor; //プレイヤーの色
     public byte playerNameLength; //プレイヤー名のバイト数
     public string playerName; //プレイヤー名
-    public int playerColor; //プレイヤーの色
 
-    public InitPacketClient(ushort pass, ushort rcvPort, ushort initSessionPass, string playerName, int playerColor)
+    public InitPacketClient(ushort pass, ushort rcvPort, ushort initSessionPass, int playerColor, string playerName)
     {
         this.sessionPass = pass;
         this.rcvPort = rcvPort;
         this.initSessionPass = initSessionPass;
+        this.playerColor = playerColor;
         this.playerNameLength = (byte)Encoding.UTF8.GetByteCount(playerName);
         this.playerName = playerName;
-        this.playerColor = playerColor;
     }
 
     public InitPacketClient(byte[] bytes)
@@ -123,6 +123,8 @@ public class InitPacketClient : Packet
         index += sizeof(ushort);
         this.initSessionPass = BitConverter.ToUInt16(bytes, index);
         index += sizeof(ushort);
+        this.playerColor = BitConverter.ToInt32(bytes, index);
+        index += sizeof(int);
         this.playerNameLength = bytes[index];
         index++;
         this.playerName = Encoding.UTF8.GetString(bytes, index, playerNameLength);
@@ -135,6 +137,7 @@ public class InitPacketClient : Packet
         ret = AddBytes(ret, BitConverter.GetBytes(sessionPass));
         ret = AddBytes(ret, BitConverter.GetBytes(rcvPort));
         ret = AddBytes(ret, BitConverter.GetBytes(initSessionPass));
+        ret = AddBytes(ret, BitConverter.GetBytes(playerColor));
         ret = AddByte(ret, playerNameLength);
         ret = AddBytes(ret, Encoding.UTF8.GetBytes(playerName));
 
