@@ -19,6 +19,7 @@ TagManager:
   - MagicButton
   - Scroll
   - Thunder
+  - 1stActor
   layers:
   - Default
   - TransparentFX
