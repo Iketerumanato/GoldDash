@@ -327,7 +327,7 @@ public class GameClientManager : MonoBehaviour
                                                 playerController.SessionID = this.sessionID;
                                                 playerController.UdpGameClient = this.udpGameClient;
                                                 //色変更
-                                                playerController.ChangePlayerColor((Definer.PLAYER_COLOR)receivedActionPacket.value);
+                                                actorController.ChangePlayerColor((Definer.PLAYER_COLOR)receivedActionPacket.value);
                                             }
                                             else //他人のIDなら
                                             {

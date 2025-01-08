@@ -64,16 +64,6 @@ public class PlayerControllerV2 : MonoBehaviour
     [SerializeField] private float m_fallThreshold = -3f;
     private Vector3 m_RespawnPosition;
 
-    [Header("プレイヤーの腕のメッシュレンダラー")]
-    [SerializeField] private SkinnedMeshRenderer m_skinnedMeshRenderer;
-
-    [Header("プレイヤーの色に対応したマテリアル。赤→緑→青→黄→白")]
-    [SerializeField] private Material materialRed;
-    [SerializeField] private Material materialGreen;
-    [SerializeField] private Material materialBlue;
-    [SerializeField] private Material materialYellow;
-    [SerializeField] private Material materialWhite;
-
     //入力取得用プロパティ
     private float V_InputHorizontal
     {
@@ -777,32 +767,6 @@ public class PlayerControllerV2 : MonoBehaviour
             default:
                 break;
         }
-    }
-
-    public void ChangePlayerColor(Definer.PLAYER_COLOR color)
-    {
-        switch (color)
-        {
-            case Definer.PLAYER_COLOR.RED:
-                m_skinnedMeshRenderer.material = materialRed;
-                break;
-            case Definer.PLAYER_COLOR.GREEN:
-                m_skinnedMeshRenderer.material = materialGreen;
-                break;
-            case Definer.PLAYER_COLOR.BLUE:
-                m_skinnedMeshRenderer.material = materialBlue;
-                break;
-            case Definer.PLAYER_COLOR.YELLOW:
-                m_skinnedMeshRenderer.material = materialYellow;
-                break;
-            default:
-                break;
-        }
-    }
-
-    public void ChangeGreenToWhite()
-    {
-        m_skinnedMeshRenderer.material = materialWhite;
     }
 
     private void OnTriggerStay(Collider other)

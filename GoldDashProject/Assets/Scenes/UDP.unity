@@ -3244,6 +3244,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f63d56cfaac9cb04b9d9182cbb0c8a65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerColor: 1
   sessionPass: 9999
   initSessionPass: 1234
   myName: Main
