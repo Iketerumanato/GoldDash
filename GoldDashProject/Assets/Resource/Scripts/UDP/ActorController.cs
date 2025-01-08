@@ -55,6 +55,16 @@ public class ActorController : MonoBehaviour
     //所持金テキスト
     [SerializeField] private TextMeshProUGUI goldText;
 
+    [Header("プレイヤーの腕のメッシュレンダラー")]
+    [SerializeField] private SkinnedMeshRenderer m_skinnedMeshRenderer;
+
+    [Header("プレイヤーの色に対応したマテリアル。赤→緑→青→黄→白")]
+    [SerializeField] private Material materialRed;
+    [SerializeField] private Material materialGreen;
+    [SerializeField] private Material materialBlue;
+    [SerializeField] private Material materialYellow;
+    [SerializeField] private Material materialWhite;
+
     private void Start()
     {
         //プレイヤーか否か確認する
@@ -126,5 +136,31 @@ public class ActorController : MonoBehaviour
     {
         //背面殴られモーション再生(Actor)
         PlayerAnimator.SetTrigger(strHitedBackTrigger);
+    }
+
+    public void ChangePlayerColor(Definer.PLAYER_COLOR color)
+    {
+        switch (color)
+        {
+            case Definer.PLAYER_COLOR.RED:
+                m_skinnedMeshRenderer.material = materialRed;
+                break;
+            case Definer.PLAYER_COLOR.GREEN:
+                m_skinnedMeshRenderer.material = materialGreen;
+                break;
+            case Definer.PLAYER_COLOR.BLUE:
+                m_skinnedMeshRenderer.material = materialBlue;
+                break;
+            case Definer.PLAYER_COLOR.YELLOW:
+                m_skinnedMeshRenderer.material = materialYellow;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void ChangeGreenToWhite()
+    {
+        m_skinnedMeshRenderer.material = materialWhite;
     }
 }

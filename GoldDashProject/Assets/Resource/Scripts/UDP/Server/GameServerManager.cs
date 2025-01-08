@@ -431,6 +431,9 @@ public class GameServerManager : MonoBehaviour
 
                             //アクターの名前を書き込み
                             actorController.PlayerName = receivedInitPacket.playerName;
+                            //アクターの色を書き込み
+                            actorController.Color = (Definer.PLAYER_COLOR)receivedInitPacket.playerColor;
+
                             //アクターのゲームオブジェクト
                             actorController.name = $"Actor: {receivedInitPacket.playerName} ({receivedHeader.sessionID})"; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
                             actorController.gameObject.SetActive(false); //初期設定が済んだら無効化して処理を止める。ゲーム開始時に有効化して座標などをセットする
@@ -484,7 +487,7 @@ public class GameServerManager : MonoBehaviour
                                 foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
                                 {
                                     //リスポーン地点を参照しながら各プレイヤーの名前とIDを載せてアクター生成命令を飛ばす
-                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_ACTOR, k.Key, default, respawnPoints[index], default, k.Value.PlayerName);
+                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_ACTOR, k.Key, (int)k.Value.Color, respawnPoints[index], default, k.Value.PlayerName);
                                     myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                     udpGameServer.Send(myHeader.ToByte());
                                     index++;

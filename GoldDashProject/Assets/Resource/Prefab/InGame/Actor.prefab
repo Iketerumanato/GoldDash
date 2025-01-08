@@ -9,13 +9,37 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4695047622233530533, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+      propertyPath: materialRed
+      value: 
+      objectReference: {fileID: 2100000, guid: dafd079d646f9c648a857e922ef98f14, type: 2}
+    - target: {fileID: 4695047622233530533, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+      propertyPath: materialBlue
+      value: 
+      objectReference: {fileID: 2100000, guid: 3769adc359b77ba4dac042a40390da8b, type: 2}
+    - target: {fileID: 4695047622233530533, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
       propertyPath: runThreshold
       value: 0.005
       objectReference: {fileID: 0}
     - target: {fileID: 4695047622233530533, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+      propertyPath: materialGreen
+      value: 
+      objectReference: {fileID: 2100000, guid: 1d8689bc5e602f14791c9604b71231ed, type: 2}
+    - target: {fileID: 4695047622233530533, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+      propertyPath: materialWhite
+      value: 
+      objectReference: {fileID: 2100000, guid: dafd079d646f9c648a857e922ef98f14, type: 2}
+    - target: {fileID: 4695047622233530533, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+      propertyPath: materialYellow
+      value: 
+      objectReference: {fileID: 2100000, guid: 6c1b3a3b35e71024998762f61afa6b4b, type: 2}
+    - target: {fileID: 4695047622233530533, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
       propertyPath: animationLerpSpeed
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 4695047622233530533, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+      propertyPath: m_skinnedMeshRenderer
+      value: 
+      objectReference: {fileID: 3112111132405173023}
     - target: {fileID: 4778165897659890379, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -90,3 +114,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+--- !u!137 &3112111132405173023 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3250651553491699694, guid: 26f8aac337294d44c953e5459fcd6a29, type: 3}
+  m_PrefabInstance: {fileID: 444962234318015729}
+  m_PrefabAsset: {fileID: 0}

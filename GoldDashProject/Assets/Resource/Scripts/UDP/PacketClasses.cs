@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -100,14 +101,16 @@ public class InitPacketClient : Packet
     public ushort initSessionPass; ////初回通信時にプレイヤー側から送るセッションパス。得られたレスポンスがサーバーからのものであると断定するときに使う。
     public byte playerNameLength; //プレイヤー名のバイト数
     public string playerName; //プレイヤー名
+    public int playerColor; //プレイヤーの色
 
-    public InitPacketClient(ushort pass, ushort rcvPort, ushort initSessionPass, string playerName)
+    public InitPacketClient(ushort pass, ushort rcvPort, ushort initSessionPass, string playerName, int playerColor)
     {
         this.sessionPass = pass;
         this.rcvPort = rcvPort;
         this.initSessionPass = initSessionPass;
         this.playerNameLength = (byte)Encoding.UTF8.GetByteCount(playerName);
         this.playerName = playerName;
+        this.playerColor = playerColor;
     }
 
     public InitPacketClient(byte[] bytes)
