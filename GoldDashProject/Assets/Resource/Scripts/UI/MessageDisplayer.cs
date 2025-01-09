@@ -28,7 +28,7 @@ public class MessageDisplayer : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.P))  // Pキーが押されたとき
         {
-            DisplaySmallMessage($"{TestGoldNum} ゴールドを手に入れた!");
+            DisplaySmallMessage($"{TestGoldNum}ゴールドを手に入れた!");
         }
 
         if(Input.GetKeyDown(KeyCode.L))// Lキーが押された時

@@ -12972,7 +12972,7 @@ PrefabInstance:
       objectReference: {fileID: 6193928572962396567, guid: cd4c2ee223efe5b499ce9968ad1f2f9f, type: 3}
     - target: {fileID: 1316063112127402304, guid: a76510da3c2d60a41b65204b2c95f9a7, type: 3}
       propertyPath: lageTextDisplayTime
-      value: 1
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1316063112127402304, guid: a76510da3c2d60a41b65204b2c95f9a7, type: 3}
       propertyPath: largeTextFadeDuration

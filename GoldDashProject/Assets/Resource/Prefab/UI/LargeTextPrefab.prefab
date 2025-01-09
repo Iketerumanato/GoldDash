@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u306E\u3053\u308A 1\u5206 !"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: c43833ca0574902409add40850f8668d, type: 2}
-  m_sharedMaterial: {fileID: -3976194810242514473, guid: c43833ca0574902409add40850f8668d, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
+  m_sharedMaterial: {fileID: -739646076848395095, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -92,8 +92,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 114
-  m_fontSizeBase: 114
+  m_fontSize: 156
+  m_fontSizeBase: 156
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
