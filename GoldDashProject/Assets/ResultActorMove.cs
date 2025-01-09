@@ -68,7 +68,7 @@ public class ResultActorMove : MonoBehaviour
             //transform.position = centerPoint.position;
             transform.eulerAngles = Vector3.zero;
             ResultActorAnimator.SetBool(isResultGame, true);
-            _resultImage.ResultTextCanvasAlphaToMax(5f, 0.5f);
+            _resultImage.ResultTextCanvasAlphaToMax(3f, 0.5f);
         });
     }
 }

@@ -18,9 +18,14 @@ public class ResultImage : MonoBehaviour
 
     //各プレイヤーの名前、スコア表示のテキスト
     //画面右のテキスト
-    [SerializeField] TMP_Text RightResultText;
+    [SerializeField] TMP_Text RightRankingText;
+    [SerializeField] TMP_Text RightNameText;
+    [SerializeField] TMP_Text RightScoreText;
+
     //画面左のテキスト
-    [SerializeField] TMP_Text LeftResultText;
+    [SerializeField] TMP_Text LeftRankingText;
+    [SerializeField] TMP_Text LeftNameText;
+    [SerializeField] TMP_Text LeftScoreText;
 
     [SerializeField] CanvasGroup ResultTextCanvas;
 
@@ -31,8 +36,6 @@ public class ResultImage : MonoBehaviour
 
     [SerializeField] private float lerpDuration = 2.0f;
     [SerializeField] private float ChangeAnimSpeed = 0.4f;
-
-    [SerializeField] ShakeEffect _shakeEffect;
 
     private List<int> scoresList;
     private float[] scoreRatios;
@@ -250,16 +253,22 @@ public class ResultImage : MonoBehaviour
 
     void DisplayFinalScore()
     {
-        RightResultText.text = "";
-        LeftResultText.text = "";
+        RightRankingText.text = "";
+        LeftRankingText.text = "";
 
-        for (int i = 0; i <pairPlayerDataList.Count; i++)
+        for (int playerRank = 0; playerRank <pairPlayerDataList.Count; playerRank++)
         {
-            var player = pairPlayerDataList[i];
+            var player = pairPlayerDataList[playerRank];
 
             // 順位、名前、スコアを1行ずつ表示
-            RightResultText.text += $"{i + 1}: {player.name} - Score: {player.gold}\n";
-            LeftResultText.text += $"{i + 1}: {player.name} - : {player.gold}\n";
+            RightRankingText.text += $"{playerRank + 1}位:\n";
+            LeftRankingText.text += $"{playerRank + 1}位:\n";
+
+            RightNameText.text += $"{player.name}\n";
+            LeftNameText.text += $"{player.name}\n";
+
+            RightScoreText.text += $"{player.gold}\n";
+            LeftScoreText.text += $"{player.gold}\n";
         }
     }
 
