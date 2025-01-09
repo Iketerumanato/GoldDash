@@ -399,7 +399,11 @@ public class GameClientManager : MonoBehaviour
                                             if (receivedActionPacket.targetID == this.sessionID)
                                             {
                                                 //プレイヤー側で演出
-                                                if (receivedActionPacket.value > 0) playerController.PlayGetCoinAnimation(); //所持金が増えたときはコイン吸い取りアニメーション
+                                                if (receivedActionPacket.value > 0)
+                                                {
+                                                    playerController.PlayGetCoinAnimation(); //所持金が増えたときはコイン吸い取りアニメーション
+                                                    SEPlayer.instance.PlaySEGetGold();
+                                                }
                                             }
                                             //指定されたアクターの所持金を編集
                                             actorDictionary[receivedActionPacket.targetID].Gold += receivedActionPacket.value;

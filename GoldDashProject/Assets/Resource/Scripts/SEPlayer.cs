@@ -25,6 +25,12 @@ public class SEPlayer : MonoBehaviour
     [Header("金貨を拾った時のSE")]
     [SerializeField] private AudioClip seGetGold;
 
+    [Header("宝箱に触れたときのSE")]
+    [SerializeField] private AudioClip seAccessChest;
+
+    [Header("宝箱が開いた時のSE")]
+    [SerializeField] private AudioClip seOpenChest;
+
     private void Start()
     {
         //シングルトンな静的変数の初期化
@@ -64,5 +70,15 @@ public class SEPlayer : MonoBehaviour
     public void PlaySEGetGold()
     {
         audioSource.PlayOneShot(seGetGold);
+    }
+
+    public void PlaySEAccessChest()
+    {
+        audioSource.PlayOneShot(seAccessChest);
+    }
+
+    public void PlaySEOpenChest()
+    {
+        audioSource.PlayOneShot(seOpenChest);
     }
 }

@@ -3966,7 +3966,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f63d56cfaac9cb04b9d9182cbb0c8a65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerColor: 3
+  playerColor: 2
   sessionPass: 9999
   initSessionPass: 1234
   myName: Main
@@ -6572,11 +6572,15 @@ PrefabInstance:
     - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
       propertyPath: seGetGold
       value: 
-      objectReference: {fileID: 8300000, guid: f119e5e4d39e8a2438e545175ae81356, type: 3}
+      objectReference: {fileID: 8300000, guid: 01e20f17cdf7a594b8a07673c7a0109f, type: 3}
     - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
       propertyPath: seDropGold
       value: 
-      objectReference: {fileID: 8300000, guid: 01e20f17cdf7a594b8a07673c7a0109f, type: 3}
+      objectReference: {fileID: 8300000, guid: f40075fd1ab39264bb7cb9c7decb5084, type: 3}
+    - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
+      propertyPath: seAccessChest
+      value: 
+      objectReference: {fileID: 8300000, guid: e0df3aaee44cfd04b8350de273a90f16, type: 3}
     - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
       propertyPath: sePunchHitBack
       value: 
