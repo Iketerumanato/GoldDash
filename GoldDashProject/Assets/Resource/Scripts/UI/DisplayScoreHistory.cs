@@ -10,7 +10,7 @@ public class DisplayScoreHistory : MonoBehaviour
     [SerializeField] private Transform historyContainer;     // 履歴の表示場所
     [SerializeField] private int maxHistoryCount = 3;        // 表示する履歴の最大数
     [SerializeField] private float historyDuration = 3f;     // 各履歴を表示する時間
-    [SerializeField] private float verticalSpacing = 30f;    // 履歴間の垂直スペース
+    [SerializeField] private float verticalSpacing = 30f;    // 履歴間の垂直スペース(文字の大きさを考慮)
     [SerializeField] private float scaleDecreaseFactor = 0.9f; // テキストの縮小率
 
     private List<TextMeshProUGUI> historyList = new List<TextMeshProUGUI>();
@@ -56,7 +56,7 @@ public class DisplayScoreHistory : MonoBehaviour
                 historyList[historyNum].rectTransform.DOKill(); // 既存のアニメーションを中断
                 historyList[historyNum].rectTransform.DOAnchorPosY(-historyNum * verticalSpacing, 0.3f);
 
-                // DOTweenでサイズを変更
+                // DOTweenでサイズを変更(0.3ずつ小さくなっていく)
                 float historyscale = Mathf.Pow(scaleDecreaseFactor, historyNum); // インデックスに応じて小さくする
                 historyList[historyNum].rectTransform.DOScale(historyscale, 0.3f);
             }

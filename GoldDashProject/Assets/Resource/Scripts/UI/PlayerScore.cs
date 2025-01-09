@@ -30,10 +30,11 @@ public class PlayerScore : MonoBehaviour
         if (actorScore.Gold != previousScore)
         {
             UpdateScoreDisplay();
-            previousScore = actorScore.Gold;
+            previousScore = actorScore.Gold;//現在のスコアの値を渡す
         }
     }
 
+    //一文字分の画像(テクスチャ)を取得
     private void SetupDigitImages()
     {
         foreach (var scoreimages in digitImages)
@@ -42,6 +43,7 @@ public class PlayerScore : MonoBehaviour
         }
     }
 
+    //文字の字間を取得
     private void StoreInitialPositions()
     {
         digitsInitialPositions = new Vector2[digitImages.Length];
@@ -51,8 +53,10 @@ public class PlayerScore : MonoBehaviour
         }
     }
 
+    //スコア更新時のアニメーション
     private void UpdateScoreDisplay()
     {
+        //画像を動かしたら処理を一旦Kill
         if (CountUpAnimation != null && CountUpAnimation.IsActive())
         {
             CountUpAnimation.Kill();
@@ -61,9 +65,10 @@ public class PlayerScore : MonoBehaviour
         int scoreDifference = actorScore.Gold - previousScore;
         if (scoreDifference != 0 && displayScoreHistory != null) displayScoreHistory.AddScoreHistory(scoreDifference);
 
-        int[] digits = GetAllDigits(actorScore.Gold);
+        int[] digits = GetAllDigits(actorScore.Gold);//全ての桁の文字の大きさを取得
         CountUpAnimation = DOTween.Sequence();
 
+        //桁数ごとに上下動かしていく
         for (int digitsCnt = 0; digitsCnt < digitImages.Length; digitsCnt++)
         {
             RectTransform rectTransform = digitImages[digitImages.Length - 1 - digitsCnt];
