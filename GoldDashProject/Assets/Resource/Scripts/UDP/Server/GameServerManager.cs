@@ -5,6 +5,7 @@ using R3;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
+using TMPro;
 
 public class GameServerManager : MonoBehaviour
 {
@@ -64,6 +65,19 @@ public class GameServerManager : MonoBehaviour
     //レイを飛ばすためのカメラ
     [SerializeField] private Camera mapCamera;
 
+    //地図UI
+    [SerializeField] private Canvas mapUICanvas;
+
+    //プレイヤーネーム
+    [SerializeField] private TextMeshProUGUI redNameText;
+    [SerializeField] private TextMeshProUGUI blueNameText;
+    [SerializeField] private TextMeshProUGUI greenNameText;
+    [SerializeField] private TextMeshProUGUI yellowNameText;
+
+    //制限時間
+    [SerializeField] private TextMeshProUGUI timeTextLeft;
+    [SerializeField] private TextMeshProUGUI timeTextRight;
+
     #region Stateインターフェース
     public interface ISetverState
     {
@@ -98,26 +112,6 @@ public class GameServerManager : MonoBehaviour
 
         public void UpdateProcess(GameServerManager gameServerManager)
         {
-            //if (Input.GetKeyDown(KeyCode.Alpha1))
-            //{
-            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.NORMAL;
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha2))
-            //{
-            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_1;
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha3))
-            //{
-            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_2;
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha4))
-            //{
-            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_3;
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha5))
-            //{
-            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_4;
-            //}
         }
 
         public void ExitState(GameServerManager gameServerManager)
@@ -443,15 +437,19 @@ public class GameServerManager : MonoBehaviour
                             {
                                 case Definer.PLAYER_COLOR.RED:
                                     actorPrefab = RedActorPrefab;
+                                    redNameText.text = receivedInitPacket.playerName;
                                     break;
                                 case Definer.PLAYER_COLOR.GREEN:
                                     actorPrefab = GreenActorPrefab;
+                                    greenNameText.text = receivedInitPacket.playerName;
                                     break;
                                 case Definer.PLAYER_COLOR.BLUE:
                                     actorPrefab = BlueActorPrefab;
+                                    blueNameText.text = receivedInitPacket.playerName;
                                     break;
                                 case Definer.PLAYER_COLOR.YELLOW:
                                     actorPrefab = YellowActorPrefab;
+                                    yellowNameText.text = receivedInitPacket.playerName;
                                     break;
                                 default:
                                     actorPrefab = WhiteActorPrefab;
