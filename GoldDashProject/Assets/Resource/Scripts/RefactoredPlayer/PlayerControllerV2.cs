@@ -385,7 +385,7 @@ public class PlayerControllerV2 : MonoBehaviour
         }
 
         //STEPX SEを再生しよう
-        SEPlayer.instance.PlaySEOpenChest();
+        if(isUnlocked) SEPlayer.instance.PlaySEOpenChest();
 
         //STEP4 開錠できたら少し待ってステートロックを解除しよう
         if (isUnlocked)

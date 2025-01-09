@@ -409,10 +409,10 @@ public class GameClientManager : MonoBehaviour
                                                     //失った金額に応じてSE再生
                                                     switch (receivedActionPacket.value)
                                                     {
-                                                        case <= 50:
+                                                        case >= -50:
                                                             SEPlayer.instance.PlaySEDropGold_S();
                                                             break;
-                                                        case <= 500:
+                                                        case < -50 and >= -500:
                                                             SEPlayer.instance.PlaySEDropGold_M();
                                                             break;
                                                         default:
