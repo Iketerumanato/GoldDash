@@ -144,7 +144,7 @@ MonoBehaviour:
   sePunchMiss: {fileID: 8300000, guid: eccc933a238f7f34bb04cd7396dd5b42, type: 3}
   sePunchHitFront: {fileID: 8300000, guid: e6daf2c0137a5fa4897aef29cfe15bbb, type: 3}
   sePunchHitBack: {fileID: 8300000, guid: e6daf2c0137a5fa4897aef29cfe15bbb, type: 3}
-  seDropGold: {fileID: 8300000, guid: f7b02d5beb6ada14bbbb5f9babd4a6cc, type: 3}
+  seDropGold: {fileID: 8300000, guid: c41f89ee685b25d42ac21f71e499a87f, type: 3}
   seGetGold: {fileID: 8300000, guid: 01e20f17cdf7a594b8a07673c7a0109f, type: 3}
   seAccessChest: {fileID: 8300000, guid: e0df3aaee44cfd04b8350de273a90f16, type: 3}
   seOpenChest: {fileID: 0}
