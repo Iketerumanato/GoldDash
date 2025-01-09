@@ -6570,13 +6570,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
+      propertyPath: seDash
+      value: 
+      objectReference: {fileID: 8300000, guid: e0df3aaee44cfd04b8350de273a90f16, type: 3}
+    - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
+      propertyPath: seWarp
+      value: 
+      objectReference: {fileID: 8300000, guid: 0c244193b763e7947a3f6758e027f75d, type: 3}
+    - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
       propertyPath: seGetGold
       value: 
       objectReference: {fileID: 8300000, guid: 01e20f17cdf7a594b8a07673c7a0109f, type: 3}
     - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
+      propertyPath: seThunder
+      value: 
+      objectReference: {fileID: 8300000, guid: 32b7fce5001273548b5bf3bdf5deddc4, type: 3}
+    - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
       propertyPath: seDropGold
       value: 
-      objectReference: {fileID: 8300000, guid: f40075fd1ab39264bb7cb9c7decb5084, type: 3}
+      objectReference: {fileID: 8300000, guid: f7b02d5beb6ada14bbbb5f9babd4a6cc, type: 3}
     - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
       propertyPath: seAccessChest
       value: 

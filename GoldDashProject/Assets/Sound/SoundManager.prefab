@@ -143,6 +143,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sePunchMiss: {fileID: 8300000, guid: eccc933a238f7f34bb04cd7396dd5b42, type: 3}
   sePunchHitFront: {fileID: 8300000, guid: e6daf2c0137a5fa4897aef29cfe15bbb, type: 3}
-  sePunchHitBack: {fileID: 0}
-  seDropGold: {fileID: 0}
-  seGetGold: {fileID: 0}
+  sePunchHitBack: {fileID: 8300000, guid: e6daf2c0137a5fa4897aef29cfe15bbb, type: 3}
+  seDropGold: {fileID: 8300000, guid: f7b02d5beb6ada14bbbb5f9babd4a6cc, type: 3}
+  seGetGold: {fileID: 8300000, guid: 01e20f17cdf7a594b8a07673c7a0109f, type: 3}
+  seAccessChest: {fileID: 8300000, guid: e0df3aaee44cfd04b8350de273a90f16, type: 3}
+  seOpenChest: {fileID: 0}
+  seThunder: {fileID: 8300000, guid: 32b7fce5001273548b5bf3bdf5deddc4, type: 3}
+  seDash: {fileID: 8300000, guid: e0df3aaee44cfd04b8350de273a90f16, type: 3}
+  seWarp: {fileID: 8300000, guid: 0c244193b763e7947a3f6758e027f75d, type: 3}
