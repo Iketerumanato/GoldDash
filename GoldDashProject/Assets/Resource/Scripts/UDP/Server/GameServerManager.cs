@@ -179,6 +179,9 @@ public class GameServerManager : MonoBehaviour
                                     myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                     gameServerManager.udpGameServer.Send(myHeader.ToByte());
 
+                                    //SE再生
+                                    SEPlayer.instance.PlaySEThunder();
+
                                     gameServerManager.ChangeServerState(new NormalState()); //雷を落としたらノーマルステートに戻る
                                     break;
                                 default:
@@ -216,6 +219,9 @@ public class GameServerManager : MonoBehaviour
                                     myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.END_MAGIC_SUCCESSFULLY, gameServerManager.magicUserID);
                                     myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                     gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+                                    //SE再生
+                                    SEPlayer.instance.PlaySEWarp();
 
                                     gameServerManager.ChangeServerState(new NormalState()); //転移先を指定したらノーマルステートに戻る
                                     break;
@@ -915,6 +921,7 @@ public class GameServerManager : MonoBehaviour
                                                                       //雷を生成する命令
                                                 myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_THUNDER, default, default, receivedActionPacket.pos);
                                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                udpGameServer.Send(myHeader.ToByte());
                                                 udpGameServer.Send(myHeader.ToByte());
                                             }
                                             break;

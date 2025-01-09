@@ -31,6 +31,15 @@ public class SEPlayer : MonoBehaviour
     [Header("宝箱が開いた時のSE")]
     [SerializeField] private AudioClip seOpenChest;
 
+    [Header("雷が落ちた時のSE")]
+    [SerializeField] private AudioClip seThunder;
+
+    [Header("ダッシュが発動したときのSE")]
+    [SerializeField] private AudioClip seDash;
+    
+    [Header("誰かがワープしたときのSE")]
+    [SerializeField] private AudioClip seWarp;
+
     private void Start()
     {
         //シングルトンな静的変数の初期化
@@ -80,5 +89,20 @@ public class SEPlayer : MonoBehaviour
     public void PlaySEOpenChest()
     {
         audioSource.PlayOneShot(seOpenChest);
+    }
+
+    public void PlaySEThunder()
+    {
+        audioSource.PlayOneShot(seThunder);
+    }
+
+    public void PlaySEDash()
+    {
+        audioSource.PlayOneShot(seDash);
+    }
+
+    public void PlaySEWarp()
+    {
+        audioSource.PlayOneShot(seWarp);
     }
 }
