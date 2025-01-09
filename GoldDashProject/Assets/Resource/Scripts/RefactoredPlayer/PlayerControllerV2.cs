@@ -704,14 +704,13 @@ public class PlayerControllerV2 : MonoBehaviour
     public void GetPunchFront()
     {
         m_playerAnimationController.SetTriggerGuard();
-        SEPlayer.instance.PlaySEPunchHitFront();
     }
 
     //背面から殴られたときStateを強制的に変更する
     public void GetPunchBack()
     {
         this.State = PLAYER_STATE.KNOCKED;
-        SEPlayer.instance.PlaySEPunchHitBack();
+        SEPlayer.instance.PlaySEDropGold();
     }
 
     public void PlayGetCoinAnimation()
