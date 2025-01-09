@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
 using TMPro;
+using System;
 
 public class GameServerManager : MonoBehaviour
 {
@@ -44,8 +45,6 @@ public class GameServerManager : MonoBehaviour
 
     private bool inGame; //ゲームは始まっているか
 
-    [SerializeField] private BGGradientController gradientController;
-
     //12/29追記
     [SerializeField] TitleUI _titleUi;
 
@@ -77,6 +76,8 @@ public class GameServerManager : MonoBehaviour
     //制限時間
     [SerializeField] private TextMeshProUGUI timeTextLeft;
     [SerializeField] private TextMeshProUGUI timeTextRight;
+
+    private float timeLimitSeconds = 333f;
 
     #region Stateインターフェース
     public interface ISetverState
@@ -341,6 +342,16 @@ public class GameServerManager : MonoBehaviour
     private void Update()
     {
         currentSetverState.UpdateProcess(this);
+
+        //秒数を減らす
+        timeLimitSeconds -= Time.deltaTime;
+        //0秒未満なら0で固定する
+        if (timeLimitSeconds < 0f) timeLimitSeconds = 0f;
+        //分：秒表記に変換
+        TimeSpan span = new TimeSpan(0, 0, (int)timeLimitSeconds);
+        string timeText = span.ToString(@"m\:ss");
+        timeTextLeft.text = $"試合終了まで\r\n<size=120>{timeText}</size>";
+        timeTextRight.text = $"試合終了まで\r\n<size=120>{timeText}</size>";
     }
 
     private async void SendAllActorsPosition()
