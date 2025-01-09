@@ -144,10 +144,12 @@ MonoBehaviour:
   sePunchMiss: {fileID: 8300000, guid: eccc933a238f7f34bb04cd7396dd5b42, type: 3}
   sePunchHitFront: {fileID: 8300000, guid: e6daf2c0137a5fa4897aef29cfe15bbb, type: 3}
   sePunchHitBack: {fileID: 8300000, guid: e6daf2c0137a5fa4897aef29cfe15bbb, type: 3}
-  seDropGold: {fileID: 8300000, guid: c41f89ee685b25d42ac21f71e499a87f, type: 3}
+  seDropGold_S: {fileID: 8300000, guid: c41f89ee685b25d42ac21f71e499a87f, type: 3}
+  seDropGold_M: {fileID: 8300000, guid: 26168af4273f9814186e46553ab6cd47, type: 3}
+  seDropGold_L: {fileID: 8300000, guid: af1a88616d3203047a91f0a63fdcd7a5, type: 3}
   seGetGold: {fileID: 8300000, guid: 01e20f17cdf7a594b8a07673c7a0109f, type: 3}
-  seAccessChest: {fileID: 8300000, guid: e0df3aaee44cfd04b8350de273a90f16, type: 3}
-  seOpenChest: {fileID: 0}
+  seAccessChest: {fileID: 8300000, guid: f7e925757179523459e772e0fac4b752, type: 3}
+  seOpenChest: {fileID: 8300000, guid: e2800cd6425c02d43bc77c2d189b8505, type: 3}
   seThunder: {fileID: 8300000, guid: 32b7fce5001273548b5bf3bdf5deddc4, type: 3}
   seDash: {fileID: 8300000, guid: e0df3aaee44cfd04b8350de273a90f16, type: 3}
   seWarp: {fileID: 8300000, guid: 0c244193b763e7947a3f6758e027f75d, type: 3}

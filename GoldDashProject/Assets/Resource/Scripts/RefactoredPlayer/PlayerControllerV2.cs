@@ -384,6 +384,9 @@ public class PlayerControllerV2 : MonoBehaviour
             UdpGameClient.Send(myHeader.ToByte());
         }
 
+        //STEPX SEを再生しよう
+        if(isUnlocked) SEPlayer.instance.PlaySEOpenChest();
+
         //STEP4 開錠できたら少し待ってステートロックを解除しよう
         if (isUnlocked)
         {
@@ -683,7 +686,6 @@ public class PlayerControllerV2 : MonoBehaviour
     public void GetPunchBack()
     {
         this.State = PLAYER_STATE.KNOCKED;
-        SEPlayer.instance.PlaySEDropGold();
     }
 
     public void PlayGetCoinAnimation()

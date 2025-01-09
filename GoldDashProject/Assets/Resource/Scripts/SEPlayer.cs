@@ -19,8 +19,14 @@ public class SEPlayer : MonoBehaviour
     [Header("パンチが背中に当たったときのSE")]
     [SerializeField] private AudioClip sePunchHitBack;
 
-    [Header("金貨がこぼれた時のSE")]
-    [SerializeField] private AudioClip seDropGold;
+    [Header("金貨がこぼれた時のSE:小")]
+    [SerializeField] private AudioClip seDropGold_S;
+
+    [Header("金貨がこぼれた時のSE:中")]
+    [SerializeField] private AudioClip seDropGold_M;
+
+    [Header("金貨がこぼれた時のSE:大")]
+    [SerializeField] private AudioClip seDropGold_L;
 
     [Header("金貨を拾った時のSE")]
     [SerializeField] private AudioClip seGetGold;
@@ -71,9 +77,19 @@ public class SEPlayer : MonoBehaviour
         audioSource.PlayOneShot(sePunchHitBack);
     }
 
-    public void PlaySEDropGold()
+    public void PlaySEDropGold_S()
     {
-        audioSource.PlayOneShot(seDropGold);
+        audioSource.PlayOneShot(seDropGold_S);
+    }
+
+    public void PlaySEDropGold_M()
+    {
+        audioSource.PlayOneShot(seDropGold_M);
+    }
+
+    public void PlaySEDropGold_L()
+    {
+        audioSource.PlayOneShot(seDropGold_L);
     }
 
     public void PlaySEGetGold()
