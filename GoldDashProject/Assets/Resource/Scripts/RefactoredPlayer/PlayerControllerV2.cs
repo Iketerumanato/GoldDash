@@ -318,6 +318,9 @@ public class PlayerControllerV2 : MonoBehaviour
         //STEP8 モーションを決めよう
         m_playerAnimationController.SetAnimationFromInteract(interactInfo.interactType, runSpeed); //インタラクト結果に応じてモーションを再生
 
+        //STEPX SEを再生しよう
+        PlaySEFromInteract(interactInfo);
+
         //STEP9 ダッシュ中で、かつ金貨ドロップのクールダウンが回っていたら金貨を落とそう
         if (m_isDashable && m_isDropable)
         {
@@ -664,6 +667,32 @@ public class PlayerControllerV2 : MonoBehaviour
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.USE_MAGIC, default, (int)m_currentMagicID);
                 myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                 UdpGameClient.Send(myHeader.ToByte());
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void PlaySEFromInteract((INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) interactInfo)
+    {
+        switch (interactInfo.interactType)
+        {
+            case INTERACT_TYPE.ENEMY_MISS:
+                SEPlayer.instance.PlaySEPunchMiss();
+                break;
+            case INTERACT_TYPE.ENEMY_FRONT:
+                SEPlayer.instance.PlaySEPunchHitFront();
+                break;
+            case INTERACT_TYPE.ENEMY_BACK:
+                SEPlayer.instance.PlaySEPunchHitBack();
+                break;
+            case INTERACT_TYPE.CHEST:
+                break;
+            case INTERACT_TYPE.MAGIC_ICON:
+                break;
+            case INTERACT_TYPE.MAGIC_CANCEL:
+                break;
+            case INTERACT_TYPE.MAGIC_USE:
                 break;
             default:
                 break;
