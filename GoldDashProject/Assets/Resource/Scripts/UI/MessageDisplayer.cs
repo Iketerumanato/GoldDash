@@ -3,31 +3,47 @@ using TMPro;
 using System.Collections;
 using DG.Tweening;
 using System.Collections.Generic;
+using static UnityEngine.Rendering.BoolParameter;
 
 public class MessageDisplayer : MonoBehaviour
 {
     [SerializeField] GameObject smallTextPrefab;
+    [SerializeField] GameObject largeTextPrefab;
     [SerializeField] Transform SpawnTextPoint;
-    [SerializeField] TextMeshProUGUI largeTextPrefab;
-    [SerializeField] int TestGoldNum;
-    [SerializeField] private float historyDuration = 3f;//テキストの表示時間
+    [SerializeField] int TestGoldNum;//仮のスコアの値
+    [SerializeField] private float historyDisplayTime = 3f;//テキストの表示時間(smallText)
+    [SerializeField] private float lageTextDisplayTime = 1f;//テキストの表示時間(largeText)
     [SerializeField] private float verticalSpacing = 45f;//テキストの移動量(文字の大きさによる)
-    const int MaxTextNum = 3;//テキストの最大表示数
+    const int MaxSmallTextCnt = 3;//テキストの最大表示数
+    const int MaxLargeTextCnt = 1;
+    //表示数チェックのためのリスト
     private List<GameObject> currentSmallTextList = new();
+    private List<GameObject> currentLargeTextList = new();
 
+    [Range(0f, 1f)]
+    [SerializeField] float largeTextFadeDuration = 0.5f;
+
+    //別のクラスで呼び出し予定
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.P))  // Pキーが押されたとき
         {
-            DisplaySmallMessage($"{TestGoldNum} Gold Get !!!");
+            DisplaySmallMessage($"{TestGoldNum} ゴールドを手に入れた!");
+        }
+
+        if(Input.GetKeyDown(KeyCode.L))// Lキーが押された時
+        {
+            DisplayLargeMessage($"あと 1分 !", lageTextDisplayTime);
         }
     }
 
+    #region SmallMessageの処理
     // 画面右のメッセージの表示
     public void DisplaySmallMessage(string text)
     {
         // 新しいテキストを生成
         GameObject insSmallText = Instantiate(smallTextPrefab, SpawnTextPoint);
+        insSmallText.transform.SetAsFirstSibling();
         Transform childTransform = insSmallText.transform.GetChild(0);
         Transform childSecondTransform = childTransform.GetChild(0);
         TextMeshProUGUI smallTextUgi = childSecondTransform.GetComponent<TextMeshProUGUI>();
@@ -41,7 +57,7 @@ public class MessageDisplayer : MonoBehaviour
         RepositionAndResizeSmallTexts();
 
         // 最大数を超えた場合、古いテキストを削除
-        if (currentSmallTextList.Count > MaxTextNum)
+        if (currentSmallTextList.Count > MaxSmallTextCnt)
         {
             GameObject oldestText = currentSmallTextList[currentSmallTextList.Count - 1];
             currentSmallTextList.RemoveAt(currentSmallTextList.Count - 1);
@@ -52,7 +68,7 @@ public class MessageDisplayer : MonoBehaviour
         }
 
         //３秒後に消滅
-        StartCoroutine(RemoveHistoryAfterDelay(insSmallText, historyDuration));
+        StartCoroutine(RemoveHistoryAfterDelay(insSmallText, historyDisplayTime));
     }
 
     // テキストを下に移動させる
@@ -88,16 +104,42 @@ public class MessageDisplayer : MonoBehaviour
             RepositionAndResizeSmallTexts();
         }
     }
+    #endregion
+
+    #region LargeMessageの処理
 
     //画面中央に大きく出るメッセージ
-    //public void DisplayLargeMessage(string text ,float displaytime)
-    //{
+    public void DisplayLargeMessage(string text, float displaytime)
+    {
+        //生成したUIの各コンポーネントの取得
+        GameObject insLargeText = Instantiate(largeTextPrefab, SpawnTextPoint);
+        insLargeText.transform.SetAsLastSibling();
+        CanvasGroup largeTextGroup =  insLargeText.GetComponent<CanvasGroup>();
+        Transform childTransform = insLargeText.transform.GetChild(0);
+        TextMeshProUGUI largeText = childTransform.GetComponent<TextMeshProUGUI>();     
 
-    //}
+        largeText.text = text;//テキストに反映
+        largeTextGroup.DOFade(1f, largeTextFadeDuration);//現れる
+        StartCoroutine(DeleteLargeMessage(displaytime, largeTextGroup, insLargeText));//何秒後かに自動でフェードして削除
 
-    ////画面中央のメッセージ専用強制消去
-    //public void DeleteLargeMessage()
-    //{
+        //表示数が1以上になれば即削除
+        currentLargeTextList.Insert(0, insLargeText);
+        if (currentLargeTextList.Count > MaxLargeTextCnt)
+        {
+            GameObject oldestText = currentLargeTextList[currentLargeTextList.Count - 1];
+            currentLargeTextList.RemoveAt(currentLargeTextList.Count - 1);
+            if (oldestText != null)
+            {
+                Destroy(oldestText.gameObject);
+            }
+        }
+    }
 
-    //}
+    //画面中央のメッセージ専用強制消去
+    public IEnumerator DeleteLargeMessage(float delay,CanvasGroup largeTextGroup,GameObject inslargeText)
+    {
+        yield return new WaitForSeconds(delay);
+        largeTextGroup.DOFade(0f, largeTextFadeDuration).OnComplete(() => Destroy(inslargeText));
+    }
+    #endregion
 }

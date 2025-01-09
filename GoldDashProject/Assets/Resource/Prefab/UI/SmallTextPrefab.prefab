@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 754271587052594593}
   - component: {fileID: 8182609578171554609}
   m_Layer: 5
-  m_Name: TextEnpty
+  m_Name: SmallTextPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -207,7 +207,27 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2969468135311426008, guid: 8d8cd13e73d13da4895f141615e8036d, type: 3}
+      propertyPath: m_fontSize
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 2969468135311426008, guid: 8d8cd13e73d13da4895f141615e8036d, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: c43833ca0574902409add40850f8668d, type: 2}
+    - target: {fileID: 2969468135311426008, guid: 8d8cd13e73d13da4895f141615e8036d, type: 3}
       propertyPath: m_fontColor.a
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2969468135311426008, guid: 8d8cd13e73d13da4895f141615e8036d, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 2969468135311426008, guid: 8d8cd13e73d13da4895f141615e8036d, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -3976194810242514473, guid: c43833ca0574902409add40850f8668d, type: 2}
+    - target: {fileID: 2969468135311426008, guid: 8d8cd13e73d13da4895f141615e8036d, type: 3}
+      propertyPath: m_hasFontAssetChanged
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3684294464638090684, guid: 8d8cd13e73d13da4895f141615e8036d, type: 3}
