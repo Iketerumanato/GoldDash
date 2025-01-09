@@ -32,7 +32,8 @@ public class UDPUIDisplayerDE : MonoBehaviour
 
     [SerializeField] private GameObject gameStartButton;
 
-    [SerializeField] private GameObject textBox;
+    [SerializeField] private GameObject textBoxUpper;
+    [SerializeField] private GameObject textBoxLower;
 
     [Header("サーバー用UI")]
     [SerializeField] private GameObject titleLogo;
