@@ -404,6 +404,22 @@ public class GameClientManager : MonoBehaviour
                                                     playerController.PlayGetCoinAnimation(); //所持金が増えたときはコイン吸い取りアニメーション
                                                     SEPlayer.instance.PlaySEGetGold();
                                                 }
+                                                else if (receivedActionPacket.value < 0)
+                                                {
+                                                    //失った金額に応じてSE再生
+                                                    switch (receivedActionPacket.value)
+                                                    {
+                                                        case <= 50:
+                                                            SEPlayer.instance.PlaySEDropGold_S();
+                                                            break;
+                                                        case <= 500:
+                                                            SEPlayer.instance.PlaySEDropGold_M();
+                                                            break;
+                                                        default:
+                                                            SEPlayer.instance.PlaySEDropGold_L();
+                                                            break;
+                                                    }
+                                                }
                                             }
                                             //指定されたアクターの所持金を編集
                                             actorDictionary[receivedActionPacket.targetID].Gold += receivedActionPacket.value;
