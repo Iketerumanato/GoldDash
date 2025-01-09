@@ -8941,10 +8941,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1470805afa7a823429d606edc73e0dec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShineEffect: {fileID: 0}
   PlayerAnimator: {fileID: 3835903084797589556}
   runThreshold: 1
   animationLerpSpeed: 70
   goldText: {fileID: 4947960246120122317}
+  m_skinnedMeshRenderer: {fileID: 6575032045437719507}
+  materialRed: {fileID: 2100000, guid: dafd079d646f9c648a857e922ef98f14, type: 2}
+  materialGreen: {fileID: 2100000, guid: 1d8689bc5e602f14791c9604b71231ed, type: 2}
+  materialBlue: {fileID: 2100000, guid: 3769adc359b77ba4dac042a40390da8b, type: 2}
+  materialYellow: {fileID: 2100000, guid: 6c1b3a3b35e71024998762f61afa6b4b, type: 2}
+  materialWhite: {fileID: 2100000, guid: 0a02aacf34f61b34ba6f4ec82ea0a8ed, type: 2}
 --- !u!54 &6971471286411823467
 Rigidbody:
   m_ObjectHideFlags: 0

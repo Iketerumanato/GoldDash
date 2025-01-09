@@ -100,10 +100,10 @@ public class MapGenerator : MonoBehaviour
 
         //ランダム抽選は保留。指定した名前のファイルを４つ読み込む
         TextAsset[] textAsset_array = {
-            Resources.Load("MapPart5x5_25") as TextAsset,
-            Resources.Load("MapPart5x5_26") as TextAsset,
-            Resources.Load("MapPart5x5_27") as TextAsset,
-            Resources.Load("MapPart5x5_28") as TextAsset};
+            Resources.Load("MapPart5x5_oudou1") as TextAsset,
+            Resources.Load("MapPart5x5_guruguru2x2x2") as TextAsset,
+            Resources.Load("MapPart5x5_meirohirome") as TextAsset,
+            Resources.Load("MapPart5x5_zyadouittyokusen") as TextAsset};
 
         map = MergeMap(textAsset_array);
 

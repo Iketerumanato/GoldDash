@@ -8,6 +8,9 @@ using System.Threading;
 
 public class GameClientManager : MonoBehaviour
 {
+    [Header("このクライアントで使うプレイヤーカラー")]
+    [SerializeField] private Definer.PLAYER_COLOR playerColor;
+
     private bool isRunning; //稼働中か
 
     private UdpGameClient udpGameClient; //UdpCommunicatorを継承したUdpGameClientのインスタンス
@@ -131,7 +134,7 @@ public class GameClientManager : MonoBehaviour
 
                 isRunning = true;
                 // Initパケット送信 (非同期)
-                Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte()), SendCts);
+                Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, (int)playerColor, myName).ToByte()).ToByte()), SendCts);
 
                 break;
 
@@ -323,11 +326,15 @@ public class GameClientManager : MonoBehaviour
                                                 //Playerクラスには別にSessionIDとUdpGameClientを渡し、パケット送信を自分でやらせる。
                                                 playerController.SessionID = this.sessionID;
                                                 playerController.UdpGameClient = this.udpGameClient;
+                                                //色変更
+                                                actorController.ChangePlayerColor((Definer.PLAYER_COLOR)receivedActionPacket.value);
                                             }
                                             else //他人のIDなら
                                             {
                                                 //アクターををインスタンス化しながらActorControllerを取得
                                                 actorController = Instantiate(ActorPrefab).GetComponent<ActorController>();
+                                                //色変更
+                                                actorController.ChangePlayerColor((Definer.PLAYER_COLOR)receivedActionPacket.value);
                                             }
 
                                             //アクターを指定地点へ移動させる

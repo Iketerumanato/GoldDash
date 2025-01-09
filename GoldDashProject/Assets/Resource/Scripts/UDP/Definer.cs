@@ -10,7 +10,6 @@ public static class Definer
     //プレイヤーの色
     public enum PLAYER_COLOR : int
     {
-        BROWN = 0,
         RED,
         BLUE,
         GREEN,

@@ -30,7 +30,11 @@ public class GameServerManager : MonoBehaviour
     //動的に減らしたり増やしたりしても問題ないが、宝箱の出現候補地点の数より多くならないように注意が必要。宝箱が同じ位置に重なって生成されてしまう。
     private int currentNumOfChests; //現在生成されている宝箱の数
 
-    [SerializeField] private GameObject ActorPrefab; //アクターのプレハブ
+    [SerializeField] private GameObject RedActorPrefab; //アクターのプレハブ
+    [SerializeField] private GameObject BlueActorPrefab;
+    [SerializeField] private GameObject GreenActorPrefab;
+    [SerializeField] private GameObject YellowActorPrefab;
+    [SerializeField] private GameObject WhiteActorPrefab;
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
     [SerializeField] private GameObject GoldPileMiniPrefab; //小金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
@@ -427,10 +431,34 @@ public class GameServerManager : MonoBehaviour
 
                             //ActorControllerインスタンスを作りDictionaryに加える
                             //Actorをインスタンス化しながらActorControllerを取得
-                            ActorController actorController = Instantiate(ActorPrefab).GetComponent<ActorController>();
+
+                            GameObject actorPrefab;
+                            switch ((Definer.PLAYER_COLOR)receivedInitPacket.playerColor)
+                            {
+                                case Definer.PLAYER_COLOR.RED:
+                                    actorPrefab = RedActorPrefab;
+                                    break;
+                                case Definer.PLAYER_COLOR.GREEN:
+                                    actorPrefab = GreenActorPrefab;
+                                    break;
+                                case Definer.PLAYER_COLOR.BLUE:
+                                    actorPrefab = BlueActorPrefab;
+                                    break;
+                                case Definer.PLAYER_COLOR.YELLOW:
+                                    actorPrefab = YellowActorPrefab;
+                                    break;
+                                default:
+                                    actorPrefab = WhiteActorPrefab;
+                                    break;
+                            }
+
+                            ActorController actorController = Instantiate(actorPrefab).GetComponent<ActorController>();
 
                             //アクターの名前を書き込み
                             actorController.PlayerName = receivedInitPacket.playerName;
+                            //アクターの色を書き込み
+                            actorController.Color = (Definer.PLAYER_COLOR)receivedInitPacket.playerColor;
+
                             //アクターのゲームオブジェクト
                             actorController.name = $"Actor: {receivedInitPacket.playerName} ({receivedHeader.sessionID})"; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
                             actorController.gameObject.SetActive(false); //初期設定が済んだら無効化して処理を止める。ゲーム開始時に有効化して座標などをセットする
@@ -484,7 +512,7 @@ public class GameServerManager : MonoBehaviour
                                 foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
                                 {
                                     //リスポーン地点を参照しながら各プレイヤーの名前とIDを載せてアクター生成命令を飛ばす
-                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_ACTOR, k.Key, default, respawnPoints[index], default, k.Value.PlayerName);
+                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_ACTOR, k.Key, (int)k.Value.Color, respawnPoints[index], default, k.Value.PlayerName);
                                     myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                     udpGameServer.Send(myHeader.ToByte());
                                     index++;
@@ -623,6 +651,7 @@ public class GameServerManager : MonoBehaviour
                                             myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedActionPacket.targetID, -lostGold);
                                             myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                             udpGameServer.Send(myHeader.ToByte());
+                                            EnableShiningEffect();
 
                                             //重複しないentityIDを作り、オブジェクトを生成しつつ、エンティティのコンポーネントを取得
                                             //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
@@ -657,6 +686,7 @@ public class GameServerManager : MonoBehaviour
                                                 myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, goldPile.Value);
                                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                 udpGameServer.Send(myHeader.ToByte());
+                                                EnableShiningEffect();
                                                 //その金貨の山を消す
                                                 //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
                                                 entityDictionary[receivedActionPacket.targetID].DestroyEntity();
@@ -856,6 +886,7 @@ public class GameServerManager : MonoBehaviour
                                                 myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, -dropGold);
                                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                 udpGameServer.Send(myHeader.ToByte());
+                                                EnableShiningEffect();
 
                                                 //まずサーバー側で金貨の山を生成
                                                 entityID = GetUniqueEntityID();
@@ -922,6 +953,30 @@ public class GameServerManager : MonoBehaviour
         while (usedEntityID.Contains(entityID)); //使用済IDと同じ値を生成してしまったならやり直し
         usedEntityID.Add(entityID); //このIDは使用済にする。
         return entityID;
+    }
+
+    private bool EnableShiningEffect()
+    {
+        int topGold = 0;
+        ushort topPlayerID = 0;
+        foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+        {
+            if (k.Value.Gold > topGold)
+            { 
+                topPlayerID = k.Key;
+                topGold = k.Value.Gold;
+            }
+        }
+        if (topPlayerID != 0)
+        {
+            foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
+            {
+                if (k.Key == topPlayerID) k.Value.IsShining = true;
+                else k.Value.IsShining = false;
+            }
+            return true;
+        }
+        else return false;
     }
 
     //ゲームの結果発表のために使う
