@@ -278,6 +278,8 @@ public class PlayerControllerV2 : MonoBehaviour
                 m_dropableTimeCountCts.Cancel(); //dashStateから出るときに金貨ドロップのインターバルカウントを止める
                 m_isDropable = false; //クールダウンリセット
                 UniTask.RunOnThreadPool(()=>CountDropableTime(m_dashDropInterval, DropableTimeCountCt),cancellationToken: DropableTimeCountCt); //クールダウン開始
+
+                SEPlayer.instance.PlaySEDash(); //SE再生
             }
 
             //STEP_B UI表示を切り替えよう
@@ -681,6 +683,7 @@ public class PlayerControllerV2 : MonoBehaviour
     public void GetPunchBack()
     {
         this.State = PLAYER_STATE.KNOCKED;
+        SEPlayer.instance.PlaySEDropGold();
     }
 
     public void PlayGetCoinAnimation()

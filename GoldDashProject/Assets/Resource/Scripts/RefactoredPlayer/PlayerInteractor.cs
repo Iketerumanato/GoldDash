@@ -235,6 +235,32 @@ public class PlayerInteractor : MonoBehaviour
             }
         }
 
+        //インタラクト結果に応じてSE再生
+        switch (interactType)
+        {
+            case INTERACT_TYPE.ENEMY_MISS:
+                SEPlayer.instance.PlaySEPunchMiss();
+                break;
+            case INTERACT_TYPE.ENEMY_FRONT:
+                SEPlayer.instance.PlaySEPunchHitFront();
+                break;
+            case INTERACT_TYPE.ENEMY_BACK:
+                SEPlayer.instance.PlaySEPunchHitBack();
+                break;
+            case INTERACT_TYPE.CHEST:
+                SEPlayer.instance.PlaySEAccessChest();
+                break;
+            case INTERACT_TYPE.MAGIC_ICON:
+                break;
+            case INTERACT_TYPE.MAGIC_CANCEL:
+                break;
+            case INTERACT_TYPE.MAGIC_USE:
+                break;
+            default:
+                break;
+        }
+
+
         //タプルで返却
         return (interactType, targetID, value, magicID, punchHitVec);
 

@@ -5,6 +5,8 @@ using R3;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
+using TMPro;
+using System;
 
 public class GameServerManager : MonoBehaviour
 {
@@ -43,8 +45,6 @@ public class GameServerManager : MonoBehaviour
 
     private bool inGame; //ゲームは始まっているか
 
-    [SerializeField] private BGGradientController gradientController;
-
     //12/29追記
     [SerializeField] TitleUI _titleUi;
 
@@ -63,6 +63,21 @@ public class GameServerManager : MonoBehaviour
 
     //レイを飛ばすためのカメラ
     [SerializeField] private Camera mapCamera;
+
+    //地図UI
+    [SerializeField] private Canvas mapUICanvas;
+
+    //プレイヤーネーム
+    [SerializeField] private TextMeshProUGUI redNameText;
+    [SerializeField] private TextMeshProUGUI blueNameText;
+    [SerializeField] private TextMeshProUGUI greenNameText;
+    [SerializeField] private TextMeshProUGUI yellowNameText;
+
+    //制限時間
+    [SerializeField] private TextMeshProUGUI timeTextLeft;
+    [SerializeField] private TextMeshProUGUI timeTextRight;
+
+    private float timeLimitSeconds = 333f;
 
     #region Stateインターフェース
     public interface ISetverState
@@ -98,26 +113,6 @@ public class GameServerManager : MonoBehaviour
 
         public void UpdateProcess(GameServerManager gameServerManager)
         {
-            //if (Input.GetKeyDown(KeyCode.Alpha1))
-            //{
-            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.NORMAL;
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha2))
-            //{
-            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_1;
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha3))
-            //{
-            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_2;
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha4))
-            //{
-            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_3;
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha5))
-            //{
-            //    gameServerManager.gradientController.State = BGGradientController.BG_GRAD_STATE.IN_USE_PLAYER_4;
-            //}
         }
 
         public void ExitState(GameServerManager gameServerManager)
@@ -179,6 +174,9 @@ public class GameServerManager : MonoBehaviour
                                     myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                     gameServerManager.udpGameServer.Send(myHeader.ToByte());
 
+                                    //SE再生
+                                    SEPlayer.instance.PlaySEThunder();
+
                                     gameServerManager.ChangeServerState(new NormalState()); //雷を落としたらノーマルステートに戻る
                                     break;
                                 default:
@@ -216,6 +214,9 @@ public class GameServerManager : MonoBehaviour
                                     myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.END_MAGIC_SUCCESSFULLY, gameServerManager.magicUserID);
                                     myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                     gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+                                    //SE再生
+                                    SEPlayer.instance.PlaySEWarp();
 
                                     gameServerManager.ChangeServerState(new NormalState()); //転移先を指定したらノーマルステートに戻る
                                     break;
@@ -341,6 +342,16 @@ public class GameServerManager : MonoBehaviour
     private void Update()
     {
         currentSetverState.UpdateProcess(this);
+
+        //秒数を減らす
+        timeLimitSeconds -= Time.deltaTime;
+        //0秒未満なら0で固定する
+        if (timeLimitSeconds < 0f) timeLimitSeconds = 0f;
+        //分：秒表記に変換
+        TimeSpan span = new TimeSpan(0, 0, (int)timeLimitSeconds);
+        string timeText = span.ToString(@"m\:ss");
+        timeTextLeft.text = $"試合終了まで\r\n<size=120>{timeText}</size>";
+        timeTextRight.text = $"試合終了まで\r\n<size=120>{timeText}</size>";
     }
 
     private async void SendAllActorsPosition()
@@ -437,15 +448,19 @@ public class GameServerManager : MonoBehaviour
                             {
                                 case Definer.PLAYER_COLOR.RED:
                                     actorPrefab = RedActorPrefab;
+                                    redNameText.text = receivedInitPacket.playerName;
                                     break;
                                 case Definer.PLAYER_COLOR.GREEN:
                                     actorPrefab = GreenActorPrefab;
+                                    greenNameText.text = receivedInitPacket.playerName;
                                     break;
                                 case Definer.PLAYER_COLOR.BLUE:
                                     actorPrefab = BlueActorPrefab;
+                                    blueNameText.text = receivedInitPacket.playerName;
                                     break;
                                 case Definer.PLAYER_COLOR.YELLOW:
                                     actorPrefab = YellowActorPrefab;
+                                    yellowNameText.text = receivedInitPacket.playerName;
                                     break;
                                 default:
                                     actorPrefab = WhiteActorPrefab;
@@ -915,6 +930,7 @@ public class GameServerManager : MonoBehaviour
                                                                       //雷を生成する命令
                                                 myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_THUNDER, default, default, receivedActionPacket.pos);
                                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                udpGameServer.Send(myHeader.ToByte());
                                                 udpGameServer.Send(myHeader.ToByte());
                                             }
                                             break;
