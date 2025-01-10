@@ -512,6 +512,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -62.861805
       objectReference: {fileID: 0}
+    - target: {fileID: -3662747466845417352, guid: 3caf8d39eeb1d67468bf86a8208d7438, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -3635742147225576842, guid: 3caf8d39eeb1d67468bf86a8208d7438, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -27.227451
@@ -907,6 +911,10 @@ PrefabInstance:
     - target: {fileID: -463898373557872352, guid: 3caf8d39eeb1d67468bf86a8208d7438, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -47.25327
+      objectReference: {fileID: 0}
+    - target: {fileID: -454630641214870346, guid: 3caf8d39eeb1d67468bf86a8208d7438, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -295812798068034885, guid: 3caf8d39eeb1d67468bf86a8208d7438, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1331,6 +1339,14 @@ PrefabInstance:
     - target: {fileID: 4659645082495341309, guid: 3caf8d39eeb1d67468bf86a8208d7438, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 125.17868
+      objectReference: {fileID: 0}
+    - target: {fileID: 4727912426871590910, guid: 3caf8d39eeb1d67468bf86a8208d7438, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4727912426871590910, guid: 3caf8d39eeb1d67468bf86a8208d7438, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4727912426871590910, guid: 3caf8d39eeb1d67468bf86a8208d7438, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1859,10 +1875,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1470805afa7a823429d606edc73e0dec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShineEffect: {fileID: 0}
   PlayerAnimator: {fileID: 5200685968124531673}
   runThreshold: 1
   animationLerpSpeed: 70
   goldText: {fileID: 0}
+  m_skinnedMeshRenderer: {fileID: 0}
+  materialRed: {fileID: 0}
+  materialGreen: {fileID: 0}
+  materialBlue: {fileID: 0}
+  materialYellow: {fileID: 0}
+  materialWhite: {fileID: 0}
 --- !u!54 &7338993471573580746
 Rigidbody:
   m_ObjectHideFlags: 0
