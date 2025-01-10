@@ -2,9 +2,19 @@ using R3;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UdpPhaseChanger : MonoBehaviour
 {
+    //フェーズを変え得るボタン
+    [SerializeField] private Button ServerActivateButton;
+    [SerializeField] private Button ServerStartGameButton;
+
+    [SerializeField] private Button ClientTouchToStartButton;
+    [SerializeField] private Button ClientActivateButton;
+    [SerializeField] private Button ClientConnectButton;
+    [SerializeField] private Button ClientBackButton;
+
     //シングルトンにする
     public static UdpPhaseChanger instance;
 
