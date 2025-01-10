@@ -39,16 +39,17 @@ public class UDPUIDisplayerDE : MonoBehaviour
     [SerializeField] private GameObject titleLogo;
     [SerializeField] private GameObject spinLogo;
     [SerializeField] private GameObject touchToStart;
+    [SerializeField] private GameObject lineLeft;
+    [SerializeField] private GameObject lineRight;
 
     [SerializeField] private GameObject backArrow;
-    [SerializeField] private GameObject backArrowBack;
+    [SerializeField] private GameObject ProcessingIcon;
 
-    [SerializeField] private GameObject nameBox;
-    [SerializeField] private GameObject nameEnter;
+    [SerializeField] private GameObject InputNameField;
+    [SerializeField] private GameObject ReadyButton;
 
     [SerializeField] private GameObject largeTextBox;
     [SerializeField] private GameObject upperTextBox;
-    [SerializeField] private GameObject lowerTextBox;
 
     [SerializeField] private GameObject backButton;
 }
