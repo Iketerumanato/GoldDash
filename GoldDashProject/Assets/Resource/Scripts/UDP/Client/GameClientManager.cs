@@ -252,6 +252,9 @@ public class GameClientManager : MonoBehaviour
         actorDictionary = new Dictionary<ushort, ActorController>();
         entityDictionary = new Dictionary<ushort, Entity>();
 
+        //通信用インスタンス作成
+        udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
+
         Task.Run(() => ProcessPacket());
         Task.Run(() => SendPlayerPosition());
 
@@ -284,6 +287,17 @@ public class GameClientManager : MonoBehaviour
             {
                 ChangeClientState(new Phase2State());
                 blackImage.DOFade(0f, 0.3f);
+
+                // 既に接続中なら何もしない
+                if (this.sessionID != 0)
+                {
+                    Debug.Log("もうセッションID受け取ってるよ");
+                    return;
+                }
+
+                isRunning = true;
+                // Initパケット送信 (非同期)
+                Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, (int)playerColor, inputField.text).ToByte()).ToByte()), SendCts);
             });
         });
     }
@@ -649,6 +663,7 @@ public class GameClientManager : MonoBehaviour
     private void OnDestroy()
     {
         this.udpGameClient?.Dispose();
+        this.sendCts.Cancel();
     }
 
     public void CheckNameCharacterCount()
