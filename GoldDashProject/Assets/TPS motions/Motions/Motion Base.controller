@@ -122,7 +122,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: isUseMagic
+    m_ConditionEvent: isUseScroll
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 7774872747197496527}
@@ -147,7 +147,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 2
-    m_ConditionEvent: isUseMagic
+    m_ConditionEvent: isUseScroll
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 7018576055148929098}
@@ -274,7 +274,7 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
-  - m_Name: isUseMagic
+  - m_Name: isUseScroll
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -685,7 +685,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Magic TPS
+  m_Name: UseScroll
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
