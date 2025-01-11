@@ -346,6 +346,7 @@ public class GameServerManager : MonoBehaviour
     
     private void Start()
     {
+        //コレクションのインスタンス作成
         packetQueue = new ConcurrentQueue<Header>();
         actorDictionary = new Dictionary<ushort, ActorController>();
         entityDictionary = new Dictionary<ushort, Entity>();
@@ -354,6 +355,12 @@ public class GameServerManager : MonoBehaviour
         usedEntityID = new HashSet<ushort>();
 
         inGame = false;
+
+        //udp通信を開始
+        udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
+        rcvPort = udpGameServer.GetReceivePort(); //受信用ポート番号とサーバーのセッションIDがここで決まるので取得
+        serverSessionID = udpGameServer.GetServerSessionID();
+        isRunning = true;
 
         //パケットの処理をUpdateでやると1フレームの計算量が保障できなくなる（カクつきの原因になり得る）のでマルチスレッドで
         //スレッドが何個いるのかは試してみないと分からない
@@ -1038,6 +1045,11 @@ public class GameServerManager : MonoBehaviour
     
     private void OnDestroy()
     {
+        //稼働中なら切断パケット
+        if (isRunning)
+        {
+            udpGameServer.Send(new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
+        }
         this.udpGameServer?.Dispose();
     }
 }
