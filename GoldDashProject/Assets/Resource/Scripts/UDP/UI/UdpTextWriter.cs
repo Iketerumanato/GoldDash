@@ -7,12 +7,12 @@ public class UdpTextWriter : MonoBehaviour
     //テキスト
     [SerializeField] private TextMeshProUGUI stateMessage;
     [SerializeField] private TextMeshProUGUI stateMessageMini;
-    public void InitObservation(UdpButtonManager udpUIManager, GameServerManager gameServerManager, GameClientManager gameClientManager)
-    {
-        udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
-        gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
-        gameClientManager.ClientInternalSubject.Subscribe(e => ProcessClientInternalEvent(e));
-    }
+    //public void InitObservation(UdpButtonManager udpUIManager, GameServerManager gameServerManager, GameClientManager gameClientManager)
+    //{
+    //    udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
+    //    gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
+    //    gameClientManager.ClientInternalSubject.Subscribe(e => ProcessClientInternalEvent(e));
+    //}
 
     private void ProcessUdpManagerEvent(UdpButtonManager.UDP_BUTTON_EVENT e)
     {
@@ -59,18 +59,18 @@ public class UdpTextWriter : MonoBehaviour
         }
     }
 
-    private void ProcessClientInternalEvent(GameClientManager.CLIENT_INTERNAL_EVENT e)
-    {
-        switch (e)
-        {
-            case GameClientManager.CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME:
-                stateMessageMini.text = "STABLE";
-                break;
-            case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED:
-                stateMessage.text = "CLIENT MODE : RUNNING";
-                break;
-            default:
-                break;
-        }
-    }
+    //private void ProcessClientInternalEvent(GameClientManager.CLIENT_INTERNAL_EVENT e)
+    //{
+    //    switch (e)
+    //    {
+    //        case GameClientManager.CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME:
+    //            stateMessageMini.text = "STABLE";
+    //            break;
+    //        case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED:
+    //            stateMessage.text = "CLIENT MODE : RUNNING";
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //}
 }

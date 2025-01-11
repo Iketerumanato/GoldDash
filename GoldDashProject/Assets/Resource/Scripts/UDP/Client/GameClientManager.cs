@@ -5,6 +5,8 @@ using R3;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 using System.Threading;
+using TMPro;
+using UnityEngine.UI;
 
 public class GameClientManager : MonoBehaviour
 {
@@ -52,6 +54,21 @@ public class GameClientManager : MonoBehaviour
 
     //現在のstate
     IClientState currentClientState;
+
+    //UI関連
+    [SerializeField] private GameObject Phase0UniqueUI;
+    [SerializeField] private GameObject Phase1UniqueUI;
+
+    //Gマーク
+    [SerializeField] private GameObject processingLogo;
+    [SerializeField] private GameObject arrow;
+
+    //暗転用イメージ
+    [SerializeField] private Image blackImage;
+
+    //Phaseによって変わるテキスト
+    [SerializeField] private TextMeshProUGUI upperTextBox;
+    [SerializeField] private TextMeshProUGUI centerTextBox;
     #endregion
 
     #region Stateインターフェース
