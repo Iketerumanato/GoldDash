@@ -64,12 +64,25 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private GameObject processingLogo;
     [SerializeField] private GameObject arrow;
 
+    //文字数が多すぎエラー
+    [SerializeField] private GameObject characterCountError;
+    [SerializeField] private TMP_InputField inputField;
+
     //暗転用イメージ
     [SerializeField] private Image blackImage;
 
     //Phaseによって変わるテキスト
     [SerializeField] private TextMeshProUGUI upperTextBox;
     [SerializeField] private TextMeshProUGUI centerTextBox;
+
+    //ボタンの強調アニメーション・グレーアウト状態を管理するスクリプトコンポーネント
+    [SerializeField] private ButtonAnimator NameInputFieldAnimator;
+    [SerializeField] private ButtonAnimator ConnectButtonAnimator;
+
+    //各種ボタン
+    [SerializeField] private Button TouchToStartButton;
+    [SerializeField] private Button BackButton;
+    [SerializeField] private Button ConnectButton;
     #endregion
 
     #region Stateインターフェース
@@ -101,14 +114,6 @@ public class GameClientManager : MonoBehaviour
 
         public void UpdateProcess(GameClientManager gameClientManager)
         {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                gameClientManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
-                {
-                    gameClientManager.ChangeClientState(new Phase1State());
-                    gameClientManager.blackImage.DOFade(0f, 0.3f);
-                });
-            }
         }
 
         public void ExitState(GameClientManager gameClientManager)
@@ -127,18 +132,21 @@ public class GameClientManager : MonoBehaviour
             //テキスト変える
             gameClientManager.upperTextBox.text = "プレイヤー名を入力してください";
             gameClientManager.centerTextBox.text = "";
+            //名前欄の強調
+            gameClientManager.NameInputFieldAnimator.IsAnimating = true;
+            //接続ボタンをグレーアウト
+            gameClientManager.ConnectButtonAnimator.IsGrayedOut = true;
+            //エラーメッセージは非表示に
+            gameClientManager.characterCountError.SetActive(false);
+            //インプットフィールドに既に何か書き込まれているならアニメーション状態の更新
+            if (gameClientManager.inputField.text.Length != 0)
+            {
+                gameClientManager.CheckNameCharacterCount();
+            }
         }
 
         public void UpdateProcess(GameClientManager gameClientManager)
         {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                gameClientManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
-                {
-                    gameClientManager.ChangeClientState(new Phase2State());
-                    gameClientManager.blackImage.DOFade(0f, 0.3f);
-                });
-            }
         }
 
         public void ExitState(GameClientManager gameClientManager)
@@ -252,6 +260,32 @@ public class GameClientManager : MonoBehaviour
 
         //マップは作っておく
         MapGenerator.instance.GenerateMap();
+
+        //各種ボタンに関数を設定
+        TouchToStartButton.OnClickAsObservable().Subscribe(_ => 
+        {
+            blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+            {
+                ChangeClientState(new Phase1State());
+                blackImage.DOFade(0f, 0.3f);
+            });
+        });
+        BackButton.OnClickAsObservable().Subscribe(_ => 
+        {
+            blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+            {
+                ChangeClientState(new Phase0State());
+                blackImage.DOFade(0f, 0.3f);
+            });
+        });
+        ConnectButton.OnClickAsObservable().Subscribe(_ => 
+        {
+            blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+            {
+                ChangeClientState(new Phase2State());
+                blackImage.DOFade(0f, 0.3f);
+            });
+        });
     }
 
     private void Update()
@@ -615,5 +649,24 @@ public class GameClientManager : MonoBehaviour
     private void OnDestroy()
     {
         this.udpGameClient?.Dispose();
+    }
+
+    public void CheckNameCharacterCount()
+    {
+        string name = inputField.text;
+        if (name.Length > 0 && name.Length <= 8)
+        {
+            characterCountError.SetActive(false);
+            NameInputFieldAnimator.IsAnimating = false;
+            ConnectButtonAnimator.IsAnimating = true;
+            ConnectButtonAnimator.IsGrayedOut = false;
+        }
+        else
+        {
+            characterCountError.SetActive(true);
+            NameInputFieldAnimator.IsAnimating = true;
+            ConnectButtonAnimator.IsAnimating = false;
+            ConnectButtonAnimator.IsGrayedOut = true;
+        }
     }
 }
