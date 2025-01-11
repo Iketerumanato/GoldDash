@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using TMPro;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class GameClientManager : MonoBehaviour
 {
@@ -91,14 +92,29 @@ public class GameClientManager : MonoBehaviour
     {
         public void EnterState(GameClientManager gameClientManager)
         {
+            //必要なUI出す
+            gameClientManager.Phase0UniqueUI.SetActive(true);
+            //テキスト変える
+            gameClientManager.upperTextBox.text = "";
+            gameClientManager.centerTextBox.text = "";
         }
 
         public void UpdateProcess(GameClientManager gameClientManager)
         {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                gameClientManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+                {
+                    gameClientManager.ChangeClientState(new Phase1State());
+                    gameClientManager.blackImage.DOFade(0f, 0.3f);
+                });
+            }
         }
 
         public void ExitState(GameClientManager gameClientManager)
         {
+            //不要なUI消す
+            gameClientManager.Phase0UniqueUI.SetActive(false);
         }
     }
 
@@ -106,14 +122,29 @@ public class GameClientManager : MonoBehaviour
     {
         public void EnterState(GameClientManager gameClientManager)
         {
+            //必要なUI出す
+            gameClientManager.Phase1UniqueUI.SetActive(true);
+            //テキスト変える
+            gameClientManager.upperTextBox.text = "プレイヤー名を入力してください";
+            gameClientManager.centerTextBox.text = "";
         }
 
         public void UpdateProcess(GameClientManager gameClientManager)
         {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                gameClientManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+                {
+                    gameClientManager.ChangeClientState(new Phase2State());
+                    gameClientManager.blackImage.DOFade(0f, 0.3f);
+                });
+            }
         }
 
         public void ExitState(GameClientManager gameClientManager)
         {
+            //不要なUI消す
+            gameClientManager.Phase1UniqueUI.SetActive(false);
         }
     }
 
@@ -121,6 +152,11 @@ public class GameClientManager : MonoBehaviour
     {
         public void EnterState(GameClientManager gameClientManager)
         {
+            //必要なUI出す
+            gameClientManager.processingLogo.SetActive(true);
+            gameClientManager.upperTextBox.text = "";
+            gameClientManager.centerTextBox.text = "接続中…";
+            //テキスト変える
         }
 
         public void UpdateProcess(GameClientManager gameClientManager)
@@ -129,6 +165,7 @@ public class GameClientManager : MonoBehaviour
 
         public void ExitState(GameClientManager gameClientManager)
         {
+            //不要なUI消す
         }
     }
 
@@ -209,6 +246,17 @@ public class GameClientManager : MonoBehaviour
 
         Task.Run(() => ProcessPacket());
         Task.Run(() => SendPlayerPosition());
+
+        //State初期化
+        ChangeClientState(new Phase0State());
+
+        //マップは作っておく
+        MapGenerator.instance.GenerateMap();
+    }
+
+    private void Update()
+    {
+        currentClientState.UpdateProcess(this);
     }
 
     private async void SendPlayerPosition()

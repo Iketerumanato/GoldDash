@@ -54,7 +54,7 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    private void Start()
+    private void Awake()
     {
         //シングルトンな静的変数の初期化
         if (instance == null)
