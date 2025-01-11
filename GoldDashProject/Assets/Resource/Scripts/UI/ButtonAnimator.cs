@@ -21,6 +21,7 @@ public class ButtonAnimator : MonoBehaviour
     [SerializeField] private float m_animationDelayTime = 0.3f; //元の位置に戻ったとき、また広がり始めるまでの待機時間
 
     //グレーアウト
+    [SerializeField] private Button m_button; //グレーアウトさせたいボタン
     [SerializeField] private Image m_editImage; // グレーアウトさせたいボタンのImageコンポーネント
     [SerializeField] private TextMeshProUGUI m_editText; // グレーアウトさせたいボタンのTMPコンポーネント
     [SerializeField] private Color m_targetImageColor; // グレーアウト時この色に変更する
@@ -92,7 +93,7 @@ public class ButtonAnimator : MonoBehaviour
         m_targetAnchoredPosLowerRight = m_rtLowerRight.anchoredPosition + (new Vector2(1, -1) * m_offset);
 
         //グレーアウトする画像や文字の元の色を保存
-        if (m_editImage == null && m_editText == null) return;
+        if (m_button == null) return;
 
         m_originImageColor = m_editImage.color;
         m_originTextColor = m_editText.color;
@@ -144,16 +145,18 @@ public class ButtonAnimator : MonoBehaviour
 
     private void StartGrayOut()
     {
-        if (m_editImage == null && m_editText == null) return;
+        if (m_button == null) return;
 
+        m_button.interactable = false;
         m_editImage.color = m_targetImageColor;
         m_editText.color = m_targetTextColor;
     }
 
     private void StopGrayOut()
     {
-        if (m_editImage == null && m_editText == null) return;
+        if (m_button == null) return;
 
+        m_button.interactable = true;
         m_editImage.color = m_originImageColor;
         m_editText.color = m_originTextColor;
     }
