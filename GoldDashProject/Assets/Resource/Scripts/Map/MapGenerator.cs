@@ -41,30 +41,12 @@ public class MapGenerator : MonoBehaviour
     //宝箱について同じもの
     private List<Vector3> chestPointsOrigin; //全象限の宝箱出現地点
     private List<Vector3> chestPointsDeck; //↑の全ての要素をランダムな順で並べ替えたリスト。文字通り山札
-
-    public void InitObservation(GameServerManager gameServerManager, GameClientManager gameClientManager)
-    {
-        gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
-        gameClientManager.ClientInternalSubject.Subscribe(e => ProcessClientInternalEvent(e));
-    }
-
+    
     private void ProcessServerInternalEvent(GameServerManager.SERVER_INTERNAL_EVENT e)
     {
         switch (e)
         {
             case GameServerManager.SERVER_INTERNAL_EVENT.GENERATE_MAP:
-                GenerateMap();
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void ProcessClientInternalEvent(GameClientManager.CLIENT_INTERNAL_EVENT e)
-    {
-        switch (e)
-        {
-            case GameClientManager.CLIENT_INTERNAL_EVENT.GENERATE_MAP:
                 GenerateMap();
                 break;
             default:
