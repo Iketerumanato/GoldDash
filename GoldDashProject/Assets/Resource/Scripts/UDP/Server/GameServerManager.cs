@@ -7,12 +7,16 @@ using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
 using TMPro;
 using System;
+using UnityEngine.UI;
+using DG.Tweening;
 
 public class GameServerManager : MonoBehaviour
 {
+    #region 変数宣言リージョン
     private bool isRunning; //サーバーが稼働中か
+    private bool inGame; //メインゲームは始まっているか
 
-    //GameServer関連のインスタンスがDisposeメソッド以外で破棄されることは想定していない。そのときはおしまいだろう。
+    //udpGameServerインスタンスがDisposeメソッド以外で破棄されることは想定していない。そのときはおしまいだろう。
     private UdpGameServer udpGameServer; //UdpCommunicatorを継承したUdpGameServerのインスタンス
     private ushort rcvPort; //udpGameServerの受信用ポート番号
     private ushort serverSessionID; //クライアントにサーバーを判別させるためのID
@@ -32,7 +36,7 @@ public class GameServerManager : MonoBehaviour
     //動的に減らしたり増やしたりしても問題ないが、宝箱の出現候補地点の数より多くならないように注意が必要。宝箱が同じ位置に重なって生成されてしまう。
     private int currentNumOfChests; //現在生成されている宝箱の数
 
-    [SerializeField] private GameObject RedActorPrefab; //アクターのプレハブ
+    [SerializeField] private GameObject RedActorPrefab; //アクターのアイコンプレハブ
     [SerializeField] private GameObject BlueActorPrefab;
     [SerializeField] private GameObject GreenActorPrefab;
     [SerializeField] private GameObject YellowActorPrefab;
@@ -42,11 +46,6 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
     [SerializeField] private GameObject ScrollPrefab; //巻物のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
-
-    private bool inGame; //ゲームは始まっているか
-
-    //12/29追記
-    [SerializeField] TitleUI _titleUi;
 
     //サーバーが内部をコントロールするための通知　マップ生成など
     //クライアントサーバーのクライアント部分の処理をここでやると機能過多になるため、通知を飛ばすだけにする。脳が体内の器官に命令を送るようなイメージ。実行するのはあくまで器官側。
@@ -64,8 +63,16 @@ public class GameServerManager : MonoBehaviour
     //レイを飛ばすためのカメラ
     [SerializeField] private Camera mapCamera;
 
-    //地図UI
-    [SerializeField] private Canvas mapUICanvas;
+    //UI関連
+    [SerializeField] private GameObject PlayerInfoUI;
+    [SerializeField] private GameObject Phase1UniqueUI;
+    [SerializeField] private GameObject Phase2UniqueUI;
+
+    //Gマーク
+    [SerializeField] private GameObject processingLogo;
+
+    //暗転用イメージ
+    [SerializeField] private Image blackImage;
 
     //プレイヤーネーム
     [SerializeField] private TextMeshProUGUI redNameText;
@@ -73,19 +80,15 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI greenNameText;
     [SerializeField] private TextMeshProUGUI yellowNameText;
 
+    //Phaseによって変わるテキスト
+    [SerializeField] private TextMeshProUGUI lowerTextBox;
+    [SerializeField] private TextMeshProUGUI upperTextBox;
+
     //制限時間
     [SerializeField] private TextMeshProUGUI timeTextLeft;
     [SerializeField] private TextMeshProUGUI timeTextRight;
 
     private float timeLimitSeconds = 333f;
-
-    #region Stateインターフェース
-    public interface ISetverState
-    {
-        void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID);
-        void UpdateProcess(GameServerManager gameServerManager);
-        void ExitState(GameServerManager gameServerManager);
-    }
 
     //現在のstate
     private ISetverState currentSetverState;
@@ -95,6 +98,15 @@ public class GameServerManager : MonoBehaviour
     private Definer.MID awaitingMagicID;
     //魔法を使用をしようとしているプレイヤーのsessionID
     private ushort magicUserID;
+    #endregion
+
+    #region Stateインターフェース
+    public interface ISetverState
+    {
+        void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID);
+        void UpdateProcess(GameServerManager gameServerManager);
+        void ExitState(GameServerManager gameServerManager);
+    }
 
     //魔法IDを渡しつつStateの切り替え
     public void ChangeServerState(ISetverState newState, Definer.MID magicID = Definer.MID.NONE, ushort magicUserID = 0)
@@ -102,6 +114,100 @@ public class GameServerManager : MonoBehaviour
         if (currentSetverState != null) currentSetverState.ExitState(this);
         currentSetverState = newState;
         currentSetverState.EnterState(this, magicID, magicUserID);
+    }
+
+    //通常の状態
+    public class Phase0State : ISetverState
+    {
+        public void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
+        {
+            //必要なUI出す
+            gameServerManager.PlayerInfoUI.SetActive(true);
+            //テキスト変える
+            gameServerManager.upperTextBox.text = "プレイヤーの接続を待っています…";
+            gameServerManager.lowerTextBox.text = "プレイヤーの接続を待っています…";
+        }
+
+        public void UpdateProcess(GameServerManager gameServerManager)
+        {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                gameServerManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+                {
+                    gameServerManager.ChangeServerState(new Phase1State());
+                    gameServerManager.blackImage.DOFade(0f, 0.3f);
+                });
+            }
+        }
+
+        public void ExitState(GameServerManager gameServerManager)
+        {
+            //不要なUI消す
+            gameServerManager.PlayerInfoUI.SetActive(false);
+        }
+    }
+
+    //通常の状態
+    public class Phase1State : ISetverState
+    {
+        public void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
+        {
+            //必要なUI出す
+            gameServerManager.Phase1UniqueUI.SetActive(true);
+            //テキスト変える
+            gameServerManager.upperTextBox.text = "プレイヤーの配色を選んでください";
+            gameServerManager.lowerTextBox.text = "プレイヤーの配色を選んでください";
+        }
+
+        public void UpdateProcess(GameServerManager gameServerManager)
+        {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                gameServerManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+                {
+                    gameServerManager.ChangeServerState(new Phase2State());
+                    gameServerManager.blackImage.DOFade(0f, 0.3f);
+                });
+            }
+        }
+
+        public void ExitState(GameServerManager gameServerManager)
+        {
+            //不要なUI消す
+            gameServerManager.Phase1UniqueUI.SetActive(false);
+            gameServerManager.processingLogo.SetActive(false);
+        }
+    }
+
+    //通常の状態
+    public class Phase2State : ISetverState
+    {
+        public void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
+        {
+            //必要なUI出す
+            gameServerManager.PlayerInfoUI.SetActive(true);
+            gameServerManager.Phase2UniqueUI.SetActive(true);
+            //テキスト変える
+            gameServerManager.upperTextBox.text = "";
+            gameServerManager.lowerTextBox.text = "";
+            //マップ作る
+            MapGenerator.instance.GenerateMap();
+            //宝箱作る
+            //もろもろ終わったらパケット1 クライアントメインカメラの変更
+            //1秒ほど待ってメッセージを送り、操作可能にする
+            //ノーマルstateへ
+        }
+
+        public void UpdateProcess(GameServerManager gameServerManager)
+        {
+        }
+
+        public void ExitState(GameServerManager gameServerManager)
+        {
+            //座標同期開始
+            //制限時間カウント開始
+            //BGM開始
+        }
     }
 
     //通常の状態
@@ -237,85 +343,7 @@ public class GameServerManager : MonoBehaviour
         }
     }
     #endregion
-
-    #region ボタンが押されたらサーバーを有効化したり無効化したり
-    //public void InitObservation(UdpButtonManager udpUIManager)
-    //{
-    //    ServerInternalSubject = new Subject<SERVER_INTERNAL_EVENT>();
-    //    udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
-    //}
-
-    public void InitObservation(Title title)
-    {
-        ServerInternalSubject = new Subject<SERVER_INTERNAL_EVENT>();
-        title.titleButtonSubject.Subscribe(e => ProcessUdpManagerEvent(e));
-    }
-
-    //private void ProcessUdpManagerEvent(UdpButtonManager.UDP_BUTTON_EVENT e)
-    //{
-    //    switch (e)
-    //    {
-    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_SERVER_MODE:
-    //            udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
-    //            rcvPort = udpGameServer.GetReceivePort(); //受信用ポート番号とサーバーのセッションIDがここで決まるので取得
-    //            serverSessionID = udpGameServer.GetServerSessionID();
-    //            break;
-    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_ACTIVATE:
-    //            if (udpGameServer == null) udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
-    //            isRunning = true;
-    //            break;
-    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
-    //            if (isRunning) //稼働中なら切断パケット
-    //            {
-    //                udpGameServer.Send(new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
-    //            }
-    //            if (udpGameServer != null) udpGameServer.Dispose();
-    //            udpGameServer = null;
-    //            actorDictionary.Clear(); //変数リセットなど
-    //            preparedPlayers = 0;
-    //            isRunning = false;
-    //            break;
-    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
-    //            if (udpGameServer != null) udpGameServer.Dispose();
-    //            udpGameServer = null;
-    //            isRunning = false;
-    //            break;
-    //        default:
-    //            break;
-    //    }
-    //}
-    private void ProcessUdpManagerEvent(Title.TITLE_BUTTON_EVENT titlebuttonEvent)
-    {
-        switch (titlebuttonEvent)
-        {
-            case Title.TITLE_BUTTON_EVENT.BUTTON_START_SERVER_ACTIVATE:
-                udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
-                rcvPort = udpGameServer.GetReceivePort(); //受信用ポート番号とサーバーのセッションIDがここで決まるので取得
-                serverSessionID = udpGameServer.GetServerSessionID();
-                isRunning = true;
-                break;
-            //case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_SERVER_DEACTIVATE:
-            //    if (isRunning) //稼働中なら切断パケット
-            //    {
-            //        udpGameServer.Send(new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT).ToByte()).ToByte());
-            //    }
-            //    if (udpGameServer != null) udpGameServer.Dispose();
-            //    udpGameServer = null;
-            //    actorDictionary.Clear(); //変数リセットなど
-            //    preparedPlayers = 0;
-            //    isRunning = false;
-            //    break;
-            //case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
-            //    if (udpGameServer != null) udpGameServer.Dispose();
-            //    udpGameServer = null;
-            //    isRunning = false;
-            //    break;
-            default:
-                break;
-        }
-    }
-    #endregion
-
+    
     private void Start()
     {
         packetQueue = new ConcurrentQueue<Header>();
@@ -336,12 +364,14 @@ public class GameServerManager : MonoBehaviour
         magicLottely = GetComponent<MagicLottely>();
 
         //State初期化
-        ChangeServerState(new NormalState());
+        ChangeServerState(new Phase0State());
     }
 
     private void Update()
     {
         currentSetverState.UpdateProcess(this);
+
+        if (!inGame) return;
 
         //秒数を減らす
         timeLimitSeconds -= Time.deltaTime;
@@ -506,8 +536,6 @@ public class GameServerManager : MonoBehaviour
                                 //内部通知
                                 ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
                                 ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.EDIT_GUI_FOR_GAME); //UIレイアウトを変更せよ
-
-                                _titleUi.ChangeStateServer(TitleUI.SERVER_MODE.MODE_CREATE_MAP);
 
                                 //全クライアントにアクターの生成命令を送る
 

@@ -94,7 +94,7 @@ public class MapGenerator : MonoBehaviour
         chestPointsDeck = new List<Vector3>();
     }
 
-    private void GenerateMap()
+    public void GenerateMap()
     {
         //ランダムに選んだcsvファイルから19*19のcellInfo2次元配列を作成する
 

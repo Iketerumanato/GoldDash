@@ -199,11 +199,7 @@ public class TitleUI : MonoBehaviour
 
     private void Start()
     {
-        _title.InitObservationClient(_title);
-        _gameClientManager.InitObservation(_title);
-        _gameServerManager.InitObservation(_title);
-        InitObserver(_title,_gameClientManager,_gameServerManager);
-        _mapGenerator.InitObservation(_gameServerManager, _gameClientManager);
+        
     }
 
     public void InitObserver(Title title,GameClientManager gameClientManager,GameServerManager gameServerManager)
