@@ -122,6 +122,34 @@ public class MapGenerator : MonoBehaviour
                         }
                     }
                 }
+
+                // 宝箱のスポーン位置
+                if (map[i, j].spawnChest)
+                {
+                    //第2または第1象限なら
+                    if (i < MAP_PART_SIZE)
+                    {
+                        if (j < MAP_PART_SIZE) //第2象限なら
+                        {
+                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                        }
+                        else //第1象限なら
+                        {
+                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                        }
+                    }
+                    else //第3または第4象限なら
+                    {
+                        if (j < MAP_PART_SIZE) //第3象限なら
+                        {
+                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                        }
+                        else //第4象限なら
+                        {
+                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                        }
+                    }
+                }
             }
         }
     }
@@ -225,34 +253,6 @@ public class MapGenerator : MonoBehaviour
                 {
                     GameObject lowerDoor = Instantiate(doorObj, new Vector3(i + 1f, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
                     lowerDoor.transform.parent = Parenttransform;
-                }
-
-                // 宝箱のスポーン位置
-                if (map[i, j].spawnChest)
-                {
-                    //第2または第1象限なら
-                    if (i < MAP_PART_SIZE)
-                    {
-                        if (j < MAP_PART_SIZE) //第2象限なら
-                        {
-                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                        }
-                        else //第1象限なら
-                        {
-                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                        }
-                    }
-                    else //第3または第4象限なら
-                    {
-                        if (j < MAP_PART_SIZE) //第3象限なら
-                        {
-                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                        }
-                        else //第4象限なら
-                        {
-                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                        }
-                    }
                 }
             }
         }
@@ -358,35 +358,6 @@ public class MapGenerator : MonoBehaviour
                     GameObject lowerDoor = Instantiate(doorObj, new Vector3(i + 1f, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
                     lowerDoor.transform.parent = Parenttransform;
                 }
-
-                // 宝箱のスポーン位置
-                if (map[i, j].spawnChest)
-                {
-                    //第2または第1象限なら
-                    if (i < MAP_PART_SIZE)
-                    {
-                        if (j < MAP_PART_SIZE) //第2象限なら
-                        {
-                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                        }
-                        else //第1象限なら
-                        {
-                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                        }
-                    }
-                    else //第3または第4象限なら
-                    {
-                        if (j < MAP_PART_SIZE) //第3象限なら
-                        {
-                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                        }
-                        else //第4象限なら
-                        {
-                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                        }
-                    }
-                }
-
                 await UniTask.Delay(10);
             }
         }
