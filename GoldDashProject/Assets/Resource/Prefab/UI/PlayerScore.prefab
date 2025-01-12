@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 9b85f7d1af54cd04180e551cb61f4eb9, type: 3}
+  m_Texture: {fileID: 2800000, guid: d50cbe99136c04944826ed9004b6dbea, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -170,7 +170,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 9b85f7d1af54cd04180e551cb61f4eb9, type: 3}
+  m_Texture: {fileID: 2800000, guid: d50cbe99136c04944826ed9004b6dbea, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -242,7 +242,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 9b85f7d1af54cd04180e551cb61f4eb9, type: 3}
+  m_Texture: {fileID: 2800000, guid: d50cbe99136c04944826ed9004b6dbea, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -314,7 +314,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 9b85f7d1af54cd04180e551cb61f4eb9, type: 3}
+  m_Texture: {fileID: 2800000, guid: d50cbe99136c04944826ed9004b6dbea, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -337,7 +337,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8362373728269707536
 Transform:
   m_ObjectHideFlags: 0
@@ -436,7 +436,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding: {x: 0, y: 0, z: 0, w: 0}
-  m_Softness: {x: 0, y: 34}
+  m_Softness: {x: 0, y: 20}
 --- !u!114 &956161853949214835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -450,13 +450,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   digitImages:
-  - {fileID: 3631325911372021155}
   - {fileID: 5095587071441153131}
   - {fileID: 832180962772840523}
   - {fileID: 201444916959431857}
   - {fileID: 5954803683359898699}
   - {fileID: 3334800041158751676}
-  numberTexture: {fileID: 2800000, guid: 9b85f7d1af54cd04180e551cb61f4eb9, type: 3}
+  numberTexture: {fileID: 2800000, guid: d50cbe99136c04944826ed9004b6dbea, type: 3}
   animationTime: 0.5
   digitHeight: 32
   delayBetweenDigits: 0.1
@@ -479,7 +478,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3631325911372021155
 RectTransform:
   m_ObjectHideFlags: 0
@@ -527,7 +526,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 9b85f7d1af54cd04180e551cb61f4eb9, type: 3}
+  m_Texture: {fileID: 2800000, guid: ce07a7e2e431e9444a72dfd889491133, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -599,7 +598,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 9b85f7d1af54cd04180e551cb61f4eb9, type: 3}
+  m_Texture: {fileID: 2800000, guid: d50cbe99136c04944826ed9004b6dbea, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0

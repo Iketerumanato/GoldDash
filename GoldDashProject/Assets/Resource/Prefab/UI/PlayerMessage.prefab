@@ -33,7 +33,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1130, y: 296}
+  m_AnchoredPosition: {x: 1130, y: 255}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1316063112127402304
@@ -51,8 +51,8 @@ MonoBehaviour:
   smallTextPrefab: {fileID: 6609272581741569117, guid: 1203aee5e1309c34bad7eec535868fdd, type: 3}
   largeTextPrefab: {fileID: 6193928572962396567, guid: cd4c2ee223efe5b499ce9968ad1f2f9f, type: 3}
   SpawnTextPoint: {fileID: 534753535498417867}
-  TestGoldNum: 1234
+  TestGoldNum: 100
   historyDisplayTime: 3
   lageTextDisplayTime: 1
   verticalSpacing: 85
-  largeTextFadeDuration: 0.5
+  largeTextFadeDuration: 0.2

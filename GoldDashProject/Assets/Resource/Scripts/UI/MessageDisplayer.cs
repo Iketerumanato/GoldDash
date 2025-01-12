@@ -23,18 +23,10 @@ public class MessageDisplayer : MonoBehaviour
     [Range(0f, 1f)]
     [SerializeField] float largeTextFadeDuration = 0.5f;
 
-    //別のクラスで呼び出し予定
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))  // Pキーが押されたとき
-        {
-            DisplaySmallMessage($"{TestGoldNum}ゴールドを手に入れた!");
-        }
-
-        if(Input.GetKeyDown(KeyCode.L))// Lキーが押された時
-        {
-            DisplayLargeMessage($"あと 1分 !", lageTextDisplayTime);
-        }
+        if (Input.GetKeyDown(KeyCode.X)) { DisplaySmallMessage($"{TestGoldNum} Gを手に入れた!"); }
+        if (Input.GetKeyDown(KeyCode.Z)) { DisplayLargeMessage($"あと 1分 !", lageTextDisplayTime); }
     }
 
     #region SmallMessageの処理
