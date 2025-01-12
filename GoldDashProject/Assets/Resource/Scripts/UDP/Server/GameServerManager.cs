@@ -252,7 +252,11 @@ public class GameServerManager : MonoBehaviour
                 gameServerManager.udpGameServer.Send(myHeader.ToByte());
             }
             //サーバー側でも色変更
-            gameServerManager.actorDictionary[greenID].ChangeGreenToWhiteServer();
+            ActorController tmp;
+            if (gameServerManager.actorDictionary.TryGetValue(greenID, out tmp))
+            {
+                gameServerManager.actorDictionary[greenID].ChangeGreenToWhiteServer();
+            }
 
             //サーバー側のマップ生成 //非同期に行うので待つ
             MapGenerator.instance.GenerateMapForServer();
