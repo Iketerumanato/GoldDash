@@ -256,6 +256,7 @@ public class GameServerManager : MonoBehaviour
             if (gameServerManager.actorDictionary.TryGetValue(greenID, out tmp))
             {
                 gameServerManager.actorDictionary[greenID].ChangeGreenToWhiteServer();
+                gameServerManager.greenArrow.GetComponent<RawImage>().color = Color.white;
             }
 
             //サーバー側のマップ生成 //非同期に行うので待つ
