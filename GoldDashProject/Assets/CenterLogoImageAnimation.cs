@@ -13,10 +13,10 @@ public class CenterLogoImageAnimation : MonoBehaviour
     void Start()
     {
         CenterLogoAnimation = DOTween.Sequence();
-        CenterLogoAnimationMain();
+        PlayCenterLogoAnimation();
     }
 
-    private void CenterLogoAnimationMain()
+    private void PlayCenterLogoAnimation()
     {
         CenterLogoAnimation.Append(CenterLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 360f), startRotateSpeed, RotateMode.FastBeyond360).SetEase(Ease.InOutBack))//InOutBackを付けつつ一回目の回転
             .SetDelay(animationDylayTime)//少し待機
