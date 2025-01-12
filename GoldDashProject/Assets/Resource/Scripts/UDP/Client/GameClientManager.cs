@@ -216,7 +216,7 @@ public class GameClientManager : MonoBehaviour
         ChangeClientState(new Phase0State());
 
         //マップは作っておく
-        MapGenerator.instance.GenerateMap();
+        MapGenerator.instance.GenerateMapForClient();
 
         //各種ボタンに関数を設定
         TouchToStartButton.OnClickAsObservable().Subscribe(_ => 
@@ -324,6 +324,8 @@ public class GameClientManager : MonoBehaviour
 
                             sessionID = receivedInitPacket.sessionID; //自分のsessionIDを受け取る
                             Debug.Log($"sessionID:{sessionID}を受け取ったぜ。");
+
+                            centerTextBox.text = "接続完了！";
                             break;
                         case (byte)Definer.PT.AP:
 
@@ -344,8 +346,6 @@ public class GameClientManager : MonoBehaviour
                                         case (byte)Definer.NDID.HELLO:
                                             break;
                                         case (byte)Definer.NDID.PSG:
-                                            //生成すべきアクターの数を受け取る
-                                            numOfActors = receivedActionPacket.targetID;
                                             break;
                                         case (byte)Definer.NDID.DISCONNECT:
                                             //ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL); //予期せずサーバーから切断された場合エラーを出す
@@ -570,6 +570,14 @@ public class GameClientManager : MonoBehaviour
                                         case (byte)Definer.EDID.TELEPORT_ACTOR:
                                             actorDictionary[receivedActionPacket.targetID].Warp(receivedActionPacket.pos, actorDictionary[receivedActionPacket.targetID].transform.forward);
                                             break;
+                                        case (byte)Definer.EDID.CHANGE_ACTOR_COLOR_TO_WHITE:
+                                            //サーバー側でも色変更
+                                            ActorController tmp;
+                                            if (actorDictionary.TryGetValue(receivedActionPacket.targetID, out tmp))
+                                            {
+                                                actorDictionary[receivedActionPacket.targetID].ChangeGreenToWhiteClient();
+                                            }
+                                            break;
                                     }
                                     break;
                             }
@@ -625,7 +633,7 @@ public class GameClientManager : MonoBehaviour
         }
 
         this.udpGameClient?.Dispose();
-        this.sendCts.Cancel();
+        this.sendCts?.Cancel();
     }
 
     //インプットフィールドの編集を終えたときに呼び出す。名前の文字数チェックをしてUI状況を更新しつつ、myNameに値を格納

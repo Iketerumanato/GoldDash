@@ -84,6 +84,10 @@ public class ActorController : MonoBehaviour
     [SerializeField] private Material materialYellow;
     [SerializeField] private Material materialWhite;
 
+    //色変え用　緑と白の表示を切り替えるため
+    [SerializeField] private GameObject greenIcon;
+    [SerializeField] private GameObject whiteIcon;
+
     private void Start()
     {
         //プレイヤーか否か確認する
@@ -197,9 +201,16 @@ public class ActorController : MonoBehaviour
         }
     }
 
-    //白に色変え
-    public void ChangeGreenToWhite()
+    //白に色変え　クライアント用
+    public void ChangeGreenToWhiteClient()
     {
         m_skinnedMeshRenderer.material = materialWhite;
+    }
+    
+    //白に色変え　サーバー用
+    public void ChangeGreenToWhiteServer()
+    {
+        greenIcon.SetActive(false);
+        whiteIcon.SetActive(true);
     }
 }

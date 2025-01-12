@@ -209,6 +209,10 @@ public static class Definer
         /// このActorを瞬間移動させろ
         /// </summary>
         TELEPORT_ACTOR,
+        /// <summary>
+        /// このアクターを白色にしろ
+        /// </summary>
+        CHANGE_ACTOR_COLOR_TO_WHITE,
     }
 
     /// <summary>

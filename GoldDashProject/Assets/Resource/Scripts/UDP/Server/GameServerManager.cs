@@ -30,6 +30,7 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private ushort sessionPass; //サーバーに入るためのパスワード。udpGameServerのコンストラクタに渡す。
     [SerializeField] private int numOfPlayers; //何人のプレイヤーを募集するか
     private int preparedPlayers; //準備が完了したプレイヤーの数
+    private bool allActorsPrepared = false;
 
     [SerializeField] private int maxNumOfChests; //現在の（ゲーム開始時もそう）宝箱の同時出現数の上限。この値より少なければ生成される。
     //動的に減らしたり増やしたりしても問題ないが、宝箱の出現候補地点の数より多くならないように注意が必要。宝箱が同じ位置に重なって生成されてしまう。
@@ -92,6 +93,26 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timeTextRight;
 
     private float timeLimitSeconds = 333f;
+
+    //色変えボタン
+    [SerializeField] private ColorSelectButtonColorChanger colorSelectButtonColorChanger1;
+    [SerializeField] private ColorSelectButtonColorChanger colorSelectButtonColorChanger2;
+    [SerializeField] private ButtonAnimator colorSelectButtonAnimator1;
+    [SerializeField] private ButtonAnimator colorSelectButtonAnimator2;
+    [SerializeField] private Button colorSelectButton1;
+    [SerializeField] private Button colorSelectButton2;
+
+    //プレイヤーの配色パターン
+    public enum COLOR_TYPE
+    {
+        DEFAULT,
+        CHANGE_GREEN_TO_WHITE,
+    }
+    //現在の色パターン
+    private COLOR_TYPE currentColorType;
+
+    [SerializeField] private Button gameStartButton;
+    [SerializeField] private ButtonAnimator gameStartButtonAnimator;
 
     //現在のstate
     private ISetverState currentSetverState;
@@ -174,18 +195,17 @@ public class GameServerManager : MonoBehaviour
             //テキスト変える
             gameServerManager.upperTextBox.text = "プレイヤーの配色を選んでください";
             gameServerManager.lowerTextBox.text = "プレイヤーの配色を選んでください";
+            //スタートボタンをグレーアウト
+            gameServerManager.gameStartButtonAnimator.IsGrayedOut = true;
+            //色変更ボタンを強調、どちらも非選択状態にする
+            gameServerManager.colorSelectButtonAnimator1.IsAnimating = true;
+            gameServerManager.colorSelectButtonAnimator2.IsAnimating = true;
+            gameServerManager.colorSelectButtonColorChanger1.IsSelected = false;
+            gameServerManager.colorSelectButtonColorChanger2.IsSelected = false;
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
         {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                gameServerManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
-                {
-                    gameServerManager.ChangeServerState(new Phase2State());
-                    gameServerManager.blackImage.DOFade(0f, 0.3f);
-                });
-            }
         }
 
         public void ExitState(GameServerManager gameServerManager)
@@ -199,21 +219,89 @@ public class GameServerManager : MonoBehaviour
     //通常の状態
     public class Phase2State : ISetverState
     {
-        public void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
+        public async void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
         {
-            //フェーズ１を飛ばして実装したので一旦これで
-            gameServerManager.processingLogo.SetActive(false);
             //必要なUI出す
             gameServerManager.PlayerInfoUI.SetActive(true);
             gameServerManager.Phase2UniqueUI.SetActive(true);
             //テキスト変える
             gameServerManager.upperTextBox.text = "";
             gameServerManager.lowerTextBox.text = "";
-            //マップ作る
-            //宝箱作る
-            //もろもろ終わったらパケット1 クライアントメインカメラの変更
-            //1秒ほど待ってメッセージを送り、操作可能にする
-            //ノーマルstateへ
+
+            await UniTask.WaitUntil(() => gameServerManager.allActorsPrepared == true);
+
+            ActionPacket myActionPacket;
+            Header myHeader;
+
+            //色がタイプ２なら色変更パケット
+            ushort greenID = 0;
+            if (gameServerManager.currentColorType == COLOR_TYPE.CHANGE_GREEN_TO_WHITE)
+            {
+                //全アクターの中から緑のアクターを見つける
+                foreach (KeyValuePair<ushort, ActorController> k in gameServerManager.actorDictionary)
+                {
+                    if (k.Value.Color == Definer.PLAYER_COLOR.GREEN)
+                    { 
+                        greenID = k.Key;
+                        break;
+                    }
+                }
+
+                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.CHANGE_ACTOR_COLOR_TO_WHITE, greenID);
+                myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                gameServerManager.udpGameServer.Send(myHeader.ToByte());
+            }
+            //サーバー側でも色変更
+            ActorController tmp;
+            if (gameServerManager.actorDictionary.TryGetValue(greenID, out tmp))
+            {
+                gameServerManager.actorDictionary[greenID].ChangeGreenToWhiteServer();
+                gameServerManager.greenArrow.GetComponent<RawImage>().color = Color.white;
+            }
+
+            //サーバー側のマップ生成 //非同期に行うので待つ
+            MapGenerator.instance.GenerateMapForServer();
+
+            await UniTask.Delay(6200);
+
+            for (int i = 0; i < gameServerManager.maxNumOfChests; i++) //宝箱が上限数に達するまで宝箱を生成する
+            {
+                //まずサーバー側のシーンで
+                ushort entityID = gameServerManager.GetUniqueEntityID(); //エンティティID生成
+                Vector3 chestPos = MapGenerator.instance.GetUniqueChestPointRandomly(); //座標決め
+                Chest chest = Instantiate(gameServerManager.ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>();
+                chest.EntityID = entityID; //ID書き込み
+                chest.Tier = 1; //レア度はまだ適当に1
+                chest.gameObject.name = $"Chest ({entityID})";
+                gameServerManager.entityDictionary.Add(entityID, chest); //辞書に登録
+
+                //ティア（１）と座標を指定して、宝箱を生成する命令
+                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
+                myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+                //宝箱の数を記録
+                gameServerManager.currentNumOfChests++;
+            }
+
+            await UniTask.Delay(1000);
+
+            //全アクターの有効化
+            foreach (KeyValuePair<ushort, ActorController> k in gameServerManager.actorDictionary)
+            {
+                k.Value.gameObject.transform.position = new Vector3(5.5f, 0.4f, 5.5f);
+                k.Value.gameObject.SetActive(true);
+            }
+
+            await UniTask.Delay(1000);
+
+            //ゲーム開始
+            gameServerManager.inGame = true;
+
+            //ゲーム開始命令を送る
+            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
+            myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            gameServerManager.udpGameServer.Send(myHeader.ToByte());
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
@@ -388,6 +476,36 @@ public class GameServerManager : MonoBehaviour
 
         //State初期化
         ChangeServerState(new Phase0State());
+
+        //ボタンの処理記述
+        colorSelectButton1.OnClickAsObservable().Subscribe(_ =>
+        {
+            currentColorType = COLOR_TYPE.DEFAULT;
+            colorSelectButtonColorChanger1.IsSelected = true;
+            colorSelectButtonColorChanger2.IsSelected = false;
+            colorSelectButtonAnimator1.IsAnimating = false;
+            colorSelectButtonAnimator2.IsAnimating = false;
+            gameStartButtonAnimator.IsGrayedOut = false;
+            gameStartButtonAnimator.IsAnimating = true;
+        });
+        colorSelectButton2.OnClickAsObservable().Subscribe(_ =>
+        {
+            currentColorType = COLOR_TYPE.CHANGE_GREEN_TO_WHITE;
+            colorSelectButtonColorChanger1.IsSelected = false;
+            colorSelectButtonColorChanger2.IsSelected = true;
+            colorSelectButtonAnimator1.IsAnimating = false;
+            colorSelectButtonAnimator2.IsAnimating = false;
+            gameStartButtonAnimator.IsGrayedOut = false;
+            gameStartButtonAnimator.IsAnimating = true;
+        });
+        gameStartButton.OnClickAsObservable().Subscribe(_ =>
+        {
+            blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+            {
+                ChangeServerState(new Phase2State());
+                blackImage.DOFade(0f, 0.3f);
+            });
+        });
     }
 
     private void Update()
@@ -536,7 +654,10 @@ public class GameServerManager : MonoBehaviour
                             //規定人数のプレイヤーが集まった時の処理
                             if (actorDictionary.Count == numOfPlayers)
                             {
-                                await UniTask.Delay(1000);
+                                upperTextBox.text = "プレイヤーが集まりました！";
+                                lowerTextBox.text = "プレイヤーが集まりました！";
+
+                                await UniTask.Delay(1500);
 
                                 Debug.Log($"十分なプレイヤーが集まったぜ。闇のゲームの始まりだぜ。");
 
@@ -557,6 +678,12 @@ public class GameServerManager : MonoBehaviour
                                 }
 
                                 Debug.Log($"アクターを生成命令を出したぜ。");
+
+                                blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+                                {
+                                    ChangeServerState(new Phase1State());
+                                    blackImage.DOFade(0f, 0.3f);
+                                });
                             }
                             break;
                         #endregion
@@ -585,43 +712,8 @@ public class GameServerManager : MonoBehaviour
                                             if (preparedPlayers == numOfPlayers) //全プレイヤーの準備ができたら
                                             {
                                                 Debug.Log("やったー！全プレイヤーの準備ができたよ！");
-                                                ChangeServerState(new Phase2State());
 
-                                                //サーバー側のマップ生成
-                                                MapGenerator.instance.GenerateMap();
-
-                                                for (int i = 0; i < maxNumOfChests; i++) //宝箱が上限数に達するまで宝箱を生成する
-                                                {
-                                                    //まずサーバー側のシーンで
-                                                    entityID = GetUniqueEntityID(); //エンティティID生成
-                                                    Vector3 chestPos = MapGenerator.instance.GetUniqueChestPointRandomly(); //座標決め
-                                                    Chest chest = Instantiate(ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>();
-                                                    chest.EntityID = entityID; //ID書き込み
-                                                    chest.Tier = 1; //レア度はまだ適当に1
-                                                    chest.gameObject.name = $"Chest ({entityID})";
-                                                    entityDictionary.Add(entityID, chest); //辞書に登録
-
-                                                    //ティア（１）と座標を指定して、宝箱を生成する命令
-                                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
-                                                    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                                    udpGameServer.Send(myHeader.ToByte());
-
-                                                    //宝箱の数を記録
-                                                    currentNumOfChests++;
-                                                }
-
-                                                //全アクターの有効化
-                                                foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
-                                                {
-                                                    k.Value.gameObject.SetActive(true);
-                                                }
-                                                //ゲーム開始
-                                                inGame = true;
-
-                                                //ゲーム開始命令を送る
-                                                myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
-                                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                                udpGameServer.Send(myHeader.ToByte());
+                                                allActorsPrepared = true;
                                             }
                                             break;
                                         case (byte)Definer.NDID.DISCONNECT:
@@ -789,16 +881,6 @@ public class GameServerManager : MonoBehaviour
                                             {
                                                 //エンティティをChestにキャスト
                                                 Chest chest = (Chest)entity;
-
-                                                //存在するなら入手したプレイヤーにランダムなゴールドを振り込む 適当に80~200ゴールド
-                                                //System.Random random = new System.Random();
-                                                //int chestGold = random.Next(80, 201);
-                                                ////まずサーバー側で
-                                                //actorDictionary[receivedHeader.sessionID].Gold += chestGold;
-                                                ////ゴールド振込パケット送信
-                                                //myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.EDIT_GOLD, receivedHeader.sessionID, chestGold);
-                                                //myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                                //udpGameServer.Send(myHeader.ToByte());
 
                                                 //重複しないentityIDを作り、オブジェクトを生成しつつ、エンティティのコンポーネントを取得
                                                 //goldPileという変数名をここでだけ使いたいのでブロック文でスコープ分け
