@@ -74,60 +74,21 @@ public class MapGenerator : MonoBehaviour
         allRespawnPoints = new List<Vector3>();
         chestPointsOrigin = new List<Vector3>();
         chestPointsDeck = new List<Vector3>();
-
-        
-        //指定した名前のcsvファイルからcellInfo2次元配列を作成する
-        TextAsset[] textAsset_array =
-        {
-            Resources.Load("MapPart5x5_oudou1") as TextAsset,
-            Resources.Load("MapPart5x5_guruguru2x2x2") as TextAsset,
-            Resources.Load("MapPart5x5_meirohirome") as TextAsset,
-            Resources.Load("MapPart5x5_zyadouittyokusen") as TextAsset
-        };
-        map = MergeMap(textAsset_array);
-
-        //キャラのスポーン位置を読み込んでおく
-        for (int i = 0; i < MAP_SIZE; i++)
-        {
-            for (int j = 0; j < MAP_SIZE; j++)
-            {
-                // プレイヤーのスポーン位置をリストに追加
-                if (map[i, j].spawnPlayer)
-                {
-                    //第2または第1象限なら
-                    if (i < MAP_PART_SIZE)
-                    {
-                        if (j < MAP_PART_SIZE) //第2象限なら
-                        {
-                            respawnPointsInQuadrant2.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                        }
-                        else //第1象限なら
-                        {
-                            respawnPointsInQuadrant1.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                        }
-                    }
-                    else //第3または第4象限なら
-                    {
-                        if (j < MAP_PART_SIZE) //第3象限なら
-                        {
-                            respawnPointsInQuadrant3.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                        }
-                        else //第4象限なら
-                        {
-                            respawnPointsInQuadrant4.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                        }
-                    }
-                }
-            }
-        }
     }
 
     public void GenerateMap()
     {
+        //ランダムに選んだcsvファイルから19*19のcellInfo2次元配列を作成する
+
+        //ランダム抽選は保留。指定した名前のファイルを４つ読み込む
+        TextAsset[] textAsset_array = {
+            Resources.Load("MapPart5x5_oudou1") as TextAsset,
+            Resources.Load("MapPart5x5_guruguru2x2x2") as TextAsset,
+            Resources.Load("MapPart5x5_meirohirome") as TextAsset,
+            Resources.Load("MapPart5x5_zyadouittyokusen") as TextAsset};
+
+        map = MergeMap(textAsset_array);
+
         //上の廊下
         for (int row = 0; row < MAP_SIZE; row++)
         {
@@ -253,7 +214,40 @@ public class MapGenerator : MonoBehaviour
                             chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
                         }
                     }
-                }            }
+                }
+
+                // プレイヤーのスポーン位置をリストに追加
+                if (map[i, j].spawnPlayer)
+                {
+                    //第2または第1象限なら
+                    if (i < MAP_PART_SIZE)
+                    {
+                        if (j < MAP_PART_SIZE) //第2象限なら
+                        {
+                            respawnPointsInQuadrant2.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                        }
+                        else //第1象限なら
+                        {
+                            respawnPointsInQuadrant1.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                        }
+                    }
+                    else //第3または第4象限なら
+                    {
+                        if (j < MAP_PART_SIZE) //第3象限なら
+                        {
+                            respawnPointsInQuadrant3.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                        }
+                        else //第4象限なら
+                        {
+                            respawnPointsInQuadrant4.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                        }
+                    }
+                }
+            }
         }
     }
 
