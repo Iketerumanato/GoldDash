@@ -57,20 +57,24 @@ public class ActorController : MonoBehaviour
     [SerializeField] float runThreshold = 1f;
     float sqrRunThreshold;
     [SerializeField] float animationLerpSpeed = 70f;
+    //スクロールのアニメーションを再生する時のみSetActiveをtrueに変更させる
+    [SerializeField] GameObject BigScroll;
 
     //歩行アニメーションのメソッドに渡す
     float blendSpeed;
 
-    readonly string strMoveAnimation = "BlendSpeed";
-    readonly string strPunchTrigger = "PunchTrigger";
-    readonly string strHitedFrontTrigger = "HitFrontActorTrigger";
-    readonly string strHitedBackTrigger = "HitBackActorTrigger";
+    const string strMoveAnimation = "BlendSpeed";
+    const string strPunchTrigger = "PunchTrigger";
+    const string strHitedFrontTrigger = "HitFrontActorTrigger";
+    const string strHitedBackTrigger = "HitBackActorTrigger";
+    const string strIsUseScroll = "isUseScroll";
+    const string strIsStunned = "isStunned";
 
     //仮
     //所持金テキスト
     [SerializeField] private TextMeshProUGUI goldText;
 
-    [Header("プレイヤーの腕のメッシュレンダラー")]
+    [Header("プレイヤーの体のメッシュレンダラー")]
     [SerializeField] private SkinnedMeshRenderer m_skinnedMeshRenderer;
 
     [Header("プレイヤーの色に対応したマテリアル。赤→緑→青→黄→白")]
@@ -153,6 +157,25 @@ public class ActorController : MonoBehaviour
         PlayerAnimator.SetTrigger(strHitedBackTrigger);
     }
 
+    //スクロースの使用モーション再生※SetBoolでtrueになる前にあらかじめ非表示にしたスクロールのオブジェクトを表示してから再生
+    public void PlayActorScrollAnimation()
+    {
+        BigScroll.SetActive(true);
+        PlayerAnimator.SetBool(strIsUseScroll, true);
+    }
+    //スクロールオブジェクトの非表示
+    public void HideScrollObj()
+    {
+        BigScroll.SetActive(false);
+    }
+
+    //Actor側で雷を食らった時のモーション再生
+    public void PlayActorStunnAnimation()
+    {
+        PlayerAnimator.SetBool(strIsStunned, true);
+    }
+
+    //マテリアル変更するやり方での色変え
     public void ChangePlayerColor(Definer.PLAYER_COLOR color)
     {
         switch (color)
@@ -174,6 +197,7 @@ public class ActorController : MonoBehaviour
         }
     }
 
+    //白に色変え
     public void ChangeGreenToWhite()
     {
         m_skinnedMeshRenderer.material = materialWhite;

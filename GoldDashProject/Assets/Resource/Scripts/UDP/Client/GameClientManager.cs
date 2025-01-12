@@ -5,13 +5,18 @@ using R3;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 using System.Threading;
+using TMPro;
+using UnityEngine.UI;
+using DG.Tweening;
 
 public class GameClientManager : MonoBehaviour
 {
+    #region 変数宣言リージョン
     [Header("このクライアントで使うプレイヤーカラー")]
     [SerializeField] private Definer.PLAYER_COLOR playerColor;
 
     private bool isRunning; //稼働中か
+    private bool inGame; //ゲームは始まっているか
 
     private UdpGameClient udpGameClient; //UdpCommunicatorを継承したUdpGameClientのインスタンス
     private Queue<Header> packetQueue; //udpGameClientは”勝手に”このキューにパケットを入れてくれる。不正パケット処理なども済んだ状態で入る。
@@ -27,8 +32,7 @@ public class GameClientManager : MonoBehaviour
 
     private PlayerControllerV2 playerController; //プレイヤーが操作するキャラクターのplayerController
 
-
-    private int numOfActors; //アクターの人数
+    [SerializeField] private int numOfActors = 4; //アクターの人数
     private int preparedActors; //生成し終わったアクターの数
 
     [SerializeField] private GameObject ActorPrefab; //アクターのプレハブ
@@ -38,10 +42,6 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
     [SerializeField] private GameObject ScrollPrefab; //巻物のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
-
-    [SerializeField] TitleUI _titleUi;
-
-    private bool inGame; //ゲームは始まっているか
 
     private CancellationTokenSource sendCts; //パケット送信タスクのキャンセル用。ブロードキャストは時間がかかるので
     private CancellationToken SendCts
@@ -53,117 +53,147 @@ public class GameClientManager : MonoBehaviour
         }
     }
 
-    //クライアントが内部をコントロールするための通知　マップ生成など
-    public enum CLIENT_INTERNAL_EVENT
+    //現在のstate
+    IClientState currentClientState;
+
+    //UI関連
+    [SerializeField] private GameObject Phase0UniqueUI;
+    [SerializeField] private GameObject Phase1UniqueUI;
+
+    //Gマーク
+    [SerializeField] private GameObject processingLogo;
+    [SerializeField] private GameObject arrow;
+
+    //文字数が多すぎエラー
+    [SerializeField] private GameObject characterCountError;
+    [SerializeField] private TMP_InputField inputField;
+
+    //暗転用イメージ
+    [SerializeField] private Image blackImage;
+
+    //Phaseによって変わるテキスト
+    [SerializeField] private TextMeshProUGUI upperTextBox;
+    [SerializeField] private TextMeshProUGUI centerTextBox;
+
+    //ボタンの強調アニメーション・グレーアウト状態を管理するスクリプトコンポーネント
+    [SerializeField] private ButtonAnimator NameInputFieldAnimator;
+    [SerializeField] private ButtonAnimator ConnectButtonAnimator;
+
+    //各種ボタン
+    [SerializeField] private Button TouchToStartButton;
+    [SerializeField] private Button BackButton;
+    [SerializeField] private Button ConnectButton;
+    #endregion
+
+    #region Stateインターフェース
+    public interface IClientState
     {
-        GENERATE_MAP = 0, //マップを生成せよ
-        EDIT_GUI_FOR_GAME, //インゲーム用のUIレイアウトに変更せよ
-        COMM_ESTABLISHED, //通信が確立された
-        COMM_ERROR, //通信エラー
-        COMM_ERROR_FATAL, //致命的な通信エラー
+        void EnterState(GameClientManager gameClientManager);
+        void UpdateProcess(GameClientManager gameClientManager);
+        void ExitState(GameClientManager gameClientManager);
     }
 
-    public Subject<CLIENT_INTERNAL_EVENT> ClientInternalSubject;
-
-    #region ボタンが押されたら有効化したり無効化したり
-    //public void InitObservation(UdpButtonManager udpUIManager)
-    //{
-    //    ClientInternalSubject = new Subject<CLIENT_INTERNAL_EVENT>();
-    //    udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
-    //}
-
-    public void InitObservation(Title title)
+    //Stateの切り替え
+    public void ChangeClientState(IClientState newState)
     {
-        ClientInternalSubject = new Subject<CLIENT_INTERNAL_EVENT>();
-        title.titleButtonSubject.Subscribe(e => ProcessUdpManagerEvent(e));
+        if (currentClientState != null) currentClientState.ExitState(this);
+        currentClientState = newState;
+        currentClientState.EnterState(this);
     }
 
-    //private void ProcessUdpManagerEvent(UdpButtonManager.UDP_BUTTON_EVENT e)
-    //{
-    //    switch (e)
-    //    {
-    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_START_CLIENT_MODE:
-    //            if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
-    //            break;
-    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
-    //            if (udpGameClient == null) udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
-    //            if (this.sessionID != 0) break; //既に接続中なら何もしない
-    //            isRunning = true;
-    //            Initパケット送信
-    //            再送処理など時間がかかるので非同期に行う
-    //            sendCts = new CancellationTokenSource();
-    //            token = sendCts.Token;
-    //            Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, myName).ToByte()).ToByte()), token);
-
-    //            break;
-    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
-    //            isRunning = false;
-    //            sendCts.Cancel(); //送信を非同期で行っているなら止める
-    //            if (this.sessionID != 0) //サーバーに接続中なら切断パケット
-    //            {
-    //                udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
-    //            }
-    //            if (udpGameClient != null) udpGameClient.Dispose();
-    //            udpGameClient = null;
-    //            this.sessionID = 0; //変数リセットなど
-    //            break;
-    //        case UdpButtonManager.UDP_BUTTON_EVENT.BUTTON_BACK_TO_SELECT:
-    //            if (udpGameClient != null) udpGameClient.Dispose();
-    //            udpGameClient = null;
-    //            isRunning = false;
-    //            break;
-    //        default:
-    //            break;
-    //    }
-    //}
-
-    private void ProcessUdpManagerEvent(Title.TITLE_BUTTON_EVENT titlebuttonEvent)
+    public class Phase0State : IClientState
     {
-        switch (titlebuttonEvent)
+        public void EnterState(GameClientManager gameClientManager)
         {
-            case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
-                Debug.Log("サーバーへの接続開始");
-                // udpGameClientがnullの場合に初期化
-                if (udpGameClient == null)
-                {
-                    udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
-                }
+            //必要なUI出す
+            gameClientManager.Phase0UniqueUI.SetActive(true);
+            //テキスト変える
+            gameClientManager.upperTextBox.text = "";
+            gameClientManager.centerTextBox.text = "";
+        }
 
-                // 既に接続中なら何もしない
-                if (this.sessionID != 0) break;
+        public void UpdateProcess(GameClientManager gameClientManager)
+        {
+        }
 
-                isRunning = true;
-                // Initパケット送信 (非同期)
-                Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, (int)playerColor, myName).ToByte()).ToByte()), SendCts);
+        public void ExitState(GameClientManager gameClientManager)
+        {
+            //不要なUI消す
+            gameClientManager.Phase0UniqueUI.SetActive(false);
+        }
+    }
 
-                break;
+    public class Phase1State : IClientState
+    {
+        public void EnterState(GameClientManager gameClientManager)
+        {
+            //必要なUI出す
+            gameClientManager.Phase1UniqueUI.SetActive(true);
+            //テキスト変える
+            gameClientManager.upperTextBox.text = "プレイヤー名を入力してください";
+            gameClientManager.centerTextBox.text = "";
+            //名前欄の強調
+            gameClientManager.NameInputFieldAnimator.IsAnimating = true;
+            //接続ボタンをグレーアウト
+            gameClientManager.ConnectButtonAnimator.IsGrayedOut = true;
+            //エラーメッセージは非表示に
+            gameClientManager.characterCountError.SetActive(false);
+            //インプットフィールドに既に何か書き込まれているならアニメーション状態の更新
+            if (gameClientManager.inputField.text.Length != 0)
+            {
+                gameClientManager.CheckNameCharacterCount();
+            }
+        }
 
-            case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
-                isRunning = false;
-                if (sendCts != null) sendCts.Cancel(); // 送信を非同期で行っているなら止める
+        public void UpdateProcess(GameClientManager gameClientManager)
+        {
+        }
 
-                // サーバーに接続中なら切断パケットを送信
-                if (this.sessionID != 0 && _titleUi.CurrentClientMode == TitleUI.CLIENT_MODE.MODE_WAITING)
-                {
-                    Debug.Log("ついでにサーバーへの接続を切りました");
-                    if (udpGameClient != null)
-                    {
-                        udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
-                    }
-                }
+        public void ExitState(GameClientManager gameClientManager)
+        {
+            //不要なUI消す
+            gameClientManager.Phase1UniqueUI.SetActive(false);
+        }
+    }
 
-                // udpGameClientがnullでない場合にDisposeを呼び出す
-                if (udpGameClient != null)
-                {
-                    udpGameClient.Dispose();
-                    udpGameClient = null;
-                }
+    public class Phase2State : IClientState
+    {
+        public void EnterState(GameClientManager gameClientManager)
+        {
+            //必要なUI出す
+            gameClientManager.processingLogo.SetActive(true);
+            //テキスト変える
+            gameClientManager.upperTextBox.text = "";
+            gameClientManager.centerTextBox.text = "接続中…";
+        }
 
-                this.sessionID = 0; // 変数リセットなど
-                break;
+        public void UpdateProcess(GameClientManager gameClientManager)
+        {
+        }
 
-            default:
-                break;
+        public void ExitState(GameClientManager gameClientManager)
+        {
+            //不要なUI消す
+            gameClientManager.processingLogo.SetActive(false);
+        }
+    }
+
+    //通常の状態
+    public class NormalState : IClientState
+    {
+        public void EnterState(GameClientManager gameClientManager)
+        {
+            //テキスト変える
+            gameClientManager.upperTextBox.text = "";
+            gameClientManager.centerTextBox.text = "";
+        }
+
+        public void UpdateProcess(GameClientManager gameClientManager)
+        {
+        }
+
+        public void ExitState(GameClientManager gameClientManager)
+        {
         }
     }
     #endregion
@@ -176,8 +206,60 @@ public class GameClientManager : MonoBehaviour
         actorDictionary = new Dictionary<ushort, ActorController>();
         entityDictionary = new Dictionary<ushort, Entity>();
 
+        //通信用インスタンス作成
+        udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
+
         Task.Run(() => ProcessPacket());
         Task.Run(() => SendPlayerPosition());
+
+        //State初期化
+        ChangeClientState(new Phase0State());
+
+        //マップは作っておく
+        MapGenerator.instance.GenerateMap();
+
+        //各種ボタンに関数を設定
+        TouchToStartButton.OnClickAsObservable().Subscribe(_ => 
+        {
+            blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+            {
+                ChangeClientState(new Phase1State());
+                blackImage.DOFade(0f, 0.3f);
+            });
+        });
+        BackButton.OnClickAsObservable().Subscribe(_ => 
+        {
+            blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+            {
+                ChangeClientState(new Phase0State());
+                blackImage.DOFade(0f, 0.3f);
+            });
+        });
+        ConnectButton.OnClickAsObservable().Subscribe(_ => 
+        {
+            blackImage.DOFade(1f, 0.3f).OnComplete(async () =>
+            {
+                ChangeClientState(new Phase2State());
+                blackImage.DOFade(0f, 0.3f);
+
+                // 既に接続中なら何もしない
+                if (this.sessionID != 0)
+                {
+                    Debug.Log("もうセッションID受け取ってるよ");
+                    return;
+                }
+
+                isRunning = true;
+                // Initパケット送信 (非同期)
+                await UniTask.Delay(1000);
+                Task t = Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, (int)playerColor, myName).ToByte()).ToByte()), SendCts);
+            });
+        });
+    }
+
+    private void Update()
+    {
+        currentClientState.UpdateProcess(this); //stateによって異なる処理
     }
 
     private async void SendPlayerPosition()
@@ -206,7 +288,7 @@ public class GameClientManager : MonoBehaviour
         ActionPacket myActionPacket;
         Header myHeader;
 
-        try
+        try //サブスレッドの例外をコンソールに出すためのtry-catch
         {
             while (true)
             {
@@ -242,10 +324,6 @@ public class GameClientManager : MonoBehaviour
 
                             sessionID = receivedInitPacket.sessionID; //自分のsessionIDを受け取る
                             Debug.Log($"sessionID:{sessionID}を受け取ったぜ。");
-                            //通信が確立されたことを内部通知
-                            ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED);
-
-                            //エラーコードがあればここで処理
                             break;
                         case (byte)Definer.PT.AP:
 
@@ -270,19 +348,18 @@ public class GameClientManager : MonoBehaviour
                                             numOfActors = receivedActionPacket.targetID;
                                             break;
                                         case (byte)Definer.NDID.DISCONNECT:
-                                            ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL); //予期せずサーバーから切断された場合エラーを出す
+                                            //ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL); //予期せずサーバーから切断された場合エラーを出す
                                             break;
                                         case (byte)Definer.NDID.STG:
                                             //ここでプレイヤーを有効化してゲーム開始
-                                            //内部通知
-                                            ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
-                                            ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME); //UIレイアウトを変更せよ
-                                                                                                                   //全アクターの有効化
+                                            //全アクターの有効化
                                             foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
                                             {
                                                 k.Value.gameObject.SetActive(true);
                                             }
                                             inGame = true;
+
+                                            ChangeClientState(new NormalState());
                                             break;
                                         case (byte)Definer.NDID.EDG:
                                             break;
@@ -351,8 +428,8 @@ public class GameClientManager : MonoBehaviour
                                             actorDictionary.Add(receivedActionPacket.targetID, actorController);
 
                                             //準備が完了したアクターの数を加算
-                                            //ここバグ疑惑あり
                                             preparedActors++;
+                                            Debug.Log($"現在{numOfActors}人中{preparedActors}人分のアクターが用意できています。");
                                             if (preparedActors == numOfActors) //準備完了通知をサーバに送る
                                             {
                                                 Debug.Log("PSGを送信しました。");
@@ -535,6 +612,40 @@ public class GameClientManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        isRunning = false;
+
+        // サーバーに接続中なら切断パケットを送信
+        if (this.sessionID != 0)
+        {
+            Debug.Log("サーバーに切断パケットを送信");
+            if (udpGameClient != null)
+            {
+                udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
+            }
+        }
+
         this.udpGameClient?.Dispose();
+        this.sendCts.Cancel();
+    }
+
+    //インプットフィールドの編集を終えたときに呼び出す。名前の文字数チェックをしてUI状況を更新しつつ、myNameに値を格納
+    public void CheckNameCharacterCount()
+    {
+        string name = inputField.text;
+        if (name.Length > 0 && name.Length <= 8)
+        {
+            characterCountError.SetActive(false);
+            NameInputFieldAnimator.IsAnimating = false;
+            ConnectButtonAnimator.IsAnimating = true;
+            ConnectButtonAnimator.IsGrayedOut = false;
+        }
+        else
+        {
+            characterCountError.SetActive(true);
+            NameInputFieldAnimator.IsAnimating = true;
+            ConnectButtonAnimator.IsAnimating = false;
+            ConnectButtonAnimator.IsGrayedOut = true;
+        }
+        myName = inputField.text;
     }
 }

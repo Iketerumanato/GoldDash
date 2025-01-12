@@ -41,13 +41,7 @@ public class MapGenerator : MonoBehaviour
     //宝箱について同じもの
     private List<Vector3> chestPointsOrigin; //全象限の宝箱出現地点
     private List<Vector3> chestPointsDeck; //↑の全ての要素をランダムな順で並べ替えたリスト。文字通り山札
-
-    public void InitObservation(GameServerManager gameServerManager, GameClientManager gameClientManager)
-    {
-        gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
-        gameClientManager.ClientInternalSubject.Subscribe(e => ProcessClientInternalEvent(e));
-    }
-
+    
     private void ProcessServerInternalEvent(GameServerManager.SERVER_INTERNAL_EVENT e)
     {
         switch (e)
@@ -60,19 +54,7 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    private void ProcessClientInternalEvent(GameClientManager.CLIENT_INTERNAL_EVENT e)
-    {
-        switch (e)
-        {
-            case GameClientManager.CLIENT_INTERNAL_EVENT.GENERATE_MAP:
-                GenerateMap();
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void Start()
+    private void Awake()
     {
         //シングルトンな静的変数の初期化
         if (instance == null)
@@ -92,21 +74,59 @@ public class MapGenerator : MonoBehaviour
         allRespawnPoints = new List<Vector3>();
         chestPointsOrigin = new List<Vector3>();
         chestPointsDeck = new List<Vector3>();
-    }
 
-    private void GenerateMap()
-    {
-        //ランダムに選んだcsvファイルから19*19のcellInfo2次元配列を作成する
-
-        //ランダム抽選は保留。指定した名前のファイルを４つ読み込む
+        //選んだcsvファイルからcellInfo2次元配列を作成する
         TextAsset[] textAsset_array = {
             Resources.Load("MapPart5x5_oudou1") as TextAsset,
             Resources.Load("MapPart5x5_guruguru2x2x2") as TextAsset,
             Resources.Load("MapPart5x5_meirohirome") as TextAsset,
             Resources.Load("MapPart5x5_zyadouittyokusen") as TextAsset};
-
         map = MergeMap(textAsset_array);
 
+        //スポーン位置はサーバーからクライアントに渡さなければならないのでここで調べておく
+        for (int i = 0; i < MAP_SIZE; i++)
+        {
+            for (int j = 0; j < MAP_SIZE; j++)
+            {
+                if(map[i, j] == null) continue;
+
+                // プレイヤーのスポーン位置をリストに追加
+                if (map[i, j].spawnPlayer)
+                {
+                    //第2または第1象限なら
+                    if (i < MAP_PART_SIZE)
+                    {
+                        if (j < MAP_PART_SIZE) //第2象限なら
+                        {
+                            respawnPointsInQuadrant2.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                        }
+                        else //第1象限なら
+                        {
+                            respawnPointsInQuadrant1.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                        }
+                    }
+                    else //第3または第4象限なら
+                    {
+                        if (j < MAP_PART_SIZE) //第3象限なら
+                        {
+                            respawnPointsInQuadrant3.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                        }
+                        else //第4象限なら
+                        {
+                            respawnPointsInQuadrant4.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void GenerateMap()
+    {
         //上の廊下
         for (int row = 0; row < MAP_SIZE; row++)
         {
@@ -233,68 +253,9 @@ public class MapGenerator : MonoBehaviour
                         }
                     }
                 }
-
-                // プレイヤーのスポーン位置をリストに追加
-                if (map[i, j].spawnPlayer)
-                {
-                    //第2または第1象限なら
-                    if (i < MAP_PART_SIZE)
-                    {
-                        if (j < MAP_PART_SIZE) //第2象限なら
-                        {
-                            respawnPointsInQuadrant2.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                        }
-                        else //第1象限なら
-                        {
-                            respawnPointsInQuadrant1.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                        }
-                    }
-                    else //第3または第4象限なら
-                    {
-                        if (j < MAP_PART_SIZE) //第3象限なら
-                        {
-                            respawnPointsInQuadrant3.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                        }
-                        else //第4象限なら
-                        {
-                            respawnPointsInQuadrant4.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                            allRespawnPoints.Add(new Vector3(i + 0.5f, 0.4f, j + 0.5f));
-                        }
-                    }
-                }
             }
         }
     }
-
-    ////ランダム抽選用
-    //TextAsset[] SelectCSVFileRandomly(int size)
-    //{
-    //    //返却用
-    //    TextAsset[] ret = new TextAsset[size];
-
-    //    //LoadAllでResourcesフォルダ下のすべてのCSVファイルを格納する
-    //    TextAsset[] csvMap_Array = Resources.LoadAll("", typeof(TextAsset)).Cast<TextAsset>().ToArray();
-
-    //    //↑のすべてのcsvファイルをリストに格納する
-    //    List<TextAsset> csvMap_List = new List<TextAsset>();
-    //    csvMap_List.AddRange(csvMap_Array);
-
-    //    Debug.Log("リストに" + csvMap_List.Count + "個のテキストアセットを格納");
-
-    //    //重複なしでTextAssetを4つ取り出して配列に格納する
-    //    for (int i = 0; i < size; i++)
-    //    {
-    //        int index = UnityEngine.Random.Range(0, csvMap_List.Count);
-    //        ret[i] = csvMap_List[index];
-    //        csvMap_List.RemoveAt(index);
-    //    }
-
-    //    //返却
-    //    return ret;
-    //}
 
     //4つのテキストアセットをマージしてマップデータを作成
     private CellInfo[,] MergeMap(TextAsset[] textAsset_Array)

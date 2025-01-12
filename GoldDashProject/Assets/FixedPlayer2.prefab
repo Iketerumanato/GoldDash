@@ -8945,6 +8945,7 @@ MonoBehaviour:
   PlayerAnimator: {fileID: 3835903084797589556}
   runThreshold: 1
   animationLerpSpeed: 70
+  BigScroll: {fileID: 0}
   goldText: {fileID: 4947960246120122317}
   m_skinnedMeshRenderer: {fileID: 6575032045437719507}
   materialRed: {fileID: 2100000, guid: dafd079d646f9c648a857e922ef98f14, type: 2}
@@ -9034,7 +9035,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb95c0c102c50fb438c876ecbb96e8f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_WASD_Available: 1
+  m_WASD_Available: 0
   m_variableJoystick: {fileID: 3015399711445905654}
   m_dynamicJoystick: {fileID: 7284966120084178288}
   m_blownPowerHorizontal: 4
@@ -9099,7 +9100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67f89c6768f43c84384fb7976cd89030, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_clickIsAvailable: 1
+  m_clickIsAvailable: 0
   m_HotbarCamera: {fileID: 6973855709987891972}
   m_HandCamera: {fileID: 6555887835970418255}
   m_playerCamera: {fileID: 3975254240555154285}

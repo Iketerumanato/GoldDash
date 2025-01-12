@@ -38,12 +38,12 @@ public class UdpUIColorChanger : MonoBehaviour
 
     private float timeOffsetSize;
 
-    public void InitObservation(UdpButtonManager udpUIManager, GameServerManager gameServerManager, GameClientManager gameClientManager)
-    {
-        udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
-        gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
-        gameClientManager.ClientInternalSubject.Subscribe(e => ProcessClientInternalEvent(e));
-    }
+    //public void InitObservation(UdpButtonManager udpUIManager, GameServerManager gameServerManager, GameClientManager gameClientManager)
+    //{
+    //    udpUIManager.udpUIManagerSubject.Subscribe(e => ProcessUdpManagerEvent(e));
+    //    gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
+    //    gameClientManager.ClientInternalSubject.Subscribe(e => ProcessClientInternalEvent(e));
+    //}
 
     private void ProcessServerInternalEvent(GameServerManager.SERVER_INTERNAL_EVENT e)
     {
@@ -58,25 +58,25 @@ public class UdpUIColorChanger : MonoBehaviour
         }
     }
 
-    private void ProcessClientInternalEvent(GameClientManager.CLIENT_INTERNAL_EVENT e)
-    {
-        switch (e)
-        {
-            case GameClientManager.CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME:
-                currentTextComponent = stateMsgMini;
-                currentProcessImage = clientSignMini;
-                break;
-            case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED:
-                currentGradiant = client;
-                timeOffsetSize = 0.1f;
-                break;
-            case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL:
-                currentGradiant = error;
-                break;
-            default:
-                break;
-        }
-    }
+    //private void ProcessClientInternalEvent(GameClientManager.CLIENT_INTERNAL_EVENT e)
+    //{
+    //    switch (e)
+    //    {
+    //        case GameClientManager.CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME:
+    //            currentTextComponent = stateMsgMini;
+    //            currentProcessImage = clientSignMini;
+    //            break;
+    //        case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED:
+    //            currentGradiant = client;
+    //            timeOffsetSize = 0.1f;
+    //            break;
+    //        case GameClientManager.CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL:
+    //            currentGradiant = error;
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //}
 
     private void ProcessUdpManagerEvent(UdpButtonManager.UDP_BUTTON_EVENT e)
     {

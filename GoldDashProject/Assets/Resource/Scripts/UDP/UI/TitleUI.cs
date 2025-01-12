@@ -199,37 +199,33 @@ public class TitleUI : MonoBehaviour
 
     private void Start()
     {
-        _title.InitObservationClient(_title);
-        _gameClientManager.InitObservation(_title);
-        _gameServerManager.InitObservation(_title);
-        InitObserver(_title,_gameClientManager,_gameServerManager);
-        _mapGenerator.InitObservation(_gameServerManager, _gameClientManager);
+        
     }
 
-    public void InitObserver(Title title,GameClientManager gameClientManager,GameServerManager gameServerManager)
-    {
-        title.titleButtonSubject.Subscribe(buttonevent => ProcessUdpManagerEvent(buttonevent));
-        gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
-        gameClientManager.ClientInternalSubject.Subscribe(e => ProcessClientInternalEvent(e));
+    //public void InitObserver(Title title,GameClientManager gameClientManager,GameServerManager gameServerManager)
+    //{
+    //    title.titleButtonSubject.Subscribe(buttonevent => ProcessUdpManagerEvent(buttonevent));
+    //    gameServerManager.ServerInternalSubject.Subscribe(e => ProcessServerInternalEvent(e));
+    //    gameClientManager.ClientInternalSubject.Subscribe(e => ProcessClientInternalEvent(e));
 
-        if (_clientStateTable != null && _serverStateTable != null) return;
+    //    if (_clientStateTable != null && _serverStateTable != null) return;
 
-        //各テーブルの初期化
-        Dictionary<CLIENT_MODE, ITitleMode_Client> clienttable = new()
-        {
-            { CLIENT_MODE.MODE_LOGO,new Mode_Logo(this) },
-            { CLIENT_MODE.MODE_SETTING,new Mode_Setting(this) },
-            { CLIENT_MODE.MODE_WAITING,new Mode_Waiting(this) },
-        };
-        _clientStateTable = clienttable;
+    //    //各テーブルの初期化
+    //    Dictionary<CLIENT_MODE, ITitleMode_Client> clienttable = new()
+    //    {
+    //        { CLIENT_MODE.MODE_LOGO,new Mode_Logo(this) },
+    //        { CLIENT_MODE.MODE_SETTING,new Mode_Setting(this) },
+    //        { CLIENT_MODE.MODE_WAITING,new Mode_Waiting(this) },
+    //    };
+    //    _clientStateTable = clienttable;
 
-        Dictionary<SERVER_MODE, ITitleMode_Server> servertable = new()
-        {
-            { SERVER_MODE.MODE_ACTIVATE,new Mode_Activate(this) },
-            { SERVER_MODE.MODE_CREATE_MAP,new Mode_Create_Map(this) }
-        };
-        _serverStateTable = servertable;
-    }
+    //    Dictionary<SERVER_MODE, ITitleMode_Server> servertable = new()
+    //    {
+    //        { SERVER_MODE.MODE_ACTIVATE,new Mode_Activate(this) },
+    //        { SERVER_MODE.MODE_CREATE_MAP,new Mode_Create_Map(this) }
+    //    };
+    //    _serverStateTable = servertable;
+    //}
 
     private void ProcessUdpManagerEvent(Title.TITLE_BUTTON_EVENT clientbuttonEvent)
     {
@@ -275,24 +271,24 @@ public class TitleUI : MonoBehaviour
         }
     }
 
-    private void ProcessClientInternalEvent(GameClientManager.CLIENT_INTERNAL_EVENT e)
-    {
-        switch (e)
-        {
-            case GameClientManager.CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME:
-                //非表示
-                TitleUICamvas[0].SetActive(false);
-                TitleUICamvas[1].SetActive(false);
+    //private void ProcessClientInternalEvent(GameClientManager.CLIENT_INTERNAL_EVENT e)
+    //{
+    //    switch (e)
+    //    {
+    //        case GameClientManager.CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME:
+    //            //非表示
+    //            TitleUICamvas[0].SetActive(false);
+    //            TitleUICamvas[1].SetActive(false);
 
-                //表示
-                //originSignMini.gameObject.SetActive(true);
-                //clientSignMini.gameObject.SetActive(true);
-                //stateMessageMini.gameObject.SetActive(true);
-                break;
-            default:
-                break;
-        }
-    }
+    //            //表示
+    //            //originSignMini.gameObject.SetActive(true);
+    //            //clientSignMini.gameObject.SetActive(true);
+    //            //stateMessageMini.gameObject.SetActive(true);
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //}
 
     //Stateの遷移(クライアント)
     public void ChangeStateClient(CLIENT_MODE nextClientState)

@@ -30,8 +30,8 @@ public class SubscribeOrderManager : MonoBehaviour
         //UI関連
 
         //udpUIDisplayer.InitObservation(udpButtonManager, gameServerManager, gameClientManager);
-        udpTextWriter.InitObservation(udpButtonManager, gameServerManager, gameClientManager);
-        udpUIColorChanger.InitObservation(udpButtonManager, gameServerManager, gameClientManager);
+        //udpTextWriter.InitObservation(udpButtonManager, gameServerManager, gameClientManager);
+        //udpUIColorChanger.InitObservation(udpButtonManager, gameServerManager, gameClientManager);
 
         soundManager.InitObservation(udpButtonManager);
 
