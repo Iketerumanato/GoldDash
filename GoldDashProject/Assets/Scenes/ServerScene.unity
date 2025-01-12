@@ -1615,7 +1615,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u672A\u53C2\u52A0"
+  m_text: "\u8D64\u306E\u540D\u524D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
   m_sharedMaterial: {fileID: -739646076848395095, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
@@ -1821,7 +1821,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u672A\u53C2\u52A0"
+  m_text: "\u7DD1\u306E\u540D\u524D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
   m_sharedMaterial: {fileID: -739646076848395095, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
@@ -2102,7 +2102,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u672A\u53C2\u52A0"
+  m_text: "\u9752\u306E\u540D\u524D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
   m_sharedMaterial: {fileID: -739646076848395095, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
@@ -2712,6 +2712,10 @@ MonoBehaviour:
   Phase2UniqueUI: {fileID: 1265691348}
   processingLogo: {fileID: 761315771}
   blackImage: {fileID: 2014690922}
+  redArrow: {fileID: 1202668668}
+  blueArrow: {fileID: 185436788}
+  greenArrow: {fileID: 62382553}
+  yellowArrow: {fileID: 926704880}
   redNameText: {fileID: 538068604}
   blueNameText: {fileID: 670569550}
   greenNameText: {fileID: 578935558}
@@ -4718,7 +4722,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1851886567
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5253,7 +5257,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u672A\u53C2\u52A0"
+  m_text: "\u9EC4\u306E\u540D\u524D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
   m_sharedMaterial: {fileID: -739646076848395095, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}

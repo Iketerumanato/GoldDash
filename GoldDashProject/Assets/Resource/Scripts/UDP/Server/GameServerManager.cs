@@ -25,7 +25,6 @@ public class GameServerManager : MonoBehaviour
     private Dictionary<ushort, ActorController> actorDictionary; //sessionパスを鍵としてactorインスタンスを管理
     private Dictionary<ushort, Entity> entityDictionary; //entityIDを鍵としてentityインスタンスを管理
 
-    private HashSet<string> usedName; //プレイヤーネームの重複防止に使う。
     private HashSet<ushort> usedEntityID; //EntityIDの重複防止に使う。
 
     [SerializeField] private ushort sessionPass; //サーバーに入るためのパスワード。udpGameServerのコンストラクタに渡す。
@@ -74,7 +73,11 @@ public class GameServerManager : MonoBehaviour
     //暗転用イメージ
     [SerializeField] private Image blackImage;
 
-    //プレイヤーネーム
+    //プレイヤーネームと矢印
+    [SerializeField] private GameObject redArrow;
+    [SerializeField] private GameObject blueArrow;
+    [SerializeField] private GameObject greenArrow;
+    [SerializeField] private GameObject yellowArrow;
     [SerializeField] private TextMeshProUGUI redNameText;
     [SerializeField] private TextMeshProUGUI blueNameText;
     [SerializeField] private TextMeshProUGUI greenNameText;
@@ -126,6 +129,20 @@ public class GameServerManager : MonoBehaviour
             //テキスト変える
             gameServerManager.upperTextBox.text = "プレイヤーの接続を待っています…";
             gameServerManager.lowerTextBox.text = "プレイヤーの接続を待っています…";
+
+            //プレイヤー情報の初期化
+            gameServerManager.redArrow.SetActive(false);
+            gameServerManager.blueArrow.SetActive(false);
+            gameServerManager.greenArrow.SetActive(false);
+            gameServerManager.yellowArrow.SetActive(false);
+
+            gameServerManager.redNameText.text = "未参加";
+            gameServerManager.blueNameText.text = "未参加";
+            gameServerManager.greenNameText.text = "未参加";
+            gameServerManager.yellowNameText.text = "未参加";
+
+            //初期設定が終わったら稼働
+            gameServerManager.isRunning = true;
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
@@ -351,16 +368,14 @@ public class GameServerManager : MonoBehaviour
         actorDictionary = new Dictionary<ushort, ActorController>();
         entityDictionary = new Dictionary<ushort, Entity>();
 
-        usedName = new HashSet<string>();
         usedEntityID = new HashSet<ushort>();
 
         inGame = false;
 
-        //udp通信を開始
+        //udp通信の準備
         udpGameServer = new UdpGameServer(ref packetQueue, sessionPass);
         rcvPort = udpGameServer.GetReceivePort(); //受信用ポート番号とサーバーのセッションIDがここで決まるので取得
         serverSessionID = udpGameServer.GetServerSessionID();
-        isRunning = true;
 
         //パケットの処理をUpdateでやると1フレームの計算量が保障できなくなる（カクつきの原因になり得る）のでマルチスレッドで
         //スレッドが何個いるのかは試してみないと分からない
@@ -465,45 +480,35 @@ public class GameServerManager : MonoBehaviour
                             //クラスに変換する
                             InitPacketClient receivedInitPacket = new InitPacketClient(receivedHeader.data);
 
-                            //送られてきたプレイヤーネームが使用済ならエラーコード1番を返す。sessionIDは登録しない。
-                            //if (usedName.Contains(receivedInitPacket.playerName))
-                            //{
-                            //    myInitPacket = new InitPacketServer(receivedInitPacket.initSessionPass, rcvPort, receivedHeader.sessionID, 1);
-                            //    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.IPS, myInitPacket.ToByte());
-                            //    udpGameServer.Send(myHeader.ToByte());
-
-                            //    Debug.Log($"プレイヤーネーム:{receivedInitPacket.playerName} は既に使われていたぜ。出直してもらうぜ。");
-                            //    break;
-                            //}
-                            //TODO プレイヤーが規定人数集まっていたらエラーコード2番
-
                             //ActorControllerインスタンスを作りDictionaryに加える
                             //Actorをインスタンス化しながらActorControllerを取得
-
                             GameObject actorPrefab;
                             switch ((Definer.PLAYER_COLOR)receivedInitPacket.playerColor)
                             {
                                 case Definer.PLAYER_COLOR.RED:
                                     actorPrefab = RedActorPrefab;
                                     redNameText.text = receivedInitPacket.playerName;
+                                    redArrow.SetActive(true);
                                     break;
                                 case Definer.PLAYER_COLOR.GREEN:
                                     actorPrefab = GreenActorPrefab;
                                     greenNameText.text = receivedInitPacket.playerName;
+                                    greenArrow.SetActive(true);
                                     break;
                                 case Definer.PLAYER_COLOR.BLUE:
                                     actorPrefab = BlueActorPrefab;
                                     blueNameText.text = receivedInitPacket.playerName;
+                                    blueArrow.SetActive(true);
                                     break;
                                 case Definer.PLAYER_COLOR.YELLOW:
                                     actorPrefab = YellowActorPrefab;
                                     yellowNameText.text = receivedInitPacket.playerName;
+                                    yellowArrow.SetActive(true);
                                     break;
                                 default:
                                     actorPrefab = WhiteActorPrefab;
                                     break;
                             }
-
                             ActorController actorController = Instantiate(actorPrefab).GetComponent<ActorController>();
 
                             //アクターの名前を書き込み
@@ -511,17 +516,12 @@ public class GameServerManager : MonoBehaviour
                             //アクターの色を書き込み
                             actorController.Color = (Definer.PLAYER_COLOR)receivedInitPacket.playerColor;
 
-                            //アクターのゲームオブジェクト
+                            //アクターのゲームオブジェクトに名前をつける
                             actorController.name = $"Actor: {receivedInitPacket.playerName} ({receivedHeader.sessionID})"; //ActorControllerはMonoBehaviourを継承しているので"name"はオブジェクトの名称を決める
                             actorController.gameObject.SetActive(false); //初期設定が済んだら無効化して処理を止める。ゲーム開始時に有効化して座標などをセットする
 
                             //アクター辞書に登録
                             actorDictionary.Add(receivedHeader.sessionID, actorController);
-
-                            usedName.Add(receivedInitPacket.playerName); //登録したプレイヤーネームを使用済にする
-
-                            //TODO 送信番号の記録開始
-                            //sendNums.Add(receivedHeader.sessionID, 0);
 
                             Debug.Log($"sessionID:{receivedHeader.sessionID},プレイヤーネーム:{receivedInitPacket.playerName} でactorDictionaryに登録したぜ！");
                             Debug.Log($"actorDictionaryには現在、{actorDictionary.Count}人のプレイヤーが登録されているぜ！");
@@ -537,23 +537,10 @@ public class GameServerManager : MonoBehaviour
                             {
                                 Debug.Log($"十分なプレイヤーが集まったぜ。闇のゲームの始まりだぜ。");
 
-                                //TODO Dictionaryへの登録を締め切る処理
-
                                 //ゲーム開始処理
-                                //内部通知
-                                ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
-                                ServerInternalSubject.OnNext(SERVER_INTERNAL_EVENT.EDIT_GUI_FOR_GAME); //UIレイアウトを変更せよ
-
                                 //全クライアントにアクターの生成命令を送る
 
                                 Debug.Log($"パケット送ってゲームはじめるぜ。");
-
-                                //何人分のアクターを生成すべきか伝える
-                                myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.PSG, (ushort)actorDictionary.Count);
-                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                udpGameServer.Send(myHeader.ToByte());
-
-                                Debug.Log($"{actorDictionary.Count}人分のアクターを生成すべきだと伝えたぜ。");
 
                                 //4つのリスポーン地点を取得する
                                 Vector3[] respawnPoints = MapGenerator.instance.Get4RespawnPointsRandomly(); //テストプレイでは4人未満でデバッグするかもしれないが、そのときは先頭の要素だけ使う
@@ -570,25 +557,25 @@ public class GameServerManager : MonoBehaviour
 
                                 Debug.Log($"アクターを生成命令を出したぜ。");
 
-                                for (int i = 0; i < maxNumOfChests; i++) //宝箱が上限数に達するまで宝箱を生成する
-                                {
-                                    //まずサーバー側のシーンで
-                                    entityID = GetUniqueEntityID(); //エンティティID生成
-                                    Vector3 chestPos = MapGenerator.instance.GetUniqueChestPointRandomly(); //座標決め
-                                    Chest chest = Instantiate(ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>();
-                                    chest.EntityID = entityID; //ID書き込み
-                                    chest.Tier = 1; //レア度はまだ適当に1
-                                    chest.gameObject.name = $"Chest ({entityID})";
-                                    entityDictionary.Add(entityID, chest); //辞書に登録
+                                //for (int i = 0; i < maxNumOfChests; i++) //宝箱が上限数に達するまで宝箱を生成する
+                                //{
+                                //    //まずサーバー側のシーンで
+                                //    entityID = GetUniqueEntityID(); //エンティティID生成
+                                //    Vector3 chestPos = MapGenerator.instance.GetUniqueChestPointRandomly(); //座標決め
+                                //    Chest chest = Instantiate(ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>();
+                                //    chest.EntityID = entityID; //ID書き込み
+                                //    chest.Tier = 1; //レア度はまだ適当に1
+                                //    chest.gameObject.name = $"Chest ({entityID})";
+                                //    entityDictionary.Add(entityID, chest); //辞書に登録
 
-                                    //ティア（１）と座標を指定して、宝箱を生成する命令
-                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
-                                    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                    udpGameServer.Send(myHeader.ToByte());
+                                //    //ティア（１）と座標を指定して、宝箱を生成する命令
+                                //    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
+                                //    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                //    udpGameServer.Send(myHeader.ToByte());
 
-                                    //宝箱の数を記録
-                                    currentNumOfChests++;
-                                }
+                                //    //宝箱の数を記録
+                                //    currentNumOfChests++;
+                                //}
                             }
                             break;
                         #endregion
@@ -641,7 +628,6 @@ public class GameServerManager : MonoBehaviour
                                             {
                                                 Debug.Log($"{receivedActionPacket.targetID}からのセッション切断通知がありました。クライアント登録・アクター登録を抹消します。");
                                                 //サーバー側で登録の抹消
-                                                usedName.Remove(actorDictionary[receivedActionPacket.targetID].PlayerName);
                                                 Destroy(actorDictionary[receivedActionPacket.targetID].gameObject);
                                                 udpGameServer.RemoveClientFromDictionary(receivedActionPacket.targetID);
                                                 actorDictionary.Remove(receivedActionPacket.targetID);
