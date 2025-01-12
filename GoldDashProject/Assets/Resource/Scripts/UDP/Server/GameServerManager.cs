@@ -93,6 +93,26 @@ public class GameServerManager : MonoBehaviour
 
     private float timeLimitSeconds = 333f;
 
+    //色変えボタン
+    [SerializeField] private ColorSelectButtonColorChanger colorSelectButtonColorChanger1;
+    [SerializeField] private ColorSelectButtonColorChanger colorSelectButtonColorChanger2;
+    [SerializeField] private ButtonAnimator colorSelectButtonAnimator1;
+    [SerializeField] private ButtonAnimator colorSelectButtonAnimator2;
+    [SerializeField] private Button colorSelectButton1;
+    [SerializeField] private Button colorSelectButton2;
+
+    //プレイヤーの配色パターン
+    public enum COLOR_TYPE
+    {
+        DEFAULT,
+        CHANGE_GREEN_TO_WHITE,
+    }
+    //現在の色パターン
+    private COLOR_TYPE currentColorType;
+
+    [SerializeField] private Button gameStartButton;
+    [SerializeField] private ButtonAnimator gameStartButtonAnimator;
+
     //現在のstate
     private ISetverState currentSetverState;
     //魔法の実行待機ならtrue
@@ -174,18 +194,17 @@ public class GameServerManager : MonoBehaviour
             //テキスト変える
             gameServerManager.upperTextBox.text = "プレイヤーの配色を選んでください";
             gameServerManager.lowerTextBox.text = "プレイヤーの配色を選んでください";
+            //スタートボタンをグレーアウト
+            gameServerManager.gameStartButtonAnimator.IsGrayedOut = true;
+            //色変更ボタンを強調、どちらも非選択状態にする
+            gameServerManager.colorSelectButtonAnimator1.IsAnimating = true;
+            gameServerManager.colorSelectButtonAnimator2.IsAnimating = true;
+            gameServerManager.colorSelectButtonColorChanger1.IsSelected = false;
+            gameServerManager.colorSelectButtonColorChanger2.IsSelected = false;
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
         {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                gameServerManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
-                {
-                    gameServerManager.ChangeServerState(new Phase2State());
-                    gameServerManager.blackImage.DOFade(0f, 0.3f);
-                });
-            }
         }
 
         public void ExitState(GameServerManager gameServerManager)
@@ -388,6 +407,36 @@ public class GameServerManager : MonoBehaviour
 
         //State初期化
         ChangeServerState(new Phase0State());
+
+        //ボタンの処理記述
+        colorSelectButton1.OnClickAsObservable().Subscribe(_ =>
+        {
+            currentColorType = COLOR_TYPE.DEFAULT;
+            colorSelectButtonColorChanger1.IsSelected = true;
+            colorSelectButtonColorChanger2.IsSelected = false;
+            colorSelectButtonAnimator1.IsAnimating = false;
+            colorSelectButtonAnimator2.IsAnimating = false;
+            gameStartButtonAnimator.IsGrayedOut = false;
+            gameStartButtonAnimator.IsAnimating = true;
+        });
+        colorSelectButton2.OnClickAsObservable().Subscribe(_ =>
+        {
+            currentColorType = COLOR_TYPE.CHANGE_GREEN_TO_WHITE;
+            colorSelectButtonColorChanger1.IsSelected = false;
+            colorSelectButtonColorChanger2.IsSelected = true;
+            colorSelectButtonAnimator1.IsAnimating = false;
+            colorSelectButtonAnimator2.IsAnimating = false;
+            gameStartButtonAnimator.IsGrayedOut = false;
+            gameStartButtonAnimator.IsAnimating = true;
+        });
+        gameStartButton.OnClickAsObservable().Subscribe(_ =>
+        {
+            blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+            {
+                ChangeServerState(new Phase2State());
+                blackImage.DOFade(0f, 0.3f);
+            });
+        });
     }
 
     private void Update()
