@@ -283,7 +283,7 @@ public class GameClientManager : MonoBehaviour
         });
         ConnectButton.OnClickAsObservable().Subscribe(_ => 
         {
-            blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+            blackImage.DOFade(1f, 0.3f).OnComplete(async () =>
             {
                 ChangeClientState(new Phase2State());
                 blackImage.DOFade(0f, 0.3f);
@@ -297,7 +297,8 @@ public class GameClientManager : MonoBehaviour
 
                 isRunning = true;
                 // Initパケット送信 (非同期)
-                Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, (int)playerColor, inputField.text).ToByte()).ToByte()), SendCts);
+                await UniTask.Delay(1000);
+                Task t = Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, (int)playerColor, myName).ToByte()).ToByte()), SendCts);
             });
         });
     }
@@ -666,6 +667,7 @@ public class GameClientManager : MonoBehaviour
         this.sendCts.Cancel();
     }
 
+    //インプットフィールドの編集を終えたときに呼び出す。名前の文字数チェックをしてUI状況を更新しつつ、myNameに値を格納
     public void CheckNameCharacterCount()
     {
         string name = inputField.text;
@@ -683,5 +685,6 @@ public class GameClientManager : MonoBehaviour
             ConnectButtonAnimator.IsAnimating = false;
             ConnectButtonAnimator.IsGrayedOut = true;
         }
+        myName = inputField.text;
     }
 }
