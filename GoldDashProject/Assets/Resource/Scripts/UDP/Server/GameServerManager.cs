@@ -233,10 +233,12 @@ public class GameServerManager : MonoBehaviour
             await UniTask.WaitUntil(() => gameServerManager.allActorsPrepared == true);
 
             //サーバー側のマップ生成 //非同期に行うので待つ
-            await UniTask.RunOnThreadPool(() => MapGenerator.instance.GenerateMapForServer());
+            MapGenerator.instance.GenerateMapForServer();
 
             ActionPacket myActionPacket;
             Header myHeader;
+
+            await UniTask.Delay(6200);
 
             for (int i = 0; i < gameServerManager.maxNumOfChests; i++) //宝箱が上限数に達するまで宝箱を生成する
             {
@@ -258,23 +260,24 @@ public class GameServerManager : MonoBehaviour
                 gameServerManager.currentNumOfChests++;
             }
 
+            await UniTask.Delay(1000);
+
             //全アクターの有効化
             foreach (KeyValuePair<ushort, ActorController> k in gameServerManager.actorDictionary)
             {
+                k.Value.gameObject.transform.position = new Vector3(5.5f, 0.4f, 5.5f);
                 k.Value.gameObject.SetActive(true);
             }
+
+            await UniTask.Delay(1000);
+
             //ゲーム開始
             gameServerManager.inGame = true;
-
-            await UniTask.Delay(1500);
 
             //ゲーム開始命令を送る
             myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
             myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             gameServerManager.udpGameServer.Send(myHeader.ToByte());
-
-            //1秒ほど待ってメッセージを送り、操作可能にする
-            //ノーマルstateへ
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)

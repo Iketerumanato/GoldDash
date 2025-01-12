@@ -324,6 +324,8 @@ public class GameClientManager : MonoBehaviour
 
                             sessionID = receivedInitPacket.sessionID; //自分のsessionIDを受け取る
                             Debug.Log($"sessionID:{sessionID}を受け取ったぜ。");
+
+                            centerTextBox.text = "接続完了！";
                             break;
                         case (byte)Definer.PT.AP:
 
@@ -344,8 +346,6 @@ public class GameClientManager : MonoBehaviour
                                         case (byte)Definer.NDID.HELLO:
                                             break;
                                         case (byte)Definer.NDID.PSG:
-                                            //生成すべきアクターの数を受け取る
-                                            numOfActors = receivedActionPacket.targetID;
                                             break;
                                         case (byte)Definer.NDID.DISCONNECT:
                                             //ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL); //予期せずサーバーから切断された場合エラーを出す
@@ -625,7 +625,7 @@ public class GameClientManager : MonoBehaviour
         }
 
         this.udpGameClient?.Dispose();
-        this.sendCts.Cancel();
+        this.sendCts?.Cancel();
     }
 
     //インプットフィールドの編集を終えたときに呼び出す。名前の文字数チェックをしてUI状況を更新しつつ、myNameに値を格納
