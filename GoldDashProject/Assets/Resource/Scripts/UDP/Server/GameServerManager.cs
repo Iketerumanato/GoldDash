@@ -201,6 +201,8 @@ public class GameServerManager : MonoBehaviour
     {
         public void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
         {
+            //フェーズ１を飛ばして実装したので一旦これで
+            gameServerManager.processingLogo.SetActive(false);
             //必要なUI出す
             gameServerManager.PlayerInfoUI.SetActive(true);
             gameServerManager.Phase2UniqueUI.SetActive(true);
@@ -584,6 +586,7 @@ public class GameServerManager : MonoBehaviour
                                             if (preparedPlayers == numOfPlayers) //全プレイヤーの準備ができたら
                                             {
                                                 Debug.Log("やったー！全プレイヤーの準備ができたよ！");
+                                                ChangeServerState(new Phase2State());
 
                                                 //サーバー側のマップ生成
                                                 MapGenerator.instance.GenerateMap();
