@@ -32,7 +32,7 @@ public class GameClientManager : MonoBehaviour
 
     private PlayerControllerV2 playerController; //プレイヤーが操作するキャラクターのplayerController
 
-    private int numOfActors; //アクターの人数
+    [SerializeField] private int numOfActors = 4; //アクターの人数
     private int preparedActors; //生成し終わったアクターの数
 
     [SerializeField] private GameObject ActorPrefab; //アクターのプレハブ
@@ -194,56 +194,6 @@ public class GameClientManager : MonoBehaviour
     }
     #endregion
 
-    //private void ProcessUdpManagerEvent(Title.TITLE_BUTTON_EVENT titlebuttonEvent)
-    //{
-    //    switch (titlebuttonEvent)
-    //    {
-    //        case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_CONNECT:
-    //            Debug.Log("サーバーへの接続開始");
-    //            // udpGameClientがnullの場合に初期化
-    //            if (udpGameClient == null)
-    //            {
-    //                udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
-    //            }
-
-    //            // 既に接続中なら何もしない
-    //            if (this.sessionID != 0) break;
-
-    //            isRunning = true;
-    //            // Initパケット送信 (非同期)
-    //            Task.Run(() => udpGameClient.Send(new Header(0, 0, 0, 0, (byte)Definer.PT.IPC, new InitPacketClient(sessionPass, udpGameClient.rcvPort, initSessionPass, (int)playerColor, myName).ToByte()).ToByte()), SendCts);
-
-    //            break;
-
-    //        case Title.TITLE_BUTTON_EVENT.BUTTON_CLIENT_DISCONNECT:
-    //            isRunning = false;
-    //            if (sendCts != null) sendCts.Cancel(); // 送信を非同期で行っているなら止める
-
-    //            // サーバーに接続中なら切断パケットを送信
-    //            if (this.sessionID != 0 && _titleUi.CurrentClientMode == TitleUI.CLIENT_MODE.MODE_WAITING)
-    //            {
-    //                Debug.Log("ついでにサーバーへの接続を切りました");
-    //                if (udpGameClient != null)
-    //                {
-    //                    udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
-    //                }
-    //            }
-
-    //            // udpGameClientがnullでない場合にDisposeを呼び出す
-    //            if (udpGameClient != null)
-    //            {
-    //                udpGameClient.Dispose();
-    //                udpGameClient = null;
-    //            }
-
-    //            this.sessionID = 0; // 変数リセットなど
-    //            break;
-
-    //        default:
-    //            break;
-    //    }
-    //}
-
     private void Start()
     {
         inGame = false;
@@ -305,7 +255,7 @@ public class GameClientManager : MonoBehaviour
 
     private void Update()
     {
-        currentClientState.UpdateProcess(this);
+        currentClientState.UpdateProcess(this); //stateによって異なる処理
     }
 
     private async void SendPlayerPosition()
@@ -334,7 +284,7 @@ public class GameClientManager : MonoBehaviour
         ActionPacket myActionPacket;
         Header myHeader;
 
-        try
+        try //サブスレッドの例外をコンソールに出すためのtry-catch
         {
             while (true)
             {
@@ -370,10 +320,6 @@ public class GameClientManager : MonoBehaviour
 
                             sessionID = receivedInitPacket.sessionID; //自分のsessionIDを受け取る
                             Debug.Log($"sessionID:{sessionID}を受け取ったぜ。");
-                            //通信が確立されたことを内部通知
-                            //ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ESTABLISHED);
-
-                            //エラーコードがあればここで処理
                             break;
                         case (byte)Definer.PT.AP:
 
@@ -402,10 +348,7 @@ public class GameClientManager : MonoBehaviour
                                             break;
                                         case (byte)Definer.NDID.STG:
                                             //ここでプレイヤーを有効化してゲーム開始
-                                            //内部通知
-                                            //ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.GENERATE_MAP); //マップを生成せよ
-                                            //ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.EDIT_GUI_FOR_GAME); //UIレイアウトを変更せよ
-                                                                                                                   //全アクターの有効化
+                                            //全アクターの有効化
                                             foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
                                             {
                                                 k.Value.gameObject.SetActive(true);
@@ -665,6 +608,18 @@ public class GameClientManager : MonoBehaviour
     {
         this.udpGameClient?.Dispose();
         this.sendCts.Cancel();
+
+        isRunning = false;
+
+        // サーバーに接続中なら切断パケットを送信
+        if (this.sessionID != 0)
+        {
+            Debug.Log("サーバーに切断パケットを送信");
+            if (udpGameClient != null)
+            {
+                udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
+            }
+        }
     }
 
     //インプットフィールドの編集を終えたときに呼び出す。名前の文字数チェックをしてUI状況を更新しつつ、myNameに値を格納
