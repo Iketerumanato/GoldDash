@@ -81,7 +81,7 @@ public class MapGenerator : MonoBehaviour
             Resources.Load("MapPart5x5_oudou1") as TextAsset,
             Resources.Load("MapPart5x5_guruguru2x2x2") as TextAsset,
             Resources.Load("MapPart5x5_meirohirome") as TextAsset,
-            Resources.Load("MapPart5x5_zyadouittyokusen") as TextAsset};
+            Resources.Load("MapPart5x5_zenbu") as TextAsset};
         map = MergeMap(textAsset_array);
 
         //スポーン位置はサーバーからクライアントに渡さなければならないのでここで調べておく
