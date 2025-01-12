@@ -216,7 +216,7 @@ public class GameClientManager : MonoBehaviour
         ChangeClientState(new Phase0State());
 
         //マップは作っておく
-        MapGenerator.instance.GenerateMap();
+        MapGenerator.instance.GenerateMapForClient();
 
         //各種ボタンに関数を設定
         TouchToStartButton.OnClickAsObservable().Subscribe(_ => 
