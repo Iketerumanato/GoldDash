@@ -2527,6 +2527,7 @@ MonoBehaviour:
   sessionPass: 9999
   initSessionPass: 1234
   myName: 
+  numOfActors: 1
   ActorPrefab: {fileID: 5703939729677495424, guid: 8145896d58e7e6b49a27f9ce769cdd62, type: 3}
   PlayerPrefab: {fileID: 7534559491902339316, guid: 0ce77fba351586c41b12fa34affc55ee, type: 3}
   GoldPilePrefab: {fileID: 7520273227876964304, guid: d46c7d03e3ed4fa408dec7213b261fb3, type: 3}

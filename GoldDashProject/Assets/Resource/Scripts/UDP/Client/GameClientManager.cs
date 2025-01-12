@@ -358,6 +358,7 @@ public class GameClientManager : MonoBehaviour
                                                 k.Value.gameObject.SetActive(true);
                                             }
                                             inGame = true;
+                                            ChangeClientState(new NormalState());
                                             break;
                                         case (byte)Definer.NDID.EDG:
                                             break;
