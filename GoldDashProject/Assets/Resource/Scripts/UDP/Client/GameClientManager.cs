@@ -162,9 +162,9 @@ public class GameClientManager : MonoBehaviour
         {
             //必要なUI出す
             gameClientManager.processingLogo.SetActive(true);
+            //テキスト変える
             gameClientManager.upperTextBox.text = "";
             gameClientManager.centerTextBox.text = "接続中…";
-            //テキスト変える
         }
 
         public void UpdateProcess(GameClientManager gameClientManager)
@@ -174,6 +174,7 @@ public class GameClientManager : MonoBehaviour
         public void ExitState(GameClientManager gameClientManager)
         {
             //不要なUI消す
+            gameClientManager.processingLogo.SetActive(false);
         }
     }
 
@@ -182,6 +183,9 @@ public class GameClientManager : MonoBehaviour
     {
         public void EnterState(GameClientManager gameClientManager)
         {
+            //テキスト変える
+            gameClientManager.upperTextBox.text = "";
+            gameClientManager.centerTextBox.text = "";
         }
 
         public void UpdateProcess(GameClientManager gameClientManager)

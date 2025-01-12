@@ -616,7 +616,7 @@ public class GameServerManager : MonoBehaviour
                                                     k.Value.gameObject.SetActive(true);
                                                 }
                                                 //ゲーム開始
-                                                //inGame = true;
+                                                inGame = true;
                                             }
                                             break;
                                         case (byte)Definer.NDID.DISCONNECT:
