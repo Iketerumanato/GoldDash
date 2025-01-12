@@ -29,6 +29,9 @@ public class ButtonAnimator : MonoBehaviour
     private Color m_originImageColor; // 元のImageの色
     private Color m_originTextColor; // 元の色
 
+    [SerializeField] private Image m_additionalEditImage; // グレーアウトさせたいボタンの追加Imageコンポーネント　文字色と同じになる
+    [SerializeField] private TextMeshProUGUI m_additionaEditText; // グレーアウトさせたいボタンのTMPコンポーネント
+
     //制御用プロパティ
     public bool IsAnimating
     {
@@ -150,6 +153,9 @@ public class ButtonAnimator : MonoBehaviour
         m_button.interactable = false;
         m_editImage.color = m_targetImageColor;
         m_editText.color = m_targetTextColor;
+
+        if(m_additionalEditImage != null) m_additionalEditImage.color = m_targetTextColor;
+        if(m_additionaEditText != null) m_additionaEditText.color = m_targetTextColor;
     }
 
     private void StopGrayOut()
@@ -159,5 +165,8 @@ public class ButtonAnimator : MonoBehaviour
         m_button.interactable = true;
         m_editImage.color = m_originImageColor;
         m_editText.color = m_originTextColor;
+
+        if (m_additionalEditImage != null) m_additionalEditImage.color = m_originTextColor;
+        if (m_additionaEditText != null) m_additionaEditText.color = m_originTextColor;
     }
 }

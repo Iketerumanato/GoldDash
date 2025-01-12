@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using R3;
+using Cysharp.Threading.Tasks;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -47,7 +48,7 @@ public class MapGenerator : MonoBehaviour
         switch (e)
         {
             case GameServerManager.SERVER_INTERNAL_EVENT.GENERATE_MAP:
-                GenerateMap();
+                GenerateMapForClient();
                 break;
             default:
                 break;
@@ -121,11 +122,39 @@ public class MapGenerator : MonoBehaviour
                         }
                     }
                 }
+
+                // 宝箱のスポーン位置
+                if (map[i, j].spawnChest)
+                {
+                    //第2または第1象限なら
+                    if (i < MAP_PART_SIZE)
+                    {
+                        if (j < MAP_PART_SIZE) //第2象限なら
+                        {
+                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                        }
+                        else //第1象限なら
+                        {
+                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                        }
+                    }
+                    else //第3または第4象限なら
+                    {
+                        if (j < MAP_PART_SIZE) //第3象限なら
+                        {
+                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                        }
+                        else //第4象限なら
+                        {
+                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
+                        }
+                    }
+                }
             }
         }
     }
 
-    public void GenerateMap()
+    public void GenerateMapForClient()
     {
         //上の廊下
         for (int row = 0; row < MAP_SIZE; row++)
@@ -225,34 +254,111 @@ public class MapGenerator : MonoBehaviour
                     GameObject lowerDoor = Instantiate(doorObj, new Vector3(i + 1f, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
                     lowerDoor.transform.parent = Parenttransform;
                 }
+            }
+        }
+    }
 
-                // 宝箱のスポーン位置
-                if (map[i, j].spawnChest)
+    public async void GenerateMapForServer()
+    {
+        //上の廊下
+        for (int row = 0; row < MAP_SIZE; row++)
+        {
+            map[row, MAP_PART_SIZE] = new CellInfo();
+        }
+        //左の廊下
+        for (int column = 0; column < MAP_SIZE; column++)
+        {
+            map[MAP_PART_SIZE, column] = new CellInfo();
+        }
+
+        //マップ中央に広場生成()
+        map[MAP_PART_SIZE - 1, MAP_PART_SIZE - 1] = new CellInfo();
+        map[MAP_PART_SIZE - 1, MAP_PART_SIZE + 1] = new CellInfo();
+        map[MAP_PART_SIZE + 1, MAP_PART_SIZE - 1] = new CellInfo();
+        map[MAP_PART_SIZE + 1, MAP_PART_SIZE + 1] = new CellInfo();
+
+        //中央行・列上下左右の壁
+        //上
+        CellInfo cellInfo = new CellInfo();
+        cellInfo.wallUpper = CellInfo.WALL_TYPE.WALL;
+        map[0, MAP_PART_SIZE] = cellInfo;
+        //下
+        cellInfo = new CellInfo();
+        cellInfo.wallLower = CellInfo.WALL_TYPE.WALL;
+        map[MAP_SIZE - 1, MAP_PART_SIZE] = cellInfo;
+        //左
+        cellInfo = new CellInfo();
+        cellInfo.wallLeft = CellInfo.WALL_TYPE.WALL;
+        map[MAP_PART_SIZE, 0] = cellInfo;
+        //右
+        cellInfo = new CellInfo();
+        cellInfo.wallRight = CellInfo.WALL_TYPE.WALL;
+        map[MAP_PART_SIZE, MAP_SIZE - 1] = cellInfo;
+
+        //重複した壁データの削除
+        DeleteDuplicatedWall(map);
+
+        for (int i = 0; i < MAP_SIZE; i++)
+        {
+            for (int j = 0; j < MAP_SIZE; j++)
+            {
+                // 床
+                if (map[i, j].cellType != CellInfo.CELL_TYPE.NONE)
                 {
-                    //第2または第1象限なら
-                    if (i < MAP_PART_SIZE)
-                    {
-                        if (j < MAP_PART_SIZE) //第2象限なら
-                        {
-                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                        }
-                        else //第1象限なら
-                        {
-                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                        }
-                    }
-                    else //第3または第4象限なら
-                    {
-                        if (j < MAP_PART_SIZE) //第3象限なら
-                        {
-                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                        }
-                        else //第4象限なら
-                        {
-                            chestPointsOrigin.Add(new Vector3(i + 0.5f, 0f, j + 0.5f));
-                        }
-                    }
+                    GameObject floor = Instantiate(floorObj, new Vector3(i + 0.5f, 0, j + 0.5f), Quaternion.identity);
+                    floor.transform.parent = Parenttransform;
                 }
+                // 天井
+                if (map[i, j].cellType != CellInfo.CELL_TYPE.NONE)
+                {
+                    GameObject ceiling = Instantiate(ceilingObj, new Vector3(i + 0.5f, 1f, j + 0.5f), Quaternion.identity);
+                    ceiling.transform.parent = Parenttransform;
+                }
+                // 左の壁
+                if (map[i, j].wallLeft == CellInfo.WALL_TYPE.WALL)
+                {
+                    GameObject leftWall = Instantiate(wallObj, new Vector3(i + 0.5f, 0f, j), Quaternion.identity);
+                    leftWall.transform.parent = Parenttransform;
+                }
+                else if (map[i, j].wallLeft == CellInfo.WALL_TYPE.DOOR)
+                {
+                    GameObject leftDoor = Instantiate(doorObj, new Vector3(i + 0.5f, 0f, j), Quaternion.identity);
+                    leftDoor.transform.parent = Parenttransform;
+                }
+                // 右の壁
+                if (map[i, j].wallRight == CellInfo.WALL_TYPE.WALL)
+                {
+                    GameObject rightWall = Instantiate(wallObj, new Vector3(i + 0.5f, 0f, j + 1f), Quaternion.identity);
+                    rightWall.transform.parent = Parenttransform;
+                }
+                else if (map[i, j].wallRight == CellInfo.WALL_TYPE.DOOR)
+                {
+                    GameObject rightDoor = Instantiate(doorObj, new Vector3(i + 0.5f, 0f, j + 1f), Quaternion.identity);
+                    rightDoor.transform.parent = Parenttransform;
+                }
+                // 上の壁
+                if (map[i, j].wallUpper == CellInfo.WALL_TYPE.WALL)
+                {
+                    GameObject upperWall = Instantiate(wallObj, new Vector3(i, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
+                    upperWall.transform.parent = Parenttransform;
+                }
+                else if (map[i, j].wallUpper == CellInfo.WALL_TYPE.DOOR)
+                {
+                    GameObject upperDoor = Instantiate(doorObj, new Vector3(i, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
+                    upperDoor.transform.parent = Parenttransform;
+                }
+                // 下の壁
+                if (map[i, j].wallLower == CellInfo.WALL_TYPE.WALL)
+                {
+                    GameObject lowerWall = Instantiate(wallObj, new Vector3(i + 1f, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
+                    lowerWall.transform.parent = Parenttransform;
+                }
+                else if (map[i, j].wallLower == CellInfo.WALL_TYPE.DOOR)
+                {
+                    GameObject lowerDoor = Instantiate(doorObj, new Vector3(i + 1f, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
+                    lowerDoor.transform.parent = Parenttransform;
+                }
+                await UniTask.Delay(50);
             }
         }
     }
