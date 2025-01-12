@@ -571,7 +571,12 @@ public class GameClientManager : MonoBehaviour
                                             actorDictionary[receivedActionPacket.targetID].Warp(receivedActionPacket.pos, actorDictionary[receivedActionPacket.targetID].transform.forward);
                                             break;
                                         case (byte)Definer.EDID.CHANGE_ACTOR_COLOR_TO_WHITE:
-                                            actorDictionary[receivedActionPacket.targetID].ChangeGreenToWhiteClient();
+                                            //サーバー側でも色変更
+                                            ActorController tmp;
+                                            if (actorDictionary.TryGetValue(receivedActionPacket.targetID, out tmp))
+                                            {
+                                                actorDictionary[receivedActionPacket.targetID].ChangeGreenToWhiteClient();
+                                            }
                                             break;
                                     }
                                     break;
