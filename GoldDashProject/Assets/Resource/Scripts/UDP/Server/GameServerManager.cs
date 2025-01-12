@@ -221,8 +221,6 @@ public class GameServerManager : MonoBehaviour
     {
         public async void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
         {
-            //フェーズ１を飛ばして実装したので一旦これで
-            gameServerManager.processingLogo.SetActive(false);
             //必要なUI出す
             gameServerManager.PlayerInfoUI.SetActive(true);
             gameServerManager.Phase2UniqueUI.SetActive(true);
@@ -232,11 +230,32 @@ public class GameServerManager : MonoBehaviour
 
             await UniTask.WaitUntil(() => gameServerManager.allActorsPrepared == true);
 
-            //サーバー側のマップ生成 //非同期に行うので待つ
-            MapGenerator.instance.GenerateMapForServer();
-
             ActionPacket myActionPacket;
             Header myHeader;
+
+            //色がタイプ２なら色変更パケット
+            ushort greenID = 0;
+            if (gameServerManager.currentColorType == COLOR_TYPE.CHANGE_GREEN_TO_WHITE)
+            {
+                //全アクターの中から緑のアクターを見つける
+                foreach (KeyValuePair<ushort, ActorController> k in gameServerManager.actorDictionary)
+                {
+                    if (k.Value.Color == Definer.PLAYER_COLOR.GREEN)
+                    { 
+                        greenID = k.Key;
+                        break;
+                    }
+                }
+
+                myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.CHANGE_ACTOR_COLOR_TO_WHITE, greenID);
+                myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                gameServerManager.udpGameServer.Send(myHeader.ToByte());
+            }
+            //サーバー側でも色変更
+            gameServerManager.actorDictionary[greenID].ChangeGreenToWhiteServer();
+
+            //サーバー側のマップ生成 //非同期に行うので待つ
+            MapGenerator.instance.GenerateMapForServer();
 
             await UniTask.Delay(6200);
 
