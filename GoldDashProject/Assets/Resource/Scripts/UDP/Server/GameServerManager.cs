@@ -616,7 +616,7 @@ public class GameServerManager : MonoBehaviour
                                                     k.Value.gameObject.SetActive(true);
                                                 }
                                                 //ゲーム開始
-                                                inGame = true;
+                                                //inGame = true;
                                             }
                                             break;
                                         case (byte)Definer.NDID.DISCONNECT:
@@ -628,6 +628,26 @@ public class GameServerManager : MonoBehaviour
                                             {
                                                 Debug.Log($"{receivedActionPacket.targetID}からのセッション切断通知がありました。クライアント登録・アクター登録を抹消します。");
                                                 //サーバー側で登録の抹消
+                                                //UI編集
+                                                switch (actorDictionary[receivedActionPacket.targetID].Color)
+                                                {
+                                                    case Definer.PLAYER_COLOR.RED:
+                                                        redArrow.SetActive(false);
+                                                        redNameText.text = "切断されました";
+                                                        break;
+                                                    case Definer.PLAYER_COLOR.GREEN:
+                                                        greenArrow.SetActive(false);
+                                                        greenNameText.text = "切断されました";
+                                                        break;
+                                                    case Definer.PLAYER_COLOR.BLUE:
+                                                        blueArrow.SetActive(false);
+                                                        blueNameText.text = "切断されました";
+                                                        break;
+                                                    case Definer.PLAYER_COLOR.YELLOW:
+                                                        yellowArrow.SetActive(false);
+                                                        yellowNameText.text = "切断されました";
+                                                        break;
+                                                }
                                                 Destroy(actorDictionary[receivedActionPacket.targetID].gameObject);
                                                 udpGameServer.RemoveClientFromDictionary(receivedActionPacket.targetID);
                                                 actorDictionary.Remove(receivedActionPacket.targetID);

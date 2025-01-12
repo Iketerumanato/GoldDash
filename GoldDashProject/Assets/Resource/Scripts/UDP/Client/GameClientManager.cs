@@ -606,9 +606,6 @@ public class GameClientManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        this.udpGameClient?.Dispose();
-        this.sendCts.Cancel();
-
         isRunning = false;
 
         // サーバーに接続中なら切断パケットを送信
@@ -620,6 +617,9 @@ public class GameClientManager : MonoBehaviour
                 udpGameClient.Send(new Header(this.sessionID, 0, 0, 0, (byte)Definer.PT.AP, new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISCONNECT, this.sessionID).ToByte()).ToByte());
             }
         }
+
+        this.udpGameClient?.Dispose();
+        this.sendCts.Cancel();
     }
 
     //インプットフィールドの編集を終えたときに呼び出す。名前の文字数チェックをしてUI状況を更新しつつ、myNameに値を格納
