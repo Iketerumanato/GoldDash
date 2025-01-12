@@ -55,4 +55,4 @@ MonoBehaviour:
   historyDisplayTime: 3
   lageTextDisplayTime: 1
   verticalSpacing: 85
-  largeTextFadeDuration: 0.5
+  largeTextFadeDuration: 0.2
