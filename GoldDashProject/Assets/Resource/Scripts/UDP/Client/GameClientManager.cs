@@ -422,8 +422,8 @@ public class GameClientManager : MonoBehaviour
                                             actorDictionary.Add(receivedActionPacket.targetID, actorController);
 
                                             //準備が完了したアクターの数を加算
-                                            //ここバグ疑惑あり
                                             preparedActors++;
+                                            Debug.Log($"現在{numOfActors}人中{preparedActors}人分のアクターが用意できています。");
                                             if (preparedActors == numOfActors) //準備完了通知をサーバに送る
                                             {
                                                 Debug.Log("PSGを送信しました。");

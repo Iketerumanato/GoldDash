@@ -535,12 +535,12 @@ public class GameServerManager : MonoBehaviour
                             //規定人数のプレイヤーが集まった時の処理
                             if (actorDictionary.Count == numOfPlayers)
                             {
+                                await UniTask.Delay(1000);
+
                                 Debug.Log($"十分なプレイヤーが集まったぜ。闇のゲームの始まりだぜ。");
 
                                 //ゲーム開始処理
                                 //全クライアントにアクターの生成命令を送る
-
-                                Debug.Log($"パケット送ってゲームはじめるぜ。");
 
                                 //4つのリスポーン地点を取得する
                                 Vector3[] respawnPoints = MapGenerator.instance.Get4RespawnPointsRandomly(); //テストプレイでは4人未満でデバッグするかもしれないが、そのときは先頭の要素だけ使う
