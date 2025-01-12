@@ -556,26 +556,6 @@ public class GameServerManager : MonoBehaviour
                                 }
 
                                 Debug.Log($"アクターを生成命令を出したぜ。");
-
-                                //for (int i = 0; i < maxNumOfChests; i++) //宝箱が上限数に達するまで宝箱を生成する
-                                //{
-                                //    //まずサーバー側のシーンで
-                                //    entityID = GetUniqueEntityID(); //エンティティID生成
-                                //    Vector3 chestPos = MapGenerator.instance.GetUniqueChestPointRandomly(); //座標決め
-                                //    Chest chest = Instantiate(ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>();
-                                //    chest.EntityID = entityID; //ID書き込み
-                                //    chest.Tier = 1; //レア度はまだ適当に1
-                                //    chest.gameObject.name = $"Chest ({entityID})";
-                                //    entityDictionary.Add(entityID, chest); //辞書に登録
-
-                                //    //ティア（１）と座標を指定して、宝箱を生成する命令
-                                //    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
-                                //    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                //    udpGameServer.Send(myHeader.ToByte());
-
-                                //    //宝箱の数を記録
-                                //    currentNumOfChests++;
-                                //}
                             }
                             break;
                         #endregion
@@ -603,12 +583,30 @@ public class GameServerManager : MonoBehaviour
                                             preparedPlayers++; //準備ができたプレイヤーの人数を加算
                                             if (preparedPlayers == numOfPlayers) //全プレイヤーの準備ができたら
                                             {
-                                                //ゲーム開始命令を送る
-                                                myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
-                                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                                                udpGameServer.Send(myHeader.ToByte());
-
                                                 Debug.Log("やったー！全プレイヤーの準備ができたよ！");
+
+                                                //サーバー側のマップ生成
+                                                MapGenerator.instance.GenerateMap();
+
+                                                for (int i = 0; i < maxNumOfChests; i++) //宝箱が上限数に達するまで宝箱を生成する
+                                                {
+                                                    //まずサーバー側のシーンで
+                                                    entityID = GetUniqueEntityID(); //エンティティID生成
+                                                    Vector3 chestPos = MapGenerator.instance.GetUniqueChestPointRandomly(); //座標決め
+                                                    Chest chest = Instantiate(ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>();
+                                                    chest.EntityID = entityID; //ID書き込み
+                                                    chest.Tier = 1; //レア度はまだ適当に1
+                                                    chest.gameObject.name = $"Chest ({entityID})";
+                                                    entityDictionary.Add(entityID, chest); //辞書に登録
+
+                                                    //ティア（１）と座標を指定して、宝箱を生成する命令
+                                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
+                                                    myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                    udpGameServer.Send(myHeader.ToByte());
+
+                                                    //宝箱の数を記録
+                                                    currentNumOfChests++;
+                                                }
 
                                                 //全アクターの有効化
                                                 foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
@@ -617,6 +615,11 @@ public class GameServerManager : MonoBehaviour
                                                 }
                                                 //ゲーム開始
                                                 inGame = true;
+
+                                                //ゲーム開始命令を送る
+                                                myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
+                                                myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                                udpGameServer.Send(myHeader.ToByte());
                                             }
                                             break;
                                         case (byte)Definer.NDID.DISCONNECT:
