@@ -2295,7 +2295,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7434626746944597823, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
       propertyPath: Loop
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7434626746944597823, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 366801790a2381c43979717187d573f6, type: 3}
+    - target: {fileID: 7434626746944597823, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2333,7 +2341,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sessionPass: 9999
-  numOfPlayers: 4
+  numOfPlayers: 1
   maxNumOfChests: 10
   RedActorPrefab: {fileID: 472128605623225904, guid: 51d0a9ebef4db684a91224dee56eac7e, type: 3}
   BlueActorPrefab: {fileID: 472128605623225904, guid: 56ba5da94f307b04ca428cc74eddb702, type: 3}

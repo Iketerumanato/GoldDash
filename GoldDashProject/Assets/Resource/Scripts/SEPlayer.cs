@@ -8,7 +8,7 @@ public class SEPlayer : MonoBehaviour
     public static SEPlayer instance;
 
     //再生用コンポーネント
-    private AudioSource audioSource;
+    public AudioSource audioSource;
 
     [Header("パンチが外れたときのSE")]
     [SerializeField] private AudioClip sePunchMiss;

@@ -293,7 +293,10 @@ public class GameServerManager : MonoBehaviour
                 k.Value.gameObject.SetActive(true);
             }
 
-            await UniTask.Delay(1000);
+
+            SEPlayer.instance.audioSource.Play();
+
+            await UniTask.Delay(3000);
 
             //ゲーム開始
             gameServerManager.inGame = true;
