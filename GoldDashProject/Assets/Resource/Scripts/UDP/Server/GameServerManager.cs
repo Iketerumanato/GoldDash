@@ -210,7 +210,6 @@ public class GameServerManager : MonoBehaviour
             gameServerManager.upperTextBox.text = "";
             gameServerManager.lowerTextBox.text = "";
             //マップ作る
-            MapGenerator.instance.GenerateMap();
             //宝箱作る
             //もろもろ終わったらパケット1 クライアントメインカメラの変更
             //1秒ほど待ってメッセージを送り、操作可能にする
