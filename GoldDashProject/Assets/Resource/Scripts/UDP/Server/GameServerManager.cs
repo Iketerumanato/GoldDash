@@ -94,7 +94,7 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timeTextLeft;
     [SerializeField] private TextMeshProUGUI timeTextRight;
 
-    private float timeLimitSeconds = 90f;
+    private float timeLimitSeconds = 50;
 
     //色変えボタン
     [SerializeField] private ColorSelectButtonColorChanger colorSelectButtonColorChanger1;
