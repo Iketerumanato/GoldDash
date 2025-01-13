@@ -8,7 +8,7 @@ using DG.Tweening;
 public class ResultImage : MonoBehaviour
 {
     [SerializeField] GameServerManager _gameserverManager;
-    private List<(string name, int gold, Definer.PLAYER_COLOR color)> pairPlayerDataList;
+    private List<(ushort sessionId, string name, int gold, Definer.PLAYER_COLOR color)> pairPlayerDataList;
 
     //各プレイヤーの色
     //アクターの色別テクスチャ(アクターに渡していく)
@@ -47,10 +47,10 @@ public class ResultImage : MonoBehaviour
 
     private void Start()
     {
-        pairPlayerDataList = topFourPlayerDataList(); //あらかじめゲーム終了時のプレイヤーのデータの統合
         InitializePlayerData();
-        DisplayFinalScore();
+        pairPlayerDataList = topFourPlayerDataList(); //あらかじめゲーム終了時のプレイヤーのデータの統合
         UpdateHighestScoreTag();
+        DisplayFinalScore();
         CalculateScoreRatios();
     }
 
@@ -71,7 +71,7 @@ public class ResultImage : MonoBehaviour
         }
     }
 
-    private void ApplyTextures(List<(string name, int gold, Definer.PLAYER_COLOR color)> playerDataList)
+    private void ApplyTextures(List<(ushort sessionId, string name, int gold, Definer.PLAYER_COLOR color)> playerDataList)
     {
         // プレイヤーデータと対象オブジェクトを順番に対応付け
         for (int i = 0; i < targetRenderers.Length && i < playerDataList.Count; i++)
@@ -130,11 +130,11 @@ public class ResultImage : MonoBehaviour
             var playerData = pairPlayerDataList[i];
 
             // 最高スコアのプレイヤーに対応するオブジェクトのタグを変更
-            if (playerData.name == highestScoringPlayer.name)
+            if (playerData.sessionId == highestScoringPlayer.sessionId)
             {
                 var parentObject = targetRenderers[i].transform.parent;
                 parentObject.gameObject.tag = WinerActorTag;
-                Debug.Log($"タグを変更しました: {playerData.name} -> {WinerActorTag}");
+                Debug.Log($"タグを変更しました: {playerData.sessionId} -> {WinerActorTag}");
             }
         }
     }
@@ -245,7 +245,7 @@ public class ResultImage : MonoBehaviour
     }
 
     //最高スコア(gold)を基準にプレイヤーのデータを順位の順番に整理
-    public List<(string playerName, int FinalScore, Definer.PLAYER_COLOR color)> topFourPlayerDataList()
+    public List<(ushort playerId, string name, int FinalScore, Definer.PLAYER_COLOR color)> topFourPlayerDataList()
     {
         var gameResult = _gameserverManager.GetGameResult();
         //var gameResult = GetGameResult();//テスト用
