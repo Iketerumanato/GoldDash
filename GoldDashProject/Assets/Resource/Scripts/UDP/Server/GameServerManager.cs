@@ -511,8 +511,6 @@ public class GameServerManager : MonoBehaviour
                 blackImage.DOFade(0f, 0.3f);
             });
         });
-
-        timeLimitSeconds = 10f;
     }
 
     private void Update()
