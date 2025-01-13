@@ -15,6 +15,7 @@ public class ResultImage : MonoBehaviour
     [SerializeField] private Renderer[] targetRenderers; // Scene上のRendererを参照 (順番に配置)
                                                          // プレイヤーの色に対応するテクスチャ
     [SerializeField] Texture[] ResultActorsBodyColors;
+    [SerializeField] Texture WhitePlayerTexture;
 
     //各プレイヤーの名前、スコア表示のテキスト
     //画面右のテキスト
@@ -88,8 +89,7 @@ public class ResultImage : MonoBehaviour
                materialInstance.mainTexture = ResultActorsBodyColors[colorIndex];
                if (playerData.color == Definer.PLAYER_COLOR.GREEN && _gameserverManager.currentColorType == GameServerManager.COLOR_TYPE.CHANGE_GREEN_TO_WHITE)
                {
-
-                    materialInstance.mainTexture = ResultActorsBodyColors[4];
+                    materialInstance.mainTexture = WhitePlayerTexture;
                }//ここで緑を白に変更
             }
         }
