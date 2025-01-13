@@ -63,12 +63,13 @@ public class ActorController : MonoBehaviour
     //歩行アニメーションのメソッドに渡す
     float blendSpeed;
 
-    const string strMoveAnimation = "BlendSpeed";
+    const string strRunSpeed = "RunSpeed";
+    const string strScrollFlag = "ScrollFlag";
+    const string strChestFlag = "ChestFlag";
+    const string strStunnedFlag = "StunnedFlag";
     const string strPunchTrigger = "PunchTrigger";
-    const string strHitedFrontTrigger = "HitFrontActorTrigger";
-    const string strHitedBackTrigger = "HitBackActorTrigger";
-    const string strIsUseScroll = "isUseScroll";
-    const string strIsStunned = "isStunned";
+    const string strGuardTrigger = "GuardTrigger";
+    const string strBlownTrigger = "BlownTrigger";
 
     //仮
     //所持金テキスト
@@ -115,12 +116,12 @@ public class ActorController : MonoBehaviour
         //モーション関連。そのまま＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
         float distance = (targetPosition - oldPos).sqrMagnitude;
         float speed = Mathf.Clamp01(distance / sqrRunThreshold);
-        float currentSpeed = PlayerAnimator.GetFloat(strMoveAnimation);
+        float currentSpeed = PlayerAnimator.GetFloat(strRunSpeed);
         // 上昇時と下降時で別々にLerpの速度を調整する
-        float blendSpeed = (speed > currentSpeed)
+        float RunSpeed = (speed > currentSpeed)
                             ? Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed)
                             : Mathf.Lerp(currentSpeed, speed, Time.deltaTime * animationLerpSpeed);
-        PlayMoveAnimation(blendSpeed);
+        PlayMoveAnimation(RunSpeed);
         //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 
         oldPos = transform.position; //最後にoldPos更新
@@ -141,7 +142,7 @@ public class ActorController : MonoBehaviour
     //モーション関連
     public void PlayMoveAnimation(float blendSpeed)
     {
-        PlayerAnimator.SetFloat(strMoveAnimation, blendSpeed);
+        PlayerAnimator.SetFloat(strRunSpeed, blendSpeed);
     }
 
     public void PunchAnimation()
@@ -149,34 +150,51 @@ public class ActorController : MonoBehaviour
         PlayerAnimator.SetTrigger(strPunchTrigger);
     }
 
-    public void RecoiledAnimation()
+    public void GuardAnimation()
     {
         //正面殴られモーション再生(Actor)
-        PlayerAnimator.SetTrigger(strHitedFrontTrigger);
+        PlayerAnimator.SetTrigger(strGuardTrigger);
     }
 
     public void BlownAnimation()
     {
         //背面殴られモーション再生(Actor)
-        PlayerAnimator.SetTrigger(strHitedBackTrigger);
+        PlayerAnimator.SetTrigger(strBlownTrigger);
     }
 
     //スクロースの使用モーション再生※SetBoolでtrueになる前にあらかじめ非表示にしたスクロールのオブジェクトを表示してから再生
-    public void PlayActorScrollAnimation()
+    public void PlayScrollAnimation()
     {
         BigScroll.SetActive(true);
-        PlayerAnimator.SetBool(strIsUseScroll, true);
+        PlayerAnimator.SetBool(strScrollFlag, true);
     }
     //スクロールオブジェクトの非表示
-    public void HideScrollObj()
+    public void EndScrollAnimation()
     {
         BigScroll.SetActive(false);
+        PlayerAnimator.SetBool(strScrollFlag, false);
     }
 
     //Actor側で雷を食らった時のモーション再生
-    public void PlayActorStunnAnimation()
+    public void PlayStunAnimation()
     {
-        PlayerAnimator.SetBool(strIsStunned, true);
+        PlayerAnimator.SetBool(strStunnedFlag, true);
+    }
+    
+    public void EndStunAnimation()
+    {
+        PlayerAnimator.SetBool(strStunnedFlag, true);
+    }
+
+    //Actor側で雷を食らった時のモーション再生
+    public void PlayChestAnimation()
+    {
+        PlayerAnimator.SetBool(strChestFlag, true);
+    }
+
+    public void EndChestAnimation()
+    {
+        PlayerAnimator.SetBool(strChestFlag, true);
     }
 
     //マテリアル変更するやり方での色変え

@@ -6340,6 +6340,8 @@ MonoBehaviour:
   materialBlue: {fileID: 2100000, guid: 3769adc359b77ba4dac042a40390da8b, type: 2}
   materialYellow: {fileID: 2100000, guid: 6c1b3a3b35e71024998762f61afa6b4b, type: 2}
   materialWhite: {fileID: 2100000, guid: 0a02aacf34f61b34ba6f4ec82ea0a8ed, type: 2}
+  greenIcon: {fileID: 0}
+  whiteIcon: {fileID: 0}
 --- !u!95 &4173149760160408899
 Animator:
   serializedVersion: 5
@@ -6350,7 +6352,7 @@ Animator:
   m_GameObject: {fileID: 7224334418596570499}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 8b4714ada84ca904f98d6897bf6dc891, type: 3}
-  m_Controller: {fileID: 9100000, guid: 171d1196b65a7574e9d543ef656914a5, type: 2}
+  m_Controller: {fileID: 9100000, guid: b7f4f24220888c04db396cc9fa09263a, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

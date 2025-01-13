@@ -139,6 +139,14 @@ public static class Definer
         /// </summary>
         DROP_GOLD,
         /// <summary>
+        /// 巻物を開きました
+        /// </summary>
+        OPEN_SCROLL,
+        /// <summary>
+        /// 宝箱を開け始めました
+        /// </summary>
+        TOUCH_CHEST,
+        /// <summary>
         /// サーバー内部専用。雷を生成してください。
         /// </summary>
         INTERNAL_THUNDER,
