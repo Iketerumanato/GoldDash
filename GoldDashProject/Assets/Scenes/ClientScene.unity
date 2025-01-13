@@ -2523,11 +2523,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f63d56cfaac9cb04b9d9182cbb0c8a65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerColor: 0
+  playerColor: 3
   sessionPass: 9999
   initSessionPass: 1234
   myName: 
-  numOfActors: 1
+  numOfActors: 2
   ActorPrefab: {fileID: 7224334418596570499, guid: d4e8583889415c44bb5b1ba7aec8e34c, type: 3}
   PlayerPrefab: {fileID: 7534559491902339316, guid: 0ce77fba351586c41b12fa34affc55ee, type: 3}
   GoldPilePrefab: {fileID: 7520273227876964304, guid: d46c7d03e3ed4fa408dec7213b261fb3, type: 3}
