@@ -185,7 +185,7 @@ public class ActorController : MonoBehaviour
     
     public void EndStunAnimation()
     {
-        PlayerAnimator.SetBool(strStunnedFlag, true);
+        PlayerAnimator.SetBool(strStunnedFlag, false);
     }
 
     //Actor側で雷を食らった時のモーション再生
@@ -196,7 +196,7 @@ public class ActorController : MonoBehaviour
 
     public void EndChestAnimation()
     {
-        PlayerAnimator.SetBool(strChestFlag, true);
+        PlayerAnimator.SetBool(strChestFlag, false);
     }
 
     //マテリアル変更するやり方での色変え
