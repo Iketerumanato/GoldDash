@@ -3280,6 +3280,10 @@ PrefabInstance:
       propertyPath: _gameserverManager
       value: 
       objectReference: {fileID: 903588626}
+    - target: {fileID: 5617915983377252102, guid: e297eb0681f7a0640a97074e976b2ba4, type: 3}
+      propertyPath: colorAndObjList.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5647729691963493255, guid: e297eb0681f7a0640a97074e976b2ba4, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1059
