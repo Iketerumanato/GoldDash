@@ -13,24 +13,32 @@ public class ResultImage : MonoBehaviour
     //各プレイヤーの色
     //アクターの色別テクスチャ(アクターに渡していく)
     [SerializeField] private Renderer[] targetRenderers; // Scene上のRendererを参照 (順番に配置)
-     // プレイヤーの色に対応するテクスチャ
-    [SerializeField]　Texture[] ResultActorsBodyColors;
+                                                         // プレイヤーの色に対応するテクスチャ
+    [SerializeField] Texture[] ResultActorsBodyColors;
 
     //各プレイヤーの名前、スコア表示のテキスト
     //画面右のテキスト
-    [SerializeField] TMP_Text RightResultText;
-    //画面左のテキスト
-    [SerializeField] TMP_Text LeftResultText;
+    [SerializeField] TMP_Text RightRankingText;
+    [SerializeField] TMP_Text RightNameText;
+    [SerializeField] TMP_Text RightScoreText;
 
+    //画面左のテキスト
+    [Header("")]
+    [SerializeField] TMP_Text LeftRankingText;
+    [SerializeField] TMP_Text LeftNameText;
+    [SerializeField] TMP_Text LeftScoreText;
+
+    //スコアキャンバスのフェード
     [SerializeField] CanvasGroup ResultTextCanvas;
 
+    [Header("")]
     [SerializeField] private UnityEngine.UI.Image[] segmentImages; // プレイヤー1～4のセグメント画像
-    [SerializeField] Material[] segmentImageMaterials;
+    [SerializeField] Material[] segmentImageMaterials;//セグメントのマテリアル
 
-    [SerializeField] Animator[] ResultAnimators;
+    [SerializeField] Animator[] ResultAnimators;//結果発表用のアクターのアニメーター
 
-    [SerializeField] private float lerpDuration = 2.0f;
-    [SerializeField] private float ChangeAnimSpeed = 0.4f;
+    [SerializeField] private float lerpDuration = 2.0f;//円グラフアニメーションのデュレーション量
+    [SerializeField] private float ChangeAnimSpeed = 0.4f;//変化させるアニメーションのスピード量
 
     private List<int> scoresList;
     private float[] scoreRatios;
@@ -50,9 +58,10 @@ public class ResultImage : MonoBehaviour
         scoresList = new List<int>();
 
         // GetGameResult() からゴールド値を取得
-        //var gameResults = _gameserverManager.GetGameResult();
+        var gameResults = _gameserverManager.GetGameResult();
+        ApplyTextures(gameResults);
 
-        ApplyTextures(pairPlayerDataList);
+        //ApplyTextures(pairPlayerDataList);
 
         // スコアだけを抽出してリストに追加
         foreach (var result in pairPlayerDataList)
@@ -135,6 +144,7 @@ public class ResultImage : MonoBehaviour
         }
     }
 
+    //各円グラフの初期化
     public void ConfigureSegmentImages()
     {
         foreach (var animator in ResultAnimators)
@@ -158,6 +168,7 @@ public class ResultImage : MonoBehaviour
         }
     }
 
+    //４人のスコアの合計値から円グラフのFillAmountを操作
     private void CalculateScoreRatios()
     {
         int totalScore = 0;
@@ -213,6 +224,7 @@ public class ResultImage : MonoBehaviour
         }
     }
 
+    //演出上の都合でアニメーションのスピードを変更する
     public void ChangeAnimatorSpeed()
     {
         foreach (var animator in ResultAnimators)
@@ -224,11 +236,11 @@ public class ResultImage : MonoBehaviour
         }
     }
 
-    //最高スコアを基準にプレイヤーのデータを順位の順番に整理
-    public List<(string playerName,int FinalScore, Definer.PLAYER_COLOR color)> topFourPlayerDataList()
+    //最高スコア(gold)を基準にプレイヤーのデータを順位の順番に整理
+    public List<(string playerName, int FinalScore, Definer.PLAYER_COLOR color)> topFourPlayerDataList()
     {
-        //var gameResult = _gameserverManager.GetGameResult();
-        var gameResult = GetGameResult();//テスト用
+        var gameResult = _gameserverManager.GetGameResult();
+        //var gameResult = GetGameResult();//テスト用
 
         return gameResult
             .OrderByDescending(player => player.gold)
@@ -248,16 +260,27 @@ public class ResultImage : MonoBehaviour
 
     void DisplayFinalScore()
     {
-        RightResultText.text = "";
-        LeftResultText.text = "";
+        //テキストの初期化
+        RightRankingText.text = "";
+        RightNameText.text = "";
+        RightScoreText.text = "";
+        LeftRankingText.text = "";
+        LeftNameText.text = "";
+        LeftScoreText.text = "";
 
-        for (int i = 0; i <pairPlayerDataList.Count; i++)
+        for (int playerRank = 0; playerRank < pairPlayerDataList.Count; playerRank++)
         {
-            var player = pairPlayerDataList[i];
+            var playerdata = pairPlayerDataList[playerRank];
 
             // 順位、名前、スコアを1行ずつ表示
-            RightResultText.text += $"{i + 1}: {player.name} - Score: {player.gold}\n";
-            LeftResultText.text += $"{i + 1}: {player.name} - : {player.gold}\n";
+            RightRankingText.text += $"{playerRank + 1}位:\n";
+            LeftRankingText.text += $"{playerRank + 1}位:\n";
+
+            RightNameText.text += $"{playerdata.name}\n";
+            LeftNameText.text += $"{playerdata.name}\n";
+
+            RightScoreText.text += $"{playerdata.gold}\n";
+            LeftScoreText.text += $"{playerdata.gold}\n";
         }
     }
 
@@ -267,9 +290,9 @@ public class ResultImage : MonoBehaviour
         return new List<(string name, int gold, Definer.PLAYER_COLOR color)>
         {
             ("Alice", 1000, Definer.PLAYER_COLOR.RED),
-            ("Bob", 4000, Definer.PLAYER_COLOR.BLUE),
+            ("Bob", 2000, Definer.PLAYER_COLOR.BLUE),
             ("Charlie", 3000, Definer.PLAYER_COLOR.GREEN),
-            ("Diana", 2000, Definer.PLAYER_COLOR.YELLOW),
+            ("Diana", 4000, Definer.PLAYER_COLOR.YELLOW),
         };
     }
 }
