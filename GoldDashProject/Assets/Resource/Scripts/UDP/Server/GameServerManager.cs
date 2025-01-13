@@ -243,7 +243,7 @@ public class GameServerManager : MonoBehaviour
                 foreach (KeyValuePair<ushort, ActorController> k in gameServerManager.actorDictionary)
                 {
                     if (k.Value.Color == Definer.PLAYER_COLOR.GREEN)
-                    {
+                    { 
                         greenID = k.Key;
                         break;
                     }
@@ -454,7 +454,7 @@ public class GameServerManager : MonoBehaviour
         }
     }
     #endregion
-
+    
     private void Start()
     {
         //コレクションのインスタンス作成
@@ -523,7 +523,7 @@ public class GameServerManager : MonoBehaviour
         timeLimitSeconds -= Time.deltaTime;
         //0秒未満なら0で固定する
         if (timeLimitSeconds < 0f)
-        {
+        { 
             timeLimitSeconds = 0f;
             //ここでフェードさせつつオブジェクトを起こし、結果発表用のカメラをMainCameraに変化させて疑似画面遷移開始
             //フェードで暗転
@@ -534,7 +534,7 @@ public class GameServerManager : MonoBehaviour
                 GameFinalResultSetPrefab.SetActive(true);
                 GameFinalResultCamera.tag = "MainCamera";
                 PlayerInfoUI.SetActive(false);
-                Phase2UniqueUI.SetActive(false);
+                Phase2UniqueUI.SetActive(false);          
             });
         }
         //分：秒表記に変換
@@ -1125,7 +1125,7 @@ public class GameServerManager : MonoBehaviour
         foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
         {
             if (k.Value.Gold > topGold)
-            {
+            { 
                 topPlayerID = k.Key;
                 topGold = k.Value.Gold;
             }
@@ -1143,18 +1143,18 @@ public class GameServerManager : MonoBehaviour
     }
 
     //ゲームの結果発表のために使う
-    public List<(ushort sessionId, string name, int gold, Definer.PLAYER_COLOR color)> GetGameResult()
+    public List<(string name, int gold, Definer.PLAYER_COLOR color)> GetGameResult()
     {
-        List<(ushort sessionId, string name, int gold, Definer.PLAYER_COLOR color)> ret = new List<(ushort sessionId, string name, int gold, Definer.PLAYER_COLOR color)>();
+        List<(string name, int gold, Definer.PLAYER_COLOR color)> ret = new List<(string name, int gold, Definer.PLAYER_COLOR color)>();
 
         foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
         {
-            ret.Add((k.Value.SessionID,k.Value.PlayerName, k.Value.Gold, k.Value.Color));
+            ret.Add((k.Value.PlayerName, k.Value.Gold, k.Value.Color));
         }
 
         return ret;
     }
-
+    
     private void OnDestroy()
     {
         //稼働中なら切断パケット
