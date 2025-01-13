@@ -453,7 +453,7 @@ public class GameClientManager : MonoBehaviour
                                             else
                                             {
                                                 //他人が殴られたならモーション同期
-                                                actorDictionary[receivedActionPacket.targetID].RecoiledAnimation();
+                                                actorDictionary[receivedActionPacket.targetID].GuardAnimation();
                                             }
                                             break;
                                         case (byte)Definer.EDID.HIT_BACK:
