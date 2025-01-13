@@ -165,12 +165,14 @@ public class ActorController : MonoBehaviour
     //スクロースの使用モーション再生※SetBoolでtrueになる前にあらかじめ非表示にしたスクロールのオブジェクトを表示してから再生
     public void PlayScrollAnimation()
     {
+        if(BigScroll == null) return;
         BigScroll.SetActive(true);
         PlayerAnimator.SetBool(strScrollFlag, true);
     }
     //スクロールオブジェクトの非表示
     public void EndScrollAnimation()
     {
+        if (BigScroll == null) return;
         BigScroll.SetActive(false);
         PlayerAnimator.SetBool(strScrollFlag, false);
     }
