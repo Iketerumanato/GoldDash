@@ -3322,31 +3322,39 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 0a02aacf34f61b34ba6f4ec82ea0a8ed, type: 2}
     - target: {fileID: 5617915983377252102, guid: e297eb0681f7a0640a97074e976b2ba4, type: 3}
       propertyPath: colorAndObjList.Array.size
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5617915983377252102, guid: e297eb0681f7a0640a97074e976b2ba4, type: 3}
       propertyPath: colorAndObjList.Array.data[0].obj
       value: 
       objectReference: {fileID: 1181087399}
     - target: {fileID: 5617915983377252102, guid: e297eb0681f7a0640a97074e976b2ba4, type: 3}
-      propertyPath: colorAndObjList.Array.data[2].obj
+      propertyPath: colorAndObjList.Array.data[1].obj
       value: 
       objectReference: {fileID: 1181087398}
     - target: {fileID: 5617915983377252102, guid: e297eb0681f7a0640a97074e976b2ba4, type: 3}
-      propertyPath: colorAndObjList.Array.data[3].obj
+      propertyPath: colorAndObjList.Array.data[2].obj
       value: 
       objectReference: {fileID: 1181087397}
+    - target: {fileID: 5617915983377252102, guid: e297eb0681f7a0640a97074e976b2ba4, type: 3}
+      propertyPath: colorAndObjList.Array.data[3].obj
+      value: 
+      objectReference: {fileID: 1181087396}
     - target: {fileID: 5617915983377252102, guid: e297eb0681f7a0640a97074e976b2ba4, type: 3}
       propertyPath: colorAndObjList.Array.data[4].obj
       value: 
       objectReference: {fileID: 1181087396}
     - target: {fileID: 5617915983377252102, guid: e297eb0681f7a0640a97074e976b2ba4, type: 3}
-      propertyPath: colorAndObjList.Array.data[2].color
+      propertyPath: colorAndObjList.Array.data[1].color
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5617915983377252102, guid: e297eb0681f7a0640a97074e976b2ba4, type: 3}
-      propertyPath: colorAndObjList.Array.data[3].color
+      propertyPath: colorAndObjList.Array.data[2].color
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5617915983377252102, guid: e297eb0681f7a0640a97074e976b2ba4, type: 3}
+      propertyPath: colorAndObjList.Array.data[3].color
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5617915983377252102, guid: e297eb0681f7a0640a97074e976b2ba4, type: 3}
       propertyPath: colorAndObjList.Array.data[4].color
