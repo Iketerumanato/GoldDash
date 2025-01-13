@@ -580,28 +580,28 @@ public class GameClientManager : MonoBehaviour
                                             break;
                                         case (byte)Definer.EDID.MOTION_CHEST:
                                             //自分でなければモーション再生
-                                            if (receivedActionPacket.targetID == this.sessionID)
+                                            if (receivedActionPacket.targetID != this.sessionID)
                                             {
                                                 actorDictionary[receivedActionPacket.targetID].PlayChestAnimation();
                                             }
                                             break;
                                         case (byte)Definer.EDID.MOTION_SCROLL:
                                             //自分でなければモーション再生
-                                            if (receivedActionPacket.targetID == this.sessionID)
+                                            if (receivedActionPacket.targetID != this.sessionID)
                                             {
                                                 actorDictionary[receivedActionPacket.targetID].PlayScrollAnimation();
                                             }
                                             break;
                                         case (byte)Definer.EDID.MOTION_STUN:
                                             //自分でなければモーション再生
-                                            if (receivedActionPacket.targetID == this.sessionID)
+                                            if (receivedActionPacket.targetID != this.sessionID)
                                             {
                                                 actorDictionary[receivedActionPacket.targetID].PlayStunAnimation();
                                             }
                                             break;
                                         case (byte)Definer.EDID.MOTION_END:
                                             //自分でなければモーション再生
-                                            if (receivedActionPacket.targetID == this.sessionID)
+                                            if (receivedActionPacket.targetID != this.sessionID)
                                             {
                                                 actorDictionary[receivedActionPacket.targetID].EndChestAnimation();
                                                 actorDictionary[receivedActionPacket.targetID].EndScrollAnimation();
