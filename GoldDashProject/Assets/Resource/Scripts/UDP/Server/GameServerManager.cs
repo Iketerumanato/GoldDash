@@ -527,11 +527,13 @@ public class GameServerManager : MonoBehaviour
             timeLimitSeconds = 0f;
             //ここでフェードさせつつオブジェクトを起こし、結果発表用のカメラをMainCameraに変化させて疑似画面遷移開始
             //フェードで暗転
-            blackImage.DOFade(1f, 0.3f);
-            GameFinalResultSetPrefab.SetActive(true);
-            GameFinalResultCamera.tag = "MainCamera";
-            //フェードが明けて出現
-            blackImage.DOFade(0f, 0.3f);
+            blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+            {
+                GameFinalResultSetPrefab.SetActive(true);
+                GameFinalResultCamera.tag = "MainCamera";
+                //フェードが明ける
+                blackImage.DOFade(0f, 0.3f);
+            });
         }
         //分：秒表記に変換
         TimeSpan span = new TimeSpan(0, 0, (int)timeLimitSeconds);
