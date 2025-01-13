@@ -529,10 +529,12 @@ public class GameServerManager : MonoBehaviour
             //フェードで暗転
             blackImage.DOFade(1f, 1f).OnComplete(() =>
             {
-                GameFinalResultSetPrefab.SetActive(true);
-                GameFinalResultCamera.tag = "MainCamera";
                 //フェードが明ける
                 blackImage.DOFade(0f, 0.5f);
+                GameFinalResultSetPrefab.SetActive(true);
+                GameFinalResultCamera.tag = "MainCamera";
+                PlayerInfoUI.SetActive(false);
+                Phase2UniqueUI.SetActive(false);          
             });
         }
         //分：秒表記に変換
