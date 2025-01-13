@@ -32,8 +32,6 @@ public class ResultImage : MonoBehaviour
     [SerializeField] private float lerpDuration = 2.0f;
     [SerializeField] private float ChangeAnimSpeed = 0.4f;
 
-    [SerializeField] ShakeEffect _shakeEffect;
-
     private List<int> scoresList;
     private float[] scoreRatios;
     const string WinerActorTag = "1stActor";
