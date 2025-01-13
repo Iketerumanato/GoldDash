@@ -94,7 +94,7 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timeTextLeft;
     [SerializeField] private TextMeshProUGUI timeTextRight;
 
-    private float timeLimitSeconds = 333f;
+    private float timeLimitSeconds = 20f;
 
     //色変えボタン
     [SerializeField] private ColorSelectButtonColorChanger colorSelectButtonColorChanger1;
@@ -511,8 +511,6 @@ public class GameServerManager : MonoBehaviour
                 blackImage.DOFade(0f, 0.3f);
             });
         });
-
-        timeLimitSeconds = 10f;
     }
 
     private void Update()
