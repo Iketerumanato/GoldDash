@@ -6292,7 +6292,7 @@ GameObject:
   - component: {fileID: 3077767166965415641}
   m_Layer: 0
   m_Name: Final Actor ver3
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6330,8 +6330,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShineEffect: {fileID: 0}
   PlayerAnimator: {fileID: 4173149760160408899}
-  runThreshold: 1
-  animationLerpSpeed: 70
+  runThreshold: 0.005
+  animationLerpSpeed: 35
   BigScroll: {fileID: 7788942713287943933}
   goldText: {fileID: 0}
   m_skinnedMeshRenderer: {fileID: 4209101554058272908}
@@ -6385,7 +6385,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -6405,7 +6405,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
