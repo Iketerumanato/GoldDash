@@ -52,14 +52,6 @@ public class ResultImage : MonoBehaviour
         UpdateHighestScoreTag();
         DisplayFinalScore();
         CalculateScoreRatios();
-
-
-        // 名前を gold の多い順に Debug.Log で出力
-        Debug.Log("Top players sorted by gold:");
-        foreach (var player in topFourPlayerDataList())
-        {
-            Debug.Log($"Name: {player.name}, Gold: {player.FinalScore}");
-        }
     }
 
     private void InitializePlayerData()
