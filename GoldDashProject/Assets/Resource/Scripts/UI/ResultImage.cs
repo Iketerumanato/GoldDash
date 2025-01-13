@@ -72,7 +72,7 @@ public class ResultImage : MonoBehaviour
         var gameResults = _gameserverManager.GetGameResult();
         //ApplyTextures(gameResults);
 
-        //ApplyTextures(pairPlayerDataList);
+        ApplyTextures(pairPlayerDataList);
 
         // スコアだけを抽出してリストに追加
         foreach (var result in pairPlayerDataList)
@@ -81,53 +81,51 @@ public class ResultImage : MonoBehaviour
         }
     }
 
-    //private void ApplyTextures(List<(string name, int gold, Definer.PLAYER_COLOR color)> playerDataList)
-    //{
-    //    // プレイヤーデータと対象オブジェクトを順番に対応付け
-    //    for (int i = 0; i < targetRenderers.Length && i < playerDataList.Count; i++)
-    //    {
-    //        var playerData = playerDataList[i];
-    //        var colorIndex = (int)playerData.color;
+    private void ApplyTextures(List<(string name, int gold, Definer.PLAYER_COLOR color)> playerDataList)
+    {
+        //    // プレイヤーデータと対象オブジェクトを順番に対応付け
+        //    for (int i = 0; i < targetRenderers.Length && i < playerDataList.Count; i++)
+        //    {
+        //        var playerData = playerDataList[i];
+        //        var colorIndex = (int)playerData.color;
 
-    //        // 有効な色インデックスか確認
-    //        if (colorIndex >= 0 && colorIndex < ResultActorsBodyColors.Length)
-    //        {
-    //            // Rendererのマテリアルを取得 (複製作成)
-    //            var materialInstance = targetRenderers[i].material;
+        //        // 有効な色インデックスか確認
+        //        if (colorIndex >= 0 && colorIndex < ResultActorsBodyColors.Length)
+        //        {
+        //            // Rendererのマテリアルを取得 (複製作成)
+        //            var materialInstance = targetRenderers[i].material;
 
-    //           // テクスチャを設定
-    //           materialInstance.mainTexture = ResultActorsBodyColors[colorIndex];
-    //           if (playerData.color == Definer.PLAYER_COLOR.GREEN && _gameserverManager.currentColorType == GameServerManager.COLOR_TYPE.CHANGE_GREEN_TO_WHITE)
-    //           {
-    //                materialInstance.mainTexture = WhitePlayerTexture;
-    //           }//ここで緑を白に変更
-    //        }
-    //    }
+        //           // テクスチャを設定
+        //           materialInstance.mainTexture = ResultActorsBodyColors[colorIndex];
+        //           if (playerData.color == Definer.PLAYER_COLOR.GREEN && _gameserverManager.currentColorType == GameServerManager.COLOR_TYPE.CHANGE_GREEN_TO_WHITE)
+        //           {
+        //                materialInstance.mainTexture = WhitePlayerTexture;
+        //           }//ここで緑を白に変更
+        //        }
+        //    }
 
-    //    // プレイヤーのデータをスコア順に並べる
-    //    var sortedPlayerData = pairPlayerDataList
-    //        .OrderByDescending(player => player.gold) // ゴールド順に並べる
-    //        .ToList();
+        // プレイヤーのデータをスコア順に並べる
+        var sortedPlayerData = playerDataList;
 
-    //    // segmentImagesをスコア順に対応させる
-    //    for (int i = 0; i < segmentImages.Length; i++)
-    //    {
-    //        // 順位に基づいてsegmentImagesのマテリアルを変更
-    //        if (i < segmentImageMaterials.Length && i < sortedPlayerData.Count)
-    //        {
-    //            var playerData = sortedPlayerData[i];
+        // segmentImagesをスコア順に対応させる
+        for (int i = 0; i < segmentImages.Length; i++)
+        {
+            // 順位に基づいてsegmentImagesのマテリアルを変更
+            if (i < segmentImageMaterials.Length && i < sortedPlayerData.Count)
+            {
+                var playerData = sortedPlayerData[i];
 
-    //            // 各playerDataに対応する色を使用してマテリアルを設定
-    //            //segmentImages[i].material = segmentImageMaterials[i];
+                // 各playerDataに対応する色を使用してマテリアルを設定
+                //segmentImages[i].material = segmentImageMaterials[i];
 
-    //            // 必要に応じて色を変更
-    //            segmentImages[i].color = GetColorForPlayer(playerData.color); // プレイヤーの色に対応する色を設定
-    //            if (playerData.color == Definer.PLAYER_COLOR.GREEN && _gameserverManager.currentColorType == GameServerManager.COLOR_TYPE.CHANGE_GREEN_TO_WHITE)
-    //            { segmentImages[i].color = Color.white; }//ここで緑を白に変更
+                // 必要に応じて色を変更
+                segmentImages[i].color = GetColorForPlayer(playerData.color); // プレイヤーの色に対応する色を設定
+                if (playerData.color == Definer.PLAYER_COLOR.GREEN && _gameserverManager.currentColorType == GameServerManager.COLOR_TYPE.CHANGE_GREEN_TO_WHITE)
+                { segmentImages[i].color = Color.white; }//ここで緑を白に変更
 
-    //        }
-    //    }
-    //}
+            }
+        }
+    }
 
     private void UpdateHighestScoreTag()
     {
