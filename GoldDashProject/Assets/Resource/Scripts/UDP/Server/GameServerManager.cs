@@ -111,7 +111,7 @@ public class GameServerManager : MonoBehaviour
         CHANGE_GREEN_TO_WHITE,
     }
     //現在の色パターン
-    private COLOR_TYPE currentColorType;
+    public COLOR_TYPE currentColorType;
 
     [SerializeField] private Button gameStartButton;
     [SerializeField] private ButtonAnimator gameStartButtonAnimator;

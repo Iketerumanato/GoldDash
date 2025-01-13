@@ -84,8 +84,13 @@ public class ResultImage : MonoBehaviour
                 // Rendererのマテリアルを取得 (複製作成)
                 var materialInstance = targetRenderers[i].material;
 
-                // テクスチャを設定
-                materialInstance.mainTexture = ResultActorsBodyColors[colorIndex];
+               // テクスチャを設定
+               materialInstance.mainTexture = ResultActorsBodyColors[colorIndex];
+               if (playerData.color == Definer.PLAYER_COLOR.GREEN && _gameserverManager.currentColorType == GameServerManager.COLOR_TYPE.CHANGE_GREEN_TO_WHITE)
+               {
+
+                    materialInstance.mainTexture = ResultActorsBodyColors[4];
+               }//ここで緑を白に変更
             }
         }
 
@@ -107,6 +112,8 @@ public class ResultImage : MonoBehaviour
 
                 // 必要に応じて色を変更
                 segmentImages[i].color = GetColorForPlayer(playerData.color); // プレイヤーの色に対応する色を設定
+                if (playerData.color == Definer.PLAYER_COLOR.GREEN && _gameserverManager.currentColorType == GameServerManager.COLOR_TYPE.CHANGE_GREEN_TO_WHITE)
+                { segmentImages[i].color = Color.white; }//ここで緑を白に変更
 
             }
         }
@@ -286,14 +293,14 @@ public class ResultImage : MonoBehaviour
     }
 
     //テスト用のList
-    List<(string name, int gold, Definer.PLAYER_COLOR color)> GetGameResult()
-    {
-        return new List<(string name, int gold, Definer.PLAYER_COLOR color)>
-        {
-            ("Alice", 1000, Definer.PLAYER_COLOR.RED),
-            ("Bob", 2000, Definer.PLAYER_COLOR.BLUE),
-            ("Charlie", 3000, Definer.PLAYER_COLOR.GREEN),
-            ("Diana", 4000, Definer.PLAYER_COLOR.YELLOW),
-        };
-    }
+    //List<(string name, int gold, Definer.PLAYER_COLOR color)> GetGameResult()
+    //{
+    //    return new List<(string name, int gold, Definer.PLAYER_COLOR color)>
+    //    {
+    //        ("Alice", 1000, Definer.PLAYER_COLOR.RED),
+    //        ("Bob", 2000, Definer.PLAYER_COLOR.BLUE),
+    //        ("Charlie", 3000, Definer.PLAYER_COLOR.GREEN),
+    //        ("Diana", 4000, Definer.PLAYER_COLOR.YELLOW),
+    //    };
+    //}
 }
