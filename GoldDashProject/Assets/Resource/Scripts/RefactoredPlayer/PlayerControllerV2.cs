@@ -288,6 +288,7 @@ public class PlayerControllerV2 : MonoBehaviour
             //STEP_C モーションを切り替えよう
             m_playerAnimationController.SetAnimationFromState(this.State);
 
+            //STEP_X パケットを送信しよう
             ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.BOOL_MOTION_FLAG_FALSE);
             Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             UdpGameClient.Send(myHeader.ToByte());
@@ -297,7 +298,7 @@ public class PlayerControllerV2 : MonoBehaviour
         }
 
         //STEP1 ダッシュ可能状態でないなら通常stateになろう
-        if (!m_isDashable)
+        if (!m_isDashable && this.State != PLAYER_STATE.NORMAL) //this.State != PLAYER_STATE.NORMALを忘れると毎フレームセッターが呼ばれm_isFirstFrameOfStateがtrueになる
         {
             m_dropableTimeCountCts.Cancel();
             this.State = PLAYER_STATE.NORMAL;
