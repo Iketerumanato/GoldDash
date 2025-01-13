@@ -94,7 +94,7 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timeTextLeft;
     [SerializeField] private TextMeshProUGUI timeTextRight;
 
-    private float timeLimitSeconds = 20f;
+    private float timeLimitSeconds = 5f;
 
     //色変えボタン
     [SerializeField] private ColorSelectButtonColorChanger colorSelectButtonColorChanger1;
@@ -527,12 +527,12 @@ public class GameServerManager : MonoBehaviour
             timeLimitSeconds = 0f;
             //ここでフェードさせつつオブジェクトを起こし、結果発表用のカメラをMainCameraに変化させて疑似画面遷移開始
             //フェードで暗転
-            blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+            blackImage.DOFade(1f, 1f).OnComplete(() =>
             {
                 GameFinalResultSetPrefab.SetActive(true);
                 GameFinalResultCamera.tag = "MainCamera";
                 //フェードが明ける
-                blackImage.DOFade(0f, 0.3f);
+                blackImage.DOFade(0f, 0.5f);
             });
         }
         //分：秒表記に変換
