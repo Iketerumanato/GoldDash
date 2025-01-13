@@ -107,6 +107,7 @@ public class ResultImage : MonoBehaviour
 
                 // 必要に応じて色を変更
                 segmentImages[i].color = GetColorForPlayer(playerData.color); // プレイヤーの色に対応する色を設定
+
             }
         }
     }
