@@ -1078,10 +1078,29 @@ public class GameServerManager : MonoBehaviour
                                                 myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_THUNDER, default, default, receivedActionPacket.pos);
                                                 myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                 udpGameServer.Send(myHeader.ToByte());
-                                                udpGameServer.Send(myHeader.ToByte());
                                             }
                                             break;
-                                            #endregion
+                                        #endregion
+                                        case (byte)Definer.REID.TOUCH_CHEST:
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.MOTION_CHEST, receivedHeader.sessionID);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
+                                            break;
+                                        case (byte)Definer.REID.OPEN_SCROLL:
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.MOTION_SCROLL, receivedHeader.sessionID);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
+                                            break;
+                                        case (byte)Definer.REID.STUNNED:
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.MOTION_STUN, receivedHeader.sessionID);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
+                                            break;
+                                        case (byte)Definer.REID.BOOL_MOTION_FLAG_FALSE:
+                                            myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.MOTION_END, receivedHeader.sessionID);
+                                            myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                                            udpGameServer.Send(myHeader.ToByte());
+                                            break;
                                     }
                                     break;
                                     #endregion

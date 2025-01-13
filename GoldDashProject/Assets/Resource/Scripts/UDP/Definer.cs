@@ -147,6 +147,14 @@ public static class Definer
         /// </summary>
         TOUCH_CHEST,
         /// <summary>
+        /// スタンしました
+        /// </summary>
+        STUNNED,
+        /// <summary>
+        /// bool系のモーションを終えました
+        /// </summary>
+        BOOL_MOTION_FLAG_FALSE,
+        /// <summary>
         /// サーバー内部専用。雷を生成してください。
         /// </summary>
         INTERNAL_THUNDER,
@@ -221,6 +229,22 @@ public static class Definer
         /// このアクターを白色にしろ
         /// </summary>
         CHANGE_ACTOR_COLOR_TO_WHITE,
+        /// <summary>
+        /// このアクターに宝箱を開けさせろ
+        /// </summary>
+        MOTION_CHEST,
+        /// <summary>
+        /// このアクターに巻物を開かせろ
+        /// </summary>
+        MOTION_SCROLL,
+        /// <summary>
+        /// このアクターをスタンさせろ
+        /// </summary>
+        MOTION_STUN,
+        /// <summary>
+        /// このアクターのモーションを終わらせろ
+        /// </summary>
+        MOTION_END,
     }
 
     /// <summary>

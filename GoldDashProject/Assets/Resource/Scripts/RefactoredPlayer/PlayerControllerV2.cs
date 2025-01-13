@@ -288,6 +288,10 @@ public class PlayerControllerV2 : MonoBehaviour
             //STEP_C モーションを切り替えよう
             m_playerAnimationController.SetAnimationFromState(this.State);
 
+            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.BOOL_MOTION_FLAG_FALSE);
+            Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            UdpGameClient.Send(myHeader.ToByte());
+
             //STEP_D 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
         }
@@ -359,6 +363,11 @@ public class PlayerControllerV2 : MonoBehaviour
             //STEP_E 鍵の状態をリセットしよう
             m_chestUnlocker.ResetCircleDraw();
 
+            //STEP_X パケットを送信しよう
+            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.TOUCH_CHEST);
+            Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            UdpGameClient.Send(myHeader.ToByte());
+
             //STEP_F 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
         }
@@ -409,6 +418,11 @@ public class PlayerControllerV2 : MonoBehaviour
 
             //STEP_B モーションを切り替えよう
             m_playerAnimationController.SetAnimationFromState(this.State);
+
+            //STEP_X パケットを送信しよう
+            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_SCROLL);
+            Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            UdpGameClient.Send(myHeader.ToByte());
 
             //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
@@ -780,6 +794,9 @@ public class PlayerControllerV2 : MonoBehaviour
         {
             case "Thunder":
                 //痺れたことをパケット送信
+                ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.STUNNED);
+                Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
                 //スタン状態になる
                 this.State = PLAYER_STATE.STUNNED;
                 break;
