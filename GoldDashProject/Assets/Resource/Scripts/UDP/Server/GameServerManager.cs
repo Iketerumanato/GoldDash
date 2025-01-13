@@ -46,6 +46,8 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
     [SerializeField] private GameObject ScrollPrefab; //巻物のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
+    [SerializeField] private GameObject GameFinalResultSetPrefab;
+    [SerializeField] Camera GameFinalResultCamera;
 
     //サーバーが内部をコントロールするための通知　マップ生成など
     //クライアントサーバーのクライアント部分の処理をここでやると機能過多になるため、通知を飛ばすだけにする。脳が体内の器官に命令を送るようなイメージ。実行するのはあくまで器官側。
@@ -109,7 +111,7 @@ public class GameServerManager : MonoBehaviour
         CHANGE_GREEN_TO_WHITE,
     }
     //現在の色パターン
-    private COLOR_TYPE currentColorType;
+    public COLOR_TYPE currentColorType;
 
     [SerializeField] private Button gameStartButton;
     [SerializeField] private ButtonAnimator gameStartButtonAnimator;
@@ -520,7 +522,21 @@ public class GameServerManager : MonoBehaviour
         //秒数を減らす
         timeLimitSeconds -= Time.deltaTime;
         //0秒未満なら0で固定する
-        if (timeLimitSeconds < 0f) timeLimitSeconds = 0f;
+        if (timeLimitSeconds < 0f)
+        { 
+            timeLimitSeconds = 0f;
+            //ここでフェードさせつつオブジェクトを起こし、結果発表用のカメラをMainCameraに変化させて疑似画面遷移開始
+            //フェードで暗転
+            blackImage.DOFade(1f, 1f).OnComplete(() =>
+            {
+                //フェードが明ける
+                blackImage.DOFade(0f, 0.5f);
+                GameFinalResultSetPrefab.SetActive(true);
+                GameFinalResultCamera.tag = "MainCamera";
+                PlayerInfoUI.SetActive(false);
+                Phase2UniqueUI.SetActive(false);          
+            });
+        }
         //分：秒表記に変換
         TimeSpan span = new TimeSpan(0, 0, (int)timeLimitSeconds);
         string timeText = span.ToString(@"m\:ss");

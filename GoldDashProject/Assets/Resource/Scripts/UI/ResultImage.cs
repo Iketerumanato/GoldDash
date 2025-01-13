@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using System;
 
 public class ResultImage : MonoBehaviour
 {
@@ -13,26 +14,42 @@ public class ResultImage : MonoBehaviour
     //各プレイヤーの色
     //アクターの色別テクスチャ(アクターに渡していく)
     [SerializeField] private Renderer[] targetRenderers; // Scene上のRendererを参照 (順番に配置)
-     // プレイヤーの色に対応するテクスチャ
-    [SerializeField]　Texture[] ResultActorsBodyColors;
+                                                         // プレイヤーの色に対応するテクスチャ
+    [SerializeField] Texture[] ResultActorsBodyColors;
+    [SerializeField] Material WhitePlayerMaterial;
+    [SerializeField] SkinnedMeshRenderer greenSkin;
 
     //各プレイヤーの名前、スコア表示のテキスト
     //画面右のテキスト
-    [SerializeField] TMP_Text RightResultText;
-    //画面左のテキスト
-    [SerializeField] TMP_Text LeftResultText;
+    [SerializeField] TMP_Text RightRankingText;
+    [SerializeField] TMP_Text RightNameText;
+    [SerializeField] TMP_Text RightScoreText;
 
+    //画面左のテキスト
+    [Header("")]
+    [SerializeField] TMP_Text LeftRankingText;
+    [SerializeField] TMP_Text LeftNameText;
+    [SerializeField] TMP_Text LeftScoreText;
+
+    //スコアキャンバスのフェード
     [SerializeField] CanvasGroup ResultTextCanvas;
 
+    [Header("")]
     [SerializeField] private UnityEngine.UI.Image[] segmentImages; // プレイヤー1～4のセグメント画像
-    [SerializeField] Material[] segmentImageMaterials;
+    [SerializeField] Material[] segmentImageMaterials;//セグメントのマテリアル
 
-    [SerializeField] Animator[] ResultAnimators;
+    [SerializeField] Animator[] ResultAnimators;//結果発表用のアクターのアニメーター
 
-    [SerializeField] private float lerpDuration = 2.0f;
-    [SerializeField] private float ChangeAnimSpeed = 0.4f;
+    [SerializeField] private float lerpDuration = 2.0f;//円グラフアニメーションのデュレーション量
+    [SerializeField] private float ChangeAnimSpeed = 0.4f;//変化させるアニメーションのスピード量
 
-    [SerializeField] ShakeEffect _shakeEffect;
+    [SerializeField] private List<ColorAndObjPair> colorAndObjList;
+    [Serializable]
+    private class ColorAndObjPair
+    {
+        public Definer.PLAYER_COLOR color;
+        public GameObject obj;
+    }
 
     private List<int> scoresList;
     private float[] scoreRatios;
@@ -52,7 +69,8 @@ public class ResultImage : MonoBehaviour
         scoresList = new List<int>();
 
         // GetGameResult() からゴールド値を取得
-        //var gameResults = _gameserverManager.GetGameResult();
+        var gameResults = _gameserverManager.GetGameResult();
+        //ApplyTextures(gameResults);
 
         ApplyTextures(pairPlayerDataList);
 
@@ -65,27 +83,29 @@ public class ResultImage : MonoBehaviour
 
     private void ApplyTextures(List<(string name, int gold, Definer.PLAYER_COLOR color)> playerDataList)
     {
-        // プレイヤーデータと対象オブジェクトを順番に対応付け
-        for (int i = 0; i < targetRenderers.Length && i < playerDataList.Count; i++)
-        {
-            var playerData = playerDataList[i];
-            var colorIndex = (int)playerData.color;
+        //    // プレイヤーデータと対象オブジェクトを順番に対応付け
+        //    for (int i = 0; i < targetRenderers.Length && i < playerDataList.Count; i++)
+        //    {
+        //        var playerData = playerDataList[i];
+        //        var colorIndex = (int)playerData.color;
 
-            // 有効な色インデックスか確認
-            if (colorIndex >= 0 && colorIndex < ResultActorsBodyColors.Length)
-            {
-                // Rendererのマテリアルを取得 (複製作成)
-                var materialInstance = targetRenderers[i].material;
+        //        // 有効な色インデックスか確認
+        //        if (colorIndex >= 0 && colorIndex < ResultActorsBodyColors.Length)
+        //        {
+        //            // Rendererのマテリアルを取得 (複製作成)
+        //            var materialInstance = targetRenderers[i].material;
 
-                // テクスチャを設定
-                materialInstance.mainTexture = ResultActorsBodyColors[colorIndex];
-            }
-        }
+        //           // テクスチャを設定
+        //           materialInstance.mainTexture = ResultActorsBodyColors[colorIndex];
+        //           if (playerData.color == Definer.PLAYER_COLOR.GREEN && _gameserverManager.currentColorType == GameServerManager.COLOR_TYPE.CHANGE_GREEN_TO_WHITE)
+        //           {
+        //                materialInstance.mainTexture = WhitePlayerTexture;
+        //           }//ここで緑を白に変更
+        //        }
+        //    }
 
         // プレイヤーのデータをスコア順に並べる
-        var sortedPlayerData = pairPlayerDataList
-            .OrderByDescending(player => player.gold) // ゴールド順に並べる
-            .ToList();
+        var sortedPlayerData = playerDataList;
 
         // segmentImagesをスコア順に対応させる
         for (int i = 0; i < segmentImages.Length; i++)
@@ -100,6 +120,9 @@ public class ResultImage : MonoBehaviour
 
                 // 必要に応じて色を変更
                 segmentImages[i].color = GetColorForPlayer(playerData.color); // プレイヤーの色に対応する色を設定
+                if (playerData.color == Definer.PLAYER_COLOR.GREEN && _gameserverManager.currentColorType == GameServerManager.COLOR_TYPE.CHANGE_GREEN_TO_WHITE)
+                { segmentImages[i].color = Color.white; }//ここで緑を白に変更
+
             }
         }
     }
@@ -109,19 +132,29 @@ public class ResultImage : MonoBehaviour
         // 最高スコアのプレイヤーデータを取得
         var highestScoringPlayer = pairPlayerDataList.OrderByDescending(player => player.gold).First();
 
-        // 最高スコアのプレイヤーに対応するオブジェクトを見つける
-        for (int i = 0; i < pairPlayerDataList.Count && i < targetRenderers.Length; i++)
-        {
-            var playerData = pairPlayerDataList[i];
 
-            // 最高スコアのプレイヤーに対応するオブジェクトのタグを変更
-            if (playerData.name == highestScoringPlayer.name)
-            {
-                var parentObject = targetRenderers[i].transform.parent;
-                parentObject.gameObject.tag = WinerActorTag;
-                Debug.Log($"タグを変更しました: {playerData.name} -> {WinerActorTag}");
+        foreach (ColorAndObjPair c in colorAndObjList)
+        {
+            if (c.color == highestScoringPlayer.color)
+            { 
+                c.obj.tag = WinerActorTag;
+                Debug.Log($"タグを変更しました: -> {WinerActorTag}");
             }
         }
+
+        //// 最高スコアのプレイヤーに対応するオブジェクトを見つける
+        //for (int i = 0; i < pairPlayerDataList.Count && i < targetRenderers.Length; i++)
+        //{
+        //    var playerData = pairPlayerDataList[i];
+
+        //    // 最高スコアのプレイヤーに対応するオブジェクトのタグを変更
+        //    if (playerData.name == highestScoringPlayer.name)
+        //    {
+        //        var parentObject = targetRenderers[i].transform.parent;
+        //        parentObject.gameObject.tag = WinerActorTag;
+        //        Debug.Log($"タグを変更しました: {playerData.name} -> {WinerActorTag}");
+        //    }
+        //}
     }
 
     private Color GetColorForPlayer(Definer.PLAYER_COLOR playerColor)
@@ -137,6 +170,7 @@ public class ResultImage : MonoBehaviour
         }
     }
 
+    //各円グラフの初期化
     public void ConfigureSegmentImages()
     {
         foreach (var animator in ResultAnimators)
@@ -160,6 +194,7 @@ public class ResultImage : MonoBehaviour
         }
     }
 
+    //４人のスコアの合計値から円グラフのFillAmountを操作
     private void CalculateScoreRatios()
     {
         int totalScore = 0;
@@ -215,6 +250,7 @@ public class ResultImage : MonoBehaviour
         }
     }
 
+    //演出上の都合でアニメーションのスピードを変更する
     public void ChangeAnimatorSpeed()
     {
         foreach (var animator in ResultAnimators)
@@ -226,11 +262,11 @@ public class ResultImage : MonoBehaviour
         }
     }
 
-    //最高スコアを基準にプレイヤーのデータを順位の順番に整理
-    public List<(string playerName,int FinalScore, Definer.PLAYER_COLOR color)> topFourPlayerDataList()
+    //最高スコア(gold)を基準にプレイヤーのデータを順位の順番に整理
+    public List<(string playerName, int FinalScore, Definer.PLAYER_COLOR color)> topFourPlayerDataList()
     {
-        //var gameResult = _gameserverManager.GetGameResult();
-        var gameResult = GetGameResult();//テスト用
+        var gameResult = _gameserverManager.GetGameResult();
+        //var gameResult = GetGameResult();//テスト用
 
         return gameResult
             .OrderByDescending(player => player.gold)
@@ -250,28 +286,47 @@ public class ResultImage : MonoBehaviour
 
     void DisplayFinalScore()
     {
-        RightResultText.text = "";
-        LeftResultText.text = "";
+        //テキストの初期化
+        RightRankingText.text = "";
+        RightNameText.text = "";
+        RightScoreText.text = "";
+        LeftRankingText.text = "";
+        LeftNameText.text = "";
+        LeftScoreText.text = "";
 
-        for (int i = 0; i <pairPlayerDataList.Count; i++)
+        for (int playerRank = 0; playerRank < pairPlayerDataList.Count; playerRank++)
         {
-            var player = pairPlayerDataList[i];
+            var playerdata = pairPlayerDataList[playerRank];
 
             // 順位、名前、スコアを1行ずつ表示
-            RightResultText.text += $"{i + 1}: {player.name} - Score: {player.gold}\n";
-            LeftResultText.text += $"{i + 1}: {player.name} - : {player.gold}\n";
+            RightRankingText.text += $"{playerRank + 1}位:\n";
+            LeftRankingText.text += $"{playerRank + 1}位:\n";
+
+            RightNameText.text += $"{playerdata.name}\n";
+            LeftNameText.text += $"{playerdata.name}\n";
+
+            RightScoreText.text += $"{playerdata.gold}\n";
+            LeftScoreText.text += $"{playerdata.gold}\n";
         }
     }
 
     //テスト用のList
-    List<(string name, int gold, Definer.PLAYER_COLOR color)> GetGameResult()
+    //List<(string name, int gold, Definer.PLAYER_COLOR color)> GetGameResult()
+    //{
+    //    return new List<(string name, int gold, Definer.PLAYER_COLOR color)>
+    //    {
+    //        ("Alice", 1000, Definer.PLAYER_COLOR.RED),
+    //        ("Bob", 2000, Definer.PLAYER_COLOR.BLUE),
+    //        ("Charlie", 3000, Definer.PLAYER_COLOR.GREEN),
+    //        ("Diana", 4000, Definer.PLAYER_COLOR.YELLOW),
+    //    };
+    //}
+
+    private void OnEnable()
     {
-        return new List<(string name, int gold, Definer.PLAYER_COLOR color)>
+        if (_gameserverManager.currentColorType == GameServerManager.COLOR_TYPE.CHANGE_GREEN_TO_WHITE)
         {
-            ("Alice", 1000, Definer.PLAYER_COLOR.RED),
-            ("Bob", 4000, Definer.PLAYER_COLOR.BLUE),
-            ("Charlie", 3000, Definer.PLAYER_COLOR.GREEN),
-            ("Diana", 2000, Definer.PLAYER_COLOR.YELLOW),
-        };
+            greenSkin.material = WhitePlayerMaterial;
+        }
     }
 }
