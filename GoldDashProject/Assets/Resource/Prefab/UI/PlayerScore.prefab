@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: d50cbe99136c04944826ed9004b6dbea, type: 3}
+  m_Texture: {fileID: 2800000, guid: 38c6dae5789600647a7b8ab6d6663cff, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -170,7 +170,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: d50cbe99136c04944826ed9004b6dbea, type: 3}
+  m_Texture: {fileID: 2800000, guid: 38c6dae5789600647a7b8ab6d6663cff, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -242,7 +242,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: d50cbe99136c04944826ed9004b6dbea, type: 3}
+  m_Texture: {fileID: 2800000, guid: 38c6dae5789600647a7b8ab6d6663cff, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -314,7 +314,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: d50cbe99136c04944826ed9004b6dbea, type: 3}
+  m_Texture: {fileID: 2800000, guid: 38c6dae5789600647a7b8ab6d6663cff, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -455,12 +455,11 @@ MonoBehaviour:
   - {fileID: 201444916959431857}
   - {fileID: 5954803683359898699}
   - {fileID: 3334800041158751676}
-  numberTexture: {fileID: 2800000, guid: d50cbe99136c04944826ed9004b6dbea, type: 3}
+  numberTexture: {fileID: 2800000, guid: 38c6dae5789600647a7b8ab6d6663cff, type: 3}
   animationTime: 0.5
   digitHeight: 32
   delayBetweenDigits: 0.1
   actorScore: {fileID: 0}
-  displayScoreHistory: {fileID: 5087410071597811291}
 --- !u!1 &7475190876995575860
 GameObject:
   m_ObjectHideFlags: 0
@@ -598,7 +597,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: d50cbe99136c04944826ed9004b6dbea, type: 3}
+  m_Texture: {fileID: 2800000, guid: 38c6dae5789600647a7b8ab6d6663cff, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
