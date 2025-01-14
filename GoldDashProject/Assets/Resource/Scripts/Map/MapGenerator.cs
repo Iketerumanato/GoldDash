@@ -358,6 +358,8 @@ public class MapGenerator : MonoBehaviour
                     GameObject lowerDoor = Instantiate(doorObj, new Vector3(i + 1f, 0f, j + 0.5f), Quaternion.Euler(0f, 90f, 0f));
                     lowerDoor.transform.parent = Parenttransform;
                 }
+
+                SEPlayer.instance.PlaySEGenerateCell();
                 await UniTask.Delay(50);
             }
         }

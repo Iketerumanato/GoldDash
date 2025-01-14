@@ -653,21 +653,25 @@ public class GameServerManager : MonoBehaviour
                                     actorPrefab = RedActorPrefab;
                                     redNameText.text = receivedInitPacket.playerName;
                                     redArrow.SetActive(true);
+                                    SEPlayer.instance.PlaySELoginRed();
                                     break;
                                 case Definer.PLAYER_COLOR.GREEN:
                                     actorPrefab = GreenActorPrefab;
                                     greenNameText.text = receivedInitPacket.playerName;
                                     greenArrow.SetActive(true);
+                                    SEPlayer.instance.PlaySELoginGreen();
                                     break;
                                 case Definer.PLAYER_COLOR.BLUE:
                                     actorPrefab = BlueActorPrefab;
                                     blueNameText.text = receivedInitPacket.playerName;
                                     blueArrow.SetActive(true);
+                                    SEPlayer.instance.PlaySELoginBlue();
                                     break;
                                 case Definer.PLAYER_COLOR.YELLOW:
                                     actorPrefab = YellowActorPrefab;
                                     yellowNameText.text = receivedInitPacket.playerName;
                                     yellowArrow.SetActive(true);
+                                    SEPlayer.instance.PlaySELoginYellow();
                                     break;
                                 default:
                                     actorPrefab = WhiteActorPrefab;
