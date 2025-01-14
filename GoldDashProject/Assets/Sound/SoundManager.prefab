@@ -141,6 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02b96018d741fe9488fb183d7cf43cf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioSource: {fileID: 0}
   sePunchMiss: {fileID: 8300000, guid: eccc933a238f7f34bb04cd7396dd5b42, type: 3}
   sePunchHitFront: {fileID: 8300000, guid: e6daf2c0137a5fa4897aef29cfe15bbb, type: 3}
   sePunchHitBack: {fileID: 8300000, guid: e6daf2c0137a5fa4897aef29cfe15bbb, type: 3}
@@ -150,6 +151,16 @@ MonoBehaviour:
   seGetGold: {fileID: 8300000, guid: 01e20f17cdf7a594b8a07673c7a0109f, type: 3}
   seAccessChest: {fileID: 8300000, guid: f7e925757179523459e772e0fac4b752, type: 3}
   seOpenChest: {fileID: 8300000, guid: e2800cd6425c02d43bc77c2d189b8505, type: 3}
+  seUnlock1: {fileID: 8300000, guid: 1e7fa98c247dc83448808c7a8126176b, type: 3}
+  seUnlock2: {fileID: 8300000, guid: f3c760f62b9b73a48b0846d4b878e8a3, type: 3}
+  seUnlock3: {fileID: 8300000, guid: 461e8c830ef73854495b31cba8b3f9eb, type: 3}
+  seUnlock4: {fileID: 8300000, guid: 49c64376d0d798344b45f7e82049ae31, type: 3}
+  seUnlock5: {fileID: 8300000, guid: 3db9d10ff3041af4d82b7e9d1b128367, type: 3}
   seThunder: {fileID: 8300000, guid: 32b7fce5001273548b5bf3bdf5deddc4, type: 3}
   seDash: {fileID: 8300000, guid: e0df3aaee44cfd04b8350de273a90f16, type: 3}
   seWarp: {fileID: 8300000, guid: 0c244193b763e7947a3f6758e027f75d, type: 3}
+  seLogInRed: {fileID: 8300000, guid: e37af906f831cf640a685f163dc4c84a, type: 3}
+  seLogInBlue: {fileID: 8300000, guid: f30fd610efa9181428ef93c04a407ae4, type: 3}
+  seLogInGreen: {fileID: 8300000, guid: 30d132c02a3f97d4d83457ec2d2f8c06, type: 3}
+  seLogInYellow: {fileID: 8300000, guid: 5b6481e5e4816bd45b25cc96873e0387, type: 3}
+  seGenerateCell: {fileID: 8300000, guid: 9e15448b98ac7004788463287ce13198, type: 3}

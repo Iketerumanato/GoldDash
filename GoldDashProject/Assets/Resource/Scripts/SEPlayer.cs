@@ -37,6 +37,14 @@ public class SEPlayer : MonoBehaviour
     [Header("宝箱が開いた時のSE")]
     [SerializeField] private AudioClip seOpenChest;
 
+    [Header("宝物の鍵5段階")]
+    [SerializeField] private AudioClip seUnlock1;
+    [SerializeField] private AudioClip seUnlock2;
+    [SerializeField] private AudioClip seUnlock3;
+    [SerializeField] private AudioClip seUnlock4;
+    [SerializeField] private AudioClip seUnlock5;
+
+    //以下サーバー専用
     [Header("雷が落ちた時のSE")]
     [SerializeField] private AudioClip seThunder;
 
@@ -45,6 +53,15 @@ public class SEPlayer : MonoBehaviour
     
     [Header("誰かがワープしたときのSE")]
     [SerializeField] private AudioClip seWarp;
+
+    [Header("誰かがログインしたときのSE4種")]
+    [SerializeField] private AudioClip seLogInRed;
+    [SerializeField] private AudioClip seLogInBlue;
+    [SerializeField] private AudioClip seLogInGreen;
+    [SerializeField] private AudioClip seLogInYellow;
+
+    [Header("地図が生成されたときのSE")]
+    [SerializeField] private AudioClip seGenerateCell;
 
     private void Start()
     {
@@ -107,6 +124,32 @@ public class SEPlayer : MonoBehaviour
         audioSource.PlayOneShot(seOpenChest);
     }
 
+    public void PlaySEUnlock1()
+    {
+        audioSource.PlayOneShot(seUnlock1);
+    }
+
+    public void PlaySEUnlock2()
+    {
+        audioSource.PlayOneShot(seUnlock2);
+    }
+
+    public void PlaySEUnlock3()
+    {
+        audioSource.PlayOneShot(seUnlock3);
+    }
+
+    public void PlaySEUnlock4()
+    {
+        audioSource.PlayOneShot(seUnlock4);
+    }
+
+    public void PlaySEUnlock5()
+    {
+        audioSource.PlayOneShot(seUnlock5);
+    }
+
+    //以下サーバー用
     public void PlaySEThunder()
     {
         audioSource.PlayOneShot(seThunder);
@@ -120,5 +163,30 @@ public class SEPlayer : MonoBehaviour
     public void PlaySEWarp()
     {
         audioSource.PlayOneShot(seWarp);
+    }
+
+    public void PlaySELoginRed()
+    {
+        audioSource.PlayOneShot(seLogInRed);
+    }
+
+    public void PlaySELoginBlue()
+    {
+        audioSource.PlayOneShot(seLogInBlue);
+    }
+
+    public void PlaySELoginGreen()
+    {
+        audioSource.PlayOneShot(seLogInGreen);
+    }
+
+    public void PlaySELoginYellow()
+    {
+        audioSource.PlayOneShot(seLogInYellow);
+    }
+
+    public void PlaySEGenerateCell()
+    {
+        audioSource.PlayOneShot(seGenerateCell);
     }
 }
