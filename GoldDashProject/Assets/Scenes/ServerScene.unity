@@ -2177,7 +2177,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u8A66\u5408\u7D42\u4E86\u307E\u3067\n<size=120>m:ss</size>"
+  m_text: "\u8A66\u5408\u7D42\u4E86\u307E\u3067\n<size=120>5:33</size>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
   m_sharedMaterial: {fileID: -739646076848395095, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
@@ -2346,7 +2346,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sessionPass: 9999
-  numOfPlayers: 4
+  numOfPlayers: 2
   maxNumOfChests: 10
   RedActorPrefab: {fileID: 472128605623225904, guid: 51d0a9ebef4db684a91224dee56eac7e, type: 3}
   BlueActorPrefab: {fileID: 472128605623225904, guid: 56ba5da94f307b04ca428cc74eddb702, type: 3}
@@ -3747,7 +3747,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1265691349
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4305,7 +4305,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u8A66\u5408\u7D42\u4E86\u307E\u3067\n<size=120>m:ss</size>"
+  m_text: "\u8A66\u5408\u7D42\u4E86\u307E\u3067\n<size=120>5:33</size>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
   m_sharedMaterial: {fileID: -739646076848395095, guid: 4b971c1064deea444a80d080bdab0a7b, type: 2}
