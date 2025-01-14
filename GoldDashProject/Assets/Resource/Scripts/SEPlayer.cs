@@ -10,6 +10,9 @@ public class SEPlayer : MonoBehaviour
     //再生用コンポーネント
     public AudioSource audioSource;
 
+    public AudioSource titleBGMPlayer;
+    public AudioSource mainBGMPlayer;
+
     [Header("パンチが外れたときのSE")]
     [SerializeField] private AudioClip sePunchMiss;
 

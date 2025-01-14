@@ -166,6 +166,10 @@ public class GameServerManager : MonoBehaviour
 
             //初期設定が終わったら稼働
             gameServerManager.isRunning = true;
+
+            //BGM
+            SEPlayer.instance.titleBGMPlayer.DOFade(1f, 0.3f);
+            SEPlayer.instance.titleBGMPlayer.Play();
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
@@ -215,6 +219,9 @@ public class GameServerManager : MonoBehaviour
             //不要なUI消す
             gameServerManager.Phase1UniqueUI.SetActive(false);
             gameServerManager.processingLogo.SetActive(false);
+
+            //BGM消す
+            SEPlayer.instance.titleBGMPlayer.DOFade(0f, 0.3f);
         }
     }
 
@@ -296,7 +303,7 @@ public class GameServerManager : MonoBehaviour
             }
 
 
-            SEPlayer.instance.audioSource.Play();
+            SEPlayer.instance.mainBGMPlayer.Play();
 
             await UniTask.Delay(3000);
 
