@@ -548,6 +548,10 @@ public class PlayerControllerV2 : MonoBehaviour
             //STEP_B モーションを再生しよう
             m_playerAnimationController.SetAnimationFromState(this.State);
 
+            //STEP_X メッセージとSEを鳴らそう
+            m_messageDisplayer.DisplayLargeMessage("雷に撃たれた！", 2);
+            SEPlayer.instance.PlaySEParayzed();
+
             //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
         }
@@ -854,8 +858,6 @@ public class PlayerControllerV2 : MonoBehaviour
                 UdpGameClient.Send(myHeader.ToByte());
                 //スタン状態になる
                 this.State = PLAYER_STATE.STUNNED;
-                m_messageDisplayer.DisplayLargeMessage("雷に撃たれた！", 2);
-                SEPlayer.instance.PlaySEParayzed();
                 break;
             default:
                 break;
