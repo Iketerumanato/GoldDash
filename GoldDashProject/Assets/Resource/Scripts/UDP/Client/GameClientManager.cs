@@ -486,9 +486,11 @@ public class GameClientManager : MonoBehaviour
                                                 {
                                                     playerController.PlayGetCoinAnimation(); //所持金が増えたときはコイン吸い取りアニメーション
                                                     SEPlayer.instance.PlaySEGetGold();
+                                                    playerController.DisplaySmallMessage($"{receivedActionPacket.value}ゴールドを手に入れた！");
                                                 }
                                                 else if (receivedActionPacket.value < 0)
                                                 {
+                                                    playerController.DisplaySmallMessage($"{receivedActionPacket.value}ゴールドを落とした…");
                                                     //失った金額に応じてSE再生
                                                     switch (receivedActionPacket.value)
                                                     {

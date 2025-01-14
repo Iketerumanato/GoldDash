@@ -750,8 +750,31 @@ public class PlayerControllerV2 : MonoBehaviour
     }
 
     public void SetMagicToHotbar(Definer.MID magicID)
-    { 
-        m_hotbarManager.SetMagicToHotbar(magicID);
+    {
+        if (m_hotbarManager.SetMagicToHotbar(magicID)) //セットに成功したら
+        {
+            DisplaySmallMessage($"{GetMagicNameFromID(magicID)}の巻物を手に入れた！");
+        }
+        else
+        {
+            DisplaySmallMessage($"巻物は３つまでしか持てない…");
+        }
+
+        //魔法の巻物の名前を取得
+        string GetMagicNameFromID(Definer.MID magicID)
+        {
+            switch (magicID)
+            {
+                case Definer.MID.THUNDER:
+                    return "サンダー";
+                case Definer.MID.DASH:
+                    return "ダッシュ";
+                case Definer.MID.TELEPORT:
+                    return "テレポート";
+                default:
+                    return "不正";
+            }
+        }
     }
 
     //金貨を拾うためのトリガー処理
