@@ -381,6 +381,12 @@ public class GameClientManager : MonoBehaviour
                                                 playerController.EndUsingMagicSuccessfully(); //魔法を正しく終了する
                                             }
                                             break;
+                                        case (byte)Definer.NDID.DISPLAY_SMALL_MSG: //小メッセージ表示
+                                            playerController.DisplaySmallMessage(receivedActionPacket.msg);
+                                            break;
+                                        case (byte)Definer.NDID.DISPLAY_LARGE_MSG: //大メッセージ表示
+                                            playerController.DisplayLargeMessage(receivedActionPacket.msg, receivedActionPacket.value);
+                                            break;
                                     }
                                     break;
                                 #endregion

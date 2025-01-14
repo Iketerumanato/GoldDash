@@ -99,6 +99,14 @@ public static class Definer
         /// 魔法の使用は正しく履行されました
         /// </summary>
         END_MAGIC_SUCCESSFULLY,
+        /// <summary>
+        /// このメッセージを小さく表示してください
+        /// </summary>
+        DISPLAY_SMALL_MSG,
+        /// <summary>
+        /// このメッセージを大きく表示してください
+        /// </summary>
+        DISPLAY_LARGE_MSG,
     }
 
     /// <summary>

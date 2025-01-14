@@ -145,6 +145,7 @@ public class PlayerControllerV2 : MonoBehaviour
     private HotbarManager m_hotbarManager;
     private ChestUnlocker m_chestUnlocker;
     private Rigidbody m_Rigidbody;
+    private MessageDisplayer m_messageDisplayer;
 
     //金貨を拾うことを禁止する処理
     [SerializeField] private bool m_isAbleToPickUpGold = true; //金貨を拾うことができるか
@@ -206,6 +207,7 @@ public class PlayerControllerV2 : MonoBehaviour
         m_hotbarManager = this.gameObject.GetComponent<HotbarManager>();
         m_chestUnlocker = this.gameObject.GetComponent<ChestUnlocker>();
         m_Rigidbody = this.gameObject.GetComponent<Rigidbody>();
+        m_messageDisplayer = this.gameObject.GetComponentInChildren<MessageDisplayer>();
 
         //リスポーン地点の記憶
         m_RespawnPosition = this.transform.position;
@@ -787,6 +789,16 @@ public class PlayerControllerV2 : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    public void DisplaySmallMessage(string msg)
+    { 
+        m_messageDisplayer.DisplaySmallMessage(msg);
+    }
+
+    public void DisplayLargeMessage(string msg, int time)
+    {
+        m_messageDisplayer.DisplayLargeMessage(msg, time);
     }
 
     private void OnTriggerStay(Collider other)
