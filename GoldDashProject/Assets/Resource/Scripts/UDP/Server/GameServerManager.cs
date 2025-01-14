@@ -529,6 +529,9 @@ public class GameServerManager : MonoBehaviour
     private bool displayedRemain1min = false;
     private bool displayedRemain30sec = false;
 
+    private bool chest2First = true;
+    private bool chest3First = true;
+
     private void Update()
     {
         currentSetverState.UpdateProcess(this);
@@ -1025,6 +1028,12 @@ public class GameServerManager : MonoBehaviour
                                                         System.Random random = new System.Random(); //UnityEngine.Randomはマルチスレッドで使用できないのでSystemを使う
                                                         int rand = random.Next(0, 99); //0~100
                                                         if (rand < 50) tier = 2;
+
+                                                        if (chest2First)
+                                                        {
+                                                            tier = 2;
+                                                            chest3First = false;
+                                                        }
                                                     }
                                                     else if (130 < timeLimitSeconds)
                                                     {
@@ -1032,6 +1041,12 @@ public class GameServerManager : MonoBehaviour
                                                         int rand = random.Next(0, 99); //0~100
                                                         if (rand < 50) tier = 2;
                                                         else if (rand < 65) tier = 3;
+
+                                                        if (chest3First)
+                                                        {
+                                                            tier = 3;
+                                                            chest3First = false;
+                                                        }
                                                     }
                                                     else if (64 < timeLimitSeconds)　//1:04までは70%ティア2、30%ティア3
                                                     {
