@@ -40,6 +40,8 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
     [SerializeField] private GameObject GoldPileMiniPrefab; //小金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
+    [SerializeField] private GameObject Chest2Prefab; //宝箱ティア2のプレハブ
+    [SerializeField] private GameObject Chest3Prefab; //宝箱ティア3のプレハブ
     [SerializeField] private GameObject ScrollPrefab; //巻物のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
 
@@ -517,10 +519,30 @@ public class GameClientManager : MonoBehaviour
                                             //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
                                             //chestという変数名をここでだけ使いたいのでブロック文でスコープ分け
                                             {
-                                                Chest chest = Instantiate(ChestPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
+                                                Chest chest;
+                                                switch (receivedActionPacket.value)
+                                                {
+                                                    case 1:
+                                                        chest = Instantiate(ChestPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
+                                                        chest.Tier = 1; //レア度1
+                                                        break;
+                                                    case 2:
+                                                        chest = Instantiate(Chest2Prefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
+                                                        chest.Tier = 2; //レア度2
+                                                        break;
+                                                    case 3:
+                                                        chest = Instantiate(Chest3Prefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
+                                                        chest.Tier = 3; //レア度3
+                                                        break;
+                                                    default :
+                                                        chest = Instantiate(ChestPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
+                                                        chest.Tier = 1; //レア度1
+                                                        break;
+                                                }
+
                                                 entityDictionary.Add(receivedActionPacket.targetID, chest); //管理用のIDと共に辞書へ
                                                 chest.EntityID = receivedActionPacket.targetID; //ID割り当て
-                                                chest.Tier = receivedActionPacket.value; //金額設定
+                                                chest.Tier = receivedActionPacket.value; //レア度設定
                                                 chest.name = $"Chest ({receivedActionPacket.targetID})";
                                             }
                                             break;

@@ -2499,6 +2499,8 @@ MonoBehaviour:
   GoldPilePrefab: {fileID: 7520273227876964304, guid: d46c7d03e3ed4fa408dec7213b261fb3, type: 3}
   GoldPileMiniPrefab: {fileID: 8707385699976490810, guid: 311be0a6740f77340bc696f689edfdae, type: 3}
   ChestPrefab: {fileID: 3941643310326857253, guid: 88a63aaad4124d24f9f43e32443513ab, type: 3}
+  Chest2Prefab: {fileID: 3941643310326857253, guid: 3e6dfc65427e2bc42a98f0fa4109ee50, type: 3}
+  Chest3Prefab: {fileID: 5048147325452982711, guid: 5200f716a85355c4aa4d9e922366c812, type: 3}
   ScrollPrefab: {fileID: 8802113053434281280, guid: e70a6b6c0ecebdd44bf248f0c7c88812, type: 3}
   ThunderPrefab: {fileID: 8666734358453998117, guid: 2dff9d1b170394642984e801a4cdf773, type: 3}
   GameFinalResultSetPrefab: {fileID: 408702888}

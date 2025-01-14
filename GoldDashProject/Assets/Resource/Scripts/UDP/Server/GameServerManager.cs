@@ -44,6 +44,8 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
     [SerializeField] private GameObject GoldPileMiniPrefab; //小金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
+    [SerializeField] private GameObject Chest2Prefab; //宝箱ティア2のプレハブ
+    [SerializeField] private GameObject Chest3Prefab; //宝箱ティア3のプレハブ
     [SerializeField] private GameObject ScrollPrefab; //巻物のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
     [SerializeField] private GameObject GameFinalResultSetPrefab;
@@ -947,7 +949,23 @@ public class GameServerManager : MonoBehaviour
                                                     entityID = GetUniqueEntityID();
                                                     Vector3 goldPos = new Vector3(entityDictionary[receivedActionPacket.targetID].transform.position.x, 0.1f, entityDictionary[receivedActionPacket.targetID].transform.position.z);
                                                     System.Random random = new System.Random();
-                                                    int chestGold = random.Next(80, 201); //ランダムなゴールド量の金貨の山を生成 適当に80~200ゴールド
+
+                                                    int chestGold;
+                                                    switch (((Chest)entityDictionary[receivedActionPacket.targetID]).Tier)
+                                                    {
+                                                        case 1:
+                                                            chestGold = random.Next(80, 201); //ランダムなゴールド量の金貨の山を生成 適当に80~200ゴールド
+                                                            break;
+                                                        case 2:
+                                                            chestGold = random.Next(300, 501); //ランダムなゴールド量の金貨の山を生成 適当に80~200ゴールド
+                                                            break;
+                                                        case 3:
+                                                            chestGold = random.Next(2000, 4001); //ランダムなゴールド量の金貨の山を生成 適当に80~200ゴールド
+                                                            break;
+                                                        default:
+                                                            chestGold = 1;
+                                                            break;
+                                                    }
                                                     //金額によってモデル変更
                                                     GoldPile goldPile = chestGold > 50 ? Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>() : Instantiate(GoldPileMiniPrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
                                                     goldPile.EntityID = entityID; //値を書き込み
@@ -996,17 +1014,60 @@ public class GameServerManager : MonoBehaviour
                                                 //宝箱の数が足りなければ新たに宝箱を作り出す
                                                 if (currentNumOfChests < maxNumOfChests)
                                                 {
+                                                    //宝箱のティアを制限時間に応じて異なる確立で抽選する
+                                                    int tier = 1;
+                                                    if (timeLimitSeconds < 262)
+                                                    {
+                                                        System.Random random = new System.Random(); //UnityEngine.Randomはマルチスレッドで使用できないのでSystemを使う
+                                                        int rand = random.Next(0, 99); //0~100
+                                                        if (rand < 50) tier = 2;
+                                                    }
+                                                    else if (timeLimitSeconds < 196)
+                                                    {
+                                                        System.Random random = new System.Random();
+                                                        int rand = random.Next(0, 99); //0~100
+                                                        if (rand < 50) tier = 2;
+                                                        else if (rand < 75) tier = 3;
+                                                    }
+                                                    else if (timeLimitSeconds < 130)
+                                                    {
+                                                        tier = 2;
+                                                        System.Random random = new System.Random();
+                                                        int rand = random.Next(0, 99); //0~100
+                                                        if (rand < 30) tier = 3;
+                                                    }
+                                                    else if (timeLimitSeconds < 130)
+                                                    {
+                                                        tier = 2;
+                                                        System.Random random = new System.Random();
+                                                        int rand = random.Next(0, 99); //0~100
+                                                        if (rand < 50) tier = 3;
+                                                    }
+
                                                     //まずサーバー側のシーンで
                                                     entityID = GetUniqueEntityID(); //エンティティID生成
                                                     Vector3 chestPos = MapGenerator.instance.GetUniqueChestPointRandomly(); //座標決め
-                                                    chest = Instantiate(ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>(); //ここ1つ外のスコープの変数chestを使ってるけど様子見なので問題ないかと
+                                                    switch (tier)
+                                                    {
+                                                        case 1:
+                                                            chest = Instantiate(ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>();
+                                                            chest.Tier = 1; //レア度1
+                                                            break;
+                                                        case 2:
+                                                            chest = Instantiate(Chest2Prefab, chestPos, Quaternion.identity).GetComponent<Chest>();
+                                                            chest.Tier = 2; //レア度2
+                                                            break;
+                                                        case 3:
+                                                            chest = Instantiate(Chest3Prefab, chestPos, Quaternion.identity).GetComponent<Chest>();
+                                                            chest.Tier = 3; //レア度3
+                                                            break;
+                                                    }
                                                     chest.EntityID = entityID; //ID書き込み
-                                                    chest.Tier = 1; //レア度はまだ適当に1
-                                                    chest.gameObject.name = $"Chest ({entityID})";
+                                                    chest.gameObject.name = $"Chest (Tier{tier}) ({entityID})";
                                                     entityDictionary.Add(entityID, chest); //辞書に登録
 
                                                     //ティア（１）と座標を指定して、宝箱を生成する命令
-                                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
+                                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, tier, chestPos);
                                                     myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                     udpGameServer.Send(myHeader.ToByte());
 
