@@ -216,6 +216,9 @@ public class PlayerControllerV2 : MonoBehaviour
     //デバッグ用
     [SerializeField] TextMeshProUGUI stateTxt;
 
+    //ヒントメッセージ用
+    private bool m_chestHintFlag = true;
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1)) SetMagicToHotbar(Definer.MID.THUNDER);
@@ -372,7 +375,15 @@ public class PlayerControllerV2 : MonoBehaviour
             UdpGameClient.Send(myHeader.ToByte());
 
             //STEP_X メッセージを出そう
-            m_messageDisplayer.DisplayLargeMessage("<size=120>宝箱の封印を解こう！</size>", 2);
+            if (m_chestHintFlag)
+            {
+                m_messageDisplayer.DisplayLargeMessage("<size=90>画面をぐるぐるなぞって、\r\n宝箱の封印を解こう！</size>", 2);
+                m_chestHintFlag = false;
+            }
+            else
+            {
+                m_messageDisplayer.DisplaySmallMessage("宝箱の封印を解こう！");
+            }
 
             //STEP_F 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
