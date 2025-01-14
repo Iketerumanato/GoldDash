@@ -499,6 +499,7 @@ public class GameServerManager : MonoBehaviour
             colorSelectButtonAnimator2.IsAnimating = false;
             gameStartButtonAnimator.IsGrayedOut = false;
             gameStartButtonAnimator.IsAnimating = true;
+            SEPlayer.instance.PlaySEButton();
         });
         colorSelectButton2.OnClickAsObservable().Subscribe(_ =>
         {
@@ -509,9 +510,11 @@ public class GameServerManager : MonoBehaviour
             colorSelectButtonAnimator2.IsAnimating = false;
             gameStartButtonAnimator.IsGrayedOut = false;
             gameStartButtonAnimator.IsAnimating = true;
+            SEPlayer.instance.PlaySEButton();
         });
         gameStartButton.OnClickAsObservable().Subscribe(_ =>
         {
+            SEPlayer.instance.PlaySEButton();
             blackImage.DOFade(1f, 0.3f).OnComplete(() =>
             {
                 ChangeServerState(new Phase2State());

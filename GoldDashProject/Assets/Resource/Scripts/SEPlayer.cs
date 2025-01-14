@@ -13,6 +13,12 @@ public class SEPlayer : MonoBehaviour
     public AudioSource titleBGMPlayer;
     public AudioSource mainBGMPlayer;
 
+    [Header("ボタンが押されたときのSE")]
+    [SerializeField] private AudioClip seButton;
+
+    [Header("タイトル画面でタッチしたときのSE")]
+    [SerializeField] private AudioClip seTouchToStart;
+
     [Header("パンチが外れたときのSE")]
     [SerializeField] private AudioClip sePunchMiss;
 
@@ -83,6 +89,16 @@ public class SEPlayer : MonoBehaviour
 
         //コンポーネント取得
         audioSource = GetComponent<AudioSource>();
+    }
+
+    public void PlaySEButton()
+    {
+        audioSource.PlayOneShot(seButton);
+    }
+
+    public void PlaySETouchToStart()
+    {
+        audioSource.PlayOneShot(seTouchToStart);
     }
 
     public void PlaySEPunchMiss()

@@ -219,24 +219,27 @@ public class GameClientManager : MonoBehaviour
         MapGenerator.instance.GenerateMapForClient();
 
         //各種ボタンに関数を設定
-        TouchToStartButton.OnClickAsObservable().Subscribe(_ => 
+        TouchToStartButton.OnClickAsObservable().Subscribe(_ =>
         {
+            SEPlayer.instance.PlaySETouchToStart();
             blackImage.DOFade(1f, 0.3f).OnComplete(() =>
             {
                 ChangeClientState(new Phase1State());
                 blackImage.DOFade(0f, 0.3f);
             });
         });
-        BackButton.OnClickAsObservable().Subscribe(_ => 
+        BackButton.OnClickAsObservable().Subscribe(_ =>
         {
+            SEPlayer.instance.PlaySEButton();
             blackImage.DOFade(1f, 0.3f).OnComplete(() =>
             {
                 ChangeClientState(new Phase0State());
                 blackImage.DOFade(0f, 0.3f);
             });
         });
-        ConnectButton.OnClickAsObservable().Subscribe(_ => 
+        ConnectButton.OnClickAsObservable().Subscribe(_ =>
         {
+            SEPlayer.instance.PlaySEButton();
             blackImage.DOFade(1f, 0.3f).OnComplete(async () =>
             {
                 ChangeClientState(new Phase2State());
