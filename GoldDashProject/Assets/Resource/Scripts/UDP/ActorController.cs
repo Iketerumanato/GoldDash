@@ -99,14 +99,9 @@ public class ActorController : MonoBehaviour
 
     private void Update()
     {
-        if (isPlayer) UpdateForPlayer();
-        else UpdateForEnemy();
+        if (!isPlayer) UpdateForEnemy();
     }
 
-    private void UpdateForPlayer()
-    {
-        goldText.text = $"Gold:{Gold}";
-    }
 
     private void UpdateForEnemy()
     {

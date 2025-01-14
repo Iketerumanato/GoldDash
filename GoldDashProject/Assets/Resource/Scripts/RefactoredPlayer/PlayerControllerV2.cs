@@ -145,6 +145,7 @@ public class PlayerControllerV2 : MonoBehaviour
     private HotbarManager m_hotbarManager;
     private ChestUnlocker m_chestUnlocker;
     private Rigidbody m_Rigidbody;
+    private MessageDisplayer m_messageDisplayer;
 
     //金貨を拾うことを禁止する処理
     [SerializeField] private bool m_isAbleToPickUpGold = true; //金貨を拾うことができるか
@@ -206,6 +207,7 @@ public class PlayerControllerV2 : MonoBehaviour
         m_hotbarManager = this.gameObject.GetComponent<HotbarManager>();
         m_chestUnlocker = this.gameObject.GetComponent<ChestUnlocker>();
         m_Rigidbody = this.gameObject.GetComponent<Rigidbody>();
+        m_messageDisplayer = this.gameObject.GetComponentInChildren<MessageDisplayer>();
 
         //リスポーン地点の記憶
         m_RespawnPosition = this.transform.position;
@@ -213,6 +215,9 @@ public class PlayerControllerV2 : MonoBehaviour
 
     //デバッグ用
     [SerializeField] TextMeshProUGUI stateTxt;
+
+    //ヒントメッセージ用
+    private bool m_chestHintFlag = true;
 
     private void Update()
     {
@@ -368,6 +373,17 @@ public class PlayerControllerV2 : MonoBehaviour
             ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.TOUCH_CHEST);
             Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             UdpGameClient.Send(myHeader.ToByte());
+
+            //STEP_X メッセージを出そう
+            if (m_chestHintFlag)
+            {
+                m_messageDisplayer.DisplayLargeMessage("<size=90>画面をぐるぐるなぞって、\r\n宝箱の封印を解こう！</size>", 4);
+                m_chestHintFlag = false;
+            }
+            else
+            {
+                m_messageDisplayer.DisplaySmallMessage("宝箱の封印を解こう！");
+            }
 
             //STEP_F 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
@@ -721,6 +737,7 @@ public class PlayerControllerV2 : MonoBehaviour
             case Definer.MID.DASH:
                 m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex); //ここでダッシュ魔法を消費させる
                 this.State = PLAYER_STATE.DASH;
+                m_messageDisplayer.DisplaySmallMessage("ダッシュを使った！");
                 //ダッシュ可能時間をカウントする非同期処理があるならキャンセルする
                 if (m_isDashable) m_dashableTimeCountCts.Cancel();
                 m_isDashable = true; //ダッシュ可能にする
@@ -728,6 +745,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
             default :
                 this.State = PLAYER_STATE.WAITING_MAP_ACTION;
+                m_messageDisplayer.DisplayLargeMessage("<size=120>地図をタッチしよう！</size>", 2);
                 break;
         }
     }
@@ -737,6 +755,7 @@ public class PlayerControllerV2 : MonoBehaviour
     {
         //メッセージなど出す
         this.State = PLAYER_STATE.NORMAL;
+        m_messageDisplayer.DisplayLargeMessage("<size=120>他の人が地図を使用中…</size>", 2);
     }
 
     public void EndUsingMagicSuccessfully()
@@ -745,11 +764,36 @@ public class PlayerControllerV2 : MonoBehaviour
         if(this.State != PLAYER_STATE.WAITING_MAP_ACTION) return;
         
         m_allowedUnlockState = true; //ステートロックを解除
+
+        m_messageDisplayer.DisplaySmallMessage($"{GetMagicNameFromID(m_currentMagicID)}を使った！");
     }
 
     public void SetMagicToHotbar(Definer.MID magicID)
-    { 
-        m_hotbarManager.SetMagicToHotbar(magicID);
+    {
+        if (m_hotbarManager.SetMagicToHotbar(magicID)) //セットに成功したら
+        {
+            DisplaySmallMessage($"{GetMagicNameFromID(magicID)}の巻物を手に入れた！");
+        }
+        else
+        {
+            DisplaySmallMessage($"巻物は３つまでしか持てない…");
+        }
+    }
+
+    //魔法の巻物の名前を取得
+    private string GetMagicNameFromID(Definer.MID magicID)
+    {
+        switch (magicID)
+        {
+            case Definer.MID.THUNDER:
+                return "サンダー";
+            case Definer.MID.DASH:
+                return "ダッシュ";
+            case Definer.MID.TELEPORT:
+                return "テレポート";
+            default:
+                return "不正";
+        }
     }
 
     //金貨を拾うためのトリガー処理
@@ -789,6 +833,16 @@ public class PlayerControllerV2 : MonoBehaviour
         }
     }
 
+    public void DisplaySmallMessage(string msg)
+    { 
+        m_messageDisplayer.DisplaySmallMessage(msg);
+    }
+
+    public void DisplayLargeMessage(string msg, int time)
+    {
+        m_messageDisplayer.DisplayLargeMessage(msg, time);
+    }
+
     private void OnTriggerStay(Collider other)
     {
         switch (other.tag)
@@ -800,6 +854,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 UdpGameClient.Send(myHeader.ToByte());
                 //スタン状態になる
                 this.State = PLAYER_STATE.STUNNED;
+                m_messageDisplayer.DisplayLargeMessage("雷に撃たれた！", 2);
                 break;
             default:
                 break;

@@ -105,6 +105,7 @@ public class MessageDisplayer : MonoBehaviour
     {
         //生成したUIの各コンポーネントの取得
         GameObject insLargeText = Instantiate(largeTextPrefab, SpawnTextPoint);
+        insLargeText.transform.Translate(0f, -150, 0f);
         insLargeText.transform.SetAsLastSibling();
         CanvasGroup largeTextGroup =  insLargeText.GetComponent<CanvasGroup>();
         Transform childTransform = insLargeText.transform.GetChild(0);

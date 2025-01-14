@@ -381,6 +381,12 @@ public class GameClientManager : MonoBehaviour
                                                 playerController.EndUsingMagicSuccessfully(); //魔法を正しく終了する
                                             }
                                             break;
+                                        case (byte)Definer.NDID.DISPLAY_SMALL_MSG: //小メッセージ表示
+                                            playerController.DisplaySmallMessage(receivedActionPacket.msg);
+                                            break;
+                                        case (byte)Definer.NDID.DISPLAY_LARGE_MSG: //大メッセージ表示
+                                            playerController.DisplayLargeMessage(receivedActionPacket.msg, receivedActionPacket.value);
+                                            break;
                                     }
                                     break;
                                 #endregion
@@ -480,9 +486,11 @@ public class GameClientManager : MonoBehaviour
                                                 {
                                                     playerController.PlayGetCoinAnimation(); //所持金が増えたときはコイン吸い取りアニメーション
                                                     SEPlayer.instance.PlaySEGetGold();
+                                                    playerController.DisplaySmallMessage($"{receivedActionPacket.value}ゴールドを手に入れた！");
                                                 }
                                                 else if (receivedActionPacket.value < 0)
                                                 {
+                                                    playerController.DisplaySmallMessage($"{Mathf.Abs(receivedActionPacket.value)}ゴールドを落とした…");
                                                     //失った金額に応じてSE再生
                                                     switch (receivedActionPacket.value)
                                                     {

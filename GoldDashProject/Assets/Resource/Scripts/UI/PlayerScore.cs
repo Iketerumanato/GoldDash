@@ -14,8 +14,6 @@ public class PlayerScore : MonoBehaviour
     private Sequence CountUpAnimation;
     private Vector2[] digitsInitialPositions;
 
-    [SerializeField] DisplayScoreHistory displayScoreHistory;
-
     private void Awake()
     {
         SetupDigitImages();
@@ -63,7 +61,6 @@ public class PlayerScore : MonoBehaviour
         }
 
         int scoreDifference = actorScore.Gold - previousScore;
-        if (scoreDifference != 0 && displayScoreHistory != null) displayScoreHistory.AddScoreHistory(scoreDifference);
 
         int[] digits = GetAllDigits(actorScore.Gold);//全ての桁の文字の大きさを取得
         CountUpAnimation = DOTween.Sequence();
