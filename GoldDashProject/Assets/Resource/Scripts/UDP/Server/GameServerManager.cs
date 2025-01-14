@@ -1016,27 +1016,31 @@ public class GameServerManager : MonoBehaviour
                                                 {
                                                     //宝箱のティアを制限時間に応じて異なる確立で抽選する
                                                     int tier = 1;
-                                                    if (timeLimitSeconds < 262)
+                                                    if (262 < timeLimitSeconds) //4:22まではティア１
+                                                    {
+                                                        tier = 1;
+                                                    }
+                                                    else if (196 < timeLimitSeconds) //3:16までは50%ティア1、50%ティア2
                                                     {
                                                         System.Random random = new System.Random(); //UnityEngine.Randomはマルチスレッドで使用できないのでSystemを使う
                                                         int rand = random.Next(0, 99); //0~100
                                                         if (rand < 50) tier = 2;
                                                     }
-                                                    else if (timeLimitSeconds < 196)
+                                                    else if (130 < timeLimitSeconds)
                                                     {
-                                                        System.Random random = new System.Random();
+                                                        System.Random random = new System.Random(); //2:10までは50%ティア2、15%ティア3、35%ティア1
                                                         int rand = random.Next(0, 99); //0~100
                                                         if (rand < 50) tier = 2;
-                                                        else if (rand < 75) tier = 3;
+                                                        else if (rand < 65) tier = 3;
                                                     }
-                                                    else if (timeLimitSeconds < 130)
+                                                    else if (64 < timeLimitSeconds)　//1:04までは70%ティア2、30%ティア3
                                                     {
                                                         tier = 2;
                                                         System.Random random = new System.Random();
                                                         int rand = random.Next(0, 99); //0~100
                                                         if (rand < 30) tier = 3;
                                                     }
-                                                    else if (timeLimitSeconds < 130)
+                                                    else //最後の1分は50%ティア2、50%ティア3
                                                     {
                                                         tier = 2;
                                                         System.Random random = new System.Random();
