@@ -377,7 +377,7 @@ public class PlayerControllerV2 : MonoBehaviour
             //STEP_X メッセージを出そう
             if (m_chestHintFlag)
             {
-                m_messageDisplayer.DisplayLargeMessage("<size=90>画面をぐるぐるなぞって、\r\n宝箱の封印を解こう！</size>", 2);
+                m_messageDisplayer.DisplayLargeMessage("<size=90>画面をぐるぐるなぞって、\r\n宝箱の封印を解こう！</size>", 4);
                 m_chestHintFlag = false;
             }
             else
