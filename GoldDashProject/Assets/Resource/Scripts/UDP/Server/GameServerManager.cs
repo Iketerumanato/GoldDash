@@ -513,6 +513,11 @@ public class GameServerManager : MonoBehaviour
         });
     }
 
+    private bool displayedRemain5min = false;
+    private bool displayedRemain3min = false;
+    private bool displayedRemain1min = false;
+    private bool displayedRemain30sec = false;
+
     private void Update()
     {
         currentSetverState.UpdateProcess(this);
@@ -542,6 +547,36 @@ public class GameServerManager : MonoBehaviour
         string timeText = span.ToString(@"m\:ss");
         timeTextLeft.text = $"試合終了まで\r\n<size=120>{timeText}</size>";
         timeTextRight.text = $"試合終了まで\r\n<size=120>{timeText}</size>";
+
+        //制限時間がのこり５分、3分、1分、30秒のタイミングでメッセージ表示
+        if (!displayedRemain5min && timeLimitSeconds < 300f)
+        {
+            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, 2, msg: "のこり５分！");
+            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            udpGameServer.Send(myHeader.ToByte());
+            displayedRemain5min = true;
+        }
+        else if (!displayedRemain3min && timeLimitSeconds < 180f)
+        {
+            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, 2, msg: "のこり３分！");
+            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            udpGameServer.Send(myHeader.ToByte());
+            displayedRemain3min = true;
+        }
+        else if (!displayedRemain1min && timeLimitSeconds < 60f)
+        {
+            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, 2, msg: "のこり１分！");
+            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            udpGameServer.Send(myHeader.ToByte());
+            displayedRemain1min = true;
+        }
+        else if (!displayedRemain30sec && timeLimitSeconds < 30f)
+        {
+            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, 2, msg: "のこり３０秒！");
+            Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            udpGameServer.Send(myHeader.ToByte());
+            displayedRemain30sec = true;
+        }
     }
 
     private async void SendAllActorsPosition()
