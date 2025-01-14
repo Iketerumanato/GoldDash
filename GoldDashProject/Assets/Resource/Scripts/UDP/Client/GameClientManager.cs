@@ -490,7 +490,7 @@ public class GameClientManager : MonoBehaviour
                                                 }
                                                 else if (receivedActionPacket.value < 0)
                                                 {
-                                                    playerController.DisplaySmallMessage($"{receivedActionPacket.value}ゴールドを落とした…");
+                                                    playerController.DisplaySmallMessage($"{Mathf.Abs(receivedActionPacket.value)}ゴールドを落とした…");
                                                     //失った金額に応じてSE再生
                                                     switch (receivedActionPacket.value)
                                                     {
