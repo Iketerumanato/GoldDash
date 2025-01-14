@@ -544,6 +544,11 @@ public class GameClientManager : MonoBehaviour
                                                 chest.EntityID = receivedActionPacket.targetID; //ID割り当て
                                                 chest.Tier = receivedActionPacket.value; //レア度設定
                                                 chest.name = $"Chest ({receivedActionPacket.targetID})";
+
+                                                if (chest.Tier == 3)
+                                                {
+                                                    playerController.DisplaySmallMessage("お金の匂いがする…！");
+                                                }
                                             }
                                             break;
                                         case (byte)Definer.EDID.SPAWN_SCROLL:
