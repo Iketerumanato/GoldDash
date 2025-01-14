@@ -371,6 +371,9 @@ public class PlayerControllerV2 : MonoBehaviour
             Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             UdpGameClient.Send(myHeader.ToByte());
 
+            //STEP_X メッセージを出そう
+            m_messageDisplayer.DisplayLargeMessage("<size=120>宝箱の封印を解こう！</size>", 2);
+
             //STEP_F 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
         }
@@ -731,7 +734,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
             default :
                 this.State = PLAYER_STATE.WAITING_MAP_ACTION;
-                m_messageDisplayer.DisplayLargeMessage("地図をタッチしよう！", 2);
+                m_messageDisplayer.DisplayLargeMessage("<size=120>地図をタッチしよう！</size>", 2);
                 break;
         }
     }
@@ -741,7 +744,7 @@ public class PlayerControllerV2 : MonoBehaviour
     {
         //メッセージなど出す
         this.State = PLAYER_STATE.NORMAL;
-        m_messageDisplayer.DisplayLargeMessage("他の人が地図を使用中…", 2);
+        m_messageDisplayer.DisplayLargeMessage("<size=120>他の人が地図を使用中…</size>", 2);
     }
 
     public void EndUsingMagicSuccessfully()
