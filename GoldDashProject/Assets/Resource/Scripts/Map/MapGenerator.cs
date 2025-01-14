@@ -359,7 +359,7 @@ public class MapGenerator : MonoBehaviour
                     lowerDoor.transform.parent = Parenttransform;
                 }
 
-                SEPlayer.instance.PlaySEGenerateCell();
+                if(j % 2 == 0) SEPlayer.instance.PlaySEGenerateCell(); //2回に1回SE
                 await UniTask.Delay(50);
             }
         }

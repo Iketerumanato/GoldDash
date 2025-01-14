@@ -44,6 +44,9 @@ public class SEPlayer : MonoBehaviour
     [SerializeField] private AudioClip seUnlock4;
     [SerializeField] private AudioClip seUnlock5;
 
+    [Header("雷に撃たれたときのSE")]
+    [SerializeField] private AudioClip seParalysed;
+
     //以下サーバー専用
     [Header("雷が落ちた時のSE")]
     [SerializeField] private AudioClip seThunder;
@@ -147,6 +150,11 @@ public class SEPlayer : MonoBehaviour
     public void PlaySEUnlock5()
     {
         audioSource.PlayOneShot(seUnlock5);
+    }
+
+    public void PlaySEParayzed()
+    {
+        audioSource.PlayOneShot(seParalysed);
     }
 
     //以下サーバー用

@@ -156,6 +156,7 @@ MonoBehaviour:
   seUnlock3: {fileID: 8300000, guid: 461e8c830ef73854495b31cba8b3f9eb, type: 3}
   seUnlock4: {fileID: 8300000, guid: 49c64376d0d798344b45f7e82049ae31, type: 3}
   seUnlock5: {fileID: 8300000, guid: 3db9d10ff3041af4d82b7e9d1b128367, type: 3}
+  seParalysed: {fileID: 8300000, guid: 9e733c5dc167554408c9d882c27d52b2, type: 3}
   seThunder: {fileID: 8300000, guid: 32b7fce5001273548b5bf3bdf5deddc4, type: 3}
   seDash: {fileID: 8300000, guid: e0df3aaee44cfd04b8350de273a90f16, type: 3}
   seWarp: {fileID: 8300000, guid: 0c244193b763e7947a3f6758e027f75d, type: 3}

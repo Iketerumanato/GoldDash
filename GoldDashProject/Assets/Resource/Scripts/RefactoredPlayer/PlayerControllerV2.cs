@@ -855,6 +855,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 //スタン状態になる
                 this.State = PLAYER_STATE.STUNNED;
                 m_messageDisplayer.DisplayLargeMessage("雷に撃たれた！", 2);
+                SEPlayer.instance.PlaySEParayzed();
                 break;
             default:
                 break;
