@@ -830,6 +830,10 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
             case "Thunder":
                 //痺れたことをパケット送信
+                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.STUNNED);
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
+                //スタン状態になる
                 this.State = PLAYER_STATE.STUNNED;
                 break;
             default:
@@ -845,22 +849,5 @@ public class PlayerControllerV2 : MonoBehaviour
     public void DisplayLargeMessage(string msg, int time)
     {
         m_messageDisplayer.DisplayLargeMessage(msg, time);
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        switch (other.tag)
-        {
-            case "Thunder":
-                //痺れたことをパケット送信
-                ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.STUNNED);
-                Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                UdpGameClient.Send(myHeader.ToByte());
-                //スタン状態になる
-                this.State = PLAYER_STATE.STUNNED;
-                break;
-            default:
-                break;
-        }
     }
 }
