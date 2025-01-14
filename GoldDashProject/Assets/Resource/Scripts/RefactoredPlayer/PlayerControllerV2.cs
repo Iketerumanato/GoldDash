@@ -723,6 +723,7 @@ public class PlayerControllerV2 : MonoBehaviour
             case Definer.MID.DASH:
                 m_hotbarManager.RemoveMagicFromHotbar(m_currentMagicIndex); //ここでダッシュ魔法を消費させる
                 this.State = PLAYER_STATE.DASH;
+                m_messageDisplayer.DisplaySmallMessage("ダッシュを使った！");
                 //ダッシュ可能時間をカウントする非同期処理があるならキャンセルする
                 if (m_isDashable) m_dashableTimeCountCts.Cancel();
                 m_isDashable = true; //ダッシュ可能にする
@@ -730,6 +731,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
             default :
                 this.State = PLAYER_STATE.WAITING_MAP_ACTION;
+                m_messageDisplayer.DisplayLargeMessage("地図をタッチしよう！", 2);
                 break;
         }
     }
@@ -739,6 +741,7 @@ public class PlayerControllerV2 : MonoBehaviour
     {
         //メッセージなど出す
         this.State = PLAYER_STATE.NORMAL;
+        m_messageDisplayer.DisplayLargeMessage("他の人が地図を使用中…", 2);
     }
 
     public void EndUsingMagicSuccessfully()
@@ -747,6 +750,8 @@ public class PlayerControllerV2 : MonoBehaviour
         if(this.State != PLAYER_STATE.WAITING_MAP_ACTION) return;
         
         m_allowedUnlockState = true; //ステートロックを解除
+
+        m_messageDisplayer.DisplaySmallMessage($"{GetMagicNameFromID(m_currentMagicID)}を使った！");
     }
 
     public void SetMagicToHotbar(Definer.MID magicID)
@@ -759,21 +764,21 @@ public class PlayerControllerV2 : MonoBehaviour
         {
             DisplaySmallMessage($"巻物は３つまでしか持てない…");
         }
+    }
 
-        //魔法の巻物の名前を取得
-        string GetMagicNameFromID(Definer.MID magicID)
+    //魔法の巻物の名前を取得
+    private string GetMagicNameFromID(Definer.MID magicID)
+    {
+        switch (magicID)
         {
-            switch (magicID)
-            {
-                case Definer.MID.THUNDER:
-                    return "サンダー";
-                case Definer.MID.DASH:
-                    return "ダッシュ";
-                case Definer.MID.TELEPORT:
-                    return "テレポート";
-                default:
-                    return "不正";
-            }
+            case Definer.MID.THUNDER:
+                return "サンダー";
+            case Definer.MID.DASH:
+                return "ダッシュ";
+            case Definer.MID.TELEPORT:
+                return "テレポート";
+            default:
+                return "不正";
         }
     }
 
@@ -835,6 +840,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 UdpGameClient.Send(myHeader.ToByte());
                 //スタン状態になる
                 this.State = PLAYER_STATE.STUNNED;
+                m_messageDisplayer.DisplayLargeMessage("雷に撃たれた！", 2);
                 break;
             default:
                 break;
