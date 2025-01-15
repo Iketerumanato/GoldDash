@@ -84,14 +84,7 @@ public class SEPlayer : MonoBehaviour
     private void Start()
     {
         //シングルトンな静的変数の初期化
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        instance = this;
 
         //コンポーネント取得
         audioSource = GetComponent<AudioSource>();

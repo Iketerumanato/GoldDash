@@ -389,13 +389,14 @@ public class GameServerManager : MonoBehaviour
         {
             await UniTask.Delay(34000);
 
-            SEPlayer.instance.PlaySEButton();
-
             SEPlayer.instance.resultBGMPlayer.DOFade(0f, 3f).OnComplete(() =>
             {
                 gameServerManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
                 {
                     Debug.Log("終了");
+                    DOTween.KillAll();
+                    DOTween.Clear(true);
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 });
             });
         }
