@@ -89,6 +89,10 @@ public class GameClientManager : MonoBehaviour
     //タイトルロゴアニメーション用
     private Sequence TitleLogoAnimatoin;
     [SerializeField] RectTransform TitleLogoImageTransform;
+
+    //プロセッシングロゴアニメーション用
+    Sequence CenterLogoAnimation;
+    [SerializeField] RectTransform CenterLogoImageTransform;
     #endregion
 
     #region Stateインターフェース
@@ -118,6 +122,7 @@ public class GameClientManager : MonoBehaviour
             gameClientManager.centerTextBox.text = "";
             //回転ロゴの角度リセット
             gameClientManager.TitleLogoImageTransform.rotation = Quaternion.Euler(0f, 0f, 5.2f);
+            gameClientManager.CenterLogoImageTransform.rotation = Quaternion.identity;
         }
 
         public void UpdateProcess(GameClientManager gameClientManager)
@@ -183,6 +188,8 @@ public class GameClientManager : MonoBehaviour
         {
             //不要なUI消す
             gameClientManager.processingLogo.SetActive(false);
+            //アニメーション止める
+            gameClientManager.CenterLogoAnimation.Kill();
         }
     }
 
@@ -231,10 +238,9 @@ public class GameClientManager : MonoBehaviour
         {
             SEPlayer.instance.PlaySETouchToStart();
             //ロゴアニメーション
+            TitleLogoAnimatoin = DOTween.Sequence();
             TitleLogoAnimatoin
-            .SetDelay(1f)
-            .Append(TitleLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 432f), 0.6f, RotateMode.FastBeyond360).SetEase(Ease.OutQuad))
-            .SetLoops(-1);
+            .Append(TitleLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 432f), 0.6f, RotateMode.FastBeyond360).SetEase(Ease.OutQuad));
 
             blackImage.DOFade(1f, 0.3f).OnComplete(() =>
             {
@@ -254,6 +260,14 @@ public class GameClientManager : MonoBehaviour
         ConnectButton.OnClickAsObservable().Subscribe(_ =>
         {
             SEPlayer.instance.PlaySEButton();
+
+            //ロゴアニメーション
+            CenterLogoAnimation = DOTween.Sequence();
+            CenterLogoAnimation.Append(CenterLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 360f), 1.3f, RotateMode.FastBeyond360).SetEase(Ease.InOutBack))//InOutBackを付けつつ一回目の回転
+                .SetDelay(0.3f)//少し待機
+                .Append(CenterLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 360f), 1.5f, RotateMode.FastBeyond360).SetEase(Ease.OutBack))//InOutBackでの回転速度に追いつくためOutBackで２回目の回転
+                .SetLoops(-1);//無限ループ
+
             blackImage.DOFade(1f, 0.3f).OnComplete(async () =>
             {
                 ChangeClientState(new Phase2State());
