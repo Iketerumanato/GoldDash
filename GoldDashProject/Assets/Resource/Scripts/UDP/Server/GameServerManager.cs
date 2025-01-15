@@ -633,12 +633,13 @@ public class GameServerManager : MonoBehaviour
         if (timeLimitSeconds < 0f)
         {
             timeLimitSeconds = 0f;
-            //ここでフェードさせつつオブジェクトを起こし、結果発表用のカメラをMainCameraに変化させて疑似画面遷移開始
-            //フェードで暗転
-            blackImage.DOFade(1f, 1f).OnComplete(() =>
+
+            //フェーズ3に移行
+            if (!IsPhase3)
             {
-                //フェーズ3に移行
-                if (!IsPhase3) 
+                //ここでフェードさせつつオブジェクトを起こし、結果発表用のカメラをMainCameraに変化させて疑似画面遷移開始
+                //フェードで暗転
+                blackImage.DOFade(1f, 1f).OnComplete(() =>
                 {
                     //フェードが明ける
                     blackImage.DOFade(0f, 0.5f);
@@ -647,9 +648,9 @@ public class GameServerManager : MonoBehaviour
                     PlayerInfoUI.SetActive(false);
                     Phase2UniqueUI.SetActive(false);
                     ChangeServerState(new Phase3State());
-                    IsPhase3 = true;
-                }
-            });
+                });
+                IsPhase3 = true;
+            }
         }
         //分：秒表記に変換
         TimeSpan span = new TimeSpan(0, 0, (int)timeLimitSeconds);
