@@ -116,8 +116,12 @@ public class GameClientManager : MonoBehaviour
     {
         public void EnterState(GameClientManager gameClientManager)
         {
+            gameClientManager.TouchToStartButton.interactable = false;
             //フェードイン
-            gameClientManager.blackImage.DOFade(0f, 3f);
+            gameClientManager.blackImage.DOFade(0f, 0.3f).OnComplete(()=>
+            {
+                gameClientManager.TouchToStartButton.interactable = true;
+            });
 
             //必要なUI出す
             gameClientManager.Phase0UniqueUI.SetActive(true);
@@ -240,6 +244,9 @@ public class GameClientManager : MonoBehaviour
         //各種ボタンに関数を設定
         TouchToStartButton.OnClickAsObservable().Subscribe(_ =>
         {
+            TouchToStartButton.interactable = false;
+            BackButton.interactable = true;
+
             SEPlayer.instance.PlaySETouchToStart();
             //ロゴアニメーション
             TitleLogoAnimatoin = DOTween.Sequence();
@@ -254,15 +261,16 @@ public class GameClientManager : MonoBehaviour
         });
         BackButton.OnClickAsObservable().Subscribe(_ =>
         {
+            BackButton.interactable = false;
             SEPlayer.instance.PlaySEButton();
             blackImage.DOFade(1f, 0.3f).OnComplete(() =>
             {
                 ChangeClientState(new Phase0State());
-                blackImage.DOFade(0f, 0.3f);
             });
         });
         ConnectButton.OnClickAsObservable().Subscribe(_ =>
         {
+            ConnectButton.interactable = false;
             SEPlayer.instance.PlaySEButton();
 
             //ロゴアニメーション
