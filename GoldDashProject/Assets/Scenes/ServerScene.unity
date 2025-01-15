@@ -2532,6 +2532,7 @@ MonoBehaviour:
   currentColorType: 0
   gameStartButton: {fileID: 194844387}
   gameStartButtonAnimator: {fileID: 1897528713}
+  CenterLogoImageTransform: {fileID: 761315772}
 --- !u!114 &903588627
 MonoBehaviour:
   m_ObjectHideFlags: 0

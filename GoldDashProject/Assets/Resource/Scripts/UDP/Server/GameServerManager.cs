@@ -126,6 +126,10 @@ public class GameServerManager : MonoBehaviour
     private Definer.MID awaitingMagicID;
     //魔法を使用をしようとしているプレイヤーのsessionID
     private ushort magicUserID;
+
+    //プロセッシングロゴアニメーション用
+    Sequence CenterLogoAnimation;
+    [SerializeField] RectTransform CenterLogoImageTransform;
     #endregion
 
     #region Stateインターフェース
@@ -172,6 +176,16 @@ public class GameServerManager : MonoBehaviour
             //BGM
             SEPlayer.instance.titleBGMPlayer.DOFade(1f, 0.3f);
             SEPlayer.instance.titleBGMPlayer.Play();
+
+            //回転ロゴの角度リセット
+            gameServerManager.CenterLogoImageTransform.rotation = Quaternion.identity;
+
+            //ロゴアニメーション
+            gameServerManager.CenterLogoAnimation = DOTween.Sequence();
+            gameServerManager.CenterLogoAnimation.Append(gameServerManager.CenterLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 360f), 1.3f, RotateMode.FastBeyond360).SetEase(Ease.InOutBack))//InOutBackを付けつつ一回目の回転
+                .SetDelay(0.3f)//少し待機
+                .Append(gameServerManager.CenterLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 360f), 1.5f, RotateMode.FastBeyond360).SetEase(Ease.OutBack))//InOutBackでの回転速度に追いつくためOutBackで２回目の回転
+                .SetLoops(-1);//無限ループ
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
@@ -218,6 +232,9 @@ public class GameServerManager : MonoBehaviour
 
         public void ExitState(GameServerManager gameServerManager)
         {
+            //アニメーション止める
+            gameServerManager.CenterLogoAnimation.Kill();
+
             //不要なUI消す
             gameServerManager.Phase1UniqueUI.SetActive(false);
             gameServerManager.processingLogo.SetActive(false);
