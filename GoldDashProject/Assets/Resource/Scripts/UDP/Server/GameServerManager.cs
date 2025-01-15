@@ -637,16 +637,15 @@ public class GameServerManager : MonoBehaviour
             //フェードで暗転
             blackImage.DOFade(1f, 1f).OnComplete(() =>
             {
-                //フェードが明ける
-                blackImage.DOFade(0f, 0.5f);
-                GameFinalResultSetPrefab.SetActive(true);
-                GameFinalResultCamera.tag = "MainCamera";
-                PlayerInfoUI.SetActive(false);
-                Phase2UniqueUI.SetActive(false);
-
                 //フェーズ3に移行
                 if (!IsPhase3) 
                 {
+                    //フェードが明ける
+                    blackImage.DOFade(0f, 0.5f);
+                    GameFinalResultSetPrefab.SetActive(true);
+                    GameFinalResultCamera.tag = "MainCamera";
+                    PlayerInfoUI.SetActive(false);
+                    Phase2UniqueUI.SetActive(false);
                     ChangeServerState(new Phase3State());
                     IsPhase3 = true;
                 }
