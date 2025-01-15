@@ -310,6 +310,28 @@ public class ResultImage : MonoBehaviour
         }
     }
 
+    //アニメーションイベントで呼ぶものたち
+    public void CallPlayBoomSE()
+    {
+        SEPlayer.instance.PlayResultBoomSE();
+    }
+
+    public void CallResultDrumrollBGM()
+    {
+        SEPlayer.instance.resultdrumrollBGMPlayer.Play();
+    }
+
+    public void StopResultDrumrollBGM()
+    {
+        SEPlayer.instance.resultdrumrollBGMPlayer.Stop();
+        Debug.Log("ドラムロールBGM終了");
+    }
+
+    public void CallResultBGM()
+    {
+        SEPlayer.instance.resultBGMPlayer.Play();
+    }
+
     //テスト用のList
     //List<(string name, int gold, Definer.PLAYER_COLOR color)> GetGameResult()
     //{

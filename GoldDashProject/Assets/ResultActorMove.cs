@@ -66,9 +66,15 @@ public class ResultActorMove : MonoBehaviour
         this.transform.DOMove(centerPoint.position, 1f).SetEase(Ease.Linear).OnComplete(() =>
         {
             //transform.position = centerPoint.position;
+            CallPlayClapSE();
             transform.eulerAngles = Vector3.zero;
             ResultActorAnimator.SetBool(isResultGame, true);
             _resultImage.ResultTextCanvasAlphaToMax(5f, 0.5f);
         });
+    }
+
+    private void CallPlayClapSE()
+    {
+        SEPlayer.instance.PlayResultClapSE();
     }
 }

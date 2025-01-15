@@ -12,6 +12,8 @@ public class SEPlayer : MonoBehaviour
 
     public AudioSource titleBGMPlayer;
     public AudioSource mainBGMPlayer;
+    public AudioSource resultdrumrollBGMPlayer;
+    public AudioSource resultBGMPlayer;
 
     [Header("ボタンが押されたときのSE")]
     [SerializeField] private AudioClip seButton;
@@ -62,7 +64,7 @@ public class SEPlayer : MonoBehaviour
 
     [Header("ダッシュが発動したときのSE")]
     [SerializeField] private AudioClip seDash;
-    
+
     [Header("誰かがワープしたときのSE")]
     [SerializeField] private AudioClip seWarp;
 
@@ -74,6 +76,10 @@ public class SEPlayer : MonoBehaviour
 
     [Header("地図が生成されたときのSE")]
     [SerializeField] private AudioClip seGenerateCell;
+
+    [Header("以下リザルト用のSE")]
+    [SerializeField] private AudioClip resultBoomSE;
+    [SerializeField] private AudioClip resultClapSE;
 
     private void Start()
     {
@@ -215,5 +221,16 @@ public class SEPlayer : MonoBehaviour
     public void PlaySEGenerateCell()
     {
         audioSource.PlayOneShot(seGenerateCell);
+    }
+
+    //リザルトで再生させる用のSEの再生処理
+    public void PlayResultBoomSE()
+    {
+        audioSource.PlayOneShot(resultBoomSE);
+    }
+
+    public void PlayResultClapSE()
+    {
+        audioSource.PlayOneShot(resultClapSE);
     }
 }

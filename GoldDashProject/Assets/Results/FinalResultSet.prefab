@@ -548,7 +548,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2149851165023310544}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0.73
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -1849,7 +1849,8 @@ MonoBehaviour:
   - {fileID: 2800000, guid: ec64b7cd98996744f8779852359ef42d, type: 3}
   - {fileID: 2800000, guid: bc5f490dc0b90564285dd8f4181c0a5a, type: 3}
   - {fileID: 2800000, guid: bcd50c819e5dd394893c839fe55acc6a, type: 3}
-  WhitePlayerTexture: {fileID: 2800000, guid: 90b42386967094f469ef47ba97a8c811, type: 3}
+  WhitePlayerMaterial: {fileID: 0}
+  greenSkin: {fileID: 0}
   RightRankingText: {fileID: 7574411766555536674}
   RightNameText: {fileID: 3962651599064543420}
   RightScoreText: {fileID: 3219135226974238732}
@@ -1875,6 +1876,7 @@ MonoBehaviour:
   - {fileID: 2052357113287849060}
   lerpDuration: 2
   ChangeAnimSpeed: 0.4
+  colorAndObjList: []
 --- !u!114 &8119192641383273392
 MonoBehaviour:
   m_ObjectHideFlags: 0
