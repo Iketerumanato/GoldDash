@@ -204,6 +204,9 @@ public class GameServerManager : MonoBehaviour
         {
             //不要なUI消す
             gameServerManager.PlayerInfoUI.SetActive(false);
+
+            //アニメーション止める
+            gameServerManager.CenterLogoAnimation.Kill();
         }
     }
 
@@ -232,9 +235,6 @@ public class GameServerManager : MonoBehaviour
 
         public void ExitState(GameServerManager gameServerManager)
         {
-            //アニメーション止める
-            gameServerManager.CenterLogoAnimation.Kill();
-
             //不要なUI消す
             gameServerManager.Phase1UniqueUI.SetActive(false);
             gameServerManager.processingLogo.SetActive(false);
