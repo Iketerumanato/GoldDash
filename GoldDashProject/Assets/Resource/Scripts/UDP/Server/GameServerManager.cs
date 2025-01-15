@@ -387,14 +387,15 @@ public class GameServerManager : MonoBehaviour
     {
         public async void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
         {
-            await UniTask.Delay(34000);
+            await UniTask.Delay(33000);
 
             SEPlayer.instance.PlaySEButton();
 
             SEPlayer.instance.resultBGMPlayer.DOFade(0f, 3f).OnComplete(() =>
             {
-                gameServerManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+                gameServerManager.blackImage.DOFade(1f, 0.3f).OnComplete(async () =>
                 {
+                    await UniTask.Delay(1000);
                     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 });
             });
