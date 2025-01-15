@@ -395,8 +395,12 @@ public class GameServerManager : MonoBehaviour
             {
                 gameServerManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
                 {
-                    DOTween.Clear(true);
-                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+#if UNITY_STANDALONE_WIN
+                System.Diagnostics.Process.Start(Application.dataPath.Replace("_Data", ".exe"));
+                Application.Quit();
+#else
+                UnityEditor.EditorApplication.isPlaying = false;
+#endif
                 });
             });
         }
