@@ -210,14 +210,6 @@ public class GameServerManager : MonoBehaviour
 
         public void UpdateProcess(GameServerManager gameServerManager)
         {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                gameServerManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
-                {
-                    gameServerManager.ChangeServerState(new Phase1State());
-                    gameServerManager.blackImage.DOFade(0f, 0.3f);
-                });
-            }
         }
 
         public void ExitState(GameServerManager gameServerManager)
