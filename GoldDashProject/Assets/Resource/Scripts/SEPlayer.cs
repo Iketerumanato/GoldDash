@@ -81,7 +81,7 @@ public class SEPlayer : MonoBehaviour
     [SerializeField] private AudioClip resultBoomSE;
     [SerializeField] private AudioClip resultClapSE;
 
-    private void Start()
+    private void Awake()
     {
         //シングルトンな静的変数の初期化
         instance = this;
