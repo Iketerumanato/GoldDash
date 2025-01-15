@@ -399,9 +399,12 @@ public class GameClientManager : MonoBehaviour
                                         case (byte)Definer.NDID.EDG:
                                             playerController.DisplayLargeMessage("終了！！", 2);
                                             playerController.EndGame();
+                                            inGame = false; //パケット処理を終える
+                                            isRunning = false;
+
                                             blackImage.DOFade(1f, 1f).OnComplete(async () =>
                                             {
-                                                await UniTask.Delay(34000);
+                                                await UniTask.Delay(37000);
 
                                                 Debug.Log("終了");
                                                 DOTween.KillAll();
