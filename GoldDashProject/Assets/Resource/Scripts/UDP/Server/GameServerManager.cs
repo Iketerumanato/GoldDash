@@ -648,6 +648,9 @@ public class GameServerManager : MonoBehaviour
                 GameFinalResultCamera.tag = "MainCamera";
                 PlayerInfoUI.SetActive(false);
                 Phase2UniqueUI.SetActive(false);
+
+                //フェーズ3に移行
+                ChangeServerState(new Phase3State());
             });
         }
         //分：秒表記に変換
