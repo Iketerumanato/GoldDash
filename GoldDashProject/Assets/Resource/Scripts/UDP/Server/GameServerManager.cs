@@ -368,9 +368,6 @@ public class GameServerManager : MonoBehaviour
 
         public void ExitState(GameServerManager gameServerManager)
         {
-            //座標同期開始
-            //制限時間カウント開始
-            //BGM開始
         }
     }
 
@@ -637,6 +634,11 @@ public class GameServerManager : MonoBehaviour
             //フェーズ3に移行
             if (!IsPhase3)
             {
+                //パケットを送って試合終了
+                ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.EDG);
+                Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                udpGameServer.Send(myHeader.ToByte());
+
                 //ここでフェードさせつつオブジェクトを起こし、結果発表用のカメラをMainCameraに変化させて疑似画面遷移開始
                 //フェードで暗転
                 blackImage.DOFade(1f, 1f).OnComplete(() =>

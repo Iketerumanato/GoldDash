@@ -8,6 +8,7 @@ using System.Threading;
 using TMPro;
 using UnityEngine.UI;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public class GameClientManager : MonoBehaviour
 {
@@ -115,6 +116,9 @@ public class GameClientManager : MonoBehaviour
     {
         public void EnterState(GameClientManager gameClientManager)
         {
+            //フェードイン
+            gameClientManager.blackImage.DOFade(0f, 3f);
+
             //必要なUI出す
             gameClientManager.Phase0UniqueUI.SetActive(true);
             //テキスト変える
@@ -393,6 +397,17 @@ public class GameClientManager : MonoBehaviour
                                             ChangeClientState(new NormalState());
                                             break;
                                         case (byte)Definer.NDID.EDG:
+                                            playerController.DisplayLargeMessage("終了！！", 2);
+                                            playerController.EndGame();
+                                            blackImage.DOFade(1f, 1f).OnComplete(async () =>
+                                            {
+                                                await UniTask.Delay(34000);
+
+                                                Debug.Log("終了");
+                                                DOTween.KillAll();
+                                                DOTween.Clear(true);
+                                                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                                            });
                                             break;
                                         case (byte)Definer.NDID.ALLOW_MAGIC:
                                             if (receivedActionPacket.targetID == sessionID) //自分に向けた許可なら
