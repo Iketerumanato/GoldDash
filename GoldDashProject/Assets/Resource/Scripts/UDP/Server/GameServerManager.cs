@@ -223,6 +223,8 @@ public class GameServerManager : MonoBehaviour
 
             //アニメーション止める
             gameServerManager.CenterLogoAnimation.Kill();
+            //回転ロゴの角度リセット
+            gameServerManager.CenterLogoImageTransform.rotation = Quaternion.identity;
         }
     }
 
