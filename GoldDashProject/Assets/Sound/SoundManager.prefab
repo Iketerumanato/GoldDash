@@ -144,8 +144,8 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   titleBGMPlayer: {fileID: 0}
   mainBGMPlayer: {fileID: 0}
-  seButton: {fileID: 8300000, guid: 9cd483d0d55cf9747b7ad7f4ffe17c46, type: 3}
-  seTouchToStart: {fileID: 8300000, guid: c41f89ee685b25d42ac21f71e499a87f, type: 3}
+  seButton: {fileID: 8300000, guid: 6402a66a84a0efb4f9f81053bc766a23, type: 3}
+  seTouchToStart: {fileID: 8300000, guid: 306152b55dd8d594897db37581ed203a, type: 3}
   sePunchMiss: {fileID: 8300000, guid: eccc933a238f7f34bb04cd7396dd5b42, type: 3}
   sePunchHitFront: {fileID: 8300000, guid: e6daf2c0137a5fa4897aef29cfe15bbb, type: 3}
   sePunchHitBack: {fileID: 8300000, guid: e6daf2c0137a5fa4897aef29cfe15bbb, type: 3}
