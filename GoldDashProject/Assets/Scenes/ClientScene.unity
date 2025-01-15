@@ -1965,13 +1965,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 920793712}
-  m_LocalRotation: {x: -0, y: -0, z: 0.045041062, w: 0.99898523}
+  m_LocalRotation: {x: 0, y: 0, z: 0.04536297, w: 0.9989706}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.74213606, y: 0.74213606, z: 0.74213606}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1803788411}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 5.163}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 5.2}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -432.33, y: 94.08699}
@@ -2551,6 +2551,7 @@ MonoBehaviour:
   TouchToStartButton: {fileID: 13154873}
   BackButton: {fileID: 286809826}
   ConnectButton: {fileID: 981928518}
+  TitleLogoImageTransform: {fileID: 920793713}
 --- !u!4 &1180707522
 Transform:
   m_ObjectHideFlags: 0

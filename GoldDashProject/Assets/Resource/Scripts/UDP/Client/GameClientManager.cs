@@ -85,6 +85,10 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private Button TouchToStartButton;
     [SerializeField] private Button BackButton;
     [SerializeField] private Button ConnectButton;
+
+    //タイトルロゴアニメーション用
+    private Sequence TitleLogoAnimatoin;
+    [SerializeField] RectTransform TitleLogoImageTransform;
     #endregion
 
     #region Stateインターフェース
@@ -112,6 +116,8 @@ public class GameClientManager : MonoBehaviour
             //テキスト変える
             gameClientManager.upperTextBox.text = "";
             gameClientManager.centerTextBox.text = "";
+            //回転ロゴの角度リセット
+            gameClientManager.TitleLogoImageTransform.rotation = Quaternion.Euler(0f, 0f, 5.2f);
         }
 
         public void UpdateProcess(GameClientManager gameClientManager)
@@ -224,6 +230,12 @@ public class GameClientManager : MonoBehaviour
         TouchToStartButton.OnClickAsObservable().Subscribe(_ =>
         {
             SEPlayer.instance.PlaySETouchToStart();
+            //ロゴアニメーション
+            TitleLogoAnimatoin
+            .SetDelay(1f)
+            .Append(TitleLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 432f), 0.6f, RotateMode.FastBeyond360).SetEase(Ease.OutQuad))
+            .SetLoops(-1);
+
             blackImage.DOFade(1f, 0.3f).OnComplete(() =>
             {
                 ChangeClientState(new Phase1State());
