@@ -80,9 +80,25 @@ public class GameServerManager : MonoBehaviour
 
     //プレイヤーネームと矢印
     [SerializeField] private GameObject redArrow;
+    private RectTransform redArrowIconPos;//矢印の親のオブジェクト(矢印の背景)←これと一緒にループして動かす
+    private Vector2 originRedArrowPos;//ステート切り替え時に元の位置に戻るように初期値をとっておく
+    Tween redArrowTween;//アニメーション停止用トゥイーン
+
     [SerializeField] private GameObject blueArrow;
+    private RectTransform blueArrowIconPos;
+    private Vector2 originBlueArrowPos;
+    Tween blueArrowTween;
+
     [SerializeField] private GameObject greenArrow;
+    private RectTransform greenArrowIconPos;
+    private Vector2 originGreenArrowPos;
+    Tween greenArrowTween;
+
     [SerializeField] private GameObject yellowArrow;
+    private RectTransform yellowArrowIconPos;
+    private Vector2 originYellowArrowPos;
+    Tween yellowArrowTween;
+
     [SerializeField] private TextMeshProUGUI redNameText;
     [SerializeField] private TextMeshProUGUI blueNameText;
     [SerializeField] private TextMeshProUGUI greenNameText;
@@ -227,6 +243,19 @@ public class GameServerManager : MonoBehaviour
             gameServerManager.colorSelectButtonAnimator2.IsAnimating = true;
             gameServerManager.colorSelectButtonColorChanger1.IsSelected = false;
             gameServerManager.colorSelectButtonColorChanger2.IsSelected = false;
+
+            //このステートに戻ってきたと同時に矢印のアニメーションをしてアイコンを初期位置に戻す
+            gameServerManager.redArrowTween.Kill();
+            gameServerManager.redArrowIconPos.position = gameServerManager.originRedArrowPos;
+
+            gameServerManager.blueArrowTween.Kill();
+            gameServerManager.blueArrowIconPos.position = gameServerManager.originBlueArrowPos;
+
+            gameServerManager.greenArrowTween.Kill();
+            gameServerManager.greenArrowIconPos.position = gameServerManager.originGreenArrowPos;
+
+            gameServerManager.yellowArrowTween.Kill();
+            gameServerManager.yellowArrowIconPos.position = gameServerManager.originYellowArrowPos;
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
@@ -269,7 +298,7 @@ public class GameServerManager : MonoBehaviour
                 foreach (KeyValuePair<ushort, ActorController> k in gameServerManager.actorDictionary)
                 {
                     if (k.Value.Color == Definer.PLAYER_COLOR.GREEN)
-                    { 
+                    {
                         greenID = k.Key;
                         break;
                     }
@@ -480,7 +509,7 @@ public class GameServerManager : MonoBehaviour
         }
     }
     #endregion
-    
+
     private void Start()
     {
         //コレクションのインスタンス作成
@@ -540,6 +569,20 @@ public class GameServerManager : MonoBehaviour
                 blackImage.DOFade(0f, 0.3f);
             });
         });
+
+        //親(背景の画像)のRectTransformを取得
+        redArrowIconPos = redArrow.transform.parent.GetComponent<RectTransform>();
+        //初期位置の記録
+        originRedArrowPos = redArrowIconPos.position;
+
+        blueArrowIconPos = blueArrow.transform.parent.GetComponent<RectTransform>();
+        originBlueArrowPos = blueArrowIconPos.position;
+
+        greenArrowIconPos = greenArrow.transform.parent.GetComponent<RectTransform>();
+        originGreenArrowPos = greenArrowIconPos.position;
+
+        yellowArrowIconPos = yellowArrow.transform.parent.GetComponent<RectTransform>();
+        originYellowArrowPos = yellowArrowIconPos.position;
     }
 
     private bool displayedRemain3min = false;
@@ -559,7 +602,7 @@ public class GameServerManager : MonoBehaviour
         timeLimitSeconds -= Time.deltaTime;
         //0秒未満なら0で固定する
         if (timeLimitSeconds < 0f)
-        { 
+        {
             timeLimitSeconds = 0f;
             //ここでフェードさせつつオブジェクトを起こし、結果発表用のカメラをMainCameraに変化させて疑似画面遷移開始
             //フェードで暗転
@@ -570,7 +613,7 @@ public class GameServerManager : MonoBehaviour
                 GameFinalResultSetPrefab.SetActive(true);
                 GameFinalResultCamera.tag = "MainCamera";
                 PlayerInfoUI.SetActive(false);
-                Phase2UniqueUI.SetActive(false);          
+                Phase2UniqueUI.SetActive(false);
             });
         }
         //分：秒表記に変換
@@ -686,24 +729,32 @@ public class GameServerManager : MonoBehaviour
                                     redNameText.text = receivedInitPacket.playerName;
                                     redArrow.SetActive(true);
                                     SEPlayer.instance.PlaySELoginRed();
+
+                                    redArrowTween = redArrowIconPos.DOLocalMoveY(redArrowIconPos.localPosition.y + 30f, 1f).SetLoops(-1, LoopType.Yoyo);
                                     break;
                                 case Definer.PLAYER_COLOR.GREEN:
                                     actorPrefab = GreenActorPrefab;
                                     greenNameText.text = receivedInitPacket.playerName;
                                     greenArrow.SetActive(true);
                                     SEPlayer.instance.PlaySELoginGreen();
+
+                                    greenArrowTween = greenArrowIconPos.DOLocalMoveY(greenArrowIconPos.localPosition.y + 30f, 1f).SetLoops(-1, LoopType.Yoyo);
                                     break;
                                 case Definer.PLAYER_COLOR.BLUE:
                                     actorPrefab = BlueActorPrefab;
                                     blueNameText.text = receivedInitPacket.playerName;
                                     blueArrow.SetActive(true);
                                     SEPlayer.instance.PlaySELoginBlue();
+
+                                    blueArrowTween = blueArrowIconPos.DOLocalMoveX(blueArrowIconPos.localPosition.x + 30f, 1f).SetLoops(-1, LoopType.Yoyo);
                                     break;
                                 case Definer.PLAYER_COLOR.YELLOW:
                                     actorPrefab = YellowActorPrefab;
                                     yellowNameText.text = receivedInitPacket.playerName;
                                     yellowArrow.SetActive(true);
                                     SEPlayer.instance.PlaySELoginYellow();
+
+                                    yellowArrowTween = yellowArrowIconPos.DOLocalMoveX(yellowArrowIconPos.localPosition.x + 30f, 1f).SetLoops(-1, LoopType.Yoyo);
                                     break;
                                 default:
                                     actorPrefab = WhiteActorPrefab;
@@ -1281,7 +1332,7 @@ public class GameServerManager : MonoBehaviour
         foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
         {
             if (k.Value.Gold > topGold)
-            { 
+            {
                 topPlayerID = k.Key;
                 topGold = k.Value.Gold;
             }
@@ -1310,7 +1361,7 @@ public class GameServerManager : MonoBehaviour
 
         return ret;
     }
-    
+
     private void OnDestroy()
     {
         //稼働中なら切断パケット
