@@ -626,6 +626,8 @@ public class GameServerManager : MonoBehaviour
     private bool chest2First = true;
     private bool chest3First = true;
 
+    private bool IsPhase3 = false;
+
     private void Update()
     {
         currentSetverState.UpdateProcess(this);
@@ -650,7 +652,7 @@ public class GameServerManager : MonoBehaviour
                 Phase2UniqueUI.SetActive(false);
 
                 //フェーズ3に移行
-                ChangeServerState(new Phase3State());
+                if (!IsPhase3) ChangeServerState(new Phase3State());
             });
         }
         //分：秒表記に変換
