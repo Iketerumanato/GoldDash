@@ -9,6 +9,7 @@ using TMPro;
 using System;
 using UnityEngine.UI;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public class GameServerManager : MonoBehaviour
 {
@@ -112,7 +113,7 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timeTextLeft;
     [SerializeField] private TextMeshProUGUI timeTextRight;
 
-    private float timeLimitSeconds = 333f;
+    private float timeLimitSeconds = 10f;
 
     //色変えボタン
     [SerializeField] private ColorSelectButtonColorChanger colorSelectButtonColorChanger1;
@@ -169,6 +170,9 @@ public class GameServerManager : MonoBehaviour
     {
         public void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
         {
+            //フェードイン
+            gameServerManager.blackImage.DOFade(0f, 3f);
+
             //必要なUI出す
             gameServerManager.PlayerInfoUI.SetActive(true);
             //テキスト変える
@@ -377,6 +381,34 @@ public class GameServerManager : MonoBehaviour
             //BGM開始
         }
     }
+
+    //通常の状態
+    public class Phase3State : ISetverState
+    {
+        public async void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
+        {
+            await UniTask.Delay(34000);
+
+            SEPlayer.instance.PlaySEButton();
+
+            SEPlayer.instance.resultBGMPlayer.DOFade(0f, 3f).OnComplete(() =>
+            {
+                gameServerManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+                {
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                });
+            });
+        }
+
+        public void UpdateProcess(GameServerManager gameServerManager)
+        {
+        }
+
+        public void ExitState(GameServerManager gameServerManager)
+        {
+        }
+    }
+
 
     //通常の状態
     public class NormalState : ISetverState
