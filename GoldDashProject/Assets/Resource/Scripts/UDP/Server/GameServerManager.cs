@@ -652,7 +652,11 @@ public class GameServerManager : MonoBehaviour
                 Phase2UniqueUI.SetActive(false);
 
                 //フェーズ3に移行
-                if (!IsPhase3) ChangeServerState(new Phase3State());
+                if (!IsPhase3) 
+                {
+                    ChangeServerState(new Phase3State());
+                    IsPhase3 = true;
+                }
             });
         }
         //分：秒表記に変換
