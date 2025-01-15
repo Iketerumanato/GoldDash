@@ -300,13 +300,28 @@ public class ResultImage : MonoBehaviour
 
             // 順位、名前、スコアを1行ずつ表示
             RightRankingText.text += $"{playerRank + 1}位:\n";
+            if (playerRank == 0) RightRankingText.text += "<size=72>";
+            if (playerRank == pairPlayerDataList.Count) RightRankingText.text += "</size>";
+
             LeftRankingText.text += $"{playerRank + 1}位:\n";
+            if (playerRank == 0) LeftRankingText.text += "<size=72>";
+            if (playerRank == pairPlayerDataList.Count) LeftRankingText.text += "</size>";
 
             RightNameText.text += $"{playerdata.name}\n";
+            if (playerRank == 0) RightNameText.text += "<size=48>";
+            if (playerRank == pairPlayerDataList.Count) RightNameText.text += "</size>";
+
             LeftNameText.text += $"{playerdata.name}\n";
+            if (playerRank == 0) LeftNameText.text += "<size=48>";
+            if (playerRank == pairPlayerDataList.Count) LeftNameText.text += "</size>";
 
             RightScoreText.text += $"{playerdata.gold}\n";
+            if (playerRank == 0) RightScoreText.text += "<size=48>";
+            if (playerRank == pairPlayerDataList.Count) RightScoreText.text += "</size>";
+
             LeftScoreText.text += $"{playerdata.gold}\n";
+            if (playerRank == 0) LeftScoreText.text += "<size=48>";
+            if (playerRank == pairPlayerDataList.Count) LeftScoreText.text += "</size>";
         }
     }
 
