@@ -9,18 +9,15 @@ using System;
 public class ResultImage : MonoBehaviour
 {
     [SerializeField] GameServerManager _gameserverManager;
-    private List<(string name, int gold, Definer.PLAYER_COLOR color)> pairPlayerDataList;
+    private List<(string name, int gold, Definer.PLAYER_COLOR color)> pairPlayerDataList;//サーバーとのペアリング用のリスト
 
-    //各プレイヤーの色
-    //アクターの色別テクスチャ(アクターに渡していく)
-    [SerializeField] private Renderer[] targetRenderers; // Scene上のRendererを参照 (順番に配置)
-                                                         // プレイヤーの色に対応するテクスチャ
-    [SerializeField] Texture[] ResultActorsBodyColors;
-    [SerializeField] Material WhitePlayerMaterial;
-    [SerializeField] SkinnedMeshRenderer greenSkin;
+    [Header("緑のアクターの体を白に変える用")]
+    [SerializeField] Material WhitePlayerMaterial;//白のテクスチャ
+    [SerializeField] SkinnedMeshRenderer greenSkin;//緑のアクターの体
 
     //各プレイヤーの名前、スコア表示のテキスト
     //画面右のテキスト
+    [Header("")]
     [SerializeField] TMP_Text RightRankingText;
     [SerializeField] TMP_Text RightNameText;
     [SerializeField] TMP_Text RightScoreText;
@@ -30,6 +27,16 @@ public class ResultImage : MonoBehaviour
     [SerializeField] TMP_Text LeftRankingText;
     [SerializeField] TMP_Text LeftNameText;
     [SerializeField] TMP_Text LeftScoreText;
+
+    [Header("プレイヤーのアイコン")]
+    [SerializeField] List<UnityEngine.UI.Image> RightPlayerIconImage;//右のアイコン画像4つ
+    [SerializeField] List<UnityEngine.UI.Image> LeftPlayerIconImage;//左のアイコン画像4つ
+    [SerializeField] Sprite redIcon;
+    [SerializeField] Sprite blueIcon;
+    [SerializeField] Sprite greenIcon;
+    [SerializeField] Sprite yellowIcon;
+    [SerializeField] Sprite whiteIcon;
+
 
     //スコアキャンバスのフェード
     [SerializeField] CanvasGroup ResultTextCanvas;
@@ -136,7 +143,7 @@ public class ResultImage : MonoBehaviour
         foreach (ColorAndObjPair c in colorAndObjList)
         {
             if (c.color == highestScoringPlayer.color)
-            { 
+            {
                 c.obj.tag = WinerActorTag;
                 Debug.Log($"タグを変更しました: -> {WinerActorTag}");
             }
@@ -284,6 +291,8 @@ public class ResultImage : MonoBehaviour
         }
     }
 
+
+    //最終歴なプレイヤーの名前やスコアなどの表示
     void DisplayFinalScore()
     {
         //テキストの初期化
@@ -297,13 +306,14 @@ public class ResultImage : MonoBehaviour
         for (int playerRank = 0; playerRank < pairPlayerDataList.Count; playerRank++)
         {
             var playerdata = pairPlayerDataList[playerRank];
+            //var actorData = colorAndObjList[playerRank];
 
             // 順位、名前、スコアを1行ずつ表示
-            RightRankingText.text += $"{playerRank + 1}位:\n";
+            RightRankingText.text += $"{playerRank + 1}:\n";
             if (playerRank == 0) RightRankingText.text += "<size=72>";
             if (playerRank == pairPlayerDataList.Count) RightRankingText.text += "</size>";
 
-            LeftRankingText.text += $"{playerRank + 1}位:\n";
+            LeftRankingText.text += $"{playerRank + 1}:\n";
             if (playerRank == 0) LeftRankingText.text += "<size=72>";
             if (playerRank == pairPlayerDataList.Count) LeftRankingText.text += "</size>";
 
@@ -322,6 +332,29 @@ public class ResultImage : MonoBehaviour
             LeftScoreText.text += $"{playerdata.gold}\n";
             if (playerRank == 0) LeftScoreText.text += "<size=48>";
             if (playerRank == pairPlayerDataList.Count) LeftScoreText.text += "</size>";
+
+            //下で指定した情報を使ってImageのListのSpriteを変えていく
+            RightPlayerIconImage[playerRank].sprite = GetSpriteFromColor(pairPlayerDataList[playerRank].color);
+            LeftPlayerIconImage[playerRank].sprite = GetSpriteFromColor(pairPlayerDataList[playerRank].color);
+            //各プレイヤーの色情報からスプライトを指定
+            Sprite GetSpriteFromColor(Definer.PLAYER_COLOR playerColor)
+            {
+                switch (playerColor)
+                {
+                    case Definer.PLAYER_COLOR.RED:
+                        return redIcon;
+                    case Definer.PLAYER_COLOR.BLUE:
+                        return blueIcon;
+                    case Definer.PLAYER_COLOR.GREEN:
+                        if (_gameserverManager.currentColorType == GameServerManager.COLOR_TYPE.CHANGE_GREEN_TO_WHITE) return whiteIcon;
+                        else return greenIcon;
+                    case Definer.PLAYER_COLOR.YELLOW:
+                        return yellowIcon;
+                    default:
+                        break;
+                }
+                throw new Exception("死");
+            }
         }
     }
 
