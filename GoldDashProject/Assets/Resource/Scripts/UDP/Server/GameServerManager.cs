@@ -361,17 +361,23 @@ public class GameServerManager : MonoBehaviour
             myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             gameServerManager.udpGameServer.Send(myHeader.ToByte());
 
+            SEPlayer.instance.PlaySECountDown3();
+
             await UniTask.Delay(1000);
 
             myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, value: 2, msg: "2");
             myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             gameServerManager.udpGameServer.Send(myHeader.ToByte());
 
+            SEPlayer.instance.PlaySECountDown2();
+
             await UniTask.Delay(1000);
 
             myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, value: 2, msg: "1");
             myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            SEPlayer.instance.PlaySECountDown1();
 
             await UniTask.Delay(1000);
 
@@ -382,6 +388,8 @@ public class GameServerManager : MonoBehaviour
             myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.ALLOW_MOVE);
             myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            SEPlayer.instance.PlaySECountDown0();
 
             //ゲーム開始
             gameServerManager.inGame = true;
