@@ -29,11 +29,11 @@ public class ChestUnlocker : MonoBehaviour
     }
 
     //鍵が崩れていく5段階のモーション
-    //private readonly string strUnlockTrigger1 = "UnlockTrigger1"; //最初
-    //private readonly string strUnlockTrigger2 = "UnlockTrigger2";
-    //private readonly string strUnlockTrigger3 = "UnlockTrigger3";
-    //private readonly string strUnlockTrigger4 = "UnlockTrigger4";
-    //private readonly string strUnlockTrigger5 = "UnlockTrigger5"; //最後
+    private readonly string strUnlockTrigger1 = "UnlockTrigger1"; //最初
+    private readonly string strUnlockTrigger2 = "UnlockTrigger2";
+    private readonly string strUnlockTrigger3 = "UnlockTrigger3";
+    private readonly string strUnlockTrigger4 = "UnlockTrigger4";
+    private readonly string strUnlockTrigger5 = "UnlockTrigger5"; //最後
     //アニメーションの進行状況をリセットする
     //private readonly string strResetTrigger = "ResetTrigger";
 
@@ -135,8 +135,30 @@ public class ChestUnlocker : MonoBehaviour
                         if (stageOfAnimation > 0 && stageOfAnimation > m_currentStageOfAnimations)
                         {
                             m_currentStageOfAnimations = stageOfAnimation; //現在のアニメーション段階を記録
-                            string triggerName = "UnlockTrigger" + stageOfAnimation.ToString(); //triggerのパラメータ名を作成する
-                            m_animator.SetTrigger(triggerName); //作成したパラメータ名を使ってアニメーションを再生
+
+                            switch (stageOfAnimation)
+                            {
+                                case 1:
+                                    SEPlayer.instance.PlaySEUnlock1();
+                                    m_animator.SetTrigger(strUnlockTrigger1);
+                                    break;
+                                case 2:
+                                    SEPlayer.instance.PlaySEUnlock2();
+                                    m_animator.SetTrigger(strUnlockTrigger2);
+                                    break;
+                                case 3:
+                                    SEPlayer.instance.PlaySEUnlock3();
+                                    m_animator.SetTrigger(strUnlockTrigger3);
+                                    break;
+                                case 4:
+                                    SEPlayer.instance.PlaySEUnlock4();
+                                    m_animator.SetTrigger(strUnlockTrigger4);
+                                    break;
+                                case 5:
+                                    SEPlayer.instance.PlaySEUnlock5();
+                                    m_animator.SetTrigger(strUnlockTrigger5);
+                                    break;
+                            }
                         }
                         
                     }

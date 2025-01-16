@@ -9,6 +9,7 @@ using TMPro;
 using System;
 using UnityEngine.UI;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public class GameServerManager : MonoBehaviour
 {
@@ -44,6 +45,8 @@ public class GameServerManager : MonoBehaviour
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
     [SerializeField] private GameObject GoldPileMiniPrefab; //小金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
+    [SerializeField] private GameObject Chest2Prefab; //宝箱ティア2のプレハブ
+    [SerializeField] private GameObject Chest3Prefab; //宝箱ティア3のプレハブ
     [SerializeField] private GameObject ScrollPrefab; //巻物のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
     [SerializeField] private GameObject GameFinalResultSetPrefab;
@@ -78,9 +81,25 @@ public class GameServerManager : MonoBehaviour
 
     //プレイヤーネームと矢印
     [SerializeField] private GameObject redArrow;
+    private RectTransform redArrowIconPos;//矢印の親のオブジェクト(矢印の背景)←これと一緒にループして動かす
+    private Vector2 originRedArrowPos;//ステート切り替え時に元の位置に戻るように初期値をとっておく
+    Tween redArrowTween;//アニメーション停止用トゥイーン
+
     [SerializeField] private GameObject blueArrow;
+    private RectTransform blueArrowIconPos;
+    private Vector2 originBlueArrowPos;
+    Tween blueArrowTween;
+
     [SerializeField] private GameObject greenArrow;
+    private RectTransform greenArrowIconPos;
+    private Vector2 originGreenArrowPos;
+    Tween greenArrowTween;
+
     [SerializeField] private GameObject yellowArrow;
+    private RectTransform yellowArrowIconPos;
+    private Vector2 originYellowArrowPos;
+    Tween yellowArrowTween;
+
     [SerializeField] private TextMeshProUGUI redNameText;
     [SerializeField] private TextMeshProUGUI blueNameText;
     [SerializeField] private TextMeshProUGUI greenNameText;
@@ -124,6 +143,10 @@ public class GameServerManager : MonoBehaviour
     private Definer.MID awaitingMagicID;
     //魔法を使用をしようとしているプレイヤーのsessionID
     private ushort magicUserID;
+
+    //プロセッシングロゴアニメーション用
+    Sequence CenterLogoAnimation;
+    [SerializeField] RectTransform CenterLogoImageTransform;
     #endregion
 
     #region Stateインターフェース
@@ -147,6 +170,9 @@ public class GameServerManager : MonoBehaviour
     {
         public void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
         {
+            //フェードイン
+            gameServerManager.blackImage.DOFade(0f, 3f);
+
             //必要なUI出す
             gameServerManager.PlayerInfoUI.SetActive(true);
             //テキスト変える
@@ -166,24 +192,35 @@ public class GameServerManager : MonoBehaviour
 
             //初期設定が終わったら稼働
             gameServerManager.isRunning = true;
+
+            //BGM
+            SEPlayer.instance.titleBGMPlayer.DOFade(1f, 0.3f);
+            SEPlayer.instance.titleBGMPlayer.Play();
+
+            //回転ロゴの角度リセット
+            gameServerManager.CenterLogoImageTransform.rotation = Quaternion.identity;
+
+            //ロゴアニメーション
+            gameServerManager.CenterLogoAnimation = DOTween.Sequence();
+            gameServerManager.CenterLogoAnimation.Append(gameServerManager.CenterLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 360f), 1.3f, RotateMode.FastBeyond360).SetEase(Ease.InOutBack))//InOutBackを付けつつ一回目の回転
+                .SetDelay(0.3f)//少し待機
+                .Append(gameServerManager.CenterLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 360f), 1.5f, RotateMode.FastBeyond360).SetEase(Ease.OutBack))//InOutBackでの回転速度に追いつくためOutBackで２回目の回転
+                .SetLoops(-1);//無限ループ
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
         {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                gameServerManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
-                {
-                    gameServerManager.ChangeServerState(new Phase1State());
-                    gameServerManager.blackImage.DOFade(0f, 0.3f);
-                });
-            }
         }
 
         public void ExitState(GameServerManager gameServerManager)
         {
             //不要なUI消す
             gameServerManager.PlayerInfoUI.SetActive(false);
+
+            //アニメーション止める
+            gameServerManager.CenterLogoAnimation.Kill();
+            //回転ロゴの角度リセット
+            gameServerManager.CenterLogoImageTransform.rotation = Quaternion.identity;
         }
     }
 
@@ -204,6 +241,19 @@ public class GameServerManager : MonoBehaviour
             gameServerManager.colorSelectButtonAnimator2.IsAnimating = true;
             gameServerManager.colorSelectButtonColorChanger1.IsSelected = false;
             gameServerManager.colorSelectButtonColorChanger2.IsSelected = false;
+
+            //このステートに戻ってきたと同時に矢印のアニメーションをしてアイコンを初期位置に戻す
+            gameServerManager.redArrowTween.Kill();
+            gameServerManager.redArrowIconPos.position = gameServerManager.originRedArrowPos;
+
+            gameServerManager.blueArrowTween.Kill();
+            gameServerManager.blueArrowIconPos.position = gameServerManager.originBlueArrowPos;
+
+            gameServerManager.greenArrowTween.Kill();
+            gameServerManager.greenArrowIconPos.position = gameServerManager.originGreenArrowPos;
+
+            gameServerManager.yellowArrowTween.Kill();
+            gameServerManager.yellowArrowIconPos.position = gameServerManager.originYellowArrowPos;
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
@@ -215,6 +265,9 @@ public class GameServerManager : MonoBehaviour
             //不要なUI消す
             gameServerManager.Phase1UniqueUI.SetActive(false);
             gameServerManager.processingLogo.SetActive(false);
+
+            //BGM消す
+            SEPlayer.instance.titleBGMPlayer.DOFade(0f, 0.3f);
         }
     }
 
@@ -243,7 +296,7 @@ public class GameServerManager : MonoBehaviour
                 foreach (KeyValuePair<ushort, ActorController> k in gameServerManager.actorDictionary)
                 {
                     if (k.Value.Color == Definer.PLAYER_COLOR.GREEN)
-                    { 
+                    {
                         greenID = k.Key;
                         break;
                     }
@@ -296,7 +349,7 @@ public class GameServerManager : MonoBehaviour
             }
 
 
-            SEPlayer.instance.audioSource.Play();
+            SEPlayer.instance.mainBGMPlayer.Play();
 
             await UniTask.Delay(3000);
 
@@ -315,11 +368,37 @@ public class GameServerManager : MonoBehaviour
 
         public void ExitState(GameServerManager gameServerManager)
         {
-            //座標同期開始
-            //制限時間カウント開始
-            //BGM開始
         }
     }
+
+    //通常の状態
+    public class Phase3State : ISetverState
+    {
+        public async void EnterState(GameServerManager gameServerManager, Definer.MID magicID, ushort magicUserID)
+        {
+            await UniTask.Delay(34000);
+
+            SEPlayer.instance.resultBGMPlayer.DOFade(0f, 3f).OnComplete(() =>
+            {
+                gameServerManager.blackImage.DOFade(1f, 0.3f).OnComplete(() =>
+                {
+                    Debug.Log("終了");
+                    DOTween.KillAll();
+                    DOTween.Clear(true);
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                });
+            });
+        }
+
+        public void UpdateProcess(GameServerManager gameServerManager)
+        {
+        }
+
+        public void ExitState(GameServerManager gameServerManager)
+        {
+        }
+    }
+
 
     //通常の状態
     public class NormalState : ISetverState
@@ -454,7 +533,7 @@ public class GameServerManager : MonoBehaviour
         }
     }
     #endregion
-    
+
     private void Start()
     {
         //コレクションのインスタンス作成
@@ -492,6 +571,7 @@ public class GameServerManager : MonoBehaviour
             colorSelectButtonAnimator2.IsAnimating = false;
             gameStartButtonAnimator.IsGrayedOut = false;
             gameStartButtonAnimator.IsAnimating = true;
+            SEPlayer.instance.PlaySEButton();
         });
         colorSelectButton2.OnClickAsObservable().Subscribe(_ =>
         {
@@ -502,20 +582,41 @@ public class GameServerManager : MonoBehaviour
             colorSelectButtonAnimator2.IsAnimating = false;
             gameStartButtonAnimator.IsGrayedOut = false;
             gameStartButtonAnimator.IsAnimating = true;
+            SEPlayer.instance.PlaySEButton();
         });
         gameStartButton.OnClickAsObservable().Subscribe(_ =>
         {
+            SEPlayer.instance.PlaySEButton();
             blackImage.DOFade(1f, 0.3f).OnComplete(() =>
             {
                 ChangeServerState(new Phase2State());
                 blackImage.DOFade(0f, 0.3f);
             });
         });
+
+        //親(背景の画像)のRectTransformを取得
+        redArrowIconPos = redArrow.transform.parent.GetComponent<RectTransform>();
+        //初期位置の記録
+        originRedArrowPos = redArrowIconPos.position;
+
+        blueArrowIconPos = blueArrow.transform.parent.GetComponent<RectTransform>();
+        originBlueArrowPos = blueArrowIconPos.position;
+
+        greenArrowIconPos = greenArrow.transform.parent.GetComponent<RectTransform>();
+        originGreenArrowPos = greenArrowIconPos.position;
+
+        yellowArrowIconPos = yellowArrow.transform.parent.GetComponent<RectTransform>();
+        originYellowArrowPos = yellowArrowIconPos.position;
     }
 
     private bool displayedRemain3min = false;
     private bool displayedRemain1min = false;
     private bool displayedRemain30sec = false;
+
+    private bool chest2First = true;
+    private bool chest3First = true;
+
+    private bool IsPhase3 = false;
 
     private void Update()
     {
@@ -527,19 +628,31 @@ public class GameServerManager : MonoBehaviour
         timeLimitSeconds -= Time.deltaTime;
         //0秒未満なら0で固定する
         if (timeLimitSeconds < 0f)
-        { 
+        {
             timeLimitSeconds = 0f;
-            //ここでフェードさせつつオブジェクトを起こし、結果発表用のカメラをMainCameraに変化させて疑似画面遷移開始
-            //フェードで暗転
-            blackImage.DOFade(1f, 1f).OnComplete(() =>
+
+            //フェーズ3に移行
+            if (!IsPhase3)
             {
-                //フェードが明ける
-                blackImage.DOFade(0f, 0.5f);
-                GameFinalResultSetPrefab.SetActive(true);
-                GameFinalResultCamera.tag = "MainCamera";
-                PlayerInfoUI.SetActive(false);
-                Phase2UniqueUI.SetActive(false);          
-            });
+                //パケットを送って試合終了
+                ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.EDG);
+                Header myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                udpGameServer.Send(myHeader.ToByte());
+
+                //ここでフェードさせつつオブジェクトを起こし、結果発表用のカメラをMainCameraに変化させて疑似画面遷移開始
+                //フェードで暗転
+                blackImage.DOFade(1f, 1f).OnComplete(() =>
+                {
+                    //フェードが明ける
+                    blackImage.DOFade(0f, 0.5f);
+                    GameFinalResultSetPrefab.SetActive(true);
+                    GameFinalResultCamera.tag = "MainCamera";
+                    PlayerInfoUI.SetActive(false);
+                    Phase2UniqueUI.SetActive(false);
+                    ChangeServerState(new Phase3State());
+                });
+                IsPhase3 = true;
+            }
         }
         //分：秒表記に変換
         TimeSpan span = new TimeSpan(0, 0, (int)timeLimitSeconds);
@@ -653,21 +766,33 @@ public class GameServerManager : MonoBehaviour
                                     actorPrefab = RedActorPrefab;
                                     redNameText.text = receivedInitPacket.playerName;
                                     redArrow.SetActive(true);
+                                    SEPlayer.instance.PlaySELoginRed();
+
+                                    redArrowTween = redArrowIconPos.DOLocalMoveY(redArrowIconPos.localPosition.y + 30f, 1f).SetLoops(-1, LoopType.Yoyo);
                                     break;
                                 case Definer.PLAYER_COLOR.GREEN:
                                     actorPrefab = GreenActorPrefab;
                                     greenNameText.text = receivedInitPacket.playerName;
                                     greenArrow.SetActive(true);
+                                    SEPlayer.instance.PlaySELoginGreen();
+
+                                    greenArrowTween = greenArrowIconPos.DOLocalMoveY(greenArrowIconPos.localPosition.y + 30f, 1f).SetLoops(-1, LoopType.Yoyo);
                                     break;
                                 case Definer.PLAYER_COLOR.BLUE:
                                     actorPrefab = BlueActorPrefab;
                                     blueNameText.text = receivedInitPacket.playerName;
                                     blueArrow.SetActive(true);
+                                    SEPlayer.instance.PlaySELoginBlue();
+
+                                    blueArrowTween = blueArrowIconPos.DOLocalMoveX(blueArrowIconPos.localPosition.x + 30f, 1f).SetLoops(-1, LoopType.Yoyo);
                                     break;
                                 case Definer.PLAYER_COLOR.YELLOW:
                                     actorPrefab = YellowActorPrefab;
                                     yellowNameText.text = receivedInitPacket.playerName;
                                     yellowArrow.SetActive(true);
+                                    SEPlayer.instance.PlaySELoginYellow();
+
+                                    yellowArrowTween = yellowArrowIconPos.DOLocalMoveX(yellowArrowIconPos.localPosition.x + 30f, 1f).SetLoops(-1, LoopType.Yoyo);
                                     break;
                                 default:
                                     actorPrefab = WhiteActorPrefab;
@@ -933,7 +1058,23 @@ public class GameServerManager : MonoBehaviour
                                                     entityID = GetUniqueEntityID();
                                                     Vector3 goldPos = new Vector3(entityDictionary[receivedActionPacket.targetID].transform.position.x, 0.1f, entityDictionary[receivedActionPacket.targetID].transform.position.z);
                                                     System.Random random = new System.Random();
-                                                    int chestGold = random.Next(80, 201); //ランダムなゴールド量の金貨の山を生成 適当に80~200ゴールド
+
+                                                    int chestGold;
+                                                    switch (((Chest)entityDictionary[receivedActionPacket.targetID]).Tier)
+                                                    {
+                                                        case 1:
+                                                            chestGold = random.Next(80, 201); //ランダムなゴールド量の金貨の山を生成 適当に80~200ゴールド
+                                                            break;
+                                                        case 2:
+                                                            chestGold = random.Next(300, 501); //ランダムなゴールド量の金貨の山を生成 適当に80~200ゴールド
+                                                            break;
+                                                        case 3:
+                                                            chestGold = random.Next(2000, 4001); //ランダムなゴールド量の金貨の山を生成 適当に80~200ゴールド
+                                                            break;
+                                                        default:
+                                                            chestGold = 1;
+                                                            break;
+                                                    }
                                                     //金額によってモデル変更
                                                     GoldPile goldPile = chestGold > 50 ? Instantiate(GoldPilePrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>() : Instantiate(GoldPileMiniPrefab, goldPos, Quaternion.identity).GetComponent<GoldPile>();
                                                     goldPile.EntityID = entityID; //値を書き込み
@@ -982,17 +1123,76 @@ public class GameServerManager : MonoBehaviour
                                                 //宝箱の数が足りなければ新たに宝箱を作り出す
                                                 if (currentNumOfChests < maxNumOfChests)
                                                 {
+                                                    //宝箱のティアを制限時間に応じて異なる確立で抽選する
+                                                    int tier = 1;
+                                                    if (262 < timeLimitSeconds) //4:22まではティア１
+                                                    {
+                                                        tier = 1;
+                                                    }
+                                                    else if (196 < timeLimitSeconds) //3:16までは50%ティア1、50%ティア2
+                                                    {
+                                                        System.Random random = new System.Random(); //UnityEngine.Randomはマルチスレッドで使用できないのでSystemを使う
+                                                        int rand = random.Next(0, 99); //0~100
+                                                        if (rand < 50) tier = 2;
+
+                                                        if (chest2First)
+                                                        {
+                                                            tier = 2;
+                                                            chest3First = false;
+                                                        }
+                                                    }
+                                                    else if (130 < timeLimitSeconds)
+                                                    {
+                                                        System.Random random = new System.Random(); //2:10までは50%ティア2、15%ティア3、35%ティア1
+                                                        int rand = random.Next(0, 99); //0~100
+                                                        if (rand < 50) tier = 2;
+                                                        else if (rand < 65) tier = 3;
+
+                                                        if (chest3First)
+                                                        {
+                                                            tier = 3;
+                                                            chest3First = false;
+                                                        }
+                                                    }
+                                                    else if (64 < timeLimitSeconds)　//1:04までは70%ティア2、30%ティア3
+                                                    {
+                                                        tier = 2;
+                                                        System.Random random = new System.Random();
+                                                        int rand = random.Next(0, 99); //0~100
+                                                        if (rand < 30) tier = 3;
+                                                    }
+                                                    else //最後の1分は50%ティア2、50%ティア3
+                                                    {
+                                                        tier = 2;
+                                                        System.Random random = new System.Random();
+                                                        int rand = random.Next(0, 99); //0~100
+                                                        if (rand < 50) tier = 3;
+                                                    }
+
                                                     //まずサーバー側のシーンで
                                                     entityID = GetUniqueEntityID(); //エンティティID生成
                                                     Vector3 chestPos = MapGenerator.instance.GetUniqueChestPointRandomly(); //座標決め
-                                                    chest = Instantiate(ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>(); //ここ1つ外のスコープの変数chestを使ってるけど様子見なので問題ないかと
+                                                    switch (tier)
+                                                    {
+                                                        case 1:
+                                                            chest = Instantiate(ChestPrefab, chestPos, Quaternion.identity).GetComponent<Chest>();
+                                                            chest.Tier = 1; //レア度1
+                                                            break;
+                                                        case 2:
+                                                            chest = Instantiate(Chest2Prefab, chestPos, Quaternion.identity).GetComponent<Chest>();
+                                                            chest.Tier = 2; //レア度2
+                                                            break;
+                                                        case 3:
+                                                            chest = Instantiate(Chest3Prefab, chestPos, Quaternion.identity).GetComponent<Chest>();
+                                                            chest.Tier = 3; //レア度3
+                                                            break;
+                                                    }
                                                     chest.EntityID = entityID; //ID書き込み
-                                                    chest.Tier = 1; //レア度はまだ適当に1
-                                                    chest.gameObject.name = $"Chest ({entityID})";
+                                                    chest.gameObject.name = $"Chest (Tier{tier}) ({entityID})";
                                                     entityDictionary.Add(entityID, chest); //辞書に登録
 
                                                     //ティア（１）と座標を指定して、宝箱を生成する命令
-                                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, 1, chestPos);
+                                                    myActionPacket = new ActionPacket((byte)Definer.RID.EXE, (byte)Definer.EDID.SPAWN_CHEST, entityID, tier, chestPos);
                                                     myHeader = new Header(serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
                                                     udpGameServer.Send(myHeader.ToByte());
 
@@ -1170,7 +1370,7 @@ public class GameServerManager : MonoBehaviour
         foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
         {
             if (k.Value.Gold > topGold)
-            { 
+            {
                 topPlayerID = k.Key;
                 topGold = k.Value.Gold;
             }
@@ -1199,7 +1399,7 @@ public class GameServerManager : MonoBehaviour
 
         return ret;
     }
-    
+
     private void OnDestroy()
     {
         //稼働中なら切断パケット

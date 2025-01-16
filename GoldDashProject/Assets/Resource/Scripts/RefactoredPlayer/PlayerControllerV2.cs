@@ -548,6 +548,10 @@ public class PlayerControllerV2 : MonoBehaviour
             //STEP_B モーションを再生しよう
             m_playerAnimationController.SetAnimationFromState(this.State);
 
+            //STEP_X メッセージとSEを鳴らそう
+            m_messageDisplayer.DisplayLargeMessage("雷に撃たれた！", 2);
+            SEPlayer.instance.PlaySEParayzed();
+
             //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
         }
@@ -826,6 +830,10 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
             case "Thunder":
                 //痺れたことをパケット送信
+                myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.STUNNED);
+                myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
+                //スタン状態になる
                 this.State = PLAYER_STATE.STUNNED;
                 break;
             default:
@@ -843,21 +851,8 @@ public class PlayerControllerV2 : MonoBehaviour
         m_messageDisplayer.DisplayLargeMessage(msg, time);
     }
 
-    private void OnTriggerStay(Collider other)
-    {
-        switch (other.tag)
-        {
-            case "Thunder":
-                //痺れたことをパケット送信
-                ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.STUNNED);
-                Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-                UdpGameClient.Send(myHeader.ToByte());
-                //スタン状態になる
-                this.State = PLAYER_STATE.STUNNED;
-                m_messageDisplayer.DisplayLargeMessage("雷に撃たれた！", 2);
-                break;
-            default:
-                break;
-        }
+    public void EndGame()
+    { 
+        this.State = PLAYER_STATE.UNCONTROLLABLE;
     }
 }

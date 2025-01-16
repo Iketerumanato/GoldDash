@@ -8,6 +8,7 @@ using System.Threading;
 using TMPro;
 using UnityEngine.UI;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public class GameClientManager : MonoBehaviour
 {
@@ -40,6 +41,8 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private GameObject GoldPilePrefab; //金貨の山のプレハブ
     [SerializeField] private GameObject GoldPileMiniPrefab; //小金貨の山のプレハブ
     [SerializeField] private GameObject ChestPrefab; //宝箱のプレハブ
+    [SerializeField] private GameObject Chest2Prefab; //宝箱ティア2のプレハブ
+    [SerializeField] private GameObject Chest3Prefab; //宝箱ティア3のプレハブ
     [SerializeField] private GameObject ScrollPrefab; //巻物のプレハブ
     [SerializeField] private GameObject ThunderPrefab; //雷のプレハブ
 
@@ -83,6 +86,14 @@ public class GameClientManager : MonoBehaviour
     [SerializeField] private Button TouchToStartButton;
     [SerializeField] private Button BackButton;
     [SerializeField] private Button ConnectButton;
+
+    //タイトルロゴアニメーション用
+    private Sequence TitleLogoAnimatoin;
+    [SerializeField] RectTransform TitleLogoImageTransform;
+
+    //プロセッシングロゴアニメーション用
+    Sequence CenterLogoAnimation;
+    [SerializeField] RectTransform CenterLogoImageTransform;
     #endregion
 
     #region Stateインターフェース
@@ -105,11 +116,21 @@ public class GameClientManager : MonoBehaviour
     {
         public void EnterState(GameClientManager gameClientManager)
         {
+            gameClientManager.TouchToStartButton.interactable = false;
+            //フェードイン
+            gameClientManager.blackImage.DOFade(0f, 0.3f).OnComplete(()=>
+            {
+                gameClientManager.TouchToStartButton.interactable = true;
+            });
+
             //必要なUI出す
             gameClientManager.Phase0UniqueUI.SetActive(true);
             //テキスト変える
             gameClientManager.upperTextBox.text = "";
             gameClientManager.centerTextBox.text = "";
+            //回転ロゴの角度リセット
+            gameClientManager.TitleLogoImageTransform.rotation = Quaternion.Euler(0f, 0f, 5.2f);
+            gameClientManager.CenterLogoImageTransform.rotation = Quaternion.identity;
         }
 
         public void UpdateProcess(GameClientManager gameClientManager)
@@ -175,6 +196,8 @@ public class GameClientManager : MonoBehaviour
         {
             //不要なUI消す
             gameClientManager.processingLogo.SetActive(false);
+            //アニメーション止める
+            gameClientManager.CenterLogoAnimation.Kill();
         }
     }
 
@@ -219,24 +242,44 @@ public class GameClientManager : MonoBehaviour
         MapGenerator.instance.GenerateMapForClient();
 
         //各種ボタンに関数を設定
-        TouchToStartButton.OnClickAsObservable().Subscribe(_ => 
+        TouchToStartButton.OnClickAsObservable().Subscribe(_ =>
         {
+            TouchToStartButton.interactable = false;
+            BackButton.interactable = true;
+
+            SEPlayer.instance.PlaySETouchToStart();
+            //ロゴアニメーション
+            TitleLogoAnimatoin = DOTween.Sequence();
+            TitleLogoAnimatoin
+            .Append(TitleLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 432f), 0.6f, RotateMode.FastBeyond360).SetEase(Ease.OutQuad));
+
             blackImage.DOFade(1f, 0.3f).OnComplete(() =>
             {
                 ChangeClientState(new Phase1State());
                 blackImage.DOFade(0f, 0.3f);
             });
         });
-        BackButton.OnClickAsObservable().Subscribe(_ => 
+        BackButton.OnClickAsObservable().Subscribe(_ =>
         {
+            BackButton.interactable = false;
+            SEPlayer.instance.PlaySEButton();
             blackImage.DOFade(1f, 0.3f).OnComplete(() =>
             {
                 ChangeClientState(new Phase0State());
-                blackImage.DOFade(0f, 0.3f);
             });
         });
-        ConnectButton.OnClickAsObservable().Subscribe(_ => 
+        ConnectButton.OnClickAsObservable().Subscribe(_ =>
         {
+            ConnectButton.interactable = false;
+            SEPlayer.instance.PlaySEButton();
+
+            //ロゴアニメーション
+            CenterLogoAnimation = DOTween.Sequence();
+            CenterLogoAnimation.Append(CenterLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 360f), 1.3f, RotateMode.FastBeyond360).SetEase(Ease.InOutBack))//InOutBackを付けつつ一回目の回転
+                .SetDelay(0.3f)//少し待機
+                .Append(CenterLogoImageTransform.DOLocalRotate(new Vector3(0f, 0f, 360f), 1.5f, RotateMode.FastBeyond360).SetEase(Ease.OutBack))//InOutBackでの回転速度に追いつくためOutBackで２回目の回転
+                .SetLoops(-1);//無限ループ
+
             blackImage.DOFade(1f, 0.3f).OnComplete(async () =>
             {
                 ChangeClientState(new Phase2State());
@@ -362,6 +405,18 @@ public class GameClientManager : MonoBehaviour
                                             ChangeClientState(new NormalState());
                                             break;
                                         case (byte)Definer.NDID.EDG:
+                                            playerController.DisplayLargeMessage("終了！！", 2);
+                                            playerController.EndGame();
+
+                                            blackImage.DOFade(1f, 1f).OnComplete(async () =>
+                                            {
+                                                await UniTask.Delay(37000);
+
+                                                Debug.Log("終了");
+                                                DOTween.KillAll();
+                                                DOTween.Clear(true);
+                                                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                                            });
                                             break;
                                         case (byte)Definer.NDID.ALLOW_MAGIC:
                                             if (receivedActionPacket.targetID == sessionID) //自分に向けた許可なら
@@ -514,11 +569,36 @@ public class GameClientManager : MonoBehaviour
                                             //オブジェクトを生成しつつ、エンティティのコンポーネントを取得
                                             //chestという変数名をここでだけ使いたいのでブロック文でスコープ分け
                                             {
-                                                Chest chest = Instantiate(ChestPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
+                                                Chest chest;
+                                                switch (receivedActionPacket.value)
+                                                {
+                                                    case 1:
+                                                        chest = Instantiate(ChestPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
+                                                        chest.Tier = 1; //レア度1
+                                                        break;
+                                                    case 2:
+                                                        chest = Instantiate(Chest2Prefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
+                                                        chest.Tier = 2; //レア度2
+                                                        break;
+                                                    case 3:
+                                                        chest = Instantiate(Chest3Prefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
+                                                        chest.Tier = 3; //レア度3
+                                                        break;
+                                                    default :
+                                                        chest = Instantiate(ChestPrefab, receivedActionPacket.pos, Quaternion.identity).GetComponent<Chest>();
+                                                        chest.Tier = 1; //レア度1
+                                                        break;
+                                                }
+
                                                 entityDictionary.Add(receivedActionPacket.targetID, chest); //管理用のIDと共に辞書へ
                                                 chest.EntityID = receivedActionPacket.targetID; //ID割り当て
-                                                chest.Tier = receivedActionPacket.value; //金額設定
+                                                chest.Tier = receivedActionPacket.value; //レア度設定
                                                 chest.name = $"Chest ({receivedActionPacket.targetID})";
+
+                                                if (chest.Tier == 3)
+                                                {
+                                                    playerController.DisplaySmallMessage("お金の匂いがする…！");
+                                                }
                                             }
                                             break;
                                         case (byte)Definer.EDID.SPAWN_SCROLL:

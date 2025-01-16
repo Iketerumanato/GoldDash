@@ -10,6 +10,17 @@ public class SEPlayer : MonoBehaviour
     //再生用コンポーネント
     public AudioSource audioSource;
 
+    public AudioSource titleBGMPlayer;
+    public AudioSource mainBGMPlayer;
+    public AudioSource resultdrumrollBGMPlayer;
+    public AudioSource resultBGMPlayer;
+
+    [Header("ボタンが押されたときのSE")]
+    [SerializeField] private AudioClip seButton;
+
+    [Header("タイトル画面でタッチしたときのSE")]
+    [SerializeField] private AudioClip seTouchToStart;
+
     [Header("パンチが外れたときのSE")]
     [SerializeField] private AudioClip sePunchMiss;
 
@@ -37,29 +48,56 @@ public class SEPlayer : MonoBehaviour
     [Header("宝箱が開いた時のSE")]
     [SerializeField] private AudioClip seOpenChest;
 
+    [Header("宝物の鍵5段階")]
+    [SerializeField] private AudioClip seUnlock1;
+    [SerializeField] private AudioClip seUnlock2;
+    [SerializeField] private AudioClip seUnlock3;
+    [SerializeField] private AudioClip seUnlock4;
+    [SerializeField] private AudioClip seUnlock5;
+
+    [Header("雷に撃たれたときのSE")]
+    [SerializeField] private AudioClip seParalysed;
+
+    //以下サーバー専用
     [Header("雷が落ちた時のSE")]
     [SerializeField] private AudioClip seThunder;
 
     [Header("ダッシュが発動したときのSE")]
     [SerializeField] private AudioClip seDash;
-    
+
     [Header("誰かがワープしたときのSE")]
     [SerializeField] private AudioClip seWarp;
 
-    private void Start()
+    [Header("誰かがログインしたときのSE4種")]
+    [SerializeField] private AudioClip seLogInRed;
+    [SerializeField] private AudioClip seLogInBlue;
+    [SerializeField] private AudioClip seLogInGreen;
+    [SerializeField] private AudioClip seLogInYellow;
+
+    [Header("地図が生成されたときのSE")]
+    [SerializeField] private AudioClip seGenerateCell;
+
+    [Header("以下リザルト用のSE")]
+    [SerializeField] private AudioClip resultBoomSE;
+    [SerializeField] private AudioClip resultClapSE;
+
+    private void Awake()
     {
         //シングルトンな静的変数の初期化
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        instance = this;
 
         //コンポーネント取得
         audioSource = GetComponent<AudioSource>();
+    }
+
+    public void PlaySEButton()
+    {
+        audioSource.PlayOneShot(seButton);
+    }
+
+    public void PlaySETouchToStart()
+    {
+        audioSource.PlayOneShot(seTouchToStart);
     }
 
     public void PlaySEPunchMiss()
@@ -107,6 +145,37 @@ public class SEPlayer : MonoBehaviour
         audioSource.PlayOneShot(seOpenChest);
     }
 
+    public void PlaySEUnlock1()
+    {
+        audioSource.PlayOneShot(seUnlock1);
+    }
+
+    public void PlaySEUnlock2()
+    {
+        audioSource.PlayOneShot(seUnlock2);
+    }
+
+    public void PlaySEUnlock3()
+    {
+        audioSource.PlayOneShot(seUnlock3);
+    }
+
+    public void PlaySEUnlock4()
+    {
+        audioSource.PlayOneShot(seUnlock4);
+    }
+
+    public void PlaySEUnlock5()
+    {
+        audioSource.PlayOneShot(seUnlock5);
+    }
+
+    public void PlaySEParayzed()
+    {
+        audioSource.PlayOneShot(seParalysed);
+    }
+
+    //以下サーバー用
     public void PlaySEThunder()
     {
         audioSource.PlayOneShot(seThunder);
@@ -120,5 +189,41 @@ public class SEPlayer : MonoBehaviour
     public void PlaySEWarp()
     {
         audioSource.PlayOneShot(seWarp);
+    }
+
+    public void PlaySELoginRed()
+    {
+        audioSource.PlayOneShot(seLogInRed);
+    }
+
+    public void PlaySELoginBlue()
+    {
+        audioSource.PlayOneShot(seLogInBlue);
+    }
+
+    public void PlaySELoginGreen()
+    {
+        audioSource.PlayOneShot(seLogInGreen);
+    }
+
+    public void PlaySELoginYellow()
+    {
+        audioSource.PlayOneShot(seLogInYellow);
+    }
+
+    public void PlaySEGenerateCell()
+    {
+        audioSource.PlayOneShot(seGenerateCell);
+    }
+
+    //リザルトで再生させる用のSEの再生処理
+    public void PlayResultBoomSE()
+    {
+        audioSource.PlayOneShot(resultBoomSE);
+    }
+
+    public void PlayResultClapSE()
+    {
+        audioSource.PlayOneShot(resultClapSE);
     }
 }
