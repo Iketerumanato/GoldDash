@@ -58,6 +58,18 @@ public class SEPlayer : MonoBehaviour
     [Header("雷に撃たれたときのSE")]
     [SerializeField] private AudioClip seParalysed;
 
+    [Header("巻物を開いたときのSE")]
+    [SerializeField] private AudioClip seOpenScroll;
+
+    [Header("巻物を閉じたときのSE")]
+    [SerializeField] private AudioClip seCloseScroll;
+
+    [Header("魔法を使うボタンを押したときのSE")]
+    [SerializeField] private AudioClip seUseMagic;
+
+    [Header("魔法を使えなかったときのSE")]
+    [SerializeField] private AudioClip seCanNotUseMagic;
+
     //以下サーバー専用
     [Header("雷が落ちた時のSE")]
     [SerializeField] private AudioClip seThunder;
