@@ -441,6 +441,9 @@ public class PlayerControllerV2 : MonoBehaviour
             Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             UdpGameClient.Send(myHeader.ToByte());
 
+            //SE
+            SEPlayer.instance.PlaySEOpenScroll();
+
             //STEP_C 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;
         }
@@ -461,6 +464,8 @@ public class PlayerControllerV2 : MonoBehaviour
         if(interactInfo.interactType == INTERACT_TYPE.MAGIC_CANCEL)
         {
             this.State = PLAYER_STATE.NORMAL;
+            //SE
+            SEPlayer.instance.PlaySECloseScroll();
         }
     }
 
@@ -750,6 +755,8 @@ public class PlayerControllerV2 : MonoBehaviour
             default :
                 this.State = PLAYER_STATE.WAITING_MAP_ACTION;
                 m_messageDisplayer.DisplayLargeMessage("<size=120>地図をタッチしよう！</size>", 2);
+                //SE
+                SEPlayer.instance.PlaySEUseMagic();
                 break;
         }
     }
@@ -760,6 +767,8 @@ public class PlayerControllerV2 : MonoBehaviour
         //メッセージなど出す
         this.State = PLAYER_STATE.NORMAL;
         m_messageDisplayer.DisplayLargeMessage("<size=120>他の人が地図を使用中…</size>", 2);
+        //SE
+        SEPlayer.instance.PlaySECanNotUseMagic();
     }
 
     public void EndUsingMagicSuccessfully()

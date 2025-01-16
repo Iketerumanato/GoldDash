@@ -187,6 +187,27 @@ public class SEPlayer : MonoBehaviour
         audioSource.PlayOneShot(seParalysed);
     }
 
+    public void PlaySEOpenScroll()
+    {
+        audioSource.PlayOneShot(seOpenScroll);
+    }
+
+    public void PlaySECloseScroll()
+    {
+        audioSource.PlayOneShot(seCloseScroll);
+    }
+
+    public void PlaySEUseMagic()
+    {
+        audioSource.PlayOneShot(seUseMagic);
+
+    }
+
+    public void PlaySECanNotUseMagic()
+    {
+        audioSource.PlayOneShot(seCanNotUseMagic);
+    }
+
     //以下サーバー用
     public void PlaySEThunder()
     {
