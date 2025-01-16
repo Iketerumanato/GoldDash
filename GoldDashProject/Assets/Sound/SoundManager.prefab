@@ -144,6 +144,8 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   titleBGMPlayer: {fileID: 0}
   mainBGMPlayer: {fileID: 0}
+  resultdrumrollBGMPlayer: {fileID: 0}
+  resultBGMPlayer: {fileID: 0}
   seButton: {fileID: 8300000, guid: 6402a66a84a0efb4f9f81053bc766a23, type: 3}
   seTouchToStart: {fileID: 8300000, guid: 7757ac7a3cf82bf4fb7649fea3d724c5, type: 3}
   sePunchMiss: {fileID: 8300000, guid: eccc933a238f7f34bb04cd7396dd5b42, type: 3}
@@ -161,6 +163,10 @@ MonoBehaviour:
   seUnlock4: {fileID: 8300000, guid: 49c64376d0d798344b45f7e82049ae31, type: 3}
   seUnlock5: {fileID: 8300000, guid: 3db9d10ff3041af4d82b7e9d1b128367, type: 3}
   seParalysed: {fileID: 8300000, guid: 9e733c5dc167554408c9d882c27d52b2, type: 3}
+  seOpenScroll: {fileID: 8300000, guid: 40e6e4288e37a0d42aa6a3ec9bee7e24, type: 3}
+  seCloseScroll: {fileID: 8300000, guid: 9ed3a0f500844b84a8a3d37ef0238551, type: 3}
+  seUseMagic: {fileID: 8300000, guid: 240e5433a523ce943ba1f808e63fb4f8, type: 3}
+  seCanNotUseMagic: {fileID: 8300000, guid: f61f18302c5ba4349a4a2b69e42e2d21, type: 3}
   seThunder: {fileID: 8300000, guid: 32b7fce5001273548b5bf3bdf5deddc4, type: 3}
   seDash: {fileID: 8300000, guid: e0df3aaee44cfd04b8350de273a90f16, type: 3}
   seWarp: {fileID: 8300000, guid: 0c244193b763e7947a3f6758e027f75d, type: 3}
@@ -169,3 +175,5 @@ MonoBehaviour:
   seLogInGreen: {fileID: 8300000, guid: 30d132c02a3f97d4d83457ec2d2f8c06, type: 3}
   seLogInYellow: {fileID: 8300000, guid: 5b6481e5e4816bd45b25cc96873e0387, type: 3}
   seGenerateCell: {fileID: 8300000, guid: 9e15448b98ac7004788463287ce13198, type: 3}
+  resultBoomSE: {fileID: 8300000, guid: 5a5cbd258b633c4429263440ae478167, type: 3}
+  resultClapSE: {fileID: 8300000, guid: 8da31a4004ae6294a83d2c10aa140f8b, type: 3}
