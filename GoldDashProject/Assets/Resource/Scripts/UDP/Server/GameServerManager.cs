@@ -348,18 +348,43 @@ public class GameServerManager : MonoBehaviour
                 k.Value.gameObject.SetActive(true);
             }
 
-
-            SEPlayer.instance.mainBGMPlayer.Play();
-
-            await UniTask.Delay(3000);
-
-            //ゲーム開始
-            gameServerManager.inGame = true;
-
             //ゲーム開始命令を送る
             myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
             myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            await UniTask.Delay(1000);
+
+            SEPlayer.instance.mainBGMPlayer.Play();
+
+            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, value: 2, msg: "3");
+            myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            await UniTask.Delay(1000);
+
+            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, value: 2, msg: "2");
+            myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            await UniTask.Delay(1000);
+
+            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, value: 2, msg: "1");
+            myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            await UniTask.Delay(1000);
+
+            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, value: 1, msg: "スタート！");
+            myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.ALLOW_MOVE);
+            myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            //ゲーム開始
+            gameServerManager.inGame = true;
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)

@@ -860,8 +860,13 @@ public class PlayerControllerV2 : MonoBehaviour
         m_messageDisplayer.DisplayLargeMessage(msg, time);
     }
 
-    public void EndGame()
+    public void BeUncontrollable()
     { 
         this.State = PLAYER_STATE.UNCONTROLLABLE;
+    }
+    
+    public void BeControllable()
+    { 
+        this.State = PLAYER_STATE.NORMAL;
     }
 }

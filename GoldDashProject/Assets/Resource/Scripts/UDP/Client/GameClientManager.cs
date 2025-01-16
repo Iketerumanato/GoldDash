@@ -394,6 +394,9 @@ public class GameClientManager : MonoBehaviour
                                             //ClientInternalSubject.OnNext(CLIENT_INTERNAL_EVENT.COMM_ERROR_FATAL); //予期せずサーバーから切断された場合エラーを出す
                                             break;
                                         case (byte)Definer.NDID.STG:
+                                            //コントロールできないようにする
+                                            playerController.BeUncontrollable();
+
                                             //ここでプレイヤーを有効化してゲーム開始
                                             //全アクターの有効化
                                             foreach (KeyValuePair<ushort, ActorController> k in actorDictionary)
@@ -404,9 +407,12 @@ public class GameClientManager : MonoBehaviour
 
                                             ChangeClientState(new NormalState());
                                             break;
+                                        case (byte)Definer.NDID.ALLOW_MOVE:
+                                            playerController.BeControllable();
+                                            break;
                                         case (byte)Definer.NDID.EDG:
                                             playerController.DisplayLargeMessage("終了！！", 2);
-                                            playerController.EndGame();
+                                            playerController.BeUncontrollable();
 
                                             blackImage.DOFade(1f, 1f).OnComplete(async () =>
                                             {
