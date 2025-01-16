@@ -445,8 +445,12 @@ public class GameServerManager : MonoBehaviour
 
                             switch (hit.collider.gameObject.tag)
                             {
-                                case "Floor": //床にタッチしたら雷落とす
-                                              //！あぶない！　ここで雷を生成すると最悪entityDictionaryが別スレッドの処理とぶつかってデッドロックして世界が終わるよ
+                                case "Wall":
+                                    //何もさせない
+                                    break;
+
+                                default: //床にタッチしたら雷落とす
+                                         //！あぶない！　ここで雷を生成すると最悪entityDictionaryが別スレッドの処理とぶつかってデッドロックして世界が終わるよ
                                     ActionPacket myActionPacket; //いったい何をするの！？
                                     Header myHeader; //パケットの送信はメインスレッドでやらないことにしてるよね！？大丈夫！？
 
@@ -475,8 +479,6 @@ public class GameServerManager : MonoBehaviour
 
                                     gameServerManager.ChangeServerState(new NormalState()); //雷を落としたらノーマルステートに戻る
                                     break;
-                                default:
-                                    break;
                             }
                         }
                     }
@@ -495,7 +497,12 @@ public class GameServerManager : MonoBehaviour
 
                             switch (hit.collider.gameObject.tag)
                             {
-                                case "Floor": //床にタッチしたら転移
+
+                                case "Wall":
+                                    //何もさせない
+                                    break;
+
+                                default: //床にタッチしたら転移
                                     ActionPacket myActionPacket;
                                     Header myHeader;
 
@@ -515,8 +522,6 @@ public class GameServerManager : MonoBehaviour
                                     SEPlayer.instance.PlaySEWarp();
 
                                     gameServerManager.ChangeServerState(new NormalState()); //転移先を指定したらノーマルステートに戻る
-                                    break;
-                                default:
                                     break;
                             }
                         }
@@ -594,17 +599,18 @@ public class GameServerManager : MonoBehaviour
             });
         });
 
-        //親(背景の画像)のRectTransformを取得
+        //親(背景の画像)のRectTransformを取得(赤)
         redArrowIconPos = redArrow.transform.parent.GetComponent<RectTransform>();
         //初期位置の記録
         originRedArrowPos = redArrowIconPos.position;
 
+        //青
         blueArrowIconPos = blueArrow.transform.parent.GetComponent<RectTransform>();
         originBlueArrowPos = blueArrowIconPos.position;
-
+        //緑
         greenArrowIconPos = greenArrow.transform.parent.GetComponent<RectTransform>();
         originGreenArrowPos = greenArrowIconPos.position;
-
+        //黄
         yellowArrowIconPos = yellowArrow.transform.parent.GetComponent<RectTransform>();
         originYellowArrowPos = yellowArrowIconPos.position;
     }

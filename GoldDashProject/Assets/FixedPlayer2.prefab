@@ -9144,7 +9144,7 @@ MonoBehaviour:
   m_playerCamera: {fileID: 3975254240555154285}
   m_shakeEffect: {fileID: 3349987261013257695}
   m_cameraMoveSpeed: 180
-  m_camRotateLimitX: 90
+  m_camRotateLimitX: 45
 --- !u!114 &2124854647343611678
 MonoBehaviour:
   m_ObjectHideFlags: 0
