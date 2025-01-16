@@ -424,6 +424,21 @@ public class GameServerManager : MonoBehaviour
             gameServerManager.isAwaitingMagic = true;
             gameServerManager.awaitingMagicID = magicID;
             gameServerManager.magicUserID = magicUserID;
+
+            Color backColor = Color.black;
+
+            //背景色変更
+            switch (magicID)
+            {
+                case Definer.MID.THUNDER:
+                    ColorUtility.TryParseHtmlString("#3BEDFF", out backColor);
+                    break;
+                case Definer.MID.TELEPORT:
+                    ColorUtility.TryParseHtmlString("#36AD47", out backColor);
+                    break;
+            }
+
+            gameServerManager.mapCamera.DOColor(backColor, 0.3f);
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
@@ -535,6 +550,9 @@ public class GameServerManager : MonoBehaviour
         public void ExitState(GameServerManager gameServerManager)
         {
             gameServerManager.isAwaitingMagic = false;
+
+            //背景色変更
+            gameServerManager.mapCamera.DOColor(Color.black, 0.3f);
         }
     }
     #endregion
