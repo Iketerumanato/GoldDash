@@ -111,34 +111,8 @@ public class ActorController : MonoBehaviour
     private void Update()
     {
         if (!isPlayer) UpdateForEnemy();
-        CheckBagSituation();
-        CheckSmallScrollSituation();
-
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            smallscrollNum++;
-            Debug.Log("scrollNum =>" + smallscrollNum);
-        }
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            smallscrollNum--;
-            Debug.Log("scrollNum =>" + smallscrollNum);
-        }
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            Gold = 200;
-            Debug.Log("Gold =>" + Gold);
-        }
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            Gold = 600;
-            Debug.Log("Gold =>" + Gold);
-        }
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            Gold = 2500;
-            Debug.Log("Gold =>" + Gold);
-        }
+        CheckBagSituation();//所持金のチェック
+        CheckSmallScrollSituation();//魔法の所持数のチェック
     }
 
 
