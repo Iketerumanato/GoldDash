@@ -76,6 +76,10 @@ public static class Definer
         /// </summary>
         PSG,
         /// <summary>
+        /// プレイヤーに動く許可を出す
+        /// </summary>
+        ALLOW_MOVE,
+        /// <summary>
         /// 通信を切断します。
         /// </summary>
         DISCONNECT,

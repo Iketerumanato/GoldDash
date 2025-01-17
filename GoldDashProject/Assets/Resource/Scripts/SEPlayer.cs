@@ -58,7 +58,25 @@ public class SEPlayer : MonoBehaviour
     [Header("雷に撃たれたときのSE")]
     [SerializeField] private AudioClip seParalysed;
 
+    [Header("巻物を開いたときのSE")]
+    [SerializeField] private AudioClip seOpenScroll;
+
+    [Header("巻物を閉じたときのSE")]
+    [SerializeField] private AudioClip seCloseScroll;
+
+    [Header("魔法を使うボタンを押したときのSE")]
+    [SerializeField] private AudioClip seUseMagic;
+
+    [Header("魔法を使えなかったときのSE")]
+    [SerializeField] private AudioClip seCanNotUseMagic;
+
     //以下サーバー専用
+    [Header("カウントダウンSE")]
+    [SerializeField] private AudioClip seCountDown3;
+    [SerializeField] private AudioClip seCountDown2;
+    [SerializeField] private AudioClip seCountDown1;
+    [SerializeField] private AudioClip seCountDown0;
+
     [Header("雷が落ちた時のSE")]
     [SerializeField] private AudioClip seThunder;
 
@@ -175,7 +193,48 @@ public class SEPlayer : MonoBehaviour
         audioSource.PlayOneShot(seParalysed);
     }
 
+    public void PlaySEOpenScroll()
+    {
+        audioSource.PlayOneShot(seOpenScroll);
+    }
+
+    public void PlaySECloseScroll()
+    {
+        audioSource.PlayOneShot(seCloseScroll);
+    }
+
+    public void PlaySEUseMagic()
+    {
+        audioSource.PlayOneShot(seUseMagic);
+
+    }
+
+    public void PlaySECanNotUseMagic()
+    {
+        audioSource.PlayOneShot(seCanNotUseMagic);
+    }
+
     //以下サーバー用
+    public void PlaySECountDown3()
+    {
+        audioSource.PlayOneShot(seCountDown3);
+    }
+    
+    public void PlaySECountDown2()
+    {
+        audioSource.PlayOneShot(seCountDown2);
+    }
+    
+    public void PlaySECountDown1()
+    {
+        audioSource.PlayOneShot(seCountDown1);
+    }
+    
+    public void PlaySECountDown0()
+    {
+        audioSource.PlayOneShot(seCountDown0);
+    }
+
     public void PlaySEThunder()
     {
         audioSource.PlayOneShot(seThunder);

@@ -348,18 +348,51 @@ public class GameServerManager : MonoBehaviour
                 k.Value.gameObject.SetActive(true);
             }
 
-
-            SEPlayer.instance.mainBGMPlayer.Play();
-
-            await UniTask.Delay(3000);
-
-            //ゲーム開始
-            gameServerManager.inGame = true;
-
             //ゲーム開始命令を送る
             myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.STG);
             myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            await UniTask.Delay(1000);
+
+            SEPlayer.instance.mainBGMPlayer.Play();
+
+            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, value: 2, msg: "3");
+            myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            SEPlayer.instance.PlaySECountDown3();
+
+            await UniTask.Delay(1000);
+
+            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, value: 2, msg: "2");
+            myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            SEPlayer.instance.PlaySECountDown2();
+
+            await UniTask.Delay(1000);
+
+            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, value: 2, msg: "1");
+            myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            SEPlayer.instance.PlaySECountDown1();
+
+            await UniTask.Delay(1000);
+
+            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.DISPLAY_LARGE_MSG, value: 1, msg: "スタート！");
+            myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            myActionPacket = new ActionPacket((byte)Definer.RID.NOT, (byte)Definer.NDID.ALLOW_MOVE);
+            myHeader = new Header(gameServerManager.serverSessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+            gameServerManager.udpGameServer.Send(myHeader.ToByte());
+
+            SEPlayer.instance.PlaySECountDown0();
+
+            //ゲーム開始
+            gameServerManager.inGame = true;
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
@@ -424,6 +457,21 @@ public class GameServerManager : MonoBehaviour
             gameServerManager.isAwaitingMagic = true;
             gameServerManager.awaitingMagicID = magicID;
             gameServerManager.magicUserID = magicUserID;
+
+            Color backColor = Color.black;
+
+            //背景色変更
+            switch (magicID)
+            {
+                case Definer.MID.THUNDER:
+                    ColorUtility.TryParseHtmlString("#3BEDFF", out backColor);
+                    break;
+                case Definer.MID.TELEPORT:
+                    ColorUtility.TryParseHtmlString("#36AD47", out backColor);
+                    break;
+            }
+
+            gameServerManager.mapCamera.DOColor(backColor, 0.3f);
         }
 
         public void UpdateProcess(GameServerManager gameServerManager)
@@ -445,8 +493,12 @@ public class GameServerManager : MonoBehaviour
 
                             switch (hit.collider.gameObject.tag)
                             {
-                                case "Floor": //床にタッチしたら雷落とす
-                                              //！あぶない！　ここで雷を生成すると最悪entityDictionaryが別スレッドの処理とぶつかってデッドロックして世界が終わるよ
+                                case "Wall":
+                                    //何もさせない
+                                    break;
+
+                                default: //床にタッチしたら雷落とす
+                                         //！あぶない！　ここで雷を生成すると最悪entityDictionaryが別スレッドの処理とぶつかってデッドロックして世界が終わるよ
                                     ActionPacket myActionPacket; //いったい何をするの！？
                                     Header myHeader; //パケットの送信はメインスレッドでやらないことにしてるよね！？大丈夫！？
 
@@ -475,8 +527,6 @@ public class GameServerManager : MonoBehaviour
 
                                     gameServerManager.ChangeServerState(new NormalState()); //雷を落としたらノーマルステートに戻る
                                     break;
-                                default:
-                                    break;
                             }
                         }
                     }
@@ -495,7 +545,12 @@ public class GameServerManager : MonoBehaviour
 
                             switch (hit.collider.gameObject.tag)
                             {
-                                case "Floor": //床にタッチしたら転移
+
+                                case "Wall":
+                                    //何もさせない
+                                    break;
+
+                                default: //床にタッチしたら転移
                                     ActionPacket myActionPacket;
                                     Header myHeader;
 
@@ -516,8 +571,6 @@ public class GameServerManager : MonoBehaviour
 
                                     gameServerManager.ChangeServerState(new NormalState()); //転移先を指定したらノーマルステートに戻る
                                     break;
-                                default:
-                                    break;
                             }
                         }
                     }
@@ -530,6 +583,9 @@ public class GameServerManager : MonoBehaviour
         public void ExitState(GameServerManager gameServerManager)
         {
             gameServerManager.isAwaitingMagic = false;
+
+            //背景色変更
+            gameServerManager.mapCamera.DOColor(Color.black, 0.3f);
         }
     }
     #endregion
@@ -594,17 +650,18 @@ public class GameServerManager : MonoBehaviour
             });
         });
 
-        //親(背景の画像)のRectTransformを取得
+        //親(背景の画像)のRectTransformを取得(赤)
         redArrowIconPos = redArrow.transform.parent.GetComponent<RectTransform>();
         //初期位置の記録
         originRedArrowPos = redArrowIconPos.position;
 
+        //青
         blueArrowIconPos = blueArrow.transform.parent.GetComponent<RectTransform>();
         originBlueArrowPos = blueArrowIconPos.position;
-
+        //緑
         greenArrowIconPos = greenArrow.transform.parent.GetComponent<RectTransform>();
         originGreenArrowPos = greenArrowIconPos.position;
-
+        //黄
         yellowArrowIconPos = yellowArrow.transform.parent.GetComponent<RectTransform>();
         originYellowArrowPos = yellowArrowIconPos.position;
     }
