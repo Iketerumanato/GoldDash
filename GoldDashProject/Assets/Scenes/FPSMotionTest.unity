@@ -8899,6 +8899,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6129483391092967603, guid: 0ce77fba351586c41b12fa34affc55ee, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6129483391092967603, guid: 0ce77fba351586c41b12fa34affc55ee, type: 3}
+      propertyPath: ActorBags.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7195610210303648334, guid: 0ce77fba351586c41b12fa34affc55ee, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.78679323
@@ -8942,6 +8950,10 @@ PrefabInstance:
     - target: {fileID: 7534559491902339316, guid: 0ce77fba351586c41b12fa34affc55ee, type: 3}
       propertyPath: m_Name
       value: FixedPlayer2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7534559491902339316, guid: 0ce77fba351586c41b12fa34affc55ee, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11422,7 +11434,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3936357184850533443, guid: d4e8583889415c44bb5b1ba7aec8e34c, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3936357184850533443, guid: d4e8583889415c44bb5b1ba7aec8e34c, type: 3}
+      propertyPath: ActorBags.Array.size
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7224334418596570499, guid: d4e8583889415c44bb5b1ba7aec8e34c, type: 3}
       propertyPath: m_Name
