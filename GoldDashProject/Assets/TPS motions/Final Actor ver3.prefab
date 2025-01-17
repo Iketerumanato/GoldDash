@@ -1570,7 +1570,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8433630557544275090
 Transform:
   m_ObjectHideFlags: 0
@@ -3553,7 +3553,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7930891047113161409
 Transform:
   m_ObjectHideFlags: 0
@@ -4188,7 +4188,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5944600577424887206
 Transform:
   m_ObjectHideFlags: 0
@@ -6342,6 +6342,14 @@ MonoBehaviour:
   materialWhite: {fileID: 2100000, guid: 0a02aacf34f61b34ba6f4ec82ea0a8ed, type: 2}
   greenIcon: {fileID: 0}
   whiteIcon: {fileID: 0}
+  ActorBags:
+  - {fileID: 4690859943411081955}
+  - {fileID: 1133448802555523116}
+  - {fileID: 7995994519408066218}
+  ActorSmallScrolls:
+  - {fileID: 5096973973054907374}
+  - {fileID: 1565719735177034202}
+  - {fileID: 4364931515276360745}
 --- !u!95 &4173149760160408899
 Animator:
   serializedVersion: 5
@@ -7067,7 +7075,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1783674088669904103
 Transform:
   m_ObjectHideFlags: 0

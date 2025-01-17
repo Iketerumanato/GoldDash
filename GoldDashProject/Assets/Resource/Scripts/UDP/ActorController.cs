@@ -89,6 +89,17 @@ public class ActorController : MonoBehaviour
     [SerializeField] private GameObject greenIcon;
     [SerializeField] private GameObject whiteIcon;
 
+    [Header("表示非表示切り替えのオブジェクト一覧")]
+    [SerializeField] GameObject[] ActorBags;//小、中、大の順(所持金によって切り替わる)
+    [SerializeField] GameObject[] ActorSmallScrolls;//現在所持している巻物の数分アクター側で表示する
+
+    private int smallscrollNum = 0;
+    public int SmallScrollNum
+    {
+        set { if (0 <= value && value <= MAGIC_INVENTRY_MAX) smallscrollNum = value; }
+        get { return smallscrollNum; }
+    }
+
     private void Start()
     {
         //プレイヤーか否か確認する
@@ -100,6 +111,8 @@ public class ActorController : MonoBehaviour
     private void Update()
     {
         if (!isPlayer) UpdateForEnemy();
+        CheckBagSituation();//所持金のチェック
+        CheckSmallScrollSituation();//魔法の所持数のチェック
     }
 
 
@@ -129,7 +142,7 @@ public class ActorController : MonoBehaviour
     }
 
     public void Warp(Vector3 pos, Vector3 forward)
-    { 
+    {
         this.transform.position = pos;
         this.transform.forward = forward;
     }
@@ -160,7 +173,7 @@ public class ActorController : MonoBehaviour
     //スクロースの使用モーション再生※SetBoolでtrueになる前にあらかじめ非表示にしたスクロールのオブジェクトを表示してから再生
     public void PlayScrollAnimation()
     {
-        if(BigScroll == null) return;
+        if (BigScroll == null) return;
         BigScroll.SetActive(true);
         PlayerAnimator.SetBool(strScrollFlag, true);
     }
@@ -177,7 +190,7 @@ public class ActorController : MonoBehaviour
     {
         PlayerAnimator.SetBool(strStunnedFlag, true);
     }
-    
+
     public void EndStunAnimation()
     {
         PlayerAnimator.SetBool(strStunnedFlag, false);
@@ -221,11 +234,66 @@ public class ActorController : MonoBehaviour
     {
         m_skinnedMeshRenderer.material = materialWhite;
     }
-    
+
     //白に色変え　サーバー用
     public void ChangeGreenToWhiteServer()
     {
         greenIcon.SetActive(false);
         whiteIcon.SetActive(true);
+    }
+
+    //毎フレームGoldの値からバッグの外見を変えていくためのチェックを行う
+    void CheckBagSituation()
+    {
+        if (Gold < 500)
+        {
+            ActorBags[2].SetActive(false);//バッグ大
+            ActorBags[1].SetActive(false);//バッグ中
+            ActorBags[0].SetActive(true);//バッグ小
+        }
+
+        if (500 <= Gold && Gold < 2000)
+        {
+            ActorBags[2].SetActive(false);
+            ActorBags[1].SetActive(true);
+            ActorBags[0].SetActive(false);
+        }
+
+        if (2000 <= Gold)
+        {
+            ActorBags[2].SetActive(true);
+            ActorBags[1].SetActive(false);
+            ActorBags[0].SetActive(false);
+        }
+    }
+
+    //毎フレームスクロールの所持数のチェックをベルトについているスクロールで行う
+    void CheckSmallScrollSituation()
+    {
+        switch (SmallScrollNum)//仮のプロパティ
+        {
+            case 0:
+                ActorSmallScrolls[0].SetActive(false);
+                ActorSmallScrolls[1].SetActive(false);
+                ActorSmallScrolls[2].SetActive(false);
+                break;
+            case 1:
+                ActorSmallScrolls[0].SetActive(true);
+                ActorSmallScrolls[1].SetActive(false);
+                ActorSmallScrolls[2].SetActive(false);
+                break;
+            case 2:
+                ActorSmallScrolls[0].SetActive(true);
+                ActorSmallScrolls[1].SetActive(true);
+                ActorSmallScrolls[2].SetActive(false);
+                break;
+            case 3:
+                ActorSmallScrolls[0].SetActive(true);
+                ActorSmallScrolls[1].SetActive(true);
+                ActorSmallScrolls[2].SetActive(true);
+                break;
+            default:
+                break;
+        }
     }
 }
