@@ -873,4 +873,14 @@ public class PlayerControllerV2 : MonoBehaviour
     { 
         this.State = PLAYER_STATE.NORMAL;
     }
+
+    public void InterruptOpeningChest(ushort entityID)
+    {
+        if (this.State == PLAYER_STATE.OPENING_CHEST && entityID == m_currentChestID)
+        {
+            //今触っている宝箱が開錠されたら少し待ってステートロックを解除
+            UniTask.RunOnThreadPool(() => CountStateLockTime(1200, StateLockCt), cancellationToken: StateLockCt);
+            DisplaySmallMessage("誰かが先に宝箱を開けた！");
+        }
+    }
 }
