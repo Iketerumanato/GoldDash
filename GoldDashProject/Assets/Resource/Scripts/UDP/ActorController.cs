@@ -14,13 +14,32 @@ public class ActorController : MonoBehaviour
     //プロパティ
     public string PlayerName { set; get; }
     public ushort SessionID { set; get; } //MonoBehaviourからすると、いちいちDictionaryからIDを取るより目の前のアクターのIDを取得した方が速そうなので
-    public int Gold { set; get; } = 100; //所持金
+
+    private int gold = 100;//バッキン
+    public int Gold//所持金
+    {
+        set
+        {
+            gold = value;
+            CheckBagSituation(value);
+        }
+
+        get { return gold; }
+    }
+
     public Definer.PLAYER_COLOR Color { set; get; } //アクターの色
 
     private int magicInventry; //魔法の所持数。0より小さくならない。MAGIC_INVENTRY_MAXを越えて増えない。
     public int MagicInventry
     {
-        set { if (0 <= value && value <= MAGIC_INVENTRY_MAX) magicInventry = value; }
+        set
+        { 
+            if (0 <= value && value <= MAGIC_INVENTRY_MAX) 
+            { 
+                magicInventry = value;
+                CheckSmallScrollSituation(value);
+            }
+        }
         get { return magicInventry; }
     }
 
@@ -90,8 +109,15 @@ public class ActorController : MonoBehaviour
     [SerializeField] private GameObject whiteIcon;
 
     [Header("表示非表示切り替えのオブジェクト一覧")]
-    [SerializeField] GameObject[] ActorBags;//小、中、大の順(所持金によって切り替わる)
-    [SerializeField] GameObject[] ActorSmallScrolls;//現在所持している巻物の数分アクター側で表示する
+    //小、中、大の順(所持金によって切り替わる)
+    [SerializeField] GameObject ActorBigBag;
+    [SerializeField] GameObject ActorMiddleBag;
+    [SerializeField] GameObject ActorSmallBag;
+
+    //現在所持している巻物の数分アクター側で表示する
+    [SerializeField] GameObject ActorSmallScrollOne;
+    [SerializeField] GameObject ActorSmallScrollTwo;
+    [SerializeField] GameObject ActorSmallScrollThree;
 
     private int smallscrollNum = 0;
     public int SmallScrollNum
@@ -111,8 +137,7 @@ public class ActorController : MonoBehaviour
     private void Update()
     {
         if (!isPlayer) UpdateForEnemy();
-        CheckBagSituation();//所持金のチェック
-        CheckSmallScrollSituation();//魔法の所持数のチェック
+        //CheckSmallScrollSituation();//魔法の所持数のチェック
     }
 
 
@@ -243,54 +268,56 @@ public class ActorController : MonoBehaviour
     }
 
     //毎フレームGoldの値からバッグの外見を変えていくためのチェックを行う
-    void CheckBagSituation()
+    void CheckBagSituation(int gold)
     {
-        if (Gold < 500)
-        {
-            ActorBags[2].SetActive(false);//バッグ大
-            ActorBags[1].SetActive(false);//バッグ中
-            ActorBags[0].SetActive(true);//バッグ小
-        }
+        if (this == null) return;//nullなら早期リターン
 
-        if (500 <= Gold && Gold < 2000)
+        if (gold < 500)
         {
-            ActorBags[2].SetActive(false);
-            ActorBags[1].SetActive(true);
-            ActorBags[0].SetActive(false);
+            ActorBigBag.SetActive(false);//バッグ大
+            ActorMiddleBag.SetActive(false);//バッグ中
+            ActorSmallBag.SetActive(true);//バッグ小
         }
-
-        if (2000 <= Gold)
+        else if (500 <= gold && gold < 2000)
         {
-            ActorBags[2].SetActive(true);
-            ActorBags[1].SetActive(false);
-            ActorBags[0].SetActive(false);
+            ActorBigBag.SetActive(false);//バッグ大
+            ActorMiddleBag.SetActive(true);//バッグ中
+            ActorSmallBag.SetActive(false);//バッグ小
+        }
+        else if (2000 <= gold)
+        {
+            ActorBigBag.SetActive(true);//バッグ大
+            ActorMiddleBag.SetActive(false);//バッグ中
+            ActorSmallBag.SetActive(false);//バッグ小
         }
     }
 
     //毎フレームスクロールの所持数のチェックをベルトについているスクロールで行う
-    void CheckSmallScrollSituation()
+    void CheckSmallScrollSituation(int scrollNum)
     {
-        switch (SmallScrollNum)//仮のプロパティ
+        if (this == null) return;//nullなら早期リターン
+
+        switch (scrollNum)//仮のプロパティ
         {
             case 0:
-                ActorSmallScrolls[0].SetActive(false);
-                ActorSmallScrolls[1].SetActive(false);
-                ActorSmallScrolls[2].SetActive(false);
+                ActorSmallScrollOne.SetActive(false);
+                ActorSmallScrollTwo.SetActive(false);
+                ActorSmallScrollThree.SetActive(false);
                 break;
             case 1:
-                ActorSmallScrolls[0].SetActive(true);
-                ActorSmallScrolls[1].SetActive(false);
-                ActorSmallScrolls[2].SetActive(false);
+                ActorSmallScrollOne.SetActive(true);
+                ActorSmallScrollTwo.SetActive(false);
+                ActorSmallScrollThree.SetActive(false);
                 break;
             case 2:
-                ActorSmallScrolls[0].SetActive(true);
-                ActorSmallScrolls[1].SetActive(true);
-                ActorSmallScrolls[2].SetActive(false);
+                ActorSmallScrollOne.SetActive(true);
+                ActorSmallScrollTwo.SetActive(true);
+                ActorSmallScrollThree.SetActive(false);
                 break;
             case 3:
-                ActorSmallScrolls[0].SetActive(true);
-                ActorSmallScrolls[1].SetActive(true);
-                ActorSmallScrolls[2].SetActive(true);
+                ActorSmallScrollOne.SetActive(true);
+                ActorSmallScrollTwo.SetActive(true);
+                ActorSmallScrollThree.SetActive(true);
                 break;
             default:
                 break;

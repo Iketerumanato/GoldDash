@@ -6342,14 +6342,12 @@ MonoBehaviour:
   materialWhite: {fileID: 2100000, guid: 0a02aacf34f61b34ba6f4ec82ea0a8ed, type: 2}
   greenIcon: {fileID: 0}
   whiteIcon: {fileID: 0}
-  ActorBags:
-  - {fileID: 4690859943411081955}
-  - {fileID: 1133448802555523116}
-  - {fileID: 7995994519408066218}
-  ActorSmallScrolls:
-  - {fileID: 5096973973054907374}
-  - {fileID: 1565719735177034202}
-  - {fileID: 4364931515276360745}
+  ActorBigBag: {fileID: 7995994519408066218}
+  ActorMiddleBag: {fileID: 1133448802555523116}
+  ActorSmallBag: {fileID: 4690859943411081955}
+  ActorSmallScrollOne: {fileID: 5096973973054907374}
+  ActorSmallScrollTwo: {fileID: 1565719735177034202}
+  ActorSmallScrollThree: {fileID: 4364931515276360745}
 --- !u!95 &4173149760160408899
 Animator:
   serializedVersion: 5
