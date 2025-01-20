@@ -16,13 +16,15 @@ public class Scroll : Entity
     [Header("回転する動きの速さ")]
     [SerializeField] private float m_spinSpeed;
 
+    [SerializeField] private GameObject m_scrollObject;
+
     private float time;
 
     private void Update()
     {
         time += Time.deltaTime; //Sin関数用
-        this.transform.position = new Vector3(transform.position.x, 0.3f + Mathf.Sin(m_floatSpeed * time) * m_floatLength, transform.position.z); //Sinで上下にふわふわ動かす
-        this.transform.Rotate(0f, m_spinSpeed * Time.deltaTime, 0f); //少しずつ回転させる
+        m_scrollObject.transform.position = new Vector3(transform.position.x, 0.3f + Mathf.Sin(m_floatSpeed * time) * m_floatLength, transform.position.z); //Sinで上下にふわふわ動かす
+        m_scrollObject.transform.Rotate(0f, m_spinSpeed * Time.deltaTime, 0f); //少しずつ回転させる
     }
 
     public override void InitEntity()
