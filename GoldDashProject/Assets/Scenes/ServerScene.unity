@@ -2692,6 +2692,22 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8300000, guid: 8da31a4004ae6294a83d2c10aa140f8b, type: 3}
     - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
+      propertyPath: seCountDown0
+      value: 
+      objectReference: {fileID: 8300000, guid: f343a28bb30662a48ab65f27a156613e, type: 3}
+    - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
+      propertyPath: seCountDown1
+      value: 
+      objectReference: {fileID: 8300000, guid: 8755b33689edf05428a11891aaa67b70, type: 3}
+    - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
+      propertyPath: seCountDown2
+      value: 
+      objectReference: {fileID: 8300000, guid: 6b605effbb73aef4a99970bb029305cb, type: 3}
+    - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
+      propertyPath: seCountDown3
+      value: 
+      objectReference: {fileID: 8300000, guid: a1e49c095849d224c901b9cc12109f90, type: 3}
+    - target: {fileID: 7314881242810967154, guid: 1c5eff3b29c7fd54cb2745fd7af90344, type: 3}
       propertyPath: mainBGMPlayer
       value: 
       objectReference: {fileID: 354463829}
