@@ -40,7 +40,7 @@ public class PlayerInteractor : MonoBehaviour
     /// パラメータで指定されたカメラを基準にインタラクトを実行するよ。インタラクトの情報はタプルで返却するよ。
     /// </summary>
     /// <returns>成立したインタラクト種別、パケット送信に必要な相手のSessionIDやEntityID、実行が成立した魔法のID、背面取りが成立したパンチのベクトル</returns>
-    public (INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) Interact()
+    public (INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) Interact(PLAYER_STATE state)
     {
         //返り値宣言
         INTERACT_TYPE interactType = INTERACT_TYPE.NONE;
@@ -59,12 +59,15 @@ public class PlayerInteractor : MonoBehaviour
                     //タッチし始めたフレームでないなら処理しない
                     if (t.phase != TouchPhase.Began) continue;
 
+                    //stateに応じてレイヤーマスク作成
+                    LayerMask layerMask = state == PLAYER_STATE.USING_SCROLL ? LayerMask.GetMask("PlayerHand") : LayerMask.GetMask("Default", "ScrollHotbar");
+
                     //カメラの位置からタッチした位置に向けrayを飛ばす
                     RaycastHit hit;
                     Ray ray = m_playerCamera.ScreenPointToRay(t.position);
 
                     //rayがなにかに当たったら調べる
-                    if (Physics.Raycast(ray, out hit, m_interactableDistance))
+                    if (Physics.Raycast(ray, out hit, m_interactableDistance, layerMask))
                     {
                         switch (hit.collider.gameObject.tag)
                         {
@@ -149,12 +152,15 @@ public class PlayerInteractor : MonoBehaviour
             //左クリックされているなら
             if (Input.GetMouseButtonDown(0))
             {
+                //stateに応じてレイヤーマスク作成
+                LayerMask layerMask = state == PLAYER_STATE.USING_SCROLL ? LayerMask.GetMask("PlayerHand") : LayerMask.GetMask("Default", "ScrollHotbar");
+
                 //カメラの位置からクリックした位置に向けrayを飛ばす
                 RaycastHit hit;
                 Ray ray = m_playerCamera.ScreenPointToRay(Input.mousePosition);
 
                 //rayがなにかに当たったら調べる
-                if (Physics.Raycast(ray, out hit, m_interactableDistance))
+                if (Physics.Raycast(ray, out hit, m_interactableDistance, layerMask))
                 {
                     switch (hit.collider.gameObject.tag)
                     {
