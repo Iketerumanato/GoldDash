@@ -408,10 +408,19 @@ public class PlayerControllerV2 : MonoBehaviour
             ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, m_currentChestID);
             Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             UdpGameClient.Send(myHeader.ToByte());
+
+            m_currentChestID = default; //宝箱のIDをデフォルトに戻せば「誰かが先に開けた！」というメッセージが出ない
         }
 
-        //STEPX SEを再生しよう
-        if(isUnlocked) SEPlayer.instance.PlaySEOpenChest();
+        //STEPX 演出しよう
+        if (isUnlocked)
+        {
+            if (!m_hotbarManager.IsAbleToSetMagic())
+            {
+                DisplaySmallMessage("巻物は３つまでしか持てない…"); //インベントリが埋まってたら知らせる
+            }
+            SEPlayer.instance.PlaySEOpenChest();
+        }
 
         //STEP4 開錠できたら少し待ってステートロックを解除しよう
         if (isUnlocked)
