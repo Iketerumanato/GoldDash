@@ -408,10 +408,19 @@ public class PlayerControllerV2 : MonoBehaviour
             ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.OPEN_CHEST_SUCCEED, m_currentChestID);
             Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
             UdpGameClient.Send(myHeader.ToByte());
+
+            m_currentChestID = default; //宝箱のIDをデフォルトに戻せば「誰かが先に開けた！」というメッセージが出ない
         }
 
-        //STEPX SEを再生しよう
-        if(isUnlocked) SEPlayer.instance.PlaySEOpenChest();
+        //STEPX 演出しよう
+        if (isUnlocked)
+        {
+            if (!m_hotbarManager.IsAbleToSetMagic())
+            {
+                DisplaySmallMessage("巻物は３つまでしか持てない…"); //インベントリが埋まってたら知らせる
+            }
+            SEPlayer.instance.PlaySEOpenChest();
+        }
 
         //STEP4 開錠できたら少し待ってステートロックを解除しよう
         if (isUnlocked)
@@ -829,7 +838,11 @@ public class PlayerControllerV2 : MonoBehaviour
                 break;
             case "Scroll":
                 if (!m_isAbleToPickUpGold) return; //金貨を拾えない状態ならreturn
-                if (!m_hotbarManager.IsAbleToSetMagic()) return; //魔法をこれ以上持てないならreturn
+                if (!m_hotbarManager.IsAbleToSetMagic())
+                {
+                    //DisplaySmallMessage("巻物は３つまでしか持てない…");
+                    return; //魔法をこれ以上持てないならreturn
+                }
 
                 //巻物をに触れたというリクエスト送信。（他のプレイヤーが先に触れていた場合、巻物は入手できない。早い者勝ち。）
                 myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.GET_SCROLL, other.GetComponent<Entity>().EntityID);
@@ -868,5 +881,15 @@ public class PlayerControllerV2 : MonoBehaviour
     public void BeControllable()
     { 
         this.State = PLAYER_STATE.NORMAL;
+    }
+
+    public void InterruptOpeningChest(ushort entityID)
+    {
+        if (this.State == PLAYER_STATE.OPENING_CHEST && entityID == m_currentChestID)
+        {
+            //今触っている宝箱が開錠されたら少し待ってステートロックを解除
+            UniTask.RunOnThreadPool(() => CountStateLockTime(1200, StateLockCt), cancellationToken: StateLockCt);
+            DisplaySmallMessage("誰かが先に宝箱を開けた！");
+        }
     }
 }
