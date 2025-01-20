@@ -130,7 +130,7 @@ public class PlayerInteractor : MonoBehaviour
 
                     //次に巻物UIに触ったかどうか調べ、触っていたらインタラクト情報を上書き
                     ray = m_HandCamera.ScreenPointToRay(t.position);
-                    if (Physics.Raycast(ray, out hit))
+                    if (Physics.Raycast(ray, out hit, m_interactableDistance, LayerMask.GetMask("PlayerHand")))
                     {
                         if (hit.collider.gameObject.tag == "UseMagic")
                         {
@@ -221,7 +221,7 @@ public class PlayerInteractor : MonoBehaviour
 
                 //次に巻物UIに触ったかどうか調べ、触っていたらインタラクト情報を上書き
                 ray = m_HandCamera.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hit))
+                if (Physics.Raycast(ray, out hit, m_interactableDistance, LayerMask.GetMask("PlayerHand")))
                 {
                     if (hit.collider.gameObject.tag == "UseMagic")
                     {
