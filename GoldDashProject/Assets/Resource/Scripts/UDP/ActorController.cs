@@ -272,6 +272,13 @@ public class ActorController : MonoBehaviour
     {
         if (this == null) return;//nullなら早期リターン
 
+        // バッグオブジェクトのnullチェック
+        if (ActorBigBag == null || ActorMiddleBag == null || ActorSmallBag == null)
+        {
+            Debug.LogWarning("One or more bag objects are null. Check the references.");
+            return;
+        }
+
         if (gold < 500)
         {
             ActorBigBag.SetActive(false);//バッグ大
@@ -296,6 +303,13 @@ public class ActorController : MonoBehaviour
     void CheckSmallScrollSituation(int scrollNum)
     {
         if (this == null) return;//nullなら早期リターン
+
+        // スクロールオブジェクトのnullチェック
+        if (ActorSmallScrollOne == null || ActorSmallScrollTwo == null || ActorSmallScrollThree == null)
+        {
+            Debug.LogWarning("One or more scroll objects are null. Check the references.");
+            return;
+        }
 
         switch (scrollNum)//仮のプロパティ
         {
