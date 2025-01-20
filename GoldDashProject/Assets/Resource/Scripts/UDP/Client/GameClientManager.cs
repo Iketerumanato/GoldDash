@@ -426,7 +426,7 @@ public class GameClientManager : MonoBehaviour
                                             break;
                                         case (byte)Definer.NDID.ALLOW_MAGIC:
                                             //アクター側の魔法所持数を変更する。
-                                            actorDictionary[receivedActionPacket.targetID].MagicInventr--;
+                                            actorDictionary[receivedActionPacket.targetID].MagicInventry--;
                                             if (receivedActionPacket.targetID == sessionID) //自分に向けた許可なら
                                             {
                                                 playerController.AcceptUsingMagic(); //魔法を実行させる
