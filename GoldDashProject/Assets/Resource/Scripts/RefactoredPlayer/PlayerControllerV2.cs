@@ -316,7 +316,7 @@ public class PlayerControllerV2 : MonoBehaviour
         float runSpeed = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
 
         //STEP4 インタラクトを実行しよう
-        (INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact(this.State);
+        (INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact();
 
         //STEP5 パケット送信が必要なら送ろう
         this.MakePacketFromInteract(interactInfo);
@@ -455,7 +455,7 @@ public class PlayerControllerV2 : MonoBehaviour
         float runSpeed = m_playerMover.MovePlayer(this.State, V_InputHorizontal, V_InputVertical, D_InputHorizontal);
 
         //STEP3 インタラクトを実行しよう
-        (INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact(this.State);
+        (INTERACT_TYPE interactType, ushort targetID, int value, Definer.MID magicID, Vector3 punchHitVec) interactInfo = m_playerInteractor.Interact();
 
         //STEP4 パケット送信が必要なら送ろう
         this.MakePacketFromInteract(interactInfo);
