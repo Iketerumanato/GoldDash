@@ -831,7 +831,7 @@ public class PlayerControllerV2 : MonoBehaviour
                 if (!m_isAbleToPickUpGold) return; //金貨を拾えない状態ならreturn
                 if (!m_hotbarManager.IsAbleToSetMagic())
                 {
-                    DisplaySmallMessage("巻物は３つまでしか持てない…");
+                    //DisplaySmallMessage("巻物は３つまでしか持てない…");
                     return; //魔法をこれ以上持てないならreturn
                 }
 
