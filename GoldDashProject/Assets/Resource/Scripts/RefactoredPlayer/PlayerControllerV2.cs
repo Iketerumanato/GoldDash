@@ -294,9 +294,12 @@ public class PlayerControllerV2 : MonoBehaviour
             m_playerAnimationController.SetAnimationFromState(this.State);
 
             //STEP_X パケットを送信しよう
-            ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.BOOL_MOTION_FLAG_FALSE);
-            Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
-            UdpGameClient.Send(myHeader.ToByte());
+            if (UdpGameClient is not null)
+            {
+                ActionPacket myActionPacket = new ActionPacket((byte)Definer.RID.REQ, (byte)Definer.REID.BOOL_MOTION_FLAG_FALSE);
+                Header myHeader = new Header(this.SessionID, 0, 0, 0, (byte)Definer.PT.AP, myActionPacket.ToByte());
+                UdpGameClient.Send(myHeader.ToByte());
+            }
 
             //STEP_D 最初のフレームではなくなるのでフラグを書き変えよう
             m_isFirstFrameOfState = false;

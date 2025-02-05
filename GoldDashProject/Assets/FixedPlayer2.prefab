@@ -9176,6 +9176,7 @@ MonoBehaviour:
   m_cameraMoveSpeed: 120
   m_camRotateLimitX_Upper: 5
   m_camRotateLimitX_Lower: 45
+  m_camRotateAcceleration: 0.6
 --- !u!114 &2124854647343611678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9197,6 +9198,7 @@ MonoBehaviour:
     magnification: 0.2
   - playerState: 1
     magnification: 2
+  m_rotateAcceleration: 0.6
 --- !u!114 &5204228447290793358
 MonoBehaviour:
   m_ObjectHideFlags: 0
