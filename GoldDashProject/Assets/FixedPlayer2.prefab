@@ -9055,6 +9055,12 @@ MonoBehaviour:
   materialWhite: {fileID: 2100000, guid: 0a02aacf34f61b34ba6f4ec82ea0a8ed, type: 2}
   greenIcon: {fileID: 0}
   whiteIcon: {fileID: 0}
+  ActorBigBag: {fileID: 0}
+  ActorMiddleBag: {fileID: 0}
+  ActorSmallBag: {fileID: 0}
+  ActorSmallScrollOne: {fileID: 0}
+  ActorSmallScrollTwo: {fileID: 0}
+  ActorSmallScrollThree: {fileID: 0}
 --- !u!54 &6971471286411823467
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -9168,7 +9174,8 @@ MonoBehaviour:
   m_playerCamera: {fileID: 3975254240555154285}
   m_shakeEffect: {fileID: 3349987261013257695}
   m_cameraMoveSpeed: 180
-  m_camRotateLimitX: 45
+  m_camRotateLimitX_Upper: 5
+  m_camRotateLimitX_Lower: 45
 --- !u!114 &2124854647343611678
 MonoBehaviour:
   m_ObjectHideFlags: 0
