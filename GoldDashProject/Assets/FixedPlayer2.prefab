@@ -9173,7 +9173,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_playerCamera: {fileID: 3975254240555154285}
   m_shakeEffect: {fileID: 3349987261013257695}
-  m_cameraMoveSpeed: 180
+  m_cameraMoveSpeed: 120
   m_camRotateLimitX_Upper: 5
   m_camRotateLimitX_Lower: 45
 --- !u!114 &2124854647343611678
