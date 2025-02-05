@@ -9218,7 +9218,7 @@ MonoBehaviour:
   m_interactableDistance: 1.5
   m_punchReachableDistance: 1
   m_punchCooldownTime: 1250
-  m_flontRange: 180
+  m_flontRange: 90
   m_chestReachableDistance: 0.5
 --- !u!114 &8054753377550172525
 MonoBehaviour:
