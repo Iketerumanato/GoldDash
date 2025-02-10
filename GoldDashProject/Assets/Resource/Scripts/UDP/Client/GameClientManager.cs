@@ -746,6 +746,7 @@ public class GameClientManager : MonoBehaviour
         catch(System.Exception e)
         {
             Debug.LogException(e);
+            Debug.LogError(e);
         }
     }
 
