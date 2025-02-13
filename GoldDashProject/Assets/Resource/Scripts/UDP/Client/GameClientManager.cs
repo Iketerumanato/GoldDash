@@ -94,6 +94,9 @@ public class GameClientManager : MonoBehaviour
     //プロセッシングロゴアニメーション用
     Sequence CenterLogoAnimation;
     [SerializeField] RectTransform CenterLogoImageTransform;
+
+    private Task taskRcv;
+    private Task taskSendPos;
     #endregion
 
     #region Stateインターフェース
@@ -232,8 +235,8 @@ public class GameClientManager : MonoBehaviour
         //通信用インスタンス作成
         udpGameClient = new UdpGameClient(ref packetQueue, initSessionPass);
 
-        Task.Run(() => ProcessPacket());
-        Task.Run(() => SendPlayerPosition());
+        taskRcv = Task.Run(() => ProcessPacket());
+        taskSendPos = Task.Run(() => SendPlayerPosition());
 
         //State初期化
         ChangeClientState(new Phase0State());

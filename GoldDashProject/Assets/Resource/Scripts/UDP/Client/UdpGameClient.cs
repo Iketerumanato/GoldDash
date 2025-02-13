@@ -32,6 +32,8 @@ public class UdpGameClient : UdpCommnicator
         }
     }
 
+    private Task rcvTask;
+
     public UdpGameClient(ref Queue<Header> output, ushort initSessionPass)
     {
         serverEndpoint = null; //サーバーを見つけていないときはnullになっていることを前提としているので明示的に代入
@@ -52,7 +54,7 @@ public class UdpGameClient : UdpCommnicator
         this.rcvPort = (ushort)localEndPointForReceive.Port;
 
         //パケットの受信を非同期で行う
-        Task.Run(() => Receive(), ReceiveCts);
+        rcvTask = Task.Run(() => Receive(), ReceiveCts);
     }
 
     public override void Send(byte[] sendData)
