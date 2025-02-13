@@ -345,6 +345,17 @@ public class GameClientManager : MonoBehaviour
 
                     Header receivedHeader = packetQueue.Dequeue();
 
+                    //10%の確立でパケットを破棄する
+                    if (inGame)
+                    {
+                        int rand = UnityEngine.Random.Range(0, 100);
+                        if (rand >= 90)
+                        {
+                            Debug.Log("残念だったな！パケットは破棄したぞワッハッハー");
+                            continue;
+                        }
+                    }
+                    
                     Debug.Log("パケットを受け取ったぜ！開封するぜ！");
 
                     Debug.Log($"ヘッダーを確認するぜ！パケット種別は{(Definer.PT)receivedHeader.packetType}だぜ！");
