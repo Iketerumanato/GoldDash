@@ -9055,6 +9055,12 @@ MonoBehaviour:
   materialWhite: {fileID: 2100000, guid: 0a02aacf34f61b34ba6f4ec82ea0a8ed, type: 2}
   greenIcon: {fileID: 0}
   whiteIcon: {fileID: 0}
+  ActorBigBag: {fileID: 0}
+  ActorMiddleBag: {fileID: 0}
+  ActorSmallBag: {fileID: 0}
+  ActorSmallScrollOne: {fileID: 0}
+  ActorSmallScrollTwo: {fileID: 0}
+  ActorSmallScrollThree: {fileID: 0}
 --- !u!54 &6971471286411823467
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -9167,8 +9173,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_playerCamera: {fileID: 3975254240555154285}
   m_shakeEffect: {fileID: 3349987261013257695}
-  m_cameraMoveSpeed: 180
-  m_camRotateLimitX: 45
+  m_cameraMoveSpeed: 120
+  m_camRotateLimitX_Upper: 5
+  m_camRotateLimitX_Lower: 45
+  m_camRotateAcceleration: 0.6
 --- !u!114 &2124854647343611678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9190,6 +9198,7 @@ MonoBehaviour:
     magnification: 0.2
   - playerState: 1
     magnification: 2
+  m_rotateAcceleration: 0.6
 --- !u!114 &5204228447290793358
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9209,7 +9218,7 @@ MonoBehaviour:
   m_interactableDistance: 1.5
   m_punchReachableDistance: 1
   m_punchCooldownTime: 1250
-  m_flontRange: 120
+  m_flontRange: 110
   m_chestReachableDistance: 0.5
 --- !u!114 &8054753377550172525
 MonoBehaviour:

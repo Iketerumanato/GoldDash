@@ -16,9 +16,27 @@ public class PlayerCameraController : MonoBehaviour
     [Header("カメラ回転速度（度／毎秒）")]
     [SerializeField] private float m_cameraMoveSpeed = 1f;
 
-    [Header("カメラの縦方向（X軸中心）回転の角度制限")]
+    [Header("カメラの縦方向（X軸中心）回転の上向き角度制限")]
     [Range(0f, 90f)]
-    [SerializeField] private float m_camRotateLimitX = 90f;
+    [SerializeField] private float m_camRotateLimitX_Upper = 90f;
+
+    [Header("カメラの縦方向（X軸中心）回転の下向き角度制限")]
+    [Range(0f, 90f)]
+    [SerializeField] private float m_camRotateLimitX_Lower = 90f;
+
+    [Header("右スティックを動かしたときの視点移動速度の加速具合")]
+    [Range(0f, 0.99f)]
+    [SerializeField] private float m_camRotateAcceleration = 0f;
+
+    private float AccelerateInput(float input)
+    {
+        float absInput = input < 0 ? -input : input;
+
+        float ret = (m_camRotateAcceleration * absInput * absInput) + ((1 - m_camRotateAcceleration) * absInput);
+        //Debug.Log($"input: {absInput} return: {ret}");
+
+        return input < 0 ? -ret : ret;
+    }
 
     //現在のカメラのオイラー角をxのみ保存
     private float m_rotationX;
@@ -42,8 +60,8 @@ public class PlayerCameraController : MonoBehaviour
             //ジョイスティックの入力をオイラー角（〇軸を中心に△度回転、という書き方）にする
             //前提：カメラはZ軸の負の方向を向いている
             //垂直の入力を使って、カメラのみ、X軸中心回転を行う。
-            m_rotationX -= D_InputVertcal * m_cameraMoveSpeed * Time.deltaTime; //Unityは左手座標系なので、上下の回転角度（X軸中心）にはマイナスをかけなければならない
-            m_rotationX = Mathf.Clamp(m_rotationX, -m_camRotateLimitX, m_camRotateLimitX); //縦方向(X軸中心)回転には角度制限をつけないと宙返りしてしまう
+            m_rotationX -= AccelerateInput(D_InputVertcal) * m_cameraMoveSpeed * Time.deltaTime; //Unityは左手座標系なので、上下の回転角度（X軸中心）にはマイナスをかけなければならない
+            m_rotationX = Mathf.Clamp(m_rotationX, -m_camRotateLimitX_Upper, m_camRotateLimitX_Lower); //縦方向(X軸中心)回転には角度制限をつけないと宙返りしてしまう
             m_playerCamera.transform.eulerAngles = new Vector3(m_rotationX, m_playerCamera.transform.eulerAngles.y, 0f); //m_playerCamera.transform.eulerAngles.yは親の回転に委ねているので弄らない
         }
     }

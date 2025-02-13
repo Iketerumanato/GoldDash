@@ -650,9 +650,13 @@ public class GameClientManager : MonoBehaviour
                                             break;
                                         case (byte)Definer.EDID.DESTROY_ENTITY:
                                             //エンティティを動的ディスパッチしてオーバーライドされたDestroyメソッド実行
-                                            entityDictionary[receivedActionPacket.targetID].DestroyEntity();
+                                            Entity entity;
+                                            if (entityDictionary.TryGetValue(receivedActionPacket.targetID, out entity)) //例外防止
+                                            { 
+                                                entity.DestroyEntity();
+                                                entityDictionary.Remove(receivedActionPacket.targetID);
+                                            }
                                             playerController.InterruptOpeningChest(receivedActionPacket.targetID);
-                                            entityDictionary.Remove(receivedActionPacket.targetID);
                                             break;
                                         case (byte)Definer.EDID.GIVE_MAGIC:
                                             //アクター側の魔法所持数を変更する。
@@ -742,6 +746,7 @@ public class GameClientManager : MonoBehaviour
         catch(System.Exception e)
         {
             Debug.LogException(e);
+            Debug.LogError(e);
         }
     }
 

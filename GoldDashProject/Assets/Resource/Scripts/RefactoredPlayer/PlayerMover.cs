@@ -14,6 +14,19 @@ public class PlayerMover : MonoBehaviour
     [Header("特定のStateで移動速度に倍率をかけたい場合、ここから設定しておく")]
     [SerializeField] private List<MoveSpeedMagnification> m_moveSpeedMagnificationsList;
 
+    [Header("左スティックを動かしたときの視点移動速度の加速具合")]
+    [Range(0f, 0.99f)]
+    [SerializeField] private float m_rotateAcceleration = 0f;
+    private float AccelerateInput(float input)
+    {
+        float absInput = input < 0 ? -input : input;
+
+        float ret = (m_rotateAcceleration * absInput * absInput) + ((1 - m_rotateAcceleration) * absInput);
+        Debug.Log($"input: {absInput} return: {ret}");
+
+        return input < 0 ? -ret : ret;
+    }
+
     //KeyValuePairはインスペクタで表示できない（Serializableでない）ので自前のペアを作って使う
     [Serializable]
     private class MoveSpeedMagnification
@@ -53,7 +66,7 @@ public class PlayerMover : MonoBehaviour
             //ジョイスティックの入力をオイラー角（〇軸を中心に△度回転、という書き方）にする
             //前提：カメラはZ軸の負の方向を向いている
             //水平入力を使って、プレイヤーのみ、Y軸中心回転を行う。
-            m_rotationY += D_InputHorizontal * m_playerRorateSpeed * Time.deltaTime; //Unityは左手座標系なので、左右の回転角度（Y軸中心）は加算でいい
+            m_rotationY += AccelerateInput(D_InputHorizontal) * m_playerRorateSpeed * Time.deltaTime; //Unityは左手座標系なので、左右の回転角度（Y軸中心）は加算でいい
             this.transform.eulerAngles = new Vector3(0f, m_rotationY, 0f);
         }
         //プレイヤーの移動量
